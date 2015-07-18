@@ -1,0 +1,27 @@
+{% extends base_template %} 
+{% load i18n %}
+{% load bugtracker %}
+
+{% block bugtracker_title %}
+    {{ issue.key }}
+    {{ issue.summary }}
+{% endblock %}
+
+{% block bugtracker_caption %}
+    {% if issue.parent_bug.all %}
+        {% for parent_issue in issue.parent_bug.all %}
+            <a {% if iframe %}target="_parent" {%endif%}href="{% bug_url parent_issue.bug.id %}">
+                {{ parent_issue.bug.key }} /
+            </a>
+        {% endfor %}
+    {% endif %}
+    <a {% if iframe %}target="_parent" {%endif%}href="{% bug_url issue.id %}">
+        {{ issue.key }}
+    </a>
+    {{ issue.summary }}
+{% endblock %}
+
+{% block bugtracker_body %}
+    {% include "bugtracker/snippets/issue.html" %}
+{% endblock %}
+    

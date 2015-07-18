@@ -1,0 +1,75 @@
+- extends 'base.haml'
+- load i18n
+- load url from future
+
+- block extra_scripts
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}ajaxuploader/js/fileuploader.js'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}ajaxuploader/css/fileuploader.css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-players.css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-forum.css'}
+    
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: ''}
+            {% trans "Personal cabinet" %}
+                
+- block caption
+    {% trans "Personal cabinet" %}
+    
+- block content
+    #tabs
+        %ul
+            %li
+                %a{href: '#main'}
+                    %span
+                        {% trans "Main" %}
+            %li
+                %a{href: '#pm_messages'}
+                    %span
+                        {% trans "Messages" %}
+            %li
+                %a{href: '{% url "players:profile_favorites" %}'}
+                    %span
+                        {% trans "Favorites" %}
+            - if show_stories
+                %li
+                    %a{href: '{% url "players:profile_stories" %}'}
+                        %span
+                            {% trans "Stories" %}
+            - if show_games
+                %li
+                    %a{href: '{% url "players:profile_games" %}'}
+                        %span
+                            {% trans "Games" %}
+            %li
+                %a{href: '#invites'}
+                    %span
+                        {% trans "Invites" %}
+                        - if new_invites
+                            %span.new_invites_count.badge
+                                = new_invites.count
+            %li
+                %a{href: '#settings'}
+                    %span
+                        {% trans "Settings" %}
+            - if request.user.bugs_reported.all
+                %li
+                    %a{href: '{% url "players:found_bugs" %}'}
+                        %span
+                            {% trans "Problems" %}
+            %li
+                %a{href: '{% url "players:profile_subscriptions" %}'}
+                    %span
+                        {% trans "Subscriptions" %}
+        #main
+            - include "profile/main.haml"
+        #pm_messages
+            - include "profile/messages.haml"
+        #settings
+            - include "profile/settings.haml"
+        #invites
+            - include "profile/invites.haml"
+    <script>
+        $('#tabs').tabs();
+    </script>

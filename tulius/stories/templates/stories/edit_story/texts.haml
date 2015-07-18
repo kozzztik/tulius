@@ -1,0 +1,43 @@
+- extends 'base_cataloged_navig_game.haml'
+- load i18n
+
+- block page_scripts
+    - include 'snippets/advanced_editor.html'
+    
+- block page_content
+    %form{'enctype': 'multipart/form-data', 'method': 'POST', 'class': '{{ form.html_class }} form-horizontal'}
+        - csrf_token
+        = form.media
+        = form.management_form
+        - if form.non_field_errors
+            .alert.alert-error
+                = form.non_field_errors
+        #tabs
+            %ul
+                - for field in form
+                    %li
+                        %a{'href': '\#{{ field.name }}'}
+                            %span
+                                {{ field.label }}
+            - for field in form
+                %div{'id': '{{ field.name }}'}
+                   - if field.errors
+                       .help-inline
+                           = field.errors
+                   - if field.help_text
+                      .help-block
+                          = field.help_text
+                   = field
+        - block form_actions
+            %fieldset
+                .form-actions
+                    %button.submit.btn.btn-primary{'type': 'submit'}
+                        - if form_submit_title
+                            {% trans form_submit_title %}
+                        - else
+                            {% trans "edit" %}
+                    %button.submit.btn{'type': 'reset'}
+                        {% trans "reset" %}
+    <script>
+        $('#tabs').tabs();
+    </script>

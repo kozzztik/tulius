@@ -1,0 +1,45 @@
+{% load i18n %}
+
+<table class="table table-striped">
+    {% for comment in issue.comments.all %}
+        <tr>
+            <td style="text-align: left">
+                {% if comment.jira_user %}
+                    {% if comment.jira_user.small_icon %}
+                        <img src="{{ comment.jira_user.small_icon.url }}" />
+                    {% endif %}
+                {% endif %}
+                {% if comment.user %}
+                    <a href="{{ comment.user.get_absolute_url }}">
+                        {{ comment.user }}
+                    </a>
+                {% else %}
+                    {% include 'bugtracker/snippets/issue/jira_user.html' with jira_user=comment.jira_user %}
+                {% endif %}
+                {% trans "added a comment"%} -
+                {{ comment.create_time }}
+                <br />
+                {{ comment.body|safe|linebreaks }}
+            </td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td style="text-align: left">
+                {% trans "This issue is not commented yet." %}
+            </td>
+        </tr>
+    {% endfor %}
+    {% if add_comment_form %}
+        <tr>
+            <td style="text-align: left">
+                <form id="commentForm" enctype="multipart/form-data" method="POST" action="?action=add_comment">
+                    {% csrf_token %}
+                    {{ add_comment_form.comment }}
+                    <button class="submit btn btn-primary">
+                        {% trans "Add comment" %}
+                    </button>
+                </form>
+            </td>
+        </tr>
+    {% endif %}
+</table>

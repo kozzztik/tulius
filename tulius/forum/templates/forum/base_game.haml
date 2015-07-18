@@ -1,0 +1,71 @@
+- extends 'base_game.haml'
+- load i18n
+
+- block additional_styles
+    %link{rel: 'stylesheet', href:'{{ MEDIA_URL }}css/tulius-forum.css', type: 'text/css'}
+    - block plugin_styles
+    
+- block additional_scripts
+    %script{type: 'text/javascript'}
+        var delete_thread_options = {
+            'room_header': '{% trans "Delete room" %}', 
+            'thread_header': '{% trans "Delete thread" %}',
+            'comment_header': '{% trans "Delete comment" %}',
+            'room_url': '{{ forum_site.urlizer.delete_thread }}', 
+            'thread_url': '{{ forum_site.urlizer.delete_comment }}',
+            'comment_url': '{{ forum_site.urlizer.delete_comment }}',
+            };
+
+- block title
+    - if parent_thread
+        = parent_thread.title
+    - else
+        {% trans "forums" %}
+
+- block caption
+    - if parent_thread
+        = parent_thread.title
+    - else
+        {% trans "forums" %}
+
+- block breadcrumbs
+        %li
+            .divider
+            %a{href: "{{ forum_site.urlizer.index }}"}
+                {% trans "forums" %}
+        - for ancestor in parent_thread.get_ancestors
+            %li
+                .divider
+                %a{href: "{{ ancestor.get_absolute_url }}"}
+                    = ancestor.title|capfirst
+        - if parent_thread
+            %li
+                .divider
+                %a{href: "{{ parent_thread.get_absolute_url }}"}
+                    = parent_thread.title|capfirst
+        - if form    
+            %li
+                .divider
+                %a{href: "{{ form.url }}"}
+                    = form.caption|capfirst
+
+- block custom_content
+    - block before_actions
+    
+    - block upper_actions
+        - if parent_thread
+            - include forum_site.templates.actions
+    
+    - block forum_content
+    
+    - block after_actions
+    
+    - block delete_post_form
+        - if parent_thread
+            - include forum_site.templates.delete_thread_form
+            
+- block footer_content
+    - block online_users
+        - if parent_thread
+            - with bottom_online_users=1
+                - include forum_site.templates.online_users

@@ -1,0 +1,54 @@
+- extends 'base_cataloged_navig_game.haml'
+- load i18n
+- load url from future
+    
+- block page_scripts
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}sortable/sortable.js'}
+
+- block page_content
+    %table.table
+        %thead
+            %tr
+                %th{'width': '120'}
+                    {% trans "avatar" %}
+                %th
+                    {% trans "name" %}
+                %th
+                    {% trans "character" %}
+                %th
+                    {% trans "description" %}
+        %tbody.sortable
+            - for role in variation.get_roles
+                %tr{id: 'role_{{ role.id }}'}
+                    %td
+                        - if role.avatar.image
+                            %a{'href': '{{ role.avatar.get_absolute_url }}'}
+                                %img{'src': '{{ role.avatar.image.url }}', 'height': '100', 'width': '100'}
+                    %td
+                        .dropdown
+                            %a.dropdown-toggle{'data-toggle': 'dropdown', 'href': '#'}
+                                = role.name
+                                .caret
+                            %ul.dropdown-menu
+                                %li
+                                    %a{href: '{{ role.get_absolute_url }}'}
+                                        {% trans "Edit" %}
+                                %li
+                                    %a{href: '{{ role.get_text_url }}'}
+                                        {% trans "Edit role text" %}
+                                %li
+                                    %a{href: '{% url "stories:role_view_text" role.id %}'}
+                                        {% trans "View role text" %}
+                                %li
+                                    %a.role-delete-link{href: '#', roleid: '{{ role.id }}'}
+                                        {% trans "Delete" %}
+                    %td
+                        - if role.character
+                            %a{'href': '{{ role.character.get_absolute_url }}'}
+                                = role.character.name
+                    %td
+                        = role.description
+    %br
+    %a.submit.btn.btn-primary{href: '{% url "stories:add_role" variation.id %}'}
+        {% trans "Add role" %}
+    - include 'stories/snippets/delete_role.haml'

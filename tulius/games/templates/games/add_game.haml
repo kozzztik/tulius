@@ -1,0 +1,12 @@
+- extends 'base_cataloged_navig_game.haml'
+- load i18n
+
+- block page_content
+    %h4
+        {% trans "creating a game with variation:"%}
+    = variation
+    %h4
+        {% trans "story" %}
+    = variation.story
+    - include "snippets/form.haml"
+        

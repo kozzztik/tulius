@@ -1,0 +1,29 @@
+- extends 'base.haml'
+- load i18n
+- load url from future
+
+- block extra_scripts
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-players.css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-forum.css'}
+
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: '{% url "players:profile" %}'}
+           {% trans "Personal cabinet" %}
+    %li
+        .divider
+        %a{href: ''}
+            {% trans "Played games and characters" %}
+                
+- block caption
+    {% trans "Played games and characters"%}
+    
+- block content
+    - load pagination_tags
+    - autopaginate played_roles roles_on_page
+        - paginate
+
+        - include 'profile/snippets/played_table.haml'
+
+        - paginate

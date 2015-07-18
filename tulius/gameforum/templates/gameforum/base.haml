@@ -1,0 +1,50 @@
+- extends 'forum/base_game.haml'
+- load i18n
+
+- block plugin_styles
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-forum.css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-stories.css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-games.css'}
+    %script{type: 'text/javascript'}
+        var trustmarks_url = "{{ forum_site.urlizer.trustmarks }}";
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}gameforum/trustmarks.js'}
+    
+- block breadcrumbs
+    %li
+        .divider
+        - if parent_thread.game
+            %a{href: '{{ parent_thread.game.get_absolute_url }}'}
+                {% trans "Game" %}
+        - else
+            %a{href: '{{ parent_thread.variation.get_absolute_url }}'}
+                {% trans "variation" %}
+    - for ancestor in parent_thread.get_ancestors
+        %li
+            .divider
+            %a{href: "{{ ancestor.get_absolute_url }}"}
+                = ancestor.title
+    - if parent_thread
+        %li
+            .divider
+            %a{href: "{{ parent_thread.get_absolute_url }}"}
+                = parent_thread.title
+    - if form
+        %li
+            .divider
+            %a{href: "{{ form.url }}"}
+                = form.caption|capfirst
+
+- block before_actions
+    - if variation.game.top_banner
+        - if parent_thread.room
+            .story-banner.hidden-phone
+                %img{src: '{{ variation.game.top_banner.url }}'}
+                
+- block after_actions
+    - if parent_thread
+        - with dropupmenu=1
+            - include forum_site.templates.actions
+    - if variation.game.bottom_banner
+        - if parent_thread.room
+            .story-banner.hidden-phone
+                %img{src: '{{ variation.game.bottom_banner.url }}'}

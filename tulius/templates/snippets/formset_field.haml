@@ -1,0 +1,12 @@
+%fieldset.well.control-group{'class': '{% if field.errors %} error {% endif %}{% if field.field.required %} required {% endif %}'}
+	.control-label
+		%label{'for': '{{ field.auto_id }}'}
+			= field.label
+	.controls
+		= field
+		- if field.errors
+			.help-inline
+				= field.errors
+		- if field.help_text
+			.help-block
+				= field.help_text

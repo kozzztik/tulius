@@ -1,0 +1,39 @@
+- extends 'base_game.haml'
+- load i18n
+- load url from future
+
+- block title
+    {% trans "Confirm deletion" %}
+
+- block caption
+    {% trans "Confirm deletion" %}
+
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: '{% url "stories:edit_story_variations" object.story.id %}'}
+            = object.story
+    %li
+        .divider
+        %a{href: ''}
+            {% trans "Confirm deletion" %}
+
+- block content
+    %form.form-horizontal{method: 'POST'}
+        - csrf_token
+        %fieldset.control-group
+            .controls
+                %h2
+                    {% trans "Are you shure you want to delete variation:"%}
+                %h3
+                    = object
+                %h2
+                    {% trans "from story:"%}
+                %h3
+                    = object.story
+        %fieldset
+            .form-actions
+                %button.submit.btn.btn-primary{type: 'submit'}
+                    {% trans "Delete" %}
+                %a.submit.btn{href: '{% url "stories:edit_story_variations" object.story.id %}'}
+                    {% trans "Cancel" %}

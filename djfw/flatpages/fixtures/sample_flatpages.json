@@ -1,0 +1,33 @@
+[
+    {
+        "pk": 1,
+        "model": "flatpages.flatpage",
+        "fields": {
+            "is_enabled": true,
+            "title": "A Flatpage",
+            "url": "/flatpage/",
+            "content": "Isn't it flat!"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "flatpages.flatpage",
+        "fields": {
+            "is_enabled": true,
+            "title": "Deep Flatpage",
+            "url": "/location/flatpage/",
+            "content": "Isn't it flat and deep?"
+        }
+    },
+
+    {
+        "pk": 3,
+        "model": "flatpages.flatpage",
+        "fields": {
+            "is_enabled": false,
+            "title": "Disabled Flatpage",
+            "url": "/sekrit/",
+            "content": "Isn't it disabled!"
+        }
+    }
+]

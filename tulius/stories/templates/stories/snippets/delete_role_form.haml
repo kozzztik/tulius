@@ -1,0 +1,7 @@
+- load i18n 
+.ajax-form
+    .modal-body
+        - if form.non_field_errors
+            .alert.alert-error
+                = form.non_field_errors
+        -include 'snippets/form_fields_only.haml'

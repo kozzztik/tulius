@@ -1,0 +1,32 @@
+{% load url from future %}
+{% load i18n %}
+        $(function(){
+            var uploader = new qq.FileUploader({
+                {% if avatar %}
+                action: "{% url 'stories:reload_avatar' avatar.id %}",
+                {% else %}
+                action: "{% url 'stories:add_avatar' story.id %}",
+                {% endif %}
+                element: $('#file-uploader')[0],
+                
+                multiple: false,
+                onComplete: function() {
+                    window.location.reload();
+                },
+                onAllComplete: function(uploads) {
+                },
+                params: {
+                    'csrf_token': '{{ csrf_token }}',
+                    'csrf_name': 'csrfmiddlewaretoken',
+                    'csrf_xname': 'X-CSRFToken',
+                },
+            });
+            var elem = uploader._button._element.firstChild
+            if(elem){
+                {% if avatar %}
+                elem.textContent='{% trans "Reload avatar" %}';
+                {% else %}
+                elem.textContent='{% trans "Add avatar" %}';
+                {% endif %}
+            }
+        });

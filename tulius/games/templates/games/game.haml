@@ -1,0 +1,100 @@
+- extends 'base_cataloged_navig_game.haml'
+- load i18n
+
+- block extra_scripts
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-stories.css'}
+
+- block title
+    = game.name
+
+- block caption
+    = game.name
+                
+- block content
+    .pull-right
+        - if game.enter_url
+            %a.submit.btn.btn-primary{href: '{{ game.enter_url }}'}
+                {% trans "enter" %}
+        - if game.edit_url
+            %a.submit.btn.btn-primary{href: '{{ game.edit_url }}'}
+                {% trans "edit" %}
+        - if game.send_request
+            %a.submit.btn.btn-primary{href: '{{ game.get_request_url }}'}
+                {% trans "Make request" %}
+    %ul.inline-list
+        - if game.variation.story.story.genres.all
+            - for genre in game.variation.story.genres.all
+                %li
+                    = genre
+        - if authors
+            %li.inline-list-ignore
+                {% trans "Authors:" %}
+            - for author in authors
+                %li
+                    = author
+        %li.inline-list-ignore
+            {% trans "story" %}
+            :
+        %li
+            %a{href: '{{ game.variation.story.get_absolute_url }}'}
+                = game.variation.story
+
+    - if game.top_banner
+        .story-banner
+            %img{src: '{{ game.top_banner.url }}'}
+    #tabs
+        %ul
+            %li
+                %a{href: '#introduction'}
+                    %span
+                        {% trans "Introduction" %}
+            - if roles
+                %li
+                    %a{href: '#characters'}
+                        %span
+                            {% trans "Characters" %}
+            - if materials
+                %li
+                    %a{href: '#materials'}
+                        %span
+                            {% trans "Materials" %}
+        #introduction
+            {{ game.introduction|safe }}
+        - if materials
+            #materials
+                %ul
+                    - for material in materials
+                        %li
+                            %h3
+                                %a{href: '{{ material.url }}'}
+                                    = material
+        - if roles
+            #characters
+                %table.wide.story-character
+                    - for role in roles
+                        - if forloop.counter0|divisibleby:"2" or forloop.first
+                            <tr>
+                        %td
+                            %table.wide
+                                %tr
+                                    - if role.avatar
+                                        %td.character-avatar
+                                            %img{align: 'left', src: '{{ role.avatar.image.url }}'}
+                                        %td.character-text
+                                            %h3
+                                                - if role.text_url
+                                                    %a{href: '{{ role.text_url }}'}
+                                                        = role.name
+                                                - else
+                                                    = role.name
+                                            = role.description
+                        - if forloop.last and forloop.counter0|divisibleby:"2"
+                            %td
+                        - if forloop.last or not forloop.counter0|divisibleby:"2"
+                            </tr>
+    - if game.bottom_banner
+        .story-banner
+            %img{src: '{{ game.bottom_banner.url }}'}
+    <script>
+        $('#tabs').tabs();
+    </script>

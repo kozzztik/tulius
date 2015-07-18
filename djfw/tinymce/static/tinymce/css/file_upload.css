@@ -1,0 +1,59 @@
+#files_table {
+    table-layout: fixed;
+    width: 550px;
+    border-spacing: 5px;
+    border-collapse: separate;
+}
+
+#files_table > tbody > tr > td {
+    width: 20%;
+    vertical-align: top;
+    text-align: center;
+    border: 1px solid rgb(200, 200, 208);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#files_table img {
+    max-width: 75px;
+    max-height: 75px;
+}
+
+.image-container {
+    height: 85px;
+    width: 85px;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.file-container {
+    table-layout: fixed;
+    width: 85px;
+}
+
+#table-container{
+    padding: 5px;
+    border: 1px solid rgb(200, 200, 208);
+    height: 390px;
+    overflow-y: scroll;
+    margin-bottom: 10px;
+    background-color: white;
+}
+
+.qq-uploader .qq-upload-button {
+    float: right;
+    border-radius: 8px;
+    margin-right: 30px;
+    background-color: rgb(91, 183, 91);
+}
+.qq-uploader .qq-upload-button:hover {
+    background-color: rgb(81, 163, 81);
+}
+
+.fileuploaderbody .title {
+    font-size: 14px;
+    color: black;
+    padding-left: 15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}

@@ -1,0 +1,130 @@
+- extends 'base.haml'
+- load i18n
+
+- block breadcrumbs
+    %ul.breadcrumb
+        %li
+            - include 'home_link.haml'
+
+- block page_styles
+    %link{href: '/media/home/css.css', type: 'text/css', rel: 'stylesheet'}
+    %link{href: '/media/home/home.css', type: 'text/css', rel: 'stylesheet'}
+
+- block body_class
+    home_page
+
+- block body_main_area
+    .home-body.hidden-phone
+        %table.container.body_main_area
+            %tr
+                %td.home-picture-column
+                    %table
+                        %tr
+                            %td{width: 260}
+                                %header
+                                    %a{href:'/'}
+                                        %h1#logo.span4
+                            %td
+                                %ul#links.nav.nav-pills.nav-stacked.span4
+                                    %li
+                                        %a{href:'/games/'}
+                                            {% trans "games" %}
+                                    %li
+                                        %a{href:'{% url "stories:index" %}'}
+                                            {% trans "stories" %}
+                                    %li
+                                        %a{href:'{% url "forum:index" %}'}
+                                            {% trans "forum" %}
+                                    %li
+                                        %a{href:'{% url "news:index" %}'}
+                                            {% trans "news" %}
+                                    %li
+                                        %a{href:'{% url "players:profile" %}'}
+                                            {% trans "profile" %}
+                        %tr
+                            %td{colspan: '2'}
+                %td#right_blocks
+                    #news.gameset
+                        - if news
+                            %a{href:'/news'}
+                                %h2
+                                    {% trans "News" %}
+                                %ul.announcements
+                                    - for newsitem in news
+                                        %li
+                                            %a{href:'{{ newsitem.get_absolute_url }}'}
+                                                %h3
+                                                    = newsitem.title
+                                                %div.announcement
+                                                    = newsitem.announcement|safe
+                    #new_games.gameset
+                        - if announced_games
+                            %h2
+                                %a{href:'{% url "games:announced_games" %}'}
+                                    {% trans "Announced games" %}
+                            - with games=announced_games
+                                - include 'snippets/index_games.haml'
+                    #announced_games.gameset
+                        - if request_accepting_games
+                            %h2
+                                %a{href:'{% url "games:request_accepting_games" %}'}
+                                    {% trans "Registration opened" %}
+                            - with games=request_accepting_games
+                                - include 'snippets/index_games.haml'
+                    #awaiting_start_games.gameset
+                        - if awaiting_start_games
+                            %h2
+                                %a{href:'{% url "games:awaiting_start_games" %}'}
+                                    {% trans "Awaiting start" %}
+                            - with games=awaiting_start_games
+                                - include 'snippets/index_games.haml'
+                    #current_games.gameset
+                        - if current_games
+                            %h2
+                                %a{href:'{% url "games:current_games" %}'}
+                                    {% trans "Current games" %}
+                            - with games=current_games
+                                - include 'snippets/index_games.haml'
+    #content-center.container.visible-phone
+      .content.simple
+        %h3
+            %a{href: '{% url "games:index" %}'}
+                {% trans "Games" %}
+        %ul
+            %li
+                %a{href: '{% url "games:announced_games" %}'}
+                    {% trans "Announced games" %}
+            %li
+                %a{href: '{% url "games:request_accepting_games" %}'}
+                    {% trans "Accepting requests" %}
+            %li
+                %a{href: '{% url "games:awaiting_start_games" %}'}
+                    {% trans "Awaiting start" %}
+            %li
+                %a{href: '{% url "games:current_games" %}'}
+                    {% trans "Current games" %}
+            %li
+                %a{href: '{% url "games:completed_opened_games" %}'}
+                    {% trans "Opened completed" %}
+        %h3
+            %a{href: '{% url "players:index" %}'}
+                {% trans "Players" %}
+        %h3
+            %a{href: '{% url "stories:index" %}'}
+                {% trans "Stories" %}
+        %h3
+            %a{href: '{% url "forum:index" %}'}
+                {% trans "Forums" %}
+        %h3
+            %a{href: '{% url "news:index" %}'}
+                {% trans "News" %}
+        %h3
+            %a{href: '{% url "flatpages" %}'}
+                {% trans "Flatpages" %}
+        %ul
+            - for flatpage in flatpages
+                %li
+                    %a{href: '{{ flatpage.url }}'}
+                        = flatpage.title
+    - block footer
+        {{ block.super }} 

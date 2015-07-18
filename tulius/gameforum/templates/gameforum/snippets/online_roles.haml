@@ -1,0 +1,24 @@
+- load i18n
+- if bottom_online_users
+    .pull-right
+        - if request.user.game_inline = 1
+            {% trans "Messages:" %}
+            = variation.comments_count
+        - else
+            {% trans "Current time:"%}
+            - now "D, j M Y, H:i"
+- if online_roles
+    .online-users
+        - if parent_thread.room
+            - if parent_thread.parent
+                {% trans "In this room:" %}
+            - else
+                {% trans "Online characters:" %}
+        - else
+            {% trans "In this thread:" %}
+        %ul.comma-list
+            - for role in online_roles
+                - if role.show_in_character_list
+                    <li><a data-toggle="modal" href="#role{{ role.id }}">{{ role }}</a></li>
+                - else
+                    <li>{{ role }}</li>

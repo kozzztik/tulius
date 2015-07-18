@@ -1,0 +1,123 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-04-27 15:54+0400\n"
+"PO-Revision-Date: 2012-04-27 15:56\n"
+"Last-Translator:   <admin@example.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"X-Translated-Using: django-rosetta 0.6.6\n"
+
+#: models.py:11
+msgid "private message"
+msgstr "личное сообщение"
+
+#: models.py:12
+msgid "private messages"
+msgstr "личные сообщения"
+
+#: models.py:15
+msgid "sender"
+msgstr "отправитель"
+
+#: models.py:16
+msgid "receiver"
+msgstr "получатель"
+
+#: models.py:17
+msgid "is read"
+msgstr "прочитано"
+
+#: models.py:18
+msgid "removed by sender"
+msgstr "удалено отправителем"
+
+#: models.py:19
+msgid "removed by receiver"
+msgstr "удалено получателем"
+
+#: models.py:20
+msgid "message body"
+msgstr "тело сообщения"
+
+#: views.py:41
+msgid "answer sent"
+msgstr "ответ отправлен"
+
+#: views.py:56 views.py:72
+msgid "message sent"
+msgstr "сообщение отправлено"
+
+#: templates/pm/inbox.haml:10 templates/pm/index.haml:10
+#: templates/pm/index.haml.py:14 templates/pm/message_create.haml:10
+#: templates/pm/message_details.haml:10 templates/pm/message_history.haml:10
+#: templates/pm/outbox.haml:10
+msgid "Private messages"
+msgstr "Личные сообщения"
+
+#: templates/pm/inbox.haml:13 templates/pm/inbox.haml.py:16
+#: templates/pm/index.haml:20 templates/pm/message_details.haml:14
+msgid "Inbox"
+msgstr "Входящие"
+
+#: templates/pm/inbox.haml:23 templates/pm/message_history.haml:31
+msgid "Your inbox is empty"
+msgstr "В ваших входящих нет писем"
+
+#: templates/pm/index.haml:23 templates/pm/message_details.haml:23
+#: templates/pm/message_details.haml:26 templates/pm/outbox.haml:13
+#: templates/pm/outbox.haml.py:16
+msgid "Outbox"
+msgstr "Исходящие"
+
+#: templates/pm/message_create.haml:13 templates/pm/message_create.haml:16
+msgid "Write"
+msgstr "Написать"
+
+#: templates/pm/message_create.haml:23 templates/pm/message_details.haml:44
+#: templates/pm/message_history.haml:25
+msgid "Submit"
+msgstr "Отправить"
+
+#: templates/pm/message_details.haml:17
+msgid "Message to"
+msgstr "Адресат"
+
+#: templates/pm/message_details.haml:29 templates/pm/message_details.haml:33
+msgid "Message from"
+msgstr "Отправитель"
+
+#: templates/pm/message_history.haml:13 templates/pm/message_history.haml:17
+msgid "Mail history with"
+msgstr "Переписка с"
+
+#: templates/pm/outbox.haml:23
+msgid "Your outbox is empty"
+msgstr "В ваших исходящих нет писем"
+
+#: templates/pm/snippets/message_list.haml:7
+msgid "Sender"
+msgstr "Отправитель"
+
+#: templates/pm/snippets/message_list.haml:9
+msgid "Receiver"
+msgstr "Получатель"
+
+#: templates/pm/snippets/message_list.haml:11
+msgid "Message"
+msgstr "Сообщение"
+
+#: templates/pm/snippets/message_list.haml:13
+msgid "Sent at"
+msgstr "Отправлено"

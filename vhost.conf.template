@@ -1,0 +1,27 @@
+<VirtualHost *:80>
+	ServerName tulius.com
+	ServerAlias tulius.co-de.org
+
+	ErrorLog %PWD%/error.log
+	
+	Alias /static %PWD%/tulius/static
+	Alias /favicon.ico %PWD%/tulius/media/favicon.ico
+    Alias /robots.txt %PWD%/tulius/media/robots.txt
+    
+	<Directory /static>
+		Include "%PWD%/dir.conf"
+	</Directory>
+
+	Alias /media %PWD%/tulius/media
+	<Directory /media>
+		Include "%PWD%/dir.conf"
+	</Directory>
+
+	WSGIScriptAlias / %PWD%/bin/apache.py
+
+	<Directory />
+		Options +ExecCGI -Indexes
+		Order allow,deny
+		Allow from all
+	</Directory>
+</VirtualHost>

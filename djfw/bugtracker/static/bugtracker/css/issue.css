@@ -1,0 +1,41 @@
+.issue-table { width: 100%; }
+
+.issue-table > tbody > tr > td {
+    vertical-align: top;
+
+}
+
+.issue-table > tbody > tr > td table {
+    margin-bottom: 10px;
+}
+
+.issue-table > tbody > tr > td > table tbody tr td {
+    padding: 3px;
+}
+
+.small-icon {
+    height: 16px;
+}
+
+.links-table {
+    width: 100%;
+}
+
+.issue-details {
+    width: 100%;
+}
+
+.issue-right-panel {
+    width: 100%;
+    padding: 5px;
+}
+
+.issue-table h4 { 
+    margin-bottom: 5px; 
+    margin-top: 5px; 
+}
+
+#commentForm textarea, .form-horizontal textarea {
+    width: 100%;
+    height: 75px;
+}

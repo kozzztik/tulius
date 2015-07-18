@@ -1,0 +1,48 @@
+- extends 'html5_empty.haml'
+- load i18n
+
+- block title
+    {% trans "Uploaded files"%}
+
+- block page_styles
+    %link{rel: 'stylesheet', href:'{{ STATIC_URL }}tinymce/css/file_upload.css', type: 'text/css'}
+    %link{rel: 'stylesheet', href:'{{ STATIC_URL }}tinymce/css/fileuploader.css', type: 'text/css'}
+
+- block additional_scripts
+    %script{'type': 'text/javascript', 'src': '{{ STATIC_URL }}djfw/jquery/js/jquery-1.8.2.min.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}tinymce/js/fileuploader.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}tinymce/jscripts/tiny_mce/tiny_mce_popup.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}tinymce/js/file_upload.js'}
+    
+- block body
+    %body.fileuploaderbody{role: 'application', aria-labelledby: 'app_title'}
+        %div.title
+            {% trans "Choose file:" %}
+            %br
+        #table-container
+          %table#files_table{role: 'presentation', border: '0', cellspacing: '0', cellpadding: '4'}
+            - for file_line in files
+                %tr
+                    - for file in file_line
+                        %td
+                            - if file.body
+                                %a.file_link{role: 'button', href: 'javascript: FileUploadDialog.insert("{{ file.body.url }}", {% if file.is_image %}true{% else %}false{% endif %}, "{{file.filename}}");'}
+                                    %table.file-container
+                                        %tr
+                                            %td.image-container
+                                                - if file.is_image
+                                                    %img{src: '{{ file.body.url }}', height: '50px', width:'50px', alt: '{{ file.filename }}'}
+                                                - else
+                                                    %img{src: '{{ STATIC_URL }}tinymce/img/box_address.png'}
+                                        %tr
+                                            %td
+                                                = file.filename
+                                                %br
+                                                = file.file_length|filesizeformat
+                                
+                                    
+                            
+        #file-uploader.wrapper.controls
+            #file-uploader-button.button
+                %script{'type': 'text/javascript'}
+                    - include 'tinymce/plugins/file_uploader.html'

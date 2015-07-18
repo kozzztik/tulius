@@ -1,0 +1,20 @@
+                    {% for field in fields %}
+                    <td>
+                        {% if forloop.first %}
+                        {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
+                        {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+                        {% endif %}
+                        {{ field }}
+                        {% if field.errors %}
+                        <div class="{{ error_class }}">
+                                {{ field.errors }}
+                        </div>
+                        {% endif %}
+                        {{ form.my_errors }}
+                        {% if form.my_errors %}
+                        <div class="{{ formset.error_class }}">
+                                {{ form.my_errors }}
+                        </div>
+                        {% endif %}
+                    </td>
+                    {% endfor %}

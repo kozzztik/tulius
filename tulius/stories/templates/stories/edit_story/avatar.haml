@@ -1,0 +1,15 @@
+- extends 'base_cataloged_navig_form_game.haml'
+- load i18n
+
+- block extra_scripts
+        %script{'type': 'text/javascript', 'src': '/static/ajaxuploader/js/fileuploader.js'}
+        %link{'href': '/static/ajaxuploader/css/fileuploader.css', 'media': 'screen', 'rel': 'stylesheet', 'type': 'text/css'}
+
+- block form_additional_content
+        %img.controls{'src': '{{ avatar.image.url }}'}
+        %br
+        %br
+        %div.wrapper.controls{'id': 'file-uploader'}
+            %div#file-uploader-button.button
+                %script{'type': 'text/javascript'}
+                    - include 'snippets/avatarupload.html'

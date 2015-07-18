@@ -1,0 +1,17 @@
+- load i18n
+
+%table.table.played
+    %thead
+        %tr
+            %th.play-game
+                {% trans "Played games" %}
+            %th.play-char
+                {% trans "Played characters" %}
+    %tbody                
+        - for role in played_roles
+            %tr
+                %td
+                    %a{'href':'{{ role.variation.game.url }}'}
+                        = role.variation.game 
+                %td
+                    = role

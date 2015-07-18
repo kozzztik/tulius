@@ -1,0 +1,90 @@
+- extends 'base_cataloged_navig_game.haml'
+- load i18n
+- load url from future
+
+- block extra_scripts
+    %link{rel: 'stylesheet', href: '{{ MEDIA_URL }}css/tulius-games.css', type: 'text/css'}
+    %script{type: 'text/javascript', src: '{{ MEDIA_URL }}games/reqtooltips.js'}
+    
+- block page_content
+    %p
+        {% trans "Total requests:" %}
+            = requests.count
+     %br
+    %table.table
+        %thead
+            %tr
+                %th{width: '6%'}
+                    {% trans "user" %}
+                %th{width: '32%'}
+                    {% trans "preferences" %}
+                %th{width: '32%'}
+                    {% trans "occupation" %}
+                %th{width: '30%'}
+                    {% trans "comment" %}
+        %tbody
+            - for request in requests
+                %tr
+                    %td#request-list-cell
+                        %a{href: '{{ request.user.get_absolute_url }}'}
+                            = request.user
+                    %td#request-list-cell
+                        - if request.roles
+                            .requests-list.request-list-table
+                                %ul
+                                    - for prefer in request.roles
+                                        %li.dropdown
+                                            %a.dropdown-toggle{href: '#', id: 'p{{prefer.id}}', 'role': 'button', 'data-toggle': 'dropdown'}
+                                                = prefer.role
+                                            %ul.dropdown-menu{'role': 'menu', 'aria-labelledby': 'p{{prefer.id}}'}
+                                                %li
+                                                    %a{'tabindex': '-1', 'href': '{{ prefer.role.get_absolute_url }}'}
+                                                        {% trans "View role" %}
+                                                %li
+                                                    %a{'tabindex': '0', 'href': '{% url "games:role_assign_user" prefer.role.id request.user.id %}'}
+                                                        {% trans "Assign" %}
+                        - else
+                            - if all_roles
+                                .requests-list.request-list-table
+                                    %ul
+                                        - for role in all_roles
+                                            %li.dropdown
+                                                %a.dropdown-toggle{'href': '#', 'id': 'r{{role.id}}u{{request.user.id}}', 'role': 'button', 'data-toggle': 'dropdown'}
+                                                    = role
+                                                %ul.dropdown-menu{'role': 'menu', 'aria-labelledby': 'r{{role.id}}u{{request.user.id}}'}
+                                                    %li
+                                                        %a{'tabindex': '-1', 'href': '{{ role.get_absolute_url }}'}
+                                                            {% trans "View role" %}
+                                                    %li
+                                                        %a{'tabindex': '0', 'href': '{% url "games:role_assign_user" role.id request.user.id %}'}
+                                                            {% trans "Assign" %}
+                            - else
+                                {% trans "All roles are busy." %}
+                    %td#request-list-cell
+                        .requests-list.request-list-table
+                            %ul
+                                %li
+                                    {% trans "New games" %}
+                                    :
+                                    = request.new_games
+                                %li
+                                    {% trans "Current games" %}
+                                    :
+                                    =request.current_games
+                                %li
+                                    {% trans "Complited games" %}
+                                    :
+                                    =request.complited_games
+                    %td#request-list-cell.reqtooltip{'request': '{{ request.id }}', 'title': '{% trans "Answers" %}'}
+                        {{ request.body|safe }}
+                    %div{'style': 'display:none', 'id': 'req{{ request.id }}'}
+                            - for answer in request.answers.all
+                                %b
+                                    =answer.question.question|safe
+                                %br
+                                =answer.answer|safe
+                                %br
+            - empty
+                %tr
+                    %td{'colspan': '5'}
+                        {% trans "There are no requests yet" %}

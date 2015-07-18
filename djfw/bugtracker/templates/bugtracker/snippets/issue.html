@@ -1,0 +1,215 @@
+{% load i18n %}
+<table class="issue-table wide">
+    <tr>
+        <td width="70%">
+            <table class="issue-details">
+                <tr>
+                    <td colspan="4">
+                        <h4>{% trans "Details" %}</h4>
+                    </td>
+                </tr>
+                <tr>
+                    <td>{% trans "Type:" %}</td>
+                    <td>
+                        <img src="{{ issue.bug_type.icon.url }}" />
+                        {{ issue.bug_type.name }}
+                    </td>
+                    <td>{% trans "Status:" %}</td>
+                    <td>
+                        <img src="{{ issue.status.icon.url }}" />
+                        {{ issue.status.name }}
+                </tr>
+                <tr>
+                    <td>{% trans "Priority:" %}</td>
+                    <td>
+                        <div style="color: {{ issue.priority.status_color }};">
+                            <img src="{{ issue.priority.icon.url }}" />
+                            {{ issue.priority.name }}
+                        </div>
+                    </td>
+                    <td>{% trans "Resolution:" %}</td>
+                    <td>
+                        {% if issue.resolution %}
+                            {{ issue.resolution.name }}
+                        {% else %}
+                            {% trans "No" %}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>{% trans "Version:" %}</td>
+                    <td>
+                        {% for version in issue.versions.all %}
+                            {% include "bugtracker/snippets/issue/version_icon.html" with version=version.version %}
+                            {{ version.version.name }}
+                        {% endfor %}
+                    </td>
+                    <td>{% trans "To fix:" %}</td>
+                    <td>
+                        {% for version in issue.fix_versions.all %}
+                            {% include "bugtracker/snippets/issue/version_icon.html" with version=version.version  %}
+                            {{ version.version.name }}
+                        {% endfor %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>{% trans "Components:" %}</td>
+                    <td colspan="3">
+                        {% for component in issue.components.all %}
+                            <img class="inline small-icon" src="{{ STATIC_URL }}bugtracker/img/version_archieved.png" />
+                            {{ component.component.name }}
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% if issue.environment %}
+                    <tr>
+                        <td>{% trans "Environment:" %}</td>
+                        <td colspan="3">
+                            {{ issue.environment|linebreaks }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if issue.exceptions.all %}
+                    <tr>
+                        <td>{% trans "Exceptions:" %}</td>
+                        <td colspan="3">
+                            <table>
+                                {% for exception in issue.exceptions.all %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ exception.exception_message.get_absolute_url }}">
+                                                {{ exception.exception_message }}
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if issue.files.all or issue.attachments.all %}
+                    <tr>
+                        <td colspan="4">
+                            <h4>{% trans "Files:" %}</h4>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            {% include "bugtracker/snippets/issue/files.html" %}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if issue.subtask.all %}
+                    <tr>
+                        <td colspan="4">
+                            <h4>{% trans "Subtasks" %}</h4>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            {% include "bugtracker/snippets/issue/subtasks.html" %}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if issue.outward_links.all or issue.inward_links.all %} 
+                    <tr>
+                        <td colspan="4">
+                            <h4>{% trans "Links" %}</h4>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            {% include "bugtracker/snippets/issue/links.html" %}
+                        </td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <td colspan="4">
+                        <h4>{% trans "Description" %}</h4>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">{{ issue.description|safe|linebreaks }}</td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <h4>{% trans "Comments" %}</h4>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        {% include "bugtracker/snippets/issue/comments.html" %}
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td>
+            <table class="issue-right-panel">
+                <tr>
+                    <td colspan="2">
+                        <h4>{% trans "People" %}</h4>
+                    </td>
+                </tr>
+                <tr>
+                    <td>{% trans "Assignee:" %}</td>
+                    <td>
+                        {% with jira_user=issue.assignee %}
+                            {% if jira_user.small_icon.url %}
+                                <img src="{{ jira_user.small_icon.url }}" />
+                            {% endif %}
+                            {% include "bugtracker/snippets/issue/jira_user.html" %}
+                        {% endwith %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>{% trans "Author:" %}</td>
+                    <td>
+                        {% if issue.reporter %}
+                            <a href="{{ issue.reporter.get_absolute_url }}">
+                                {{ issue.reporter }}
+                            </a>
+                        {% else %}
+                            {% if issue.jira_reporter %}
+                                {% with jira_user=issue.jira_reporter %}
+                                    {% if jira_user.small_icon.url %}
+                                        <img src="{{ jira_user.small_icon.url }}" />
+                                    {% endif %}
+                                    {% include "bugtracker/snippets/issue/jira_user.html" %}
+                                {% endwith %}
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <h4>{% trans "Dates" %}</h4>
+                    </td>
+                </tr>
+                <tr>
+                    <td>{% trans "Created:" %}</td>
+                    <td>{{ issue.create_time }}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Updated:" %}</td>
+                    <td>{{ issue.updated_time }}</td>
+                </tr>
+                {% if issue.resolution_time %}
+                    <tr>
+                        <td>{% trans "Resolved:" %}</td>
+                        <td>{{ issue.resolution_time }}</td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <td colspan="2">
+                        <h4>{% trans "Actions" %}</h4>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        {% include "bugtracker/snippets/issue/actions.html" %}
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>

@@ -1,0 +1,12 @@
+{% load i18n %}
+{% if jira_user %}
+    {% if jira_user.get_absolute_url %}
+        <a href="{{ jira_user.get_absolute_url }}">
+            {{ jira_user }}
+        </a>
+    {% else %}
+        {{ jira_user }}
+    {% endif %}
+{% else %}
+    {% trans "Not assigned" %}
+{% endif %}

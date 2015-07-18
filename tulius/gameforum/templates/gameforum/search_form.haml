@@ -1,0 +1,43 @@
+- extends 'base.haml'
+- load i18n
+
+- block additional_styles
+    %link{href: "{{ MEDIA_URL }}forum/select2/css/select2.min.css", rel: "stylesheet"}
+
+- block additional_scripts
+    %script{src: "{{ MEDIA_URL }}forum/select2/js/select2.min.js"}
+    %script{src: "{{ MEDIA_URL }}forum/select2/js/i18n/ru.js"}
+    %script{src: "{{ MEDIA_URL }}forum/datepicker-ru.js"}
+    
+- block caption
+    {% trans "Search" %}
+
+- block title
+    {% trans "Search" %}
+
+- block breadcrumbs
+        %li
+            .divider
+            - if variation.game
+                %a{'href': '{{ variation.game.get_absolute_url }}'}
+                    = variation.game
+            - else
+                %a{'href': '{{ variation.get_absolute_url }}'}
+                    {% trans "variation" %}
+                    = variation
+        %li
+            .divider
+            %a{href: ''}
+                {% trans "Search" %}
+    
+- block content
+    - include 'snippets/form.haml'
+    <script>
+        $(function() {
+            $('#id_roles').select2();
+            $('#id_not_roles').select2();
+            var v = $.datepicker.regional[ "ru" ];
+            $("#id_date_from" ).datepicker(datepicker_regional);
+            $("#id_date_to" ).datepicker(datepicker_regional);
+        });
+    </script>

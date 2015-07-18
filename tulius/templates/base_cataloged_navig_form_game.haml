@@ -1,0 +1,26 @@
+- extends 'base_cataloged_navig_game.haml'
+- load i18n
+
+- block page_content
+    %br
+    %br
+    %form{'enctype': '{% if form.handle_files %}multipart/form-data{% else %}application/x-www-form-urlencoded{% endif %}', 'method': '{% if form_method %}{{ form_method }}{% else %}POST{% endif %}', 'action': '{% if form_action %}{{ form_action }}{% else %}{% endif %}', 'class': '{{ form.html_class }} form-horizontal', 'id': '{% if form.html_id %}{{ form.html_id }}{% else %}{{ form.html_class }}{% endif %}'}
+        - csrf_token
+        = form.media
+        = form.management_form
+        - if form.non_field_errors
+            .alert.alert-error
+                = form.non_field_errors
+        - block form_content
+            - include 'snippets/form_fields_only.haml'
+        - block form_additional_content
+        - block form_actions
+            %fieldset
+                .form-actions
+                    %button.submit.btn.btn-primary{'type': 'submit'}
+                        - if form_submit_title
+                            {% trans form_submit_title %}
+                        - else
+                            {% trans "edit" %}
+                    %button.submit.btn{'type': 'reset'}
+                        {% trans "reset" %}

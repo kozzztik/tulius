@@ -1,0 +1,38 @@
+- extends 'base_cataloged_navig_game.haml'
+- load i18n
+- load url from future
+
+- block page_scripts
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}sortable/sortable.js'}
+
+- block page_content
+    %table.table
+        %thead
+            %tr
+                %th{width: '30%'}
+                    {% trans "name" %}
+                %th
+                    {% trans "decription" %}
+                %th{'width': '100'}
+                    {% trans "Forum" %}
+                %th{'width': '100'}
+                    {% trans "Delete" %}
+
+        %tbody.sortable
+            - for variation in story.get_variations
+                %tr{id: "var_{{ variation.id }}"}
+                    %td
+                        %a{href: '{{ variation.get_absolute_url }}'}
+                            = variation.name
+                    %td
+                        = variation.description
+                    %td
+                        - if variation.forumlink
+                            %a{href: '{{ variation.forumlink }}'}
+                                {% trans "Forum" %}
+                    %td
+                        %a{href: '{% url "stories:delete_variation" variation.id %}'}
+                            {% trans "Delete" %}
+    %br
+    %a.submit.btn.btn-primary{href: '{% url "stories:add_variation" story.id %}'}
+        {% trans "Add new variation" %}

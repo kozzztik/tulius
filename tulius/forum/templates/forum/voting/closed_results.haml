@@ -1,0 +1,22 @@
+- load i18n
+%br
+%h4
+    = voting.voting_name
+- if voting.voting_body
+    = voting.voting_body|safe
+%br
+%br
+%b
+    {% trans "Voting results are hidden until it will be finished." %}
+%br
+{% trans "Total votes:" %}
+= voting.votes_count
+%br
+%br
+- if choice
+    {% trans "You voted for:"%}
+    = choice.name
+- else
+    {% trans "You can not vote."%}
+%br
+%br

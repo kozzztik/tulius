@@ -1,0 +1,117 @@
+- extends 'base_cataloged_navig_game.haml'
+- load i18n
+- load url from future
+
+- block extra_scripts
+    %script{'type': 'text/javascript', 'src': '{{ MEDIA_URL }}games/reqtooltips.js'}
+    %script{'type': 'text/javascript', 'src': '{{ MEDIA_URL }}games/invites.js'}
+    
+- block page_scripts
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}sortable/sortable.js'}
+
+- block page_content
+    %table.table
+        %thead
+            %tr
+                %th
+                    {% trans "role" %}
+                %th
+                    {% trans "character" %}
+                %th
+                    {% trans "user" %}
+                %th
+                    {% trans "req." %}
+                %th
+                    {% trans "description" %}
+        %tbody.sortable
+            - for role in roles
+                %tr{id: 'role_{{ role.id }}'}
+                    %td
+                        - if role.avatar.image
+                            %a{'href': '{{ role.avatar.get_absolute_url }}'}
+                                %img{'src': '{{ role.avatar.image.url }}', 'height': '100', 'width': '100'}
+                        .dropdown
+                            %a.dropdown-toggle{'data-toggle': 'dropdown', 'href': '#', 'id': 'p{{role.id}}'}
+                                = role.name
+                                .caret
+                            %ul.dropdown-menu{'role': 'menu', 'aria-labelledby': 'p{{role.id}}'}
+                                %li
+                                    %a{'href': '{% url "games:role" role.id %}'}
+                                        {% trans "Edit" %}
+                                %li
+                                    %a{'href': '{% url "games:role_text" role.id %}'}
+                                        {% trans "Edit role text" %}
+                                %li
+                                    %a{'href': '{% url "games:view_role" role.id %}'}
+                                        {% trans "View role text" %}
+                                %li
+                                    %a.role-delete-link{href: '#', roleid: '{{ role.id }}'}
+                                        {% trans "Delete" %}
+                    %td
+                        - if role.character
+                            %a{'href': '{{ role.character.get_absolute_url }}'}
+                                = role.character.name
+                    %td
+                        .dropdown
+                                %a.dropdown-toggle{'href': '#', 'id': 'u{{role.id}}', 'data-toggle': 'dropdown'}
+                                    - if role.user
+                                        = role.user
+                                    - else
+                                        {% trans "no" %}
+                                    .caret
+                                %ul.dropdown-menu{'role': 'menu', 'aria-labelledby': 'u{{role.id}}'}
+                                    - if role.user
+                                        %li
+                                            %a{'href': '{{ role.user.get_absolute_url }}'}
+                                                {% trans "User profile" %}
+                                        %li
+                                            %a{'href': '{% url "games:role_clear_user" role.id %}'}
+                                                {% trans "Clear" %}
+                                    - else
+                                        %li
+                                            %a{'href': '{% url "games:role_assign" role.id %}'}
+                                                {% trans "Assign" %}
+                                        %li
+                                            %a.invitelink{roleid: '{{ role.id }}', rolename: '{{ role }}'}
+                                                {% trans "Invite" %}
+                        - if role.invitings
+                            %br
+                            {% trans "Invited:" %}
+                            - for invite in role.invitings
+                                %br
+                                %a{'href': '{{ invite.user.get_absolute_url }}'}
+                                    = invite.user
+                    %td
+                        - if role.requestable
+                            {% trans "yes" %}
+                        - else
+                            {% trans "no" %}
+                    %td.reqtooltip{'request': '{{ role.id }}', 'title': '{% trans "Role text" %}'}
+                        = role.description
+                        %div{'style': 'display:none', 'id': 'req{{ role.id }}'}
+                            - if role.body
+                                = role.body|truncatewords_html:30|safe
+                            - else
+                                {% trans "No role text" %}
+    %br
+    %a.submit.btn.btn-primary{'href': '{% url "games:add_role" game.id %}'}
+        {% trans "Add role" %}
+        
+    %form#InviteModal.modal.hide.fade.in.well.form-horizontal{'method': 'POST', 'action': '{% url "games:game_invite" game.id %}', }
+        - csrf_token
+        .modal-header
+            %a.close{'data-dismiss': "modal"}×
+            %h3
+                {% trans "Invite user" %}
+        #invite_success{'hidden': 'true'}
+            .alert.alert-success
+                {% trans "Player invited!" %}
+        #invite_error.alert.alert-error{'hidden': 'true'}
+        #invite_form_body
+            - include 'games/game_edit/invite_form.haml'
+        #invite_footer.modal-footer
+             %span#submit_form_btn.submit.btn.btn-primary
+                 {% trans "Invite" %}
+    - with variation=game.variation
+        - include 'stories/snippets/delete_role.haml'
+

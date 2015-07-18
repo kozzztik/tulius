@@ -1,0 +1,176 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-04-27 15:48+0400\n"
+"PO-Revision-Date: 2012-04-27 15:53\n"
+"Last-Translator:   <admin@example.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"X-Translated-Using: django-rosetta 0.6.6\n"
+
+#: auth/forms.py:5
+msgid "username"
+msgstr "имя пользователя"
+
+#: auth/forms.py:6
+msgid "password"
+msgstr "пароль"
+
+#: auth/tests.py:10
+msgid "login"
+msgstr "войти"
+
+#: auth/tests.py:14
+msgid "logout"
+msgstr "выйти"
+
+#: auth/views.py:16
+msgid "You have successfully logged in"
+msgstr "Вы успешно авторизовались"
+
+#: auth/views.py:24
+msgid "This account is disabled"
+msgstr "Эта учётная запись заблокирована"
+
+#: auth/views.py:26
+msgid "Invalid login/password pair"
+msgstr "Неверная пара логин/пароль"
+
+#: registration/admin.py:23
+msgid "Activate users"
+msgstr "Активировать пользователей"
+
+#: registration/admin.py:43
+msgid "Re-send activation emails"
+msgstr "Повторить отправку писем с активационными ссылками"
+
+#: registration/forms.py:35
+msgid "Username"
+msgstr "Имя пользователя"
+
+#: registration/forms.py:36
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "Допустимые символы для этого поля: латинские буквы, цифры, @.+-_"
+
+#: registration/forms.py:39
+msgid "E-mail"
+msgstr "E-mail"
+
+#: registration/forms.py:41
+msgid "Password"
+msgstr "Пароль"
+
+#: registration/forms.py:43
+msgid "Password (again)"
+msgstr "Пароль (ещё раз)"
+
+#: registration/forms.py:53
+msgid "A user with that username already exists."
+msgstr "Пользователь с таким именем уже существует"
+
+#: registration/forms.py:67
+msgid "The two password fields didn't match."
+msgstr "Два введённых пароля не совпадают"
+
+#: registration/forms.py:78
+msgid "I have read and agree to the Terms of Service"
+msgstr "Я прочитал и согласен с Условиями Предоставления Услуг"
+
+#: registration/forms.py:79
+msgid "You must agree to the terms to register"
+msgstr "Для регистрации вы должны согласиться с Условиями"
+
+#: registration/forms.py:95
+msgid ""
+"This email address is already in use. Please supply a different email "
+"address."
+msgstr ""
+"Этот адрес электронной почты уже зарегистрирован. Пожалуйста, выберите "
+"другой."
+
+#: registration/forms.py:122
+msgid ""
+"Registration using free email addresses is prohibited. Please supply a "
+"different email address."
+msgstr "Этот адрес запрещён для регистрации. Пожалуйста, используйте другой."
+
+#: registration/models.py:176
+msgid "user"
+msgstr "пользователь"
+
+#: registration/models.py:177
+msgid "activation key"
+msgstr "ключ активации"
+
+#: registration/models.py:182
+msgid "registration profile"
+msgstr "профиль регистрации"
+
+#: registration/models.py:183
+msgid "registration profiles"
+msgstr "профили регистрации"
+
+#: registration/templates/registration/activate.haml:10
+#: registration/templates/registration/activation_complete.haml:10
+#: registration/templates/registration/registration_complete.haml:10
+#: registration/templates/registration/registration_form.haml:10
+msgid "Register"
+msgstr "Зарегистрироваться"
+
+#: registration/templates/registration/activate.haml:13
+#: registration/templates/registration/activate.haml:17
+msgid "Profile activation failed"
+msgstr "Активация профиля провалилась"
+
+#: registration/templates/registration/activate.haml:19
+msgid "Provided activation key doesn't seem to be correct, sorry."
+msgstr "Предоставленный вами ключ активации не является корректным"
+
+#: registration/templates/registration/activation_complete.haml:13
+#: registration/templates/registration/activation_complete.haml:17
+msgid "Profile activation complete"
+msgstr "Активация профиля завершена"
+
+#: registration/templates/registration/activation_complete.haml:19
+msgid "Great! Now you can simply log in using your username and password"
+msgstr "Ура! Теперь вы можете просто войти на сайт, используя логин и пароль."
+
+#: registration/templates/registration/activation_complete.haml:22
+msgid "Use this link"
+msgstr "Используйте эту ссылку:"
+
+#: registration/templates/registration/registration_complete.haml:13
+#: registration/templates/registration/registration_complete.haml:17
+msgid "Successful registration completion"
+msgstr "Успешное завершение регистрации"
+
+#: registration/templates/registration/registration_complete.haml:19
+msgid ""
+"We've send an activation link to provided e-mail. Check your mailbox, we "
+"hope to see you logged in very soon ;)"
+msgstr ""
+"Мы послали вам на указанную почту активационную ссылку. Проверьте свой "
+"почтовый ящик - мы надеемся вскоре увидеть вас вновь ;)"
+
+#: registration/templates/registration/registration_form.haml:14
+msgid "Registration"
+msgstr "Регистрация"
+
+#: registration/templates/registration/registration_form.haml:19
+msgid "Sign up"
+msgstr "Зарегистрироваться"
+
+#: templates/accounts/auth/login.haml:10 templates/accounts/auth/login.haml:18
+msgid "Login"
+msgstr "Войти"

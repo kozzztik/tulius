@@ -1,0 +1,21 @@
+- extends 'base_game.haml'
+- load i18n
+- load catalog_paging
+
+- block extra_scripts
+    %link{'rel':'stylesheet','type': 'text/css', 'href':'{{MEDIA_URL}}css/navig.css'}
+    
+- block breadcrumbs
+    {% catalog_breadcrumbs %}
+    
+- block caption
+    {% catalog_caption catalog_page %}
+
+- block content
+    %table.navigation.wide
+        %tbody
+            %tr
+                %td.navigation-index
+                    {% catalog_index catalog_page %}
+                %td.navigation-content
+                    - block page_content

@@ -1,0 +1,24 @@
+@font-face {
+  font-family: 'Philosopher';
+  font-style: italic;
+  font-weight: normal;
+  src: local('Philosopher Italic'), local('Philosopher-Italic'), url('http://themes.googleusercontent.com/static/fonts/philosopher/v4/_9Hnc_gz9k7Qq6uKaeHKmVqQwgjTnk_Nvsyjd7gmcn8.woff') format('woff');
+}
+@font-face {
+  font-family: 'Philosopher';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Philosopher'), url('http://themes.googleusercontent.com/static/fonts/philosopher/v4/OttjxgcoEsufOGSINYBGLWOb2gHztoQeulij-1lvl-8.woff') format('woff');
+}
+@font-face {
+  font-family: 'Philosopher';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Philosopher Bold'), local('Philosopher-Bold'), url('http://themes.googleusercontent.com/static/fonts/philosopher/v4/napvkewXG9Gqby5vwGHICFRROVH9Vvc8xHnAGvvgPQc.woff') format('woff');
+}
+@font-face {
+  font-family: 'Philosopher';
+  font-style: italic;
+  font-weight: bold;
+  src: local('Philosopher Bold Italic'), local('Philosopher-BoldItalic'), url('http://themes.googleusercontent.com/static/fonts/philosopher/v4/PuKlryTcvTj7-qZWfLCFIBBJbNC_o6dSdMhcrMKcxkU.woff') format('woff');
+}

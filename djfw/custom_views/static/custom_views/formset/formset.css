@@ -1,0 +1,5 @@
+.formset_ajax_loader {
+    width: 16px;
+    height: 16px;
+    background-image: url('./ajax-loader.gif');
+}

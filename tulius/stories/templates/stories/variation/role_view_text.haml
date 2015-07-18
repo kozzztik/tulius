@@ -1,0 +1,36 @@
+- extends 'base_cataloged_navig_game.haml'
+- load i18n
+- load url from future
+
+- block caption
+    = variation.name
+    \-
+    {% trans "Roles" %}
+    %a.submit.btn.btn-primary.pull-right{href: '{% url "stories:edit_variation_roles" variation.id %}'}
+        {% trans "to roles" %}
+
+- block extra_scripts
+    %link{rel: 'stylesheet', href: '{{ MEDIA_URL }}css/tulius-stories.css', type: 'text/css'}
+    
+- block content
+   %table
+        %tr
+            %td{style: 'text-align: center'}
+                  .story-character
+                    - if role.avatar
+                        .character-avatar
+                            %img{align:'left', src: '{{ role.avatar.image.url }}'}
+                        .character-text
+                            %h3
+                                = role.name
+                            = role.description
+    %table
+        %tr
+            %td{style: 'text-align: left'}
+                - if role.body
+                    = role.body|safe
+                - else
+                    %br
+                    {% trans "No role text" %}
+                    %br
+                    %br

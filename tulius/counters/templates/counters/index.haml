@@ -1,0 +1,14 @@
+- extends 'base.haml'
+- load i18n
+
+- block caption
+    {% trans "Counters" %}
+    
+- block content
+    %p
+        %a{href: '{% url "counters:forum" %}'}
+            {% trans "Update forum counters" %}
+    %p
+        %a{href: '{% url "counters:pm" %}'}
+            {% trans "Update personal messages counters" %}
+        

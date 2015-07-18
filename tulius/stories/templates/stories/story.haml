@@ -1,0 +1,93 @@
+- extends 'stories/base_game.haml'
+- load i18n
+
+
+- block story_breadcrumbs
+    %li
+        .divider
+        %a{href: '{{ story.get_absolute_url }}'}
+            = story
+            
+- block caption
+    = story
+    
+- block title
+    = story
+    
+- block content
+    .pull-right
+        - if story.edit_url
+            %a.submit.btn.btn-primary{href: '{{ story.edit_url }}'}
+                {% trans "edit" %}
+    %ul.inline-list
+        - for genre in story.genres.all
+            %li {{ genre }}
+        %li.inline-list-ignore {{ story.creation_year }} {% trans "year" %}.
+        - if authors
+            %li.inline-list-ignore
+                {% trans "Authors:" %}
+            - for author in authors
+                <li><a href="{{ author.user.get_absolute_url }}">{{ author }}</a></li>
+    - if story.top_banner
+        .story-banner.hidden-phone
+            %img{src: '{{ story.top_banner.url }}'}
+    #tabs
+        %ul
+            %li
+                %a{href: '#introduction'}
+                    %span
+                        {% trans "Introduction" %}
+            - if characters
+                %li
+                    %a{href: '#characters'}
+                        %span
+                            {% trans "Characters" %}
+            - if materials
+                %li
+                    %a{href: '#materials'}
+                        %span
+                            {% trans "Materials" %}
+        #introduction
+            {{ story.introduction|safe }}
+                
+        - if materials
+            #materials
+                %ul
+                    - for material in materials
+                        %li
+                            %h3
+                                %a{href: '{{ material.url }}'}
+                                    = material
+        - if characters
+            #characters.hidden-phone
+                %table.wide.story-character
+                    - for character in characters
+                        - if forloop.counter0|divisibleby:"2" or forloop.first
+                            <tr>
+                        %td
+                            %table.wide
+                                %tr
+                                    %td.character-avatar
+                                        - if character.avatar
+                                            %img{align: 'left', src: '{{ character.avatar.image.url }}'}
+                                    %td.character-text
+                                        %h3
+                                            = character.name
+                                        = character.description
+                        - if forloop.last and forloop.counter0|divisibleby:"2"
+                            %td
+                        - if forloop.last or not forloop.counter0|divisibleby:"2"
+                            </tr>
+        .visible-phone
+            %ul.story-character
+                - for character in characters
+                    %li
+                        %a{href: '{{ character.get_info_url }}'}
+                            = character.name
+    - if story.bottom_banner
+        .story-banner.hidden-phone
+            %img{src: '{{ story.bottom_banner.url }}'}
+        %br
+    <script>
+        $('#tabs').tabs();
+    </script>

@@ -1,0 +1,36 @@
+{% load i18n %}
+{% load url from future %}
+        $(function(){
+            var uploader = new qq.FileUploader({
+                {% if illustration %}
+                action: "{% url 'stories:illustration_reload' illustration.id %}",
+                {% else %}
+                    {% if variation %}
+                action: "{% url 'stories:add_variation_illustration' variation.id %}",
+                    {% else %}
+                action: "{% url 'stories:add_story_illustration' story.id %}",
+                    {% endif %}
+                {% endif %}
+                element: $('#file-uploader')[0],
+                
+                multiple: false,
+                onComplete: function() {
+                    window.location.reload();
+                },
+                onAllComplete: function(uploads) {
+                },
+                params: {
+                    'csrf_token': '{{ csrf_token }}',
+                    'csrf_name': 'csrfmiddlewaretoken',
+                    'csrf_xname': 'X-CSRFToken',
+                },
+            });
+            var elem = uploader._button._element.firstChild
+            if(elem){
+                {% if illustration %}
+                elem.textContent='{% trans "Reload illustration" %}';
+                {% else %}
+                elem.textContent='{% trans "Add illustration" %}';
+                {% endif %}
+            }
+        });

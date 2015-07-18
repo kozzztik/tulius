@@ -1,0 +1,25 @@
+:javascript
+  $(document).ready(function(){
+    $("#form{{form.initial.id}}").submit(form_submit);
+    // Javascript comment
+  });
+:css
+  .someClass {
+    width: 100px;
+  }
+:cdata
+  if (a < b && a < 0)
+  {
+    return 1;
+  }
+:python
+  a=1
+  for i in range(5):
+    print a+i
+:markdown
+  hello
+  no paragraph
+
+  New paragraph
+
+      test

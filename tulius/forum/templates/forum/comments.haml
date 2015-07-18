@@ -1,0 +1,5 @@
+- load i18n
+
+- for comment in comments
+    %span{'id': '{{ comment.id }}', 'replystr': '{{ comment.reply_str }}', 'fast_reply': '{{ comment.get_fast_reply_url }}', 'extended_reply': '{{ comment.get_reply_url }}', is_thread: '{% if comment.is_thread %}1{% else %}0{% endif %}'}
+        - include forum_site.templates.comment

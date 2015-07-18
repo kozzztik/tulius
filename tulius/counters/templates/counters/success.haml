@@ -1,0 +1,16 @@
+- extends 'base.haml'
+- load i18n
+
+- block additional_meta
+    <meta http-equiv="refresh" content="5; url\={% url 'counters:index' %}" />
+
+- block title
+    {% trans "Counters" %}
+
+
+- block caption
+    {% trans "Counters" %}
+    
+- block content
+    {% trans "Success!" %}
+        

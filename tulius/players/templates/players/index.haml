@@ -1,0 +1,44 @@
+- extends 'base.haml'
+- load i18n
+- load url from future
+
+- block extra_scripts
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-players.css'}
+
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: '{% url "players:index" %}'}
+            {% trans "Players" %}
+    %li
+        .divider
+        %a{href: ''}
+            = player.username|capfirst
+                
+- block caption
+    = player.username
+    
+- block title
+    = player.username
+
+- block content
+    - if show_messages
+        #tabs
+            %ul
+                %li
+                    %a{href: '#main'}
+                        %span
+                            {% trans "Main" %}
+                %li
+                    %a{href: '#pm_messages'}
+                        %span
+                            {% trans "Messages" %}
+            #main
+                - include 'players/player_info.haml'
+            #pm_messages
+                - include "players/messages.haml"
+        <script>
+            $('#tabs').tabs();
+        </script>
+    - else
+        - include 'players/player_info.haml'

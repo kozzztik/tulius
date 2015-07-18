@@ -1,0 +1,30 @@
+- extends forum_site.templates.base
+- load i18n
+
+- block page_scripts
+    %script{type: 'text/javascript', src: '{{ MEDIA_URL }}forum/collapse_threads.js'}
+    
+- block forum_content
+    - if rooms
+        .content
+            .caption{align:"center"}
+                .captionleft
+                .captioncontent
+                    {% trans "Rooms" %}
+                .captionright
+            - include forum_site.templates.room_list
+    - if threads
+        .content
+            .caption{align: "center"}
+                .captionleft
+                .captioncontent
+                    {% trans "Threads" %}
+                .captionright
+            - include forum_site.templates.thread_list
+    - if not rooms
+        - if not threads
+            .content
+                %br
+                {% trans "This room is empty." %}
+                %br
+                %br

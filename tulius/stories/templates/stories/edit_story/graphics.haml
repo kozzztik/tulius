@@ -1,0 +1,25 @@
+- extends 'base_cataloged_navig_game.haml'
+- load i18n
+
+- block extra_scripts
+        %script{'type': 'text/javascript', 'src': '/static/ajaxuploader/js/fileuploader.js'}
+        <link href="/static/ajaxuploader/css/fileuploader.css" media="screen" rel="stylesheet" type="text/css" />    
+        
+- block page_content
+    - for story_file in story_files
+        %h3
+            = story_file.caption
+        - if story_file.saved
+            %img{'src': '{{ story_file.url }}'}
+            %br
+            %br
+            %a{'href': '{{ story_file.url }}'} 
+                {% trans "Download" %}
+        - else
+            {% trans "Not loaded yet" %}
+        %br
+        %br
+        %div.wrapper.controls{'id': 'file-uploader-{{ story_file.name }}'}
+            %div#file-uploader-button.button
+                %script{'type': 'text/javascript'}
+                    - include 'snippets/graphicupload.html'

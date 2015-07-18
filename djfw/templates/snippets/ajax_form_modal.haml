@@ -1,0 +1,11 @@
+.modal.hide.fade.in.well.ajaxform{id: '{{ form_id }}'}
+    .modal-header
+        %a.close{data-dismiss: "modal"}×
+        %h3
+            = form.caption
+    .modal-body
+        - with form=add_form
+            - include 'snippets/ajax_form.haml'
+    .modal-footer
+        %button.btn.btn-primary
+            = form.submit_caption|safe

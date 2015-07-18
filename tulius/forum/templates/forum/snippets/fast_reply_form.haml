@@ -1,0 +1,18 @@
+- load i18n
+- load url from future
+%form#replyform.form-horizontal{method: 'POST', action: '{{ parent_thread.first_comment.get_fast_reply_url }}'}
+    - csrf_token
+    = reply_form.media
+    = reply_form.management_form
+    #replyform_error.alert.alert-error{style: 'display: none;'}
+    %fieldset.control-group
+            = reply_form.body
+            %div{style: 'display:none;'}
+                = reply_form.title
+    %fieldset
+            %a.submit.btn.btn-primary{href: 'javascript:do_fast_reply()'}
+                {% trans "Reply" %}
+            %a#extended-link{href: '{{ parent_thread.first_comment.get_reply_url }}'}
+                {% trans "Extended form..." %}
+            %a#post-preview-link.pull-right{href: 'javascript:do_preview()', url: '{% url "forum:preview" %}'}
+                {% trans "Preview" %}

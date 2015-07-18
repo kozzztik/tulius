@@ -1,0 +1,21 @@
+- load i18n
+- load url from future
+%form#RoleDeleteModal.modal.hide.fade.in.well.form-horizontal{method: 'POST', action: '{% url "stories:delete_role" variation.id %}', }
+    - csrf_token
+    .modal-header
+        %a.close{'data-dismiss': "modal"}×
+        %h3
+            {% trans "Delete role" %}
+    #deleterole_success{'hidden': 'true'}
+        .alert.alert-success
+            {% trans "Role deleted!" %}
+    #deleterole_error.alert.alert-error{'hidden': 'true'}
+    #deleterole_form_body
+        - with form=delete_role_form
+            - include 'stories/snippets/delete_role_form.haml'
+    #deleterole_footer.modal-footer
+        %span#deleterole_btn.submit.btn.btn-primary
+            {% trans "Delete" %}
+        %button.btn{'data-dismiss': "modal"}
+            {% trans "Cancel" %}
+%script{'type': 'text/javascript', 'src': '{{ MEDIA_URL }}stories/role-delete.js'}

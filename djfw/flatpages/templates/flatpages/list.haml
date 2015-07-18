@@ -1,0 +1,28 @@
+- extends 'base.haml'
+- load i18n
+- load url from future
+
+- block caption
+    {% trans "Flatpages" %}
+
+- block breadcrumbs
+    %ul.breadcrumb
+        %li
+            - include 'home_link.haml'
+        %li
+            .divider
+            %a{href: '{% url "flatpages" %}'}
+                {% trans "Flatpages" %}
+
+- block content
+    %ul.unstyled.flatpages
+        - for flatpage in flatpages
+            %li.flatpages
+                %a.flatpages_title{href: '{{ flatpage.get_absolute_url }}'}
+                    = flatpage.title|capfirst
+                .flatpages_preview
+                    = flatpage.content|truncatewords_html:100|safe
+                %a.flatpages_article{href: '{{ flatpage.get_absolute_url }}'}
+                    = 'читать далее'
+- block flatpages_link_class
+    active

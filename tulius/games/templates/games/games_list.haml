@@ -1,0 +1,90 @@
+- extends 'base_cataloged_navig.haml'
+- load i18n
+- load pagination_tags
+- autopaginate games 5
+
+- block extra_scripts
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-games.css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-forum.css'}
+    
+- block caption
+    = catalog_page.name
+    
+- block content
+    - paginate
+    - if games
+      %table.game-table
+        - for game in games
+            %tr
+                %td.game-description
+                    %a{href:'{{ game.get_absolute_url }}'}
+                        %h3
+                                    = game.name
+                                    - if game.is_finishing
+                                        {% trans "(finishing)" %}
+                    = game.announcement|safe
+                    %br
+                    - if game.edit
+                        %a.game-action{href: '{{ game.get_edit_url }}'}
+                            {% trans "edit" %}
+                    - if game.request
+                        %a.game-action{href: '{{ game.get_request_url }}'}
+                            {% trans "Make request" %}
+                    - if game.cancel_request
+                        %a.game-action{href: '{{ game.get_cancel_request_url }}'}
+                            {% trans "Cancel request" %}
+                    - if game.enter
+                        %a.game-action{href: '{{ game.enter_url }}'}
+                            {% trans "Enter" %}
+                    - if game.text_hint
+                        = game.text_hint
+                    %br
+                    - if game.full
+                        {% trans "no places" %}
+                        %br
+                    - if game.user_roles and game.status >= 3
+                        {% trans "Your role:"%}
+                        - for role in game.user_roles
+                            %a{href: '{{ role.text_url }}'}
+                                = role.name
+                    %br
+                       {% trans "Our characters have posted:" %}
+                        = game.variation.comments_count
+                    %br
+                    - if game.online_roles
+                        {% trans "Present characters:" %}
+                            %ul.comma-list
+                                - for role in game.online_roles  
+                                    %div.modal.hide.fade.in.well{id: 'role{{ role.id }}'}
+                                        .modal-header
+                                            %a.close{data-dismiss: "modal"}×
+                                            %h3
+                                                = role
+                                        %table.table
+                                            %tr
+                                                %td
+                                                    %img{src: '{{ role.avatar.image.url }}'}
+                                                %td
+                                                    %small 
+                                                        {% trans "Messages:" %}
+                                                        = role.comments_count
+                                                   %br
+                                                   %br
+                                                   = role.description 
+                                                   
+                                        .modal-footer
+                                            %button.btn.btn-primary{data-dismiss: "modal"}
+                                                {% trans "Close" %}
+                                                
+                                    - if role.show_in_character_list
+                                        <li><a data-toggle="modal" href="#role{{ role.id }}">{{ role }}</a></li>
+                                    - else
+                                        <li>{{ role }}</li>             
+                    %br
+                    %br
+                %td
+                    - if game.card_image
+                        %img{src: '{{ game.card_image.url }}'}
+    - else
+        {% trans "There is no such games." %}
+    - paginate

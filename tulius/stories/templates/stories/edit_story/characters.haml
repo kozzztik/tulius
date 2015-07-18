@@ -1,0 +1,39 @@
+- extends 'base_cataloged_navig_game.haml'
+- load i18n
+- load url from future
+
+- block page_scripts
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}sortable/sortable.js'}
+
+- block page_content
+    %table.table
+        %thead
+            %tr
+                %th{'width': '120'}
+                    {% trans "avatar" %}
+                %th{'width': '20%'}
+                    {% trans "name" %}
+                %th
+                    {% trans "decription" %}
+                %th{'width': '100'}
+                    {% trans "show" %}
+        %tbody.sortable
+            - for character in story.characters.all
+                %tr{id: "char_{{ character.id }}"}
+                    %td
+                        - if character.avatar.image
+                            %a{href: '{{ character.avatar.get_absolute_url }}'}
+                                %img{src: '{{ character.avatar.image.url }}', height: '100', width: '100'}
+                    %td
+                        %a{href: '{{ character.get_absolute_url }}'}
+                            = character.name
+                    %td
+                        = character.description
+                    %td
+                        - if character.show_in_character_list
+                            {% trans "yes" %}
+                        - else
+                            {% trans "no" %}
+    %br
+    %a.submit.btn.btn-primary{href: '{% url "stories:add_character" story.id %}'}
+        {% trans "Add new character" %}

@@ -1,0 +1,56 @@
+# -*- coding: utf-8 -*-
+from django.utils.translation import ugettext_lazy as _
+from django.db import models
+from djfw.common.models import AbstractBaseModel
+from django.utils import translation
+
+class NewsItem(AbstractBaseModel):
+    class Meta(AbstractBaseModel.Meta):
+        verbose_name = _(u'news item')
+        verbose_name_plural = _(u'news items')
+        ordering = ['-published_at']
+    
+    caption = models.CharField(
+        max_length=300, 
+        default='', 
+        blank=False, 
+        null=False, 
+        verbose_name=_(u'caption')
+    )
+    announcement = models.TextField(
+        default='', 
+        blank=True, 
+        null=True, 
+        verbose_name=_(u'announcement')
+    )
+    full_text = models.TextField(
+        default='', 
+        blank=True, 
+        null=True, 
+        verbose_name=_(u'full text')
+    )
+    is_published = models.BooleanField(
+        default=False, 
+        verbose_name=_(u'is published')
+    )
+    published_at = models.DateTimeField(
+        verbose_name=_(u'published at')
+    )
+    language = models.CharField(
+        verbose_name=_('language'), 
+        max_length=10, 
+        null=False, 
+        blank=False,
+        editable=False
+    )
+    def __unicode__(self):
+        return self.caption
+    
+    @models.permalink
+    def get_absolute_url(self):
+        return ('news:detail', (), { 'pk': self.id })
+    
+    def save(self, *args, **kwargs):
+        if not self.language:
+            self.language = translation.get_language()
+        super(NewsItem, self).save(*args, **kwargs)

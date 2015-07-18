@@ -1,0 +1,57 @@
+- extends 'base.haml'
+- load i18n
+- load pagination_tags
+
+- block extra_scripts
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-players.css'}
+    
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: ''}
+            {% trans "Players" %}
+
+- block caption
+    {% trans "players" %}
+
+- block content
+    %form.form-inline{method: 'GET', action: ''}
+        - csrf_token
+        %label
+            {% trans "Player" %}:
+        = players_filter_form.filter_by_player
+        %label
+            {% trans "sort by" %}:
+        = players_filter_form.sort_type
+        %button.submit.btn.btn-small{type: 'submit'}
+            {% trans "filter" %}
+
+    - autopaginate players 25
+    
+    - paginate
+    
+    %table
+        %tr
+            %td
+                - for player in players
+                    .player-label
+                        %table
+                            %tr
+                                %td.player-avatar-cell
+                                    - include 'players/snippets/avatar.haml'
+                                %td.player-name
+                                    %h3
+                                        %a{href: '{{ player.get_absolute_url }}'}
+                                            = player.username
+                                    - include 'players/snippets/stars.haml'
+                                    - if show_stories
+                                        {% trans "Stories authored:"%}
+                                        = player.stories
+                                    - if show_games
+                                        {% trans "Games played:"%}
+                                        = player.games
+                                    - if show_reg_date
+                                        = player.date_joined|date:"d E Y"
+
+    - paginate
+    

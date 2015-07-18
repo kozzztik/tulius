@@ -1,0 +1,49 @@
+- load i18n
+- load url from future
+
+.profile-user
+    .profile-info
+        %table.player-info-table
+                %tr
+                    %td
+                        - with player=request.user
+                            - include 'players/snippets/avatar.haml'
+                    %td
+                        %h3
+                            = request.user.username
+                        - with player=request.user
+                            - include 'players/snippets/stars.haml'
+        .wrapper.controls{id: 'file-uploader'}
+            #file-uploader-button.button
+                %script{type: 'text/javascript'}
+                    - include 'profile/avatar_upload.html'
+
+        - if rankform
+                            %form{method: 'POST'}
+                                - csrf_token
+                                = rankform.management_form
+                                {% trans "Rank:" %}
+                                = rankform.rank
+        - else
+            - if request.user.rank
+                %p
+                    = request.user.rank
+                    %br
+        %p
+            - if request.user.vk_profile
+                %a{href: 'https://vk.com/{{ request.user.vk_profile.domain }}'}
+                    VK: {{ request.user.vk_profile.domain }}
+            - else
+                %a{href: "{% url 'vk:auth_oauth' %}"}
+                    {% trans "Assign VK profile" %}
+        %p
+            {% trans "Registred:" %}
+            = request.user.date_joined
+    .profile-stats
+            - with player=request.user
+                - include "players/statistics.haml"
+            - if played_roles        
+                - include "profile/snippets/played_table.haml"
+                - if played_roles.count > 5
+                    %a{href: '{% url "players:profile_played" %}'}
+                        {% trans "All played games and characters" %}

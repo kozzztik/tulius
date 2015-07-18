@@ -1,0 +1,32 @@
+- extends forum_site.templates.base
+- load i18n
+
+- block page_scripts
+    %script{type: 'text/javascript', src: '{{ MEDIA_URL }}forum/collapse_threads.js'}
+
+- block custom_content
+    - include forum_site.templates.index_actions
+    - for group in groups
+        .content
+            .caption{align:"center"}
+                .captionleft
+                .captioncontent
+                    - if request.user.is_superuser
+                        %a{href: '{{ group.get_absolute_url }}'}
+                            = group.title
+                    - else
+                        = group.title
+                .captionright
+            - if not request.user.is_anonymous
+                - if group.unreaded
+                    %a{href: '{{ group.unreaded.get_absolute_url }}'}
+                        .room_group_read_mark.not_readed
+                - else
+                        .room_group_read_mark
+                .thread_collapse{href:'{{ group.get_collapse_url }}', status: '{% if group.collapse_rooms %}1{% else %}0{% endif %}'}
+            - with rooms=group.rooms
+                - include forum_site.templates.room_list
+
+- block online_users
+    - include forum_site.templates.online_users
+    

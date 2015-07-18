@@ -1,0 +1,52 @@
+- extends 'base_cataloged_navig_game.haml'
+- load i18n
+
+- block extra_scripts
+        %script{type: 'text/javascript', src: '{{ STATIC_URL }}ajaxuploader/js/fileuploader.js'}
+        <link href="{{ STATIC_URL }}ajaxuploader/css/fileuploader.css" media="screen" rel="stylesheet" type="text/css" />    
+        
+- block page_content
+    %table.table
+        %thead
+            %tr
+                %th
+                    {% trans "image" %}
+                %th
+                    {% trans "name" %}
+                %th
+                    {% trans "actions" %}
+                %th
+                    {% trans "sizes" %}
+        %tbody
+            - for avatar in story.avatars.all
+                %tr
+                    %td
+                        - if avatar.image
+                            %a{href: '{{ avatar.image.url }}'}
+                                %img{src: '{{ avatar.image.url }}', height: '100', width: '100'}
+                    %td
+                        - if avatar.image
+                            %a{href: '{{ avatar.get_absolute_url }}'}
+                                = avatar.name
+                    %td
+                        %a{href: '{{ avatar.get_absolute_url }}'}
+                            {% trans "Edit" %}
+                        %br
+                        %br
+                        %a{href: '{{ avatar.get_delete_url }}'}
+                            {% trans "Remove" %}
+                    %td
+                      - if avatar.image  
+                          - for alt in avatar.alternatives.all
+                              = alt.height
+                              x
+                              = alt.width
+                              - if alt.image
+                                  %a{href: '{{ alt.image.url }}'}
+                                      = alt.image.url
+                              %br
+    %br
+    %div#file-uploader.wrapper.controls
+        %div#file-uploader-button.button
+            %script{type: 'text/javascript'}
+                - include 'snippets/avatarupload.html'

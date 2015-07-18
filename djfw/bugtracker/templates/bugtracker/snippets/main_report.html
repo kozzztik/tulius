@@ -1,0 +1,117 @@
+{% load i18n %}
+{% load bugtracker %}
+
+<table>
+    <tr>
+        <td width="50%">
+            <h4>{% trans "Info" %}</h4>
+            <table>
+                {% if statistics.project_url %}
+                    <tr>
+                        <td>{% trans "Project:" %}</td>
+                        <td>
+                            <img src="{{ statistics.project_small_icon }}" />
+                            {{ statistics.project_name }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>URL:</td>
+                        <td>
+                            <a {% if iframe %}target="_parent" {%endif%}href="{{ statistics.project_url }}">
+                                {{ statistics.project_url }}
+                            </a>
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if statistics.project_description %}
+                    <tr>
+                        <td>{% trans "Description:" %}</td>
+                        <td>{{ statistics.project_description }}</td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <td>{% trans "Project lead:" %}</td>
+                    <td>
+                        {% with jira_user=statistics.project_lead %}
+                            {% include "bugtracker/snippets/issue/jira_user.html" %}
+                        {% endwith %}
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td>
+            <h4>{% trans "Versions: not released" %}</h4>
+            <table class="wide">
+                {% for version in statistics.versions %}
+                    {% if not version.release_date %}
+                        <tr class="version-row">
+                            <td>
+                                <img class="version-icon inline" src="{{ STATIC_URL }}bugtracker/img/version_in_work.png" />
+                                <a {% if iframe %}target="_parent" {%endif%}href="{% bug_version_url version.id %}">
+                                    {{ version.name }}
+                                </a>
+                            </td>
+                            <td>{{ version.user_release_date }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <h4>{% trans "Need attention" %}</h4>
+            <table class="wide">
+                {% for bug in statistics.not_synced_not_solved %}
+                    <tr class="version-row">
+                        <td width="20px">
+                            <img src="{{ bug.bug_type.icon.url }}" title="{{ bug.bug_type.name }}" />
+                        </td>
+                        <td>
+                            <a {% if iframe %}target="_parent" {%endif%}href="{% bug_url bug.id %}">
+                                {{ bug.key }}
+                            </a>
+                            <br />
+                            {{ bug.summary|slice:":50" }}
+                            <br />
+                            <small>
+                                {% trans "Updated:"%}
+                                {{ bug.updated_time }}
+                            </small>
+                        </td>
+                        <td width="20px">
+                            <img src="{{ bug.priority.icon.url }}" title="{{ bug.priority.name }}" />
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </td>
+        <td>
+            <h4>{% trans "Last updated" %}</h4>
+            <table class="wide">
+                {% for bug in statistics.last_updated %}
+                    <tr class="version-row">
+                        <td width="20px">
+                            <img src="{{ bug.bug_type.icon.url }}" title="{{ bug.bug_type.name }}" />
+                        </td>
+                        <td>
+                            <a {% if iframe %}target="_parent" {%endif%}href="{% bug_url bug.id %}">
+                                {{ bug.key }}
+                            </a>
+                            <br />
+                            {{ bug.summary|slice:":50" }}
+                            <br />
+                            <small>
+                                {% trans "Updated:"%}
+                                {{ bug.updated_time }}
+                            </small>
+                        </td>
+                        <td width="20px">
+                            <img src="{{ bug.status.icon.url }}" title="{{ bug.status.name }}" />
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </td>
+    </tr>
+</table>

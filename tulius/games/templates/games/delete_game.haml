@@ -1,0 +1,39 @@
+- extends 'base.haml'
+- load i18n
+- load url from future
+
+- block title
+    {% trans "Confirm deletion" %}
+
+- block caption
+    {% trans "Confirm deletion" %}
+
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: '{% url "games:index" %}'}
+            {% trans "Games" %}
+    %li
+        .divider
+        %a{href: ''}
+            {% trans "Confirm deletion" %}
+
+- block content
+    %form.form-horizontal{method: 'POST'}
+        - csrf_token
+        %fieldset.control-group
+            .controls
+                %h2
+                    {% trans "Are you shure you want to delete game:"%}
+                %h3
+                    = object
+                %h2
+                    {% trans "from story:"%}
+                %h3
+                    = object.variation.story
+        %fieldset
+            .form-actions
+                %button.submit.btn.btn-primary{type: 'submit'}
+                    {% trans "Delete" %}
+                %a.submit.btn{href: '{% url "games:index" %}'}
+                    {% trans "Cancel" %}

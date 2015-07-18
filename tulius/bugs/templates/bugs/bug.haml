@@ -1,0 +1,29 @@
+- extends 'base.haml'
+- load i18n
+- load url from future
+
+- block extra_scripts
+    %link{rel: 'stylesheet', href: '{{ MEDIA_URL }}css/tulius-bugs.css', type: 'text/css'}
+
+- block breadcrumbs
+    %ul.breadcrumb
+        %li {% include 'home_link.haml' %}
+        - if request.user.is_superuser
+            %li
+                %a{href: "{% url 'bugs:bugs_main' %}"}
+                    {% trans "Bugtracker" %}
+        %li
+            %a{href: '{{ bug.get_absolute_url }}'}
+                {{ bug.key }}
+        
+- block caption
+    - if bug.parent_bug.all
+        - for parent_bug in bug.parent_bug.all
+            %a{href: '{{ parent_bug.bug.get_absolute_url }}'}
+                {{ parent_bug.bug.key }} /
+            
+    = bug.key
+    = bug.summary
+
+- block content
+    - include 'bugtracker/admin/snippets/bug.haml'

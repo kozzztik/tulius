@@ -1,0 +1,37 @@
+- extends 'base_cataloged_navig.haml'
+- load i18n
+- load url from future
+
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: '{% url "games:index" %}'}
+            {% trans "Games" %}
+
+- block custom_content
+
+    - block content
+        - if new_games
+            {% trans "New games" as caption %}
+            - with games=new_games
+                - include 'games/snippets/games_table.haml'
+        - if announced_games
+            {% trans "Reception of requests to play" as caption %}
+            - with games=announced_games
+                - include 'games/snippets/games_table.haml'
+        - if awaiting_start_games
+            {% trans "Awaiting start games" as caption %}
+            - with games=awaiting_start_games
+                - include 'games/snippets/games_table.haml'
+        - if current_games
+            {% trans "Current games" as caption %}
+            - with games=current_games
+                - include 'games/snippets/games_table.haml'
+        - if completed_games
+            {% trans "Completed games" as caption %}
+            - with games=completed_games
+                - include 'games/snippets/games_table.haml' 
+        - if completed_open_games
+            {% trans "Completed open games" as caption %}
+            - with games=completed_open_games
+                - include 'games/snippets/games_table.haml'

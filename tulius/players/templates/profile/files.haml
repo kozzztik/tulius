@@ -1,0 +1,37 @@
+- load i18n
+
+{% trans "Here presented files, you have attached to your posts." %}
+%br
+%br
+%table.table
+    %thead
+        %tr
+            %th{width: '40%'}
+                {% trans "File name" %}
+            %th
+                {% trans "Type" %}
+            %th
+                {% trans "Size"%}
+            %th
+                {% trans "Actions" %}
+    %tbody
+        - for file in files
+            %tr
+                %td.profile-filename
+                    = file.name
+                    %br
+                    %small
+                        {% trans "Uploaded:" %}
+                        = file.create_time
+                %td
+                    = file.mime
+                %td
+                    = file.file_length
+                %td
+                    %a{href: '{{ file.body.url }}'}
+                        {% trans "Download" %}
+- if not files
+    %br
+    {% trans "You have not uploaded files yet." %}
+    %br
+    %br

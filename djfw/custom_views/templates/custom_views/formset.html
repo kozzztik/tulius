@@ -1,0 +1,53 @@
+{% load i18n %}
+<form method="POST" action="?widget={{widget.name}}&action=add_item" id="id{{ widget.prefix }}{{ widget.name }}_form" class="formset_form">
+    <table id="id{{ widget.prefix }}{{ widget.name }}_table" class="{{ widget.table_class }}">
+        <thead>
+            <tr>
+                {% for field in widget.formset.fields %}
+                    <th>{{ field.verbose_name }}</th>
+                {% endfor %}
+                {% if widget.editable %}
+                <th>{% trans "Action" %}</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for form in widget.formset.forms %}
+                <tr id="id{{ widget.prefix }}{{ widget.name }}_{{ form.obj.pk }}">
+                    {% for field in form.fields %}
+                        <td>
+                            {{ field.value }}
+                        </td>
+                    {% endfor %}
+                    {% if widget.editable %}
+                    <td class="formset_delete">
+                        <a href="javascript: formset_delete('{{ widget.prefix }}', '{{ widget.name }}', '{{ form.obj.pk }}')">
+                            {% trans "Delete" %}
+                        </a>
+                    </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            {% if widget.editable %}
+            <tr id="id{{ widget.prefix }}{{ widget.name }}_add">
+                {% for field in widget.form %}
+                    <td>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="help-inline error formset-error">
+                                {{ field.errors }}
+                            </div>
+                        {% endif%}
+                    </td>
+                {% endfor %}
+                <td class="formset_add">
+                    <a href="javascript: formset_add('{{ widget.prefix }}', '{{ widget.name }}')">
+                        {% trans "Add" %}
+                    </a>
+                </td>
+                
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</form>

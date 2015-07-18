@@ -1,0 +1,28 @@
+- load i18n
+- load url from future
+%tr.tblrow2
+    %td.add.hidden-phone
+    %td
+        - include 'games/snippets/game_as_list_info.haml'
+    %td.hidden-phone
+        - include 'games/snippets/game_as_list_actions.haml' 
+    %td.visible-desktop
+        %a{href:'{{ game.variation.story.get_absolute_url }}'}
+            = game.variation.story
+        - if request.user.is_superuser
+            %br
+            (
+            %a{href:'{% url "games:change_game_story" game.id %}'}
+                {% trans "change" %}
+            )
+    %td.hidden-phone
+        = game.short_comment|safe        
+    %td.hidden-phone
+        - with count=game.variation.comments_count
+            - if count
+                = count
+            - else
+                0
+    %td.hidden-phone
+        = game.status_as_text
+    %td.add.hidden-phone

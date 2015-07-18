@@ -1,0 +1,29 @@
+- load i18n
+- load url from future
+
+%form.form-horizontal{method: 'POST', action: '{% url "players:profile_subscriptions" %}'}
+    - csrf_token
+    %table.table
+        %thead
+            %tr
+                %th
+                    {% trans "Name" %}
+                %th
+                    {% trans "Status" %}
+                %th
+                    {% trans "Description" %}
+        %tbody
+            - for form in forms
+                %tr
+                    %td
+                        = form.notification
+                    %td
+                        = form.enabled
+                    %td
+                        = form.notification.description
+    %fieldset
+        .form-actions
+            %button#submit_settings.submit.btn.btn-primary{type: 'submit'}
+                {% trans "save" %}
+            %button.submit.btn{type: 'reset'}
+                {% trans "reset" %}

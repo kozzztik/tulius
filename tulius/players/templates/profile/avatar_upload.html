@@ -1,0 +1,30 @@
+{% load i18n %}
+{% load url from future %}
+
+        $(function(){
+            var uploader = new qq.FileUploader({
+                action: "{% url 'players:profile_upload_avatar' %}",
+                element: $('#file-uploader')[0],
+                multiple: false,
+                onComplete: function(id, filename, data) {
+                    elem.nodeValue='{% trans "Reload avatar" %}';
+                    var avatar = $('#avatar{{request.user.id}}')[0];
+                    avatar.src = data.url+'?'+Math.random();
+                },
+                onAllComplete: function(data) {
+                },
+                params: {
+                    'csrf_token': '{{ csrf_token }}',
+                    'csrf_name': 'csrfmiddlewaretoken',
+                    'csrf_xname': 'X-CSRFToken',
+                },
+            });
+            var elem = uploader._button._element.firstChild
+            if(elem){
+                {% if request.user.profile.avatar %}
+                elem.nodeValue='{% trans "Reload avatar" %}';
+                {% else %}
+                elem.nodeValue ='{% trans "Load avatar" %}';
+                {% endif %}
+            }
+        });

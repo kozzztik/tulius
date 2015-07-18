@@ -1,0 +1,39 @@
+- extends 'base_cataloged_navig_game.haml'
+- load i18n
+- load url from future
+
+- block extra_scripts
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-stories.css'}
+
+- block caption
+    = role.name
+
+- block content
+    .pull-right
+        - if game.edit
+            %a.submit.btn.btn-primary{href: '{% url "games:edit_game_roles" game.id %}'}
+                {% trans "to roles" %}
+        - if game.enter_url
+            %a.submit.btn.btn-primary{href: '{{ game.enter_url }}'}
+                {% trans "to game" %}
+    %table
+        %tr
+            %td{style: 'text-align: center'}
+                  .story-character
+                    - if role.avatar
+                        .character-avatar
+                            %img{align: 'left', src: '{{ role.avatar.image.url }}'}
+                        .character-text
+                            %h3
+                                = role.name
+                            = role.description
+    %table
+        %tr
+            %td{style: 'text-align: left'}
+                - if role.body
+                    = role.body|safe
+                - else
+                    %br
+                    {% trans "No role text" %}
+                    %br
+                    %br

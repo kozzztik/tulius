@@ -1,0 +1,52 @@
+- extends 'base.haml'
+- load i18n
+
+- block breadcrumbs
+    %ul.breadcrumb
+        %li
+            - include 'home_link.haml'
+        %li
+            %a{'href': '{% url players:index %}'}
+                {% trans "players" %}
+        %li
+            %a{'href': '{% url players:profile %}'}
+                {% trans "Your profile" %}
+        %li
+            %a{'href': '{% url pm:index %}'}
+                {% trans "Private messages" %}
+
+        - ifequal message.sender request.user
+            %li
+                %a{'href': '{% url pm:inbox %}'}
+                    {% trans "Inbox" %}
+            %li
+                %a{'href': '{% url pm:message_details message.id %}'}
+                    {% trans "Message to" %}
+                    = message.receiver
+        - else
+            - ifequal message.receiver request.user
+                %li
+                    %a{'href': '{% url pm:outbox %}'}
+                        {% trans "Outbox" %}
+                %li
+                    %a{'href': '{% url pm:outbox %}'}
+                        {% trans "Outbox" %}
+                %li
+                    %a{'href': '{% url pm:message_details message.id %}'}
+                        {% trans "Message from" %}
+                        = message.sender
+
+- block caption
+    {% trans "Message from" %}
+    = message.sender
+
+- block content
+    .message
+        = message.body
+
+    <form method="POST" action="" class="send_private_message_form">
+        - csrf_token
+        = form
+        %button{'type': 'submit'}
+            {% trans "Submit" %}
+    </form>

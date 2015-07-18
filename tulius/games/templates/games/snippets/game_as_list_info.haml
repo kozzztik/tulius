@@ -1,0 +1,19 @@
+- load i18n
+- load url from future
+
+%a{href:'{{ game.get_absolute_url }}'}
+    = game
+- if game.full
+    (
+    {% trans "no places" %}
+    )
+- if game.user_roles
+    %br
+    {% trans "Your role:"%}
+    - for role in game.user_roles
+        %a{href: '{{ role.text_url }}'}
+            = role.name
+- else
+    - if game.text_hint
+        %br
+        = game.text_hint

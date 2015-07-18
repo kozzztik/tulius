@@ -1,0 +1,2 @@
+Вам пришло новое сообщение на сайте {{ site }} от пользователя {{ private_message.sender }}!
+Ссылка на сообщение: http://{{ site }}{% url pm:message_details private_message.id %}

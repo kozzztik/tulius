@@ -1,0 +1,118 @@
+.player-label {
+    width: 300px;
+    height: 120px;
+    margin: 10px; 
+    float:left;
+    border-radius: 6px;
+    border: 1px solid white;
+    background-color: rgb(221, 210, 190);
+    vertical-align: middle;
+ }
+ 
+.player-label .player-name h3 { line-height: 18px; }
+.player-label .player-name {
+    vertical-align: middle; 
+    width: 180px; 
+    padding: 10px;
+    text-align:center;
+}
+.stat-table { width: 300px; }
+.stat-label { width: 200px; }
+.stat-val { width: 100px; }
+
+.played { width: 600px; margin-bottom: 6px; }
+.play-game { width: 60%; }
+.play-char { width: 40%; }
+
+.profile-user { 
+    vertical-align: top;
+}
+
+@media (min-width: 768px) {
+    .profile-info { float: left; }
+    .profile-stats { margin-left: 315px; }
+}
+
+.profile-info {
+    width: 300px;
+    text-align: center;
+}
+
+.profile-info form { margin-bottom: 0px }
+.player-info-table {
+    margin-bottom: 10px; 
+}
+.profile-user .played { width: 100%; }
+.profile-user .played td{ width: 50%; }
+
+.profile-user .stat-table { width: 100%; }
+.profile-user .stat-label { width: 50%; }
+.profile-user .stat-val, .profile-user .user-player-roles { 
+    text-align: right; 
+}
+.profile-user #file-uploader, .profile-user #file-uploader .qq-upload-button { 
+    width: 100%; 
+}
+
+.profile-messages { 
+    vertical-align: top; 
+    width: 100%;
+    float: right;
+}
+.profile-messages table tbody tr td { text-align: left }
+
+.messages-area { 
+    overflow-y: auto; 
+    margin-bottom: 18px; 
+    max-height: 450px; 
+}
+.messages-area table.messages-table { margin-bottom: 0px; }
+
+table.messages-table tr.unread-talking td { background: #f2e8d6; }
+
+.messages-avatar { vertical-align: top; }
+.messages-sender { 
+    width: 100px; 
+    padding: 5px;
+    vertical-align: top;
+}
+
+.messages-sender small {
+    font-size: 70%;
+}
+
+.messages-text { 
+    padding: 5px; 
+    word-wrap: break-word;
+    max-height: 150px;
+    overflow: hidden;
+}
+
+@media (min-width: 768px) {
+    .messages-text { width: 400px; }
+}
+
+@media (max-width: 768px) {
+    .messages-text { width: 200px; }
+}
+
+@media (max-width: 500px) {
+    .messages-text { width: 100px; }
+}
+
+.messages-form textarea { 
+    width: 95%; 
+    height: 100px; 
+ }
+
+.stars { margin: 15px }
+
+.messages-form a { margin-left: 10px; }
+
+.table .profile-filename { text-align: left }
+.table .profile-gamelist { text-align: left }
+
+.player-avatar-cell {
+    padding: 10px;
+    text-align:center;
+}

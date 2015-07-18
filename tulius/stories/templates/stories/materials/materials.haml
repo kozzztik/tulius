@@ -1,0 +1,84 @@
+- extends 'base_cataloged_navig_game.haml'
+- load i18n
+- load url from future
+
+- block page_content
+    %table.table
+        %thead
+            %tr
+                %th{'width': '30%'}
+                    {% trans "name" %}
+                %th{'width': '160'}
+                    {% trans "admins only" %}
+                %th
+                    {% trans "link" %}
+        %tbody
+            - for material in materials
+                %tr
+                    %td
+                        %a{'href': '{{ material.get_absolute_url }}'} 
+                            = material.name
+                        (
+                        %a{'href': 'javascript:delete_material("{{ material.delete_url }}", "{{ material.name }}")'} 
+                            {% trans "Remove" %}
+                        )
+                    %td
+                        - if material.admins_only
+                            {% trans "yes" %}
+                        - else
+                            {% trans "no" %}
+                    %td
+                        %a{'href': '{{ material.url }}'} 
+                            = material.url
+
+    - if variation
+        %h3
+            {% trans "story materials" %}
+        %table.table
+            %thead
+                %tr
+                    %th{'width': '30%'}
+                        {% trans "name" %}
+                    %th{'width': '160'}
+                        {% trans "admins only" %}
+                    %th
+                        {% trans "link" %}
+            %tbody
+                - for material in story.additional_materials.all
+                    %tr
+                        %td
+                            = material.name
+                        %td
+                            - if material.admins_only
+                                {% trans "yes" %}
+                            - else
+                                {% trans "no" %}
+                        %td
+                            %a{'href': '{{ material.url }}'} 
+                                = material.url
+    %br
+    - if variation
+        - if variation.game
+            %a.submit.btn.btn-primary{href: '{% url "games:add_material" variation.game.id %}'}
+                {% trans "Add material" %}
+        - else
+            %a.submit.btn.btn-primary{href: '{% url "stories:add_variation_material" variation.id %}'}
+                {% trans "Add material" %}
+    - else
+        %a.submit.btn.btn-primary{href: '{% url "stories:add_story_material" story.id %}'}
+            {% trans "Add material" %}
+    %script{'type': 'text/javascript', 'src': '{{ MEDIA_URL }}stories/delete-material.js'}
+    #delete-material-popup.modal.hide.fade.in.well
+        .modal-header
+            %a.close{'data-dismiss': "modal"}×
+            %h3
+                {% trans "Delete material" %}
+        .modal-body
+            {% trans "Are you shure you want to delete" %}
+            %span#delete-material-name
+            ?
+        .modal-footer
+            %a#delete-material-button.btn.btn-primary{'href': '#'}
+                {% trans "Delete" %}
+            %a.btn{'data-dismiss': "modal"}
+                {% trans "Cancel" %}

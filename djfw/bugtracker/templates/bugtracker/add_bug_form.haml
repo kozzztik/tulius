@@ -1,0 +1,15 @@
+- load i18n
+%p
+    {% trans "Describe problem you found. More details will help us fix problem faster." %}
+- if exception
+    .alert.alert-info
+        {% trans "Exception ID:"%}
+            = exception.id
+
+- if request.user.is_anonymous
+    %p.alert.alert-info
+        {% trans "You are not logged in. We could not provide feedback on bug info, sended by anonymous users." %}
+{{ form }}
+- if not request.user.is_anonymous
+    - if not exception
+        {{ upload_form }}

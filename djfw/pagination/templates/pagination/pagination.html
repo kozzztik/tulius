@@ -1,0 +1,36 @@
+{% if is_paginated %}
+{% load i18n %}
+<div class="pagination pagination-centered">
+    <ul>
+        <li {% if page_obj.has_previous %}{% else %}class="disabled"{% endif %}>
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{{ getvars }}{{ hashtag }}">&lsaquo;&lsaquo; {% trans "previous" %}</a>
+            {% else %}
+                <a href="#">&lsaquo;&lsaquo; {% trans "previous" %}</a>
+            {% endif %}
+        </li>
+        {% for page in pages %}
+            {% if page %}
+                <li {% ifequal page page_obj.number %}class="active"{% endifequal %}>
+                    {% ifequal page page_obj.number %}
+                        <a href="#">{{ page }}</a>
+                    {% else %}
+                        <a href="?page={{ page }}{{ getvars }}{{ hashtag }}">{{ page }}</a>
+                    {% endifequal %}
+                </li>
+            {% else %}
+                <li class="disabled">
+                    <a href="#" >...</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+        <li {% if page_obj.has_next %}{% else %}class="disabled"{% endif %}>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{{ getvars }}{{ hashtag }}">{% trans "next" %} &rsaquo;&rsaquo;</a>
+            {% else %}
+                <a href="#" class="disabled">{% trans "next" %} &rsaquo;&rsaquo;</a>
+            {% endif %}
+        </li>
+    </ul>
+</div>
+{% endif %}

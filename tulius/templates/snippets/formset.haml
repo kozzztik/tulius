@@ -1,0 +1,24 @@
+- load i18n
+- load repeatblock
+- enablemacros
+
+%form{'method': '{% if form_method %}{{ form_method }}{% else %}POST{% endif %}', 'action': '{% if form_action %}{{ form_action }}{% else %}{% endif %}', 'class': '{% if form_class %}{{ form_class }}{% endif %} form-horizontal'}
+	- csrf_token
+	= form.media
+	= form.management_form
+	- if form.non_field_errors
+		.alert.alert-error
+			= form.non_field_errors
+	- block form_actions
+		%fieldset
+			.form-actions
+				%button.submit.btn.btn-primary{'type': 'submit'}
+					- if form_submit_title
+						{% trans form_submit_title %}
+					- else
+						{% trans "edit" %}
+				%button.submit.btn{'type': 'reset'}
+					{% trans "reset" %}
+	- for field in form
+		- include 'snippets/formset_field.haml'
+	- repeat form_actions

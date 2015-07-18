@@ -1,0 +1,95 @@
+- extends forum_site.templates.base
+- load i18n
+- load repeatblock
+- enablemacros
+- load url from future
+
+- block page_scripts
+    - include forum_site.templates.init_editor
+    <script>
+        $(document).ready(function() { $("#tabs").tabs(); });
+    </script>
+    - if show_preview
+        %script{type: 'text/javascript', src: '{{ MEDIA_URL }}forum/preview.js'}
+    
+    - if not form.room
+        - if formset
+            %script{type: 'text/javascript', src: '{{ STATIC_URL }}forum/rights_page.js'}
+    - if show_voting
+        %script{type: 'text/javascript', src: '{{ STATIC_URL }}forum/voting_page.js'}
+        - if voting
+            %script{type: 'text/javascript', src: '{{ STATIC_URL }}forum/voting_delete.js'}
+        
+- block title
+    {{ form.caption }}
+    
+- block caption
+    {{ form.caption }}
+
+- block upper_actions
+    
+- block forum_content
+    - if show_preview
+        #post-preview{style: 'display: none'}
+    %form.form-horizontal{enctype: 'multipart/form-data', method: 'POST', action: '', id: '{{ form.html_id }}'}
+        - csrf_token
+        = form.media
+        = form.management_form
+        - if form.non_field_errors
+            .alert.alert-error
+                = form.non_field_errors
+        %div#tabs
+            %ul
+                %li
+                    %a{href: '#main'}
+                        %span
+                            {% trans "main" %}
+                - if formset
+                    %li
+                        %a{href: '#rights'}
+                            %span
+                                {% trans "Access rights" %}
+                - if show_voting
+                    %li
+                        %a{href: '#voting'}
+                            %span
+                                {% trans "Voting" %}
+            %div#main
+                - if form.non_field_errors
+                    .alert.alert-error
+                        = form.non_field_errors
+                - block before_form
+                - for field in form
+                    - if field.is_hidden
+                        = field
+                    - else
+                        - include forum_site.templates.form_field
+                - block form_actions
+                    %fieldset
+                        .form-actions
+                            %button.submit.btn.btn-primary{type: 'submit'}
+                                - if form_submit_title
+                                    {% trans form_submit_title %}
+                                - else
+                                    {% trans "edit" %}
+                            %button.submit.btn{type: 'reset'}
+                                {% trans "reset" %}
+                            - if show_preview
+                                %a#post-preview-link.btn.pull-right{href: 'javascript:do_preview()', url: '{% url "forum:preview" %}'}
+                                    {% trans "Preview" %}
+            - if formset
+                %div#rights
+                    {{ formset }}
+                    - repeat form_actions
+            - if show_voting
+                %div#voting
+                    - if voting
+                        %div#voting_container
+                            - include forum_site.templates.voting_results
+                        - for field in voting_delete
+                            - include forum_site.templates.form_field
+                    - else
+                        - for field in voting_form
+                            - include forum_site.templates.form_field
+                        {{ voting_formset }}
+                    - repeat form_actions

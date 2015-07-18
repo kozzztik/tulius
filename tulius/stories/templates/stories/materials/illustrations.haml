@@ -1,0 +1,65 @@
+- extends 'base_cataloged_navig_game.haml'
+- load i18n
+
+- block extra_scripts
+    %script{'type': 'text/javascript', 'src': '/static/ajaxuploader/js/fileuploader.js'}
+    <link href="/static/ajaxuploader/css/fileuploader.css" media="screen" rel="stylesheet" type="text/css" />    
+        
+- block page_content
+    %table.table
+        %thead
+            %tr
+                %th{'width': '120'}
+                    {% trans "image" %}
+                %th{'width': '30%'}
+                    {% trans "name" %}
+                %th
+                    {% trans "link" %}
+        %tbody
+            - for illustration in illustrations
+                %tr
+                    %td
+                        - if illustration.thumb
+                            %img{'src': '{{ illustration.thumb.url }}'}
+                    %td
+                        %a{'href': '{{ illustration.get_absolute_url }}'} 
+                            = illustration.name
+                        (
+                        %a{'href': '{{ illustration.delete_url }}'} 
+                            {% trans "Remove" %}
+                        )
+                    %td
+                        - if illustration.image
+                            %a{'href': '{{ illustration.image.url }}', 'rel': 'lightbox[illustrations]', 'title': '{{ illustration.name }}'} 
+                                = illustration.image.url
+    
+    - if variation
+        %h3
+            {% trans "story illustrations" %}
+        %table.table
+            %thead
+                %tr
+                    %th{'width': '120'}
+                        {% trans "image" %}
+                    %th{'width': '30%'}
+                        {% trans "name" %}
+                    %th
+                        {% trans "link" %}
+            %tbody
+                - for illustration in story.illustrations.all
+                    %tr
+                        %td
+                            - if illustration.thumb
+                                %img{'src': '{{ illustration.thumb.url }}'}
+                        %td
+                            = illustration.name
+                        %td
+                            - if illustration.image
+                                %a{'href': '{{ illustration.image.url }}', 'rel': 'lightbox[illustrations]', 'title': '{{ illustration.name }}'} 
+                                    = illustration.image.url
+    %br
+    %div.wrapper.controls{'id': 'file-uploader'}
+        %div#file-uploader-button.button
+            %script{'type': 'text/javascript'}
+                - include 'stories/materials/illustrationscript.html'
+    

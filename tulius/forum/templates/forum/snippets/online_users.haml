@@ -1,0 +1,14 @@
+- load i18n
+- if online_users
+    .online-users
+        - if parent_thread
+            - if parent_thread.room
+                {% trans "In this room:" %}
+            - else
+                {% trans "In this thread:" %}
+        - else
+            {% trans "Online users:" %}
+        %ul.comma-list
+            - for user in online_users
+                - if user.show_online_status
+                    <li><a href="{{ user.get_absolute_url }}">{{ user }}</a></li>

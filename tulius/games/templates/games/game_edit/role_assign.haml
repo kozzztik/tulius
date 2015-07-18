@@ -1,0 +1,96 @@
+- extends 'base_cataloged_navig_game.haml'
+- load i18n
+- load url from future
+
+- block extra_scripts
+    %link{'rel': 'stylesheet', 'href':'{{ MEDIA_URL }}css/tulius-games.css', 'type': 'text/css'}
+    %script{'type': 'text/javascript', 'src': '{{ MEDIA_URL }}games/reqtooltips.js'}
+    
+- block page_content
+    %table.table
+        %thead
+            %tr
+                %th
+                    {% trans "user" %}
+                %th
+                    %a{'href': 'role.get_absolute_url'}
+                        = role
+                %th
+                    {% trans "assigned" %}
+                %th
+                    {% trans "preferences" %}
+                %th{'width' : '210'}
+                    {% trans "occupation" %}
+                %th
+                    {% trans "comment" %}
+        %tbody
+            - for request in requests
+                %tr
+                    %td
+                        %a{'href': '{{ request.user.get_absolute_url }}'}
+                            = request.user
+                    %td
+                        %a{'href': '{% url "games:role_assign_user_roles" role.id request.user.id %}'}
+                            {% trans "assign" %}
+                    %td
+                        - if request.assigned
+                            .requests-list
+                                %ul
+                                    - for role in request.assigned
+                                        %li
+                                            %a{'href': '{{ role.get_absolute_url }}'}
+                                                = role
+                                                %br
+                                            (
+                                            %a{'href': '{% url "games:role_clear_user" role.id %}'}
+                                                {% trans "clear" %}
+                                            )
+                        - else
+                            {% trans "no" %}
+                    %td
+                        .requests-list
+                            %ul
+                                - if request.roles
+                                    - for prefer in request.roles
+                                        %li
+                                            %a{'href': '{{ prefer.role.get_absolute_url }}'}
+                                                = prefer.role
+                                                %br
+                                            (
+                                            %a{'href': '{% url "games:role_assign_user_roles" prefer.role.id request.user.id %}'}
+                                                {% trans "assign" %}
+                                            )
+                                - else
+                                    - for role in all_roles
+                                        %li
+                                            %a{'href': '{{ role.get_absolute_url }}'}
+                                                = role
+                                            (
+                                            %a{'href': '{% url "games:role_assign_user_roles" role.id request.user.id %}'}
+                                                {% trans "assign" %}
+                                            )
+                    %td
+                        .requests-list
+                            %ul
+                                %li
+                                    {% trans "New games" %}
+                                    :
+                                    = request.new_games
+                                %li
+                                    {% trans "Current games" %}
+                                    :
+                                    =request.current_games
+                                %li
+                                    {% trans "Complited games" %}
+                                    :
+                                    =request.complited_games
+                    %td
+                        %a.reqtooltip{'href': '#', 'request': '{{ request.id }}', 'id': 'tip{{ request.id }}', 'title': '{% trans "Answers" %}'}
+                            {{ request.body|safe }}
+                        %div{'style': 'display:none', 'id': 'req{{ request.id }}'}
+                            - for answer in request.answers.all
+                                %b
+                                    =answer.question.question|safe
+                                %br
+                                =answer.answer|safe
+                                %br

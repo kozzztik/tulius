@@ -1,0 +1,20 @@
+- extends 'base.haml'
+- load i18n
+- load url from future
+
+- block breadcrumbs
+    %ul.breadcrumb
+        %li {% include 'home_link.haml' %}
+        %li
+            %a{href: "{% url 'bugs:bugs_main' %}"}
+                {% trans "Bugtracker" %}
+
+- block caption
+    {% trans "Bugtracker" %}
+    
+- block extra_scripts
+    %link{rel: 'stylesheet', href: '{{ MEDIA_URL }}css/tulius-bugs.css', type: 'text/css'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}bugtracker/sync.js'}
+
+- block content
+    - include "bugtracker/admin/snippets/main.haml"

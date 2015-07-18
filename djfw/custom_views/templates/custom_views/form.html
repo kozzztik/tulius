@@ -1,0 +1,7 @@
+<form id="{{ widget.name }}Form" class="{{ widget.css_class }}" enctype="multipart/form-data" method="POST" action="?widget={{ widget.name }}">
+    {% csrf_token %}
+    {{ widget.form.as_p }}
+    <button class="submit btn btn-primary" onclick="javascript: ajax_form_send('{{ widget.name }}Form')">
+        {{ widget.button_name }}
+    </button>
+</form>

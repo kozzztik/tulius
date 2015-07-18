@@ -1,0 +1,60 @@
+- load i18n
+
+%table.table.forum-thread-list
+    %thead
+        %tr
+            %th{width: '40'}
+                &nbsp;
+            %th
+                {% trans "thread" %}
+            %th.hidden-phone{width: '100'}
+                {% trans "author" %}
+            %th.miniphone-hidden{width: '80'}
+                    {% trans "posts" %}
+            %th.miniphone-hidden{width: '200'}
+                {% trans "latest post" %}
+    %tbody
+        - for thread in threads
+            %tr{class: '{% if thread.deleted %}deleted-thread{%endif%}'}
+                %td.forum-post-icon
+                    - if thread.important
+                        - with unreaded=thread.unreaded
+                            - if unreaded
+                                %a{href:'{{ unreaded.get_absolute_url }}'}
+                                    %img{src: '{{ MEDIA_URL }}forum/important_not_readed.gif'}
+                            - else
+                                %img{src: '{{ MEDIA_URL }}forum/important_readed.gif'}
+                    - else
+                        - if thread.closed
+                            %a{href:'{{ thread.get_absolute_url }}'}
+                                %img{src: '{{ MEDIA_URL }}forum/closed.gif'}
+                        - else
+                            - with unreaded=thread.unreaded
+                                - if unreaded
+                                    %a{href:'{{ unreaded.get_absolute_url }}'}
+                                        %img{src: '{{ MEDIA_URL }}forum/unreadedmark.gif'}
+                                - else
+                                    %img{src: '{{ MEDIA_URL }}forum/readedmark.gif'}
+                %td
+                    .forum-post-description
+                        %h4
+                            %a{href: '{{ thread.get_absolute_url }}'}
+                                = thread.title
+                        - if thread.accessed_users
+                            %h6.moderators {% trans "Opened for" %}:
+                            %ul.moderators
+                                - for accessed_user in thread.accessed_users
+                                    <li><a href="{{ accessed_user.get_absolute_url }}">{{ accessed_user }}</a></li>
+                        - if thread.pages
+                            %h6 {% trans "pages" %}:
+                            - for page in thread.pages
+                                %a{href: '{{ page.url }}'}
+                                    {{ page.page }}
+                %td.hidden-phone
+                    %a{href: '{{ thread.user.get_absolute_url }}'}
+                        {{ thread.user }}
+                %td.miniphone-hidden
+                    = thread.comments_count
+                %td.miniphone-hidden
+                    - with comment=thread.last_comment
+                        - include forum_site.templates.thread_latest_post

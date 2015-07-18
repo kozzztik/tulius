@@ -1,0 +1,19 @@
+- extends 'base_game.haml'
+- load url from future
+- load i18n
+
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: '{% url "stories:index" %}'}
+            {% trans "Story catalog" %}
+    - block story_breadcrumbs
+    
+- block caption
+    {% trans "Story catalog" %}
+    
+- block title
+    {% trans "Story catalog" %}
+    
+- block extra_scripts
+    %link{rel: 'stylesheet', href: '{{ MEDIA_URL }}css/tulius-stories.css', type: 'text/css'}

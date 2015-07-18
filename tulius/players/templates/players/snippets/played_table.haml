@@ -1,0 +1,47 @@
+- load i18n
+
+- if player.show_played_games and player.show_played_characters
+    %table.table.played
+        %thead
+            %tr
+                %th.play-game
+                    {% trans "Played games" %}
+                %th.play-char.user-player-roles
+                    {% trans "Characters" %} 
+        %tbody               
+            - for role in played_roles
+                %tr
+                    %td
+                        - if role.variation.game.url
+                            %a{href: '{{ role.variation.game.url }}'}
+                                = role.variation.game
+                        - else
+                            = role.variation.game 
+                    %td.user-player-roles
+                        = role
+- elif player.show_played_games
+    %table.table.played
+        %thead
+            %tr
+                %th
+                    {% trans "Played games" %}
+        %tbody                
+            - for game in played_games
+                %tr
+                    %td
+                        - if game.url
+                            %a{href:'{{ game.url }}'}
+                                = game
+                        - else
+                            = game        
+- elif player.show_played_characters    
+    %table.table.played
+        %thead
+            %tr
+                %th
+                    {% trans "Played characters" %}
+        %tbody                
+            - for role in played_roles
+                %tr 
+                    %td
+                        = role

@@ -1,0 +1,101 @@
+- extends 'stories/base.haml'
+- load i18n
+
+- block title
+    = story
+
+- block caption
+    = story
+    
+- block story_breadcrumbs
+    %li
+        .divider
+        %a{href: ''}
+            = story
+            
+- block page_scripts
+    - include 'snippets/advanced_editor.html'
+    
+- block content
+    #tabs
+        %ul
+            %li
+                %a{href: '#main'}
+                    %span
+                        {% trans "Main" %}
+            %li
+                %a{href: '#texts'}
+                    %span
+                        {% trans "Texts" %}
+            %li
+                %a{href: '#users'}
+                    %span
+                        {% trans "Users" %}
+            %li
+                %a{href: '#graphics'}
+                    %span
+                        {% trans "Graphics" %}
+            %li
+                %a{href: '#characters'}
+                    %span
+                        {% trans "Characters" %}
+            %li
+                %a{href: '#avatars'}
+                    %span
+                        {% trans "Avatars" %}
+            %li
+                %a{href: '#illustrations'}
+                    %span
+                        {% trans "Illustrations" %}
+            %li
+                %a{href: '#materials'}
+                    %span
+                        {% trans "Materials" %}
+            %li
+                %a{href: '#variations'}
+                    %span
+                        {% trans "Variations" %}
+        #main
+            - with field=form.name
+                - include 'snippets/form_field.haml'
+            - with field=form.short_comment
+                - include 'snippets/form_field.haml'
+            - with field=form.creation_year
+                - include 'snippets/form_field.haml'
+            - with field=form.hidden
+                - include 'snippets/form_field.haml'
+            - with field=form.genres
+                - include 'snippets/form_field.haml'
+        #texts
+            #tabstexts
+                %ul
+                    %li
+                        %a{href: '#announcement'}
+                            %span
+                                {% trans "Announcement" %}
+                    %li
+                        %a{href: '#announcement_preview'}
+                            %span
+                                {% trans "Announcement preview" %}
+                    %li
+                        %a{href: '#introduction'}
+                            %span
+                                {% trans "Introduction" %}
+                #announcement
+                    = form.announcement
+                #announcement_preview
+                    = form.announcement_preview
+                #introduction
+                    = form.introduction
+        #users
+            - include 'stories/edit_story/users.haml'
+        #graphics
+        #characters
+        #avatars
+        #illustrations
+        #materials
+        #variations
+    <script>
+        $('#tabs').tabs();
+        $('#tabstexts').tabs();
+    </script>

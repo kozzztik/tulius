@@ -1,0 +1,14 @@
+- extends forum_site.templates.comment
+
+- block post_title
+    %ul.breadcrumb.search-breadcrumb
+        - for ancestor in comment.parent.get_ancestors
+            %li
+                %a{href: "{{ ancestor.get_absolute_url }}"}
+                    = ancestor.title
+        %li
+            %a{href: "{{ comment.parent.get_absolute_url }}"}
+                = comment.parent.title
+        %li
+            %a{href: "{{ comment.get_absolute_url }}"}
+                = comment.title

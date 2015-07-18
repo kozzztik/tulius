@@ -1,0 +1,54 @@
+- load i18n
+
+.content
+    .caption{align: "center"}
+        .captionleft
+        .captioncontent
+            {% trans caption %}
+        .captionright
+    %h3.visible-phone
+        {% trans caption %}
+    %table.newtable
+        %thead
+            %tr
+                %th.add.hidden-phone
+                %th.games-table-title
+                    {% trans 'title' %}
+                %th.hidden-phone{width: '4%'}
+                %th.visible-desktop{width: '18%'}
+                    {% trans 'story' %}
+                %th.hidden-phone{width: '23%'}
+                    {% trans 'description' %}
+                %th.hidden-phone
+                    {% trans 'posts' %}
+                %th.hidden-phone{width: '100'}
+                    {% trans 'status' %}
+                %th.add.hidden-phone
+            %tr.tblhead
+                %th.addleft.hidden-phone
+                %th.thfst.hidden-phone
+                    &nbsp
+                %th
+                    &nbsp
+                %th.visible-desktop
+                    &nbsp
+                %th.hidden-phone
+                    &nbsp
+                %th.hidden-phone
+                    &nbsp
+                %th.thlst.hidden-phone
+                    &nbsp 
+                %th.addright.hidden-phone
+        %tbody
+            - for game in games 
+                - include 'games/snippets/game_as_list_element.haml'
+                %tr.tblrow
+                    %td.add.hidden-phone
+                    %td.tdfst.hidden-phone
+                    %td
+                    %td.visible-desktop
+                    %td.hidden-phone
+                    %td.hidden-phone
+                    %td.tdlst.hidden-phone
+                    %td.add.hidden-phone
+                 

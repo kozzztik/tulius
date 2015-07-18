@@ -1,0 +1,178 @@
+- load i18n
+- load url from future
+- if not request.user.is_anonymous
+    .btn-toolbar
+        .btn-group{class: '{% if dropupmenu %}dropup{% endif %}'}
+            %button.btn.dropdown-toggle{data-toggle: 'dropdown'}
+                {% trans "Actions"%} 
+                %span.caret
+            %ul.dropdown-menu
+                - if not parent_thread.room
+                    %li
+                        %a{data-toggle: 'modal', href: '#quoteAnswer'}
+                            %img{src: '{{ MEDIA_URL }}games/button_blue_heart.png', style: 'height: 25px'}
+                            {% trans "Answer with quote" %}
+                - else
+                    - if parent_thread.moderate_right
+                        %li
+                            %a{href: '{{ parent_thread.get_add_room_url}}'}
+                                %img{src: '{{ MEDIA_URL }}games/button_green_add.png', style: 'height: 25px'}
+                                {% trans "add room" %}
+                    - if parent_thread.write_right
+                        %li
+                            %a{href: '{{ parent_thread.get_add_thread_url }}'}
+                                %img{src: '{{ MEDIA_URL }}games/button_red_add.png', style: 'height: 25px'}
+                                {% trans "add thread" %}
+                    - if parent_thread.edit_right
+                        %li
+                            %a{href: '{{ parent_thread.get_edit_url }}'}
+                                %img{src: '{{ MEDIA_URL }}games/button_blue_fastforward.png', style: 'height: 25px'}
+                                {% trans "edit" %}
+                    - if parent_thread.move_right
+                        - if parent_thread.parent
+                            %li
+                                %a{href: '{{ parent_thread.get_move_url }}'}
+                                    {% trans "Move room" %}
+                    - if parent_thread.edit_right
+                        %li
+                            - if parent_thread.parent
+                                %a.post-actions-button{href: 'javascript:delete_room({{ parent_thread.id }})'}
+                                    {% trans "Delete room" %}
+                    - if not request.user.is_anonymous
+                        %li
+                            %a{href: '{{ parent_thread.get_mark_all_as_readed_url }}'}
+                                %img{src: '{{ MEDIA_URL }}games/check.png', style: 'height: 25px'}
+                                {% trans "Mark all as readed" %}
+                    - if request.user.is_superuser and parent_thread
+                        %li
+                            %a{href: '{{ parent_thread.get_fix_counters_url }}'}
+                                {% trans "Update counters" %}
+                %li
+                    %a{href: '{{ parent_thread.extended_search_url }}'}
+                        {% trans "Extended search" %}
+        - if parent_thread.character_list
+            .btn-group.hidden-phone{class: '{% if dropupmenu %}dropup{% endif %}'}
+                %button.btn.dropdown-toggle{data-toggle: 'dropdown'}
+                    {% trans "Characters"%} 
+                    %span.caret
+                %ul.dropdown-menu.characters-menu
+                    %table
+                        - for role in parent_thread.character_list
+                            - if forloop.counter0|divisibleby:"3" or forloop.first
+                                <tr>
+                            %td
+                                %li
+                                    %a{data-toggle: 'modal', href: '#role{{ role.id }}'}
+                                        %table.character-menu-list
+                                            %tr
+                                                %td{width: '55'}
+                                                    - if role.avatar
+                                                        %img{src: '{{ role.avatar.image.url }}'}
+                                                %td
+                                                    %b
+                                                        = role
+                                                    %br
+                                                    {% trans "Messages:" %}
+                                                    = role.comments_count
+                            - if forloop.last and forloop.counter0|divisibleby:"3"
+                                %td
+                            - if forloop.last or forloop.counter1|divisibleby:"3"
+                                </tr>
+        - if parent_thread.materials or parent_thread.illustrations or parent_thread.game
+            .btn-group{class: '{% if dropupmenu %}dropup{% endif %}'}
+                %button.btn.dropdown-toggle{data-toggle: 'dropdown'}
+                    {% trans "Materials"%} 
+                    %span.caret
+                %ul.dropdown-menu
+                    - if parent_thread.game
+                        %li
+                            %a{href: '{{ parent_thread.game.get_absolute_url }}', target: '_blank'}
+                                %img{src: '{{ MEDIA_URL }}games/clipboard.png', style: 'height: 25px'}
+                                {% trans "Introduction" %}
+                    - for material in parent_thread.materials
+                        %li
+                            %a{href: '{{ material.url }}', target: '_blank'}
+                                %img{src: '{{ MEDIA_URL }}games/document_blank.png', style: 'height: 25px'}
+                                = material
+                    - for illustration in parent_thread.illustrations
+                        %li
+                            %a{href: '{{ illustration.image.url }}', rel: 'lightbox[illustrations{% if dropupmenu %}2{% endif %}]', title: '{{ illustration.name }}'}
+                                %img{src: '{{ MEDIA_URL }}games/chart.png', style: 'height: 25px'}
+                                = illustration
+        - if parent_thread.roles_list
+            .btn-group.hidden-phone{class: '{% if dropupmenu %}dropup{% endif %}'}
+                %button.btn.dropdown-toggle{data-toggle: 'dropdown'}
+                    {% trans "Roles" %} 
+                    %span.caret
+                %ul.dropdown-menu
+                    - for role in parent_thread.roles_list
+                        %li
+                            %a{href: '{% url "games:view_role" role.id %}', target: '_blank'}
+                                %table.character-menu-list
+                                    %tr
+                                        %td{width: '55'}
+                                            - if role.avatar
+                                                %img{src: '{{ role.avatar.image.url }}'}
+                                        %td
+                                            %b
+                                                = role
+                                            %br
+                                            {% trans "Messages:" %}
+                                            = role.comments_count
+        - if dropupmenu
+                %label.btn-group{style: 'top: -7px'}
+                    {% trans "Comments:" %}
+                    = parent_thread.variation.comments_count
+        - block search_form
+            - if core.search_form and not search_results
+                .forum-search-form.hidden-phone
+                    %form#search_form.pull-right{method: "post", action: "{{ parent_thread.search_url }}"}
+                        - csrf_token
+                        {{ core.search_form.text }}
+                        - if parent_thread
+                            %input{id: 'id_thread', type: 'hidden', name: 'thread', value: '{{ parent_thread.id }}'}
+                        %button#search{type: 'submit'}
+                            {% trans "Search" %}
+    - if not dropupmenu
+        #quoteAnswer.modal.hide.fade.in.well
+            .modal-header
+                %a.close{data-dismiss: "modal"}×
+                %h3
+                    {% trans "Quoting" %}
+            %p
+                {% trans "Quoting now is simple! Just select text with mouse:" %}
+            %img{src: '{{ MEDIA_URL }}/forum/quote_help1.png'}
+            %p
+                {% trans 'And press "Answer" button. Fast reply form will appear under this post, and selected text will be added as quote.' %}
+            %img{src: '{{ MEDIA_URL }}/forum/quote_help2.png'}
+            .modal-footer
+                %button.btn.btn-primary{data-dismiss: "modal"}
+                    {% trans "Close" %}
+        - for role in parent_thread.character_list
+            %div.modal.hide.fade.in.well{id: 'role{{ role.id }}'}
+                .modal-header
+                    %a.close{data-dismiss: "modal"}×
+                    %h3
+                        = role
+                %table.table
+                    %tr
+                        %td.character-avatar 
+                            %img{src: '{{ role.avatar.image.url }}'}
+                        %td
+                            %small
+                                -if not request.user.hide_trustmarks
+                                    .trustmark
+                                        {% trans "All trust:" %}
+                                        %span.trust_value{id: "trustmark-{{role.id}}-allmark"}
+                                            {{ role.trust_value }}%
+                                        %br
+                                {% trans "Messages:" %}
+                                = role.comments_count
+                            %br
+                            %br
+                            = role.description
+                
+                .modal-footer
+                    %button.btn.btn-primary{data-dismiss: "modal"}
+                        {% trans "Close" %}
+            

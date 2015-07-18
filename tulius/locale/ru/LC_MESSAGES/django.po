@@ -1,0 +1,3467 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-03-23 09:15+0300\n"
+"PO-Revision-Date: 2013-02-12 16:17\n"
+"Last-Translator:   <boris.dobin@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"X-Translated-Using: django-rosetta 0.6.8\n"
+
+#: .\admin.py:18
+msgid "Permissions"
+msgstr "Разрешения"
+
+#: .\admin.py:20
+msgid "Important dates"
+msgstr "Важные даты"
+
+#: .\admin.py:21
+msgid "Forum info"
+msgstr "Форум"
+
+#: .\admin.py:22
+msgid "Private"
+msgstr "Личные данные"
+
+#: .\admin.py:23 .\players\templates\profile\index.haml:55
+msgid "Settings"
+msgstr "Настройки"
+
+#: .\catalog.py:4
+msgid "Tulius"
+msgstr "Тулиус"
+
+#: .\forms.py:95
+msgid "type"
+msgstr "Тип"
+
+#: .\forms.py:100 .\forms.py:105 .\forms.py:110 .\forms.py:115
+msgid "report"
+msgstr "отчет"
+
+#: .\models.py:16 .\stories\models.py:244
+msgid "Not defined"
+msgstr "Не указан"
+
+#: .\models.py:17 .\stories\models.py:245
+msgid "Male"
+msgstr "Мужской"
+
+#: .\models.py:18 .\stories\models.py:246
+msgid "Female"
+msgstr "Женский"
+
+#: .\models.py:24
+msgid "Current time"
+msgstr "Текущее время"
+
+#: .\models.py:25
+msgid "Messages count"
+msgstr "Количество сообщений"
+
+#: .\models.py:29
+msgid "username"
+msgstr "имя пользователя"
+
+#: .\models.py:30
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr ""
+"Обязательно. 30 символов или меньше. Допустимы буквы, цифры и символы @/./"
+"+/-/_"
+
+#: .\models.py:33
+msgid "Enter a valid username."
+msgstr "Введите правильное имя пользователя."
+
+#: .\models.py:35
+msgid "email address"
+msgstr "email адрес"
+
+#: .\models.py:36
+msgid "staff status"
+msgstr "служебный"
+
+#: .\models.py:37
+msgid "Designates whether the user can log into this admin site."
+msgstr "Определяет может ли пользователь войти в админку сайта."
+
+#: .\models.py:39
+msgid "active"
+msgstr "Активен"
+
+#: .\models.py:40
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Определяет, является ли пользователь активным. Снимите флаг вместо того, что-"
+"бы удалять пользователя"
+
+#: .\models.py:42
+msgid "date joined"
+msgstr "дата регистрации"
+
+#: .\models.py:54 .\old_site_migrate\models.py:188
+msgid "rank"
+msgstr "ранг"
+
+#: .\models.py:58
+msgid "show played games"
+msgstr "показывать сыгранные игры"
+
+#: .\models.py:62
+msgid "show played characters"
+msgstr "показывать сыгранных персонажей"
+
+#: .\models.py:66
+msgid "show on-line status"
+msgstr "показывать онлайн статус"
+
+#: .\models.py:70
+msgid "hide trustmarks"
+msgstr "скрывать \"доверие\" в играх"
+
+#: .\models.py:76
+msgid "signature"
+msgstr "подпись"
+
+#: .\models.py:80
+msgid "compact text"
+msgstr "сжатый текст"
+
+#: .\models.py:86
+msgid "ICQ"
+msgstr "ICQ"
+
+#: .\models.py:92
+msgid "skype"
+msgstr "skype"
+
+#: .\models.py:96 .\stories\models.py:280 .\stories\models.py:443
+msgid "sex"
+msgstr "пол"
+
+#: .\models.py:103 .\models.py:120
+msgid "Show in game"
+msgstr "В игре показывать"
+
+#: .\models.py:109
+msgid "Animation speed"
+msgstr "Скорость анимации"
+
+#: .\models.py:129 .\forum\models.py:26 .\forum\models.py:345
+#: .\forum\models.py:372 .\forum\models.py:547 .\forum\models.py:574
+#: .\forum\models.py:615 .\forum\models.py:654 .\forum\models.py:684
+#: .\forum\models.py:714 .\forum\models.py:814 .\gameforum\models.py:49
+#: .\games\game_edit_views.py:208 .\games\models.py:350 .\games\models.py:374
+#: .\games\models.py:398 .\games\models.py:422 .\games\models.py:552
+#: .\games\templates\games\game_edit\requests.haml:18
+#: .\games\templates\games\game_edit\role_assign.haml:14
+#: .\games\templates\games\game_edit\roles.haml:21
+#: .\old_site_migrate\models.py:69 .\old_site_migrate\models.py:273
+#: .\old_site_migrate\models.py:342 .\old_site_migrate\models.py:381
+#: .\old_site_migrate\models.py:420 .\stories\models.py:473
+#: .\stories\models.py:544 .\stories\models.py:583 .\stories\models.py:618
+msgid "user"
+msgstr "пользователь"
+
+#: .\models.py:130 .\games\game_edit_catalog.py:24
+#: .\stories\edit_story_cataloging.py:21
+msgid "users"
+msgstr "Пользователи"
+
+#: .\models.py:197 .\gameforum\comments\__init__.py:15
+#, python-format
+msgctxt "He"
+msgid "%s said"
+msgstr "%s сказал:"
+
+#: .\models.py:199 .\gameforum\comments\__init__.py:17
+#, python-format
+msgctxt "She"
+msgid "%s said"
+msgstr "%s сказала:"
+
+#: .\models.py:201 .\gameforum\comments\__init__.py:23
+#, python-format
+msgctxt "Someone"
+msgid "%s said"
+msgstr "%s сказал(а):"
+
+#: .\settings.py:25
+msgid "Russian"
+msgstr "Русский"
+
+#: .\views.py:92
+msgid "Browsers"
+msgstr "Браузеры"
+
+#: .\views.py:95
+msgid "Operating systems"
+msgstr "Операционные системы"
+
+#: .\views.py:98 .\views.py:127
+msgid "Mobile devices"
+msgstr "Мобильные устройства"
+
+#: .\views.py:101
+msgid "Calls"
+msgstr "Обращения"
+
+#: .\views.py:104 .\views.py:125
+msgid "Anonymous"
+msgstr "Анонимы"
+
+#: .\views.py:107
+msgid "Mobiles"
+msgstr "Мобильные устройства"
+
+#: .\views.py:110 .\views.py:132 .\bugs\templates\bugs\exception_page.haml:13
+#: .\bugs\templates\bugs\exceptions.haml:12
+#: .\bugs\templates\bugs\exceptions.haml:15
+#: .\players\templates\players\exceptions.haml:22
+msgid "Exceptions"
+msgstr "Исключения"
+
+#: .\views.py:113
+msgid "Exec time"
+msgstr "Время исполнения"
+
+#: .\views.py:116
+msgid "DB queries"
+msgstr "Запросы к БД"
+
+#: .\views.py:119
+msgid "DB time"
+msgstr "Время работы БД"
+
+#: .\views.py:122
+msgid "Template rendering"
+msgstr "Рендеринг шаблонов"
+
+#: .\views.py:125 .\views.py:127 .\views.py:132
+msgid "All"
+msgstr "Все"
+
+#: .\views.py:130
+msgid "Logic"
+msgstr "Логика"
+
+#: .\views.py:130
+msgid "DB"
+msgstr "БД"
+
+#: .\views.py:130
+msgid "Rendering"
+msgstr "Рендеринг"
+
+#: .\bugs\models.py:7 .\bugs\models.py:32
+msgid "Site update"
+msgstr "Обновление сайта"
+
+#: .\bugs\models.py:8 .\bugs\models.py:33
+#: .\bugs\templates\bugs\site_updates.haml:9
+#: .\bugs\templates\bugs\site_updates.haml:12
+#: .\bugs\templates\bugs\site_updates.haml:15 .\templates\base.haml:96
+msgid "Site updates"
+msgstr "Обновления сайта"
+
+#: .\bugs\models.py:14
+msgid "revision"
+msgstr "ревизия"
+
+#: .\bugs\models.py:18
+msgid "start time"
+msgstr "время начала"
+
+#: .\bugs\models.py:24
+msgid "end time"
+msgstr "время завершения"
+
+#: .\bugs\views.py:18
+msgid "Tulius updates feed"
+msgstr "Новостная лента обновлений сайта Tulius"
+
+#: .\bugs\views.py:26
+#, python-format
+msgid "Update revision %s"
+msgstr "Обновление до ревизии %s"
+
+#: .\bugs\views.py:31
+msgid "No update information provided."
+msgstr "Информация об обновлении не предоставлена."
+
+#: .\bugs\views.py:78 .\templates\base.haml:128 .\templates\base_game.haml:91
+msgid "Complaints"
+msgstr "Жалобы"
+
+#: .\bugs\templates\bugs\base.html:9 .\bugs\templates\bugs\bug.haml:14
+#: .\bugs\templates\bugs\bugs.haml:10 .\bugs\templates\bugs\bugs.haml.py:13
+#: .\templates\base.haml:93 .\templates\base.haml.py:125
+#: .\templates\base_game.haml:88
+msgid "Bugtracker"
+msgstr "Багтрекер"
+
+#: .\bugs\templates\bugs\site_updates.haml:22
+msgid "Revision"
+msgstr "Ревизия"
+
+#: .\bugs\templates\bugs\site_updates.haml:24
+msgid "Time start"
+msgstr "Время начала"
+
+#: .\bugs\templates\bugs\site_updates.haml:26
+msgid "Time end"
+msgstr "Время завершения"
+
+#: .\bugs\templates\bugs\site_updates.haml:28
+msgid "Issues"
+msgstr "Задачи"
+
+#: .\bugs\templates\bugs\user_exceptions.haml:9
+msgid "time"
+msgstr "время"
+
+#: .\bugs\templates\bugs\user_exceptions.haml:11
+msgid "class"
+msgstr "класс"
+
+#: .\bugs\templates\bugs\user_exceptions.haml:13
+msgid "path"
+msgstr "путь"
+
+#: .\bugs\templates\bugs\snippets\jira_user.haml:9
+msgid "Not assigned"
+msgstr "Не назначен"
+
+#: .\counters\templates\counters\index.haml:5
+#: .\counters\templates\counters\success.haml:8
+#: .\counters\templates\counters\success.haml:12 .\templates\base.haml:116
+#: .\templates\base_game.haml:79
+#, fuzzy
+msgid "Counters"
+msgstr "Пользователи"
+
+#: .\counters\templates\counters\index.haml:10
+#, fuzzy
+msgid "Update forum counters"
+msgstr "Обновить счетчики"
+
+#: .\counters\templates\counters\index.haml:13
+#, fuzzy
+msgid "Update personal messages counters"
+msgstr "Обновить счетчики"
+
+#: .\counters\templates\counters\success.haml:15
+#: .\forum\templates\forum\fixes\success.haml:5
+msgid "Success!"
+msgstr "Успех!"
+
+#: .\forum\admin.py:5 .\games\game_edit_catalog.py:31
+#: .\stories\edit_variation_catalog.py:17 .\templates\home.haml:37
+msgid "forum"
+msgstr "форум"
+
+#: .\forum\models.py:18
+msgid "uploaded file"
+msgstr "загруженный файл"
+
+#: .\forum\models.py:19
+msgid "uploaded files"
+msgstr "загруженные файлы"
+
+#: .\forum\models.py:31 .\forum\models.py:728 .\forum\models.py:789
+#: .\games\models.py:18 .\games\models.py:153 .\old_site_migrate\models.py:288
+#: .\old_site_migrate\models.py:476 .\stories\models.py:21
+#: .\stories\models.py:53 .\stories\models.py:164 .\stories\models.py:269
+#: .\stories\models.py:329 .\stories\models.py:439 .\stories\models.py:651
+#: .\stories\models.py:732
+#: .\stories\templates\stories\edit_story\avatars.haml:15
+#: .\stories\templates\stories\edit_story\characters.haml:15
+#: .\stories\templates\stories\edit_story\variations.haml:13
+#: .\stories\templates\stories\materials\illustrations.haml:15
+#: .\stories\templates\stories\materials\illustrations.haml:45
+#: .\stories\templates\stories\materials\materials.haml:10
+#: .\stories\templates\stories\materials\materials.haml:41
+#: .\stories\templates\stories\variation\roles.haml:15 .\theming\models.py:15
+msgid "name"
+msgstr "название"
+
+#: .\forum\models.py:36
+msgid "mime type"
+msgstr "Тип MIME"
+
+#: .\forum\models.py:40 .\stories\models.py:168 .\stories\models.py:225
+msgid "file"
+msgstr "файл"
+
+#: .\forum\models.py:44
+msgid "file length"
+msgstr "размер файла"
+
+#: .\forum\models.py:48
+msgid "uploaded at"
+msgstr "время загрузки"
+
+#: .\forum\models.py:73
+msgid "access not set"
+msgstr "доступ не задан"
+
+#: .\forum\models.py:74
+msgid "free access"
+msgstr "свободный доступ"
+
+#: .\forum\models.py:75
+msgid "read only access"
+msgstr "только чтение"
+
+#: .\forum\models.py:76
+msgid "private(no access)"
+msgstr "доступ только по списку"
+
+#: .\forum\models.py:80
+msgid "read and write rights"
+msgstr "чтение и запись"
+
+#: .\forum\models.py:81
+msgid "read right"
+msgstr "чтение"
+
+#: .\forum\models.py:82
+msgid "read, write and moderate"
+msgstr "чтение, запись и модерирование"
+
+#: .\forum\models.py:83
+msgid "write only right"
+msgstr "только запись"
+
+#: .\forum\models.py:84
+msgid "read and moderate right(no write)"
+msgstr "чтение и модерирование"
+
+#: .\forum\models.py:93
+msgid "plugin"
+msgstr "плагин"
+
+#: .\forum\models.py:167 .\forum\models.py:338 .\forum\models.py:366
+#: .\forum\models.py:410 .\forum\models.py:540 .\forum\models.py:608
+#: .\forum\models.py:695 .\forum\templates\forum\snippets\thread_list.haml:9
+#: .\gameforum\models.py:19
+#: .\gameforum\templates\gameforum\snippets\thread_list.haml:9
+msgid "thread"
+msgstr "тема"
+
+#: .\forum\models.py:168 .\forum\templates\forum\snippets\room_list.haml:11
+#: .\gameforum\templates\gameforum\snippets\room_list.haml:11
+msgid "threads"
+msgstr "тем"
+
+#: .\forum\models.py:176 .\forum\models.py:398
+#: .\games\templates\games\snippets\games_table.haml:16
+#: .\old_site_migrate\models.py:39 .\old_site_migrate\models.py:220
+#: .\stories\templates\stories\index.haml:41
+msgid "title"
+msgstr "название"
+
+#: .\forum\models.py:181 .\forum\models.py:402 .\stories\models.py:656
+msgid "body"
+msgstr "содержимое"
+
+#: .\forum\models.py:188
+msgid "parent thread"
+msgstr "родительская тема"
+
+#: .\forum\models.py:192 .\forum\templates\forum\snippets\room_list.haml:9
+#: .\gameforum\templates\gameforum\snippets\room_list.haml:9
+msgid "room"
+msgstr "комната"
+
+#: .\forum\models.py:197 .\forum\models.py:417
+#: .\forum\templates\forum\snippets\thread_list.haml:11
+#: .\gameforum\templates\gameforum\snippets\thread_list.haml:11
+msgid "author"
+msgstr "автор"
+
+#: .\forum\models.py:201
+msgid "access type"
+msgstr "Доступ"
+
+#: .\forum\models.py:206 .\forum\models.py:428 .\games\models.py:573
+#: .\old_site_migrate\models.py:33 .\stories\models.py:555
+msgid "created at"
+msgstr "год создания"
+
+#: .\forum\models.py:210 .\forum\models.py:738
+msgid "closed"
+msgstr "закрыто"
+
+#: .\forum\models.py:214
+msgid "important"
+msgstr "пометка важности"
+
+#: .\forum\models.py:218 .\forum\models.py:449 .\forum\models.py:626
+#: .\forum\models.py:664 .\games\models.py:220
+#: .\old_site_migrate\models.py:309 .\stories\models.py:361
+#: .\stories\models.py:484
+msgid "deleted"
+msgstr "удалена"
+
+#: .\forum\models.py:222
+msgid "protected threads"
+msgstr "закрытые темы"
+
+#: .\forum\models.py:227 .\forum\models.py:238
+msgid "first comment"
+msgstr "первый комментарий"
+
+#: .\forum\models.py:232
+msgid "last comment"
+msgstr "последний комментарий"
+
+#: .\forum\models.py:243
+msgid "public comments"
+msgstr "публичные комментарии"
+
+#: .\forum\models.py:248
+msgid "protected comments"
+msgstr "закрытые комментарии"
+
+#: .\forum\models.py:329 .\forum\models.py:358
+msgid "thread access right"
+msgstr "Право доступа"
+
+#: .\forum\models.py:330 .\forum\models.py:359
+msgid "threads access rights"
+msgstr "Права доступа"
+
+#: .\forum\models.py:349 .\gameforum\models.py:32
+msgid "access rights"
+msgstr "Доступ"
+
+#: .\forum\models.py:391 .\forum\models.py:581 .\forum\models.py:647
+#: .\forum\models.py:722 .\games\templates\games\game_edit\requests.haml:24
+#: .\games\templates\games\game_edit\role_assign.haml:25
+#: .\old_site_migrate\models.py:225 .\old_site_migrate\models.py:293
+msgid "comment"
+msgstr "комментарий"
+
+#: .\forum\models.py:392
+msgid "comments"
+msgstr "комментарии"
+
+#: .\forum\models.py:424
+msgid "edited by"
+msgstr "отредактирован "
+
+#: .\forum\models.py:433
+msgid "edited at"
+msgstr "время редактирования"
+
+#: .\forum\models.py:440
+msgid "reply to"
+msgstr "Ответ на"
+
+#: .\forum\models.py:445 .\forum\models.py:707 .\forum\models.py:782
+#: .\forum\models.py:807 .\forum\comments\forms.py:20
+msgid "voting"
+msgstr "голосование"
+
+#: .\forum\models.py:455
+msgid "likes"
+msgstr "лайки"
+
+#: .\forum\models.py:461
+msgid "page"
+msgstr "страница"
+
+#: .\forum\models.py:532
+msgid "thread read mark"
+msgstr "отметка прочтения"
+
+#: .\forum\models.py:533
+msgid "thread read marks"
+msgstr "отметки прочтения"
+
+#: .\forum\models.py:554
+msgid "readed comment"
+msgstr "прочитанный комментарий"
+
+#: .\forum\models.py:561
+msgid "not readed comment"
+msgstr "не прочитанный комментарий"
+
+#: .\forum\models.py:566
+msgid "comment like"
+msgstr "лайк"
+
+#: .\forum\models.py:567
+msgid "comments likes"
+msgstr "лайки"
+
+#: .\forum\models.py:601
+msgid "thread delete mark"
+msgstr "отметка удаления темы"
+
+#: .\forum\models.py:602
+msgid "threads delete marks"
+msgstr "отметки удаления тем"
+
+#: .\forum\models.py:619 .\forum\models.py:658 .\games\models.py:21
+#: .\games\templates\games\game_edit\roles.haml:25
+#: .\games\templates\games\snippets\games_table.haml:21
+#: .\stories\models.py:285 .\stories\models.py:332 .\stories\models.py:447
+#: .\stories\models.py:548 .\stories\templates\stories\index.haml:47
+#: .\stories\templates\stories\variation\roles.haml:19
+msgid "description"
+msgstr "описание"
+
+#: .\forum\models.py:631 .\forum\models.py:668
+msgid "deleted at"
+msgstr "время удаления"
+
+#: .\forum\models.py:635 .\forum\models.py:672
+#, python-format
+msgid "%(post)s deleted by %(user)s at %(time)s"
+msgstr "%(post)s удален %(user)s в %(time)s"
+
+#: .\forum\models.py:640
+msgid "comment delete mark"
+msgstr "отметка удаления комментария"
+
+#: .\forum\models.py:641
+msgid "comments delete marks"
+msgstr "отметки удаления комментариев"
+
+#: .\forum\models.py:677
+msgid "online user"
+msgstr "онлайн пользователь"
+
+#: .\forum\models.py:678
+msgid "online users"
+msgstr "онлайн пользователи"
+
+#: .\forum\models.py:689 .\stories\models.py:490
+msgid "visit time"
+msgstr "время посещения"
+
+#: .\forum\models.py:708
+msgid "votings"
+msgstr "голосования"
+
+#: .\forum\models.py:733
+msgid "voting text"
+msgstr "текст голосования"
+
+#: .\forum\models.py:743
+msgid "anonymous"
+msgstr "анонимный"
+
+#: .\forum\models.py:748
+msgid "show results before close of voting"
+msgstr "показывать результаты до закрытия"
+
+#: .\forum\models.py:753
+msgid "add preview results button"
+msgstr "добавить кнопку предпросмотра результатов"
+
+#: .\forum\models.py:775
+msgid "voting choice"
+msgstr "вариант при голосовании"
+
+#: .\forum\models.py:776
+msgid "voting choices"
+msgstr "варианты при голосовании"
+
+#: .\forum\models.py:799
+msgid "voting vote"
+msgstr "голос"
+
+#: .\forum\models.py:800
+msgid "voting votes"
+msgstr "голоса"
+
+#: .\forum\comments\core.py:13 .\forum\comments\views.py:56
+#: .\forum\threads\core.py:16 .\games\game_edit_views.py:57
+#: .\games\requests_view.py:104 .\games\views.py:25 .\players\views.py:98
+#: .\players\views.py:133 .\players\views.py:214
+msgid "there were some errors during form validation"
+msgstr "При заполнении формы допущены ошибки"
+
+#: .\forum\comments\core.py:49
+msgid "edit post"
+msgstr "редактировать сообщение"
+
+#: .\forum\comments\core.py:51
+msgid "add post"
+msgstr "Добавить сообщение"
+
+#: .\forum\comments\core.py:75
+msgid "comment was successfully added"
+msgstr "Комментарий успешно добавлен"
+
+#: .\forum\comments\core.py:77
+msgid "comment was successfully updated"
+msgstr "Комментарий успешно обновлён"
+
+#: .\forum\comments\core.py:108
+#, python-format
+msgid "Comment not found %(post_id)s."
+msgstr "Комментарий %(post_id)s не найден."
+
+#: .\forum\comments\core.py:113
+#, python-format
+msgid "You have no rights to delete comment %(post_id)s."
+msgstr "У вас нет прав удалять комментарий %(post_id)s."
+
+#: .\forum\comments\core.py:121
+msgid "Comment successfully deleted!"
+msgstr "Комментарий успешно удален!"
+
+#: .\forum\comments\forms.py:10 .\forum\threads\forms.py:20
+#: .\forum\threads\forms.py:51
+msgid "Title"
+msgstr "Название"
+
+#: .\forum\comments\forms.py:15 .\forum\threads\forms.py:25
+#: .\forum\threads\forms.py:56
+msgid "Body"
+msgstr "Текст"
+
+#: .\forum\comments\forms.py:30 .\forum\threads\forms.py:7
+msgid "post"
+msgstr "сообщение"
+
+#: .\forum\comments\forms.py:36 .\forum\threads\forms.py:13
+#: .\stories\edit_variation_forms.py:36
+msgid "Delete message"
+msgstr "Комментарий"
+
+#: .\forum\comments\views.py:46 .\forum\threads\views.py:104
+#: .\games\game_edit_views.py:156 .\games\views.py:183
+#: .\stories\edit_variation.py:99 .\stories\edit_variation.py:113
+#: .\stories\story_edit_views.py:132
+msgid "add"
+msgstr "Добавить"
+
+#: .\forum\comments\views.py:133 .\forum\threads\core.py:30
+msgid "Post was deleted"
+msgstr "Сообщение успешно удалено!"
+
+#: .\forum\comments\views.py:135
+msgid "Comment was deleted"
+msgstr "Комметарий был удален"
+
+#: .\forum\comments\views.py:159 .\forum\threads\views.py:135
+msgid "Form not valid"
+msgstr "Форма не верно заполнена"
+
+#: .\forum\search\forms.py:7 .\gameforum\search\forms.py:6
+msgid "search"
+msgstr "поиск"
+
+#: .\forum\search\forms.py:10 .\gameforum\search\forms.py:9
+msgid "place"
+msgstr "где"
+
+#: .\forum\search\forms.py:11
+msgid "from users"
+msgstr "от пользователей"
+
+#: .\forum\search\forms.py:15
+msgid "not from users"
+msgstr "не от пользователей"
+
+#: .\forum\search\forms.py:19 .\gameforum\search\forms.py:16
+msgid "from date"
+msgstr "с даты"
+
+#: .\forum\search\forms.py:20 .\gameforum\search\forms.py:17
+msgid "to date"
+msgstr "по дату"
+
+#: .\forum\search\forms.py:21 .\gameforum\search\forms.py:18
+#: .\games\game_edit_views.py:195 .\games\models.py:428
+#: .\old_site_migrate\models.py:44 .\stories\edit_variation.py:155
+#: .\stories\models.py:452 .\theming\models.py:21
+msgid "text"
+msgstr "Текст"
+
+#: .\forum\search\views.py:38 .\forum\templates\forum\search_form.haml:13
+#: .\forum\templates\forum\search_form.haml:16
+#: .\forum\templates\forum\search_form.haml:26
+#: .\forum\templates\forum\snippets\forum_actions_menu.haml:67
+#: .\gameforum\search\views.py:39
+#: .\gameforum\templates\gameforum\search_form.haml:13
+#: .\gameforum\templates\gameforum\search_form.haml:16
+#: .\gameforum\templates\gameforum\search_form.haml:31
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:135
+msgid "Search"
+msgstr "Поиск"
+
+#: .\forum\search\views.py:68 .\gameforum\search\views.py:70
+msgid "In room: "
+msgstr "В комнате: "
+
+#: .\forum\search\views.py:70 .\gameforum\search\views.py:72
+msgid "In thread: "
+msgstr "В теме: "
+
+#: .\forum\search\views.py:74
+msgid "From users: "
+msgstr "От пользователей: "
+
+#: .\forum\search\views.py:78
+msgid "Not from users: "
+msgstr "Не от пользователей: "
+
+#: .\forum\search\views.py:85 .\gameforum\search\views.py:91
+msgid "From date: "
+msgstr "С даты: "
+
+#: .\forum\search\views.py:91 .\gameforum\search\views.py:97
+msgid "To date: "
+msgstr "По дату: "
+
+#: .\forum\search\views.py:94 .\gameforum\search\views.py:100
+msgid "With text: "
+msgstr "С текстом: "
+
+#: .\forum\templates\forum\403.haml:8 .\forum\templates\forum\base.haml:24
+#: .\forum\templates\forum\base.haml:30 .\forum\templates\forum\base.haml:36
+#: .\forum\templates\forum\base_game.haml:23
+#: .\forum\templates\forum\base_game.haml:29
+#: .\forum\templates\forum\base_game.haml:35
+msgid "forums"
+msgstr "Форумы"
+
+#: .\forum\templates\forum\403.haml:9 .\forum\templates\forum\403.haml:12
+msgid "Access denied"
+msgstr "Доступ запрещен"
+
+#: .\forum\templates\forum\403.haml:15
+msgid "You have no access to this page"
+msgstr "У вас нет доступа для просмотра этой страницы"
+
+#: .\forum\templates\forum\add_post.haml:46 .\games\game_edit_catalog.py:22
+#: .\stories\edit_story_cataloging.py:19
+#: .\stories\edit_variation_catalog.py:13
+msgid "main"
+msgstr "Главная"
+
+#: .\forum\templates\forum\add_post.haml:51
+msgid "Access rights"
+msgstr "Права доступа"
+
+#: .\forum\templates\forum\add_post.haml:56 .\forum\threads\forms.py:79
+msgid "Voting"
+msgstr "Голосование"
+
+#: .\forum\templates\forum\add_post.haml:74
+#: .\forum\templates\forum\snippets\forum_actions_menu.haml:28
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:30
+#: .\games\game_edit_catalog.py:50 .\games\templates\games\game.haml:20
+#: .\games\templates\games\games_list.haml:29
+#: .\games\templates\games\snippets\game_as_list_actions.haml:6
+#: .\games\templates\games\snippets\game_as_list_short.haml:9
+#: .\players\templates\profile\stories.haml:21
+#: .\stories\edit_story_cataloging.py:39
+#: .\stories\templates\stories\index.haml:65
+#: .\stories\templates\stories\story.haml:21
+#: .\stories\templates\stories\edit_story\texts.haml:38
+#: .\stories\templates\stories\materials\illustration.haml:26
+#: .\stories\templates\stories\variation\role_text.haml:32
+#: .\templates\base_cataloged_navig_form.haml:24
+#: .\templates\base_cataloged_navig_form_game.haml:24
+#: .\templates\snippets\form.haml:20 .\templates\snippets\formset.haml:19
+msgid "edit"
+msgstr "Редактировать"
+
+#: .\forum\templates\forum\add_post.haml:76
+#: .\games\templates\games\game_request.haml:56
+#: .\players\templates\profile\settings.haml:17
+#: .\players\templates\profile\subscriptions.haml:29
+#: .\stories\templates\stories\edit_story\texts.haml:40
+#: .\stories\templates\stories\materials\illustration.haml:28
+#: .\stories\templates\stories\variation\role_text.haml:34
+#: .\templates\base_cataloged_navig_form.haml:26
+#: .\templates\base_cataloged_navig_form_game.haml:26
+#: .\templates\snippets\form.haml:22 .\templates\snippets\formset.haml:21
+msgid "reset"
+msgstr "Сбросить"
+
+#: .\forum\templates\forum\add_post.haml:79
+#: .\forum\templates\forum\snippets\fast_reply_form.haml:18
+#: .\gameforum\templates\gameforum\snippets\fast_reply.haml:25
+msgid "Preview"
+msgstr "Предварительный просмотр"
+
+#: .\forum\templates\forum\base.haml:12
+#: .\forum\templates\forum\base_game.haml:11
+#: .\forum\templates\forum\snippets\forum_actions_menu.haml:36
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:40
+msgid "Delete room"
+msgstr "Удалить комнату"
+
+#: .\forum\templates\forum\base.haml:13
+#: .\forum\templates\forum\base_game.haml:12
+msgid "Delete thread"
+msgstr "Удалить тему"
+
+#: .\forum\templates\forum\base.haml:14
+#: .\forum\templates\forum\base_game.haml:13
+msgid "Delete comment"
+msgstr "Удалить комментарий"
+
+#: .\forum\templates\forum\preview.haml:6
+msgid "Previewed message"
+msgstr "Предварительный просмотр сообщения"
+
+#: .\forum\templates\forum\preview.haml:25
+#: .\forum\templates\forum\snippets\post.haml:32
+msgid "Up"
+msgstr "Наверх"
+
+#: .\forum\templates\forum\room.haml:13
+msgid "Rooms"
+msgstr "Комнаты"
+
+#: .\forum\templates\forum\room.haml:21
+msgid "Threads"
+msgstr "Темы"
+
+#: .\forum\templates\forum\room.haml:28
+msgid "This room is empty."
+msgstr "Эта комната пуста."
+
+#: .\forum\templates\forum\search.haml:5 .\forum\templates\forum\search.haml:8
+#: .\forum\templates\forum\search.haml:18
+#: .\gameforum\templates\gameforum\search.haml:5
+#: .\gameforum\templates\gameforum\search.haml:8
+#: .\gameforum\templates\gameforum\search.haml:22
+msgid "search results"
+msgstr "Результаты поиска"
+
+#: .\forum\templates\forum\search.haml:25
+#: .\gameforum\templates\gameforum\search.haml:29
+msgid "Search conditions:"
+msgstr "Условия поиска: "
+
+#: .\forum\templates\forum\thread.haml:16
+msgid "Wait..."
+msgstr "Подождите..."
+
+#: .\forum\templates\forum\thread.haml:17
+msgid "Error"
+msgstr "Ошибка"
+
+#: .\forum\templates\forum\thread.haml:67
+msgid "Loading..."
+msgstr "Загрузка..."
+
+#: .\forum\templates\forum\comments\avatar.haml:24
+msgid "Stories author"
+msgstr "Автор сюжетов"
+
+#: .\forum\templates\forum\snippets\delete_post.haml:14
+msgid "Warning! By doing this you will delete all thread and its comments!"
+msgstr "ВНИМАНИЕ! Делая это, вы удаляете всю тему с ее коментариями!"
+
+#: .\forum\templates\forum\snippets\delete_post.haml:25
+#: .\forum\templates\forum\snippets\post.haml:50
+#: .\games\templates\games\delete_game.haml:37
+#: .\games\templates\games\game_edit\roles.haml:49
+#: .\stories\templates\stories\edit_story\delete_variation.haml:37
+#: .\stories\templates\stories\edit_story\variations.haml:19
+#: .\stories\templates\stories\edit_story\variations.haml:35
+#: .\stories\templates\stories\materials\materials.haml:82
+#: .\stories\templates\stories\snippets\delete_role.haml:18
+#: .\stories\templates\stories\variation\roles.haml:44
+msgid "Delete"
+msgstr "Удалить"
+
+#: .\forum\templates\forum\snippets\delete_post.haml:27
+#: .\games\templates\games\delete_game.haml:39
+#: .\stories\templates\stories\edit_story\delete_variation.haml:39
+#: .\stories\templates\stories\materials\materials.haml:84
+#: .\stories\templates\stories\snippets\delete_role.haml:20
+msgid "Cancel"
+msgstr "Отменить"
+
+#: .\forum\templates\forum\snippets\fast_reply_form.haml:14
+#: .\gameforum\templates\gameforum\snippets\fast_reply.haml:21
+msgid "Reply"
+msgstr "Ответить"
+
+#: .\forum\templates\forum\snippets\fast_reply_form.haml:16
+#: .\gameforum\templates\gameforum\snippets\fast_reply.haml:23
+msgid "Extended form..."
+msgstr "Расширенная форма..."
+
+#: .\forum\templates\forum\snippets\forum_actions_menu.haml:6
+#: .\forum\templates\forum\snippets\index_actions.haml:6
+#: .\forum\templates\forum\snippets\post.haml:36
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:7
+#: .\players\templates\profile\files.haml:16
+#: .\players\templates\profile\invites.haml:21
+msgid "Actions"
+msgstr "Действия"
+
+#: .\forum\templates\forum\snippets\forum_actions_menu.haml:12
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:14
+msgid "Answer with quote"
+msgstr "Ответить с цитатой"
+
+#: .\forum\templates\forum\snippets\forum_actions_menu.haml:16
+#: .\forum\templates\forum\snippets\index_actions.haml:12
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:45
+msgid "Mark all as readed"
+msgstr "Пометить все как прочитанное"
+
+#: .\forum\templates\forum\snippets\forum_actions_menu.haml:20
+#: .\forum\templates\forum\snippets\index_actions.haml:16
+#: .\forum\threads\forms.py:35
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:20
+msgid "add room"
+msgstr "Добавить комнату"
+
+#: .\forum\templates\forum\snippets\forum_actions_menu.haml:24
+#: .\forum\threads\forms.py:87
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:25
+msgid "add thread"
+msgstr "Добавить тему"
+
+#: .\forum\templates\forum\snippets\forum_actions_menu.haml:32
+#: .\forum\templates\forum\threads\move_confirm.haml:8
+#: .\forum\templates\forum\threads\move_confirm.haml:16
+#: .\forum\templates\forum\threads\move_select.haml:8
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:35
+msgid "Move room"
+msgstr "Переместить комнату"
+
+#: .\forum\templates\forum\snippets\forum_actions_menu.haml:40
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:49
+msgid "Update counters"
+msgstr "Обновить счетчики"
+
+#: .\forum\templates\forum\snippets\forum_actions_menu.haml:43
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:52
+msgid "Extended search"
+msgstr "Расширенный поиск"
+
+#: .\forum\templates\forum\snippets\forum_actions_menu.haml:49
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:141
+msgid "Quoting"
+msgstr "Цитирование"
+
+#: .\forum\templates\forum\snippets\forum_actions_menu.haml:51
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:143
+msgid "Quoting now is simple! Just select text with mouse:"
+msgstr "Цитирование стало проще! Просто выделите текст мышкой:"
+
+#: .\forum\templates\forum\snippets\forum_actions_menu.haml:54
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:146
+msgid ""
+"And press \"Answer\" button. Fast reply form will appear under this post, "
+"and selected text will be added as quote."
+msgstr ""
+"И нажмите кнопку \"Ответить\". Под постом появится форма быстрого ответа, а "
+"выделенный текст будет вставлен в нее как цитата."
+
+#: .\forum\templates\forum\snippets\forum_actions_menu.haml:58
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:150
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:177
+#: .\games\templates\games\games_list.haml:77
+msgid "Close"
+msgstr "Закрыть"
+
+#: .\forum\templates\forum\snippets\online_users.haml:6
+#: .\gameforum\templates\gameforum\snippets\online_roles.haml:14
+msgid "In this room:"
+msgstr "В этой комнате:"
+
+#: .\forum\templates\forum\snippets\online_users.haml:8
+#: .\gameforum\templates\gameforum\snippets\online_roles.haml:18
+msgid "In this thread:"
+msgstr "В этой теме:"
+
+#: .\forum\templates\forum\snippets\online_users.haml:10
+msgid "Online users:"
+msgstr "Пользователи онлайн:"
+
+#: .\forum\templates\forum\snippets\pagination.haml:10
+#: .\forum\templates\forum\snippets\pagination.haml:14
+msgid "previous"
+msgstr "назад"
+
+#: .\forum\templates\forum\snippets\pagination.haml:33
+#: .\forum\templates\forum\snippets\pagination.haml:37
+msgid "next"
+msgstr "вперед"
+
+#: .\forum\templates\forum\snippets\post.haml:42
+msgid "Answer"
+msgstr "Ответ"
+
+#: .\forum\templates\forum\snippets\post.haml:46
+#: .\games\templates\games\game_edit\roles.haml:40
+#: .\stories\templates\stories\edit_story\avatars.haml:33
+#: .\stories\templates\stories\variation\roles.haml:35
+msgid "Edit"
+msgstr "Редактировать"
+
+#: .\forum\templates\forum\snippets\post.haml:54
+msgid "Move"
+msgstr "Переместить"
+
+#: .\forum\templates\forum\snippets\post.haml:86
+#: .\gameforum\templates\gameforum\snippets\post.haml:59
+msgid "Edited by:"
+msgstr "Отредактировано:"
+
+#: .\forum\templates\forum\snippets\post.haml:90
+msgid "#"
+msgstr "#"
+
+#: .\forum\templates\forum\snippets\room_list.haml:13
+#: .\forum\templates\forum\snippets\thread_list.haml:13
+#: .\gameforum\templates\gameforum\snippets\room_list.haml:13
+#: .\gameforum\templates\gameforum\snippets\thread_list.haml:13
+#: .\games\templates\games\snippets\games_table.haml:23
+msgid "posts"
+msgstr "сообщ."
+
+#: .\forum\templates\forum\snippets\room_list.haml:15
+#: .\forum\templates\forum\snippets\thread_list.haml:15
+#: .\gameforum\templates\gameforum\snippets\room_list.haml:15
+#: .\gameforum\templates\gameforum\snippets\thread_list.haml:15
+msgid "latest post"
+msgstr "последнее сообщ."
+
+#: .\forum\templates\forum\snippets\room_list.haml:35
+msgid "Moderators"
+msgstr "Модераторы"
+
+#: .\forum\templates\forum\snippets\room_list.haml:40
+#: .\forum\templates\forum\snippets\thread_list.haml:44
+#: .\gameforum\templates\gameforum\snippets\room_list.haml:35
+#: .\gameforum\templates\gameforum\snippets\thread_list.haml:44
+msgid "Opened for"
+msgstr "Открыта для"
+
+#: .\forum\templates\forum\snippets\room_list.haml:55
+msgid "No rooms in this group"
+msgstr "В этой группе нет комнат."
+
+#: .\forum\templates\forum\snippets\thread_list.haml:49
+#: .\gameforum\templates\gameforum\snippets\thread_list.haml:52
+msgid "pages"
+msgstr "Страницы"
+
+#: .\forum\templates\forum\threads\move_confirm.haml:10
+#: .\forum\templates\forum\threads\move_confirm.haml:18
+#: .\forum\templates\forum\threads\move_select.haml:10
+msgid "Move thread"
+msgstr "Переместить тему"
+
+#: .\forum\templates\forum\threads\move_confirm.haml:23
+msgid "Are you shure you want to move room"
+msgstr "Вы уверены, что хотите переместить комнату"
+
+#: .\forum\templates\forum\threads\move_confirm.haml:25
+msgid "Are you shure you want to move thread"
+msgstr "Вы уверены, что хотите переместить тему"
+
+#: .\forum\templates\forum\threads\move_confirm.haml:31
+msgid "to room:"
+msgstr "в комнату"
+
+#: .\forum\templates\forum\threads\move_confirm.haml:37
+msgid "to forum root?"
+msgstr "в корень форума?"
+
+#: .\forum\templates\forum\threads\move_confirm.haml:40
+msgid "No, cancel moving"
+msgstr "Нет, отменить"
+
+#: .\forum\templates\forum\threads\move_confirm.haml:42
+msgid "Yes, move"
+msgstr "Да, переместить"
+
+#: .\forum\templates\forum\threads\move_select.haml:16
+msgid "Select room to move into:"
+msgstr "Выберите, в какую комнату переместить:"
+
+#: .\forum\templates\forum\threads\move_select.haml:25
+msgid "<< Forum root >>"
+msgstr "<< Корень форума >>"
+
+#: .\forum\templates\forum\voting\closed_results.haml:10
+msgid "Voting results are hidden until it will be finished."
+msgstr "Результаты голосования скрыты до тех пор, пока оно не будет завершено."
+
+#: .\forum\templates\forum\voting\closed_results.haml:12
+#: .\forum\templates\forum\voting\voting.haml:29
+#: .\forum\templates\forum\voting\voting_results.haml:18
+msgid "Total votes:"
+msgstr "Всего голосов:"
+
+#: .\forum\templates\forum\voting\closed_results.haml:17
+msgid "You voted for:"
+msgstr "Вы проголосовали за:"
+
+#: .\forum\templates\forum\voting\closed_results.haml:20
+msgid "You can not vote."
+msgstr "Вы не можете голосовать."
+
+#: .\forum\templates\forum\voting\voting.haml:34
+msgid "Show results"
+msgstr "Показать результаты"
+
+#: .\forum\templates\forum\voting\voting.haml:35
+msgid "Do vote"
+msgstr "Голосовать"
+
+#: .\forum\threads\core.py:245
+#, python-format
+msgid "Thread not found %(post_id)s."
+msgstr "Тема %(post_id)s не найдена."
+
+#: .\forum\threads\core.py:248
+#, python-format
+msgid "You have no rights to delete thread %(post_id)s."
+msgstr "У вас нет прав удалять тему %(post_id)s."
+
+#: .\forum\threads\core.py:259
+msgid "Room successfully deleted!"
+msgstr "Комната успешно удалена!"
+
+#: .\forum\threads\core.py:259
+msgid "Thread successfully deleted!"
+msgstr "Тема успешно удалена!"
+
+#: .\forum\threads\forms.py:31 .\forum\threads\forms.py:62
+msgid "Access type"
+msgstr "Доступ"
+
+#: .\forum\threads\forms.py:35
+msgid "edit room"
+msgstr "редактировать комнату"
+
+#: .\forum\threads\forms.py:67
+msgid "Closed"
+msgstr "Закрыта"
+
+#: .\forum\threads\forms.py:73
+msgid "Important"
+msgstr "Пометка важности"
+
+#: .\forum\threads\forms.py:93
+msgid "edit thread"
+msgstr "редактировать тему"
+
+#: .\forum\voting\forms.py:7
+msgid "Delete voting"
+msgstr "Удалить голосование"
+
+#: .\forum\voting\forms.py:10
+msgid "Close voting"
+msgstr "Закрыть голосование"
+
+#: .\gameforum\forms.py:24 .\gameforum\gamecore\forms.py:6
+msgid "Character"
+msgstr "Персонаж"
+
+#: .\gameforum\forms.py:37 .\gameforum\gamecore\forms.py:19
+msgid "Editor"
+msgstr "Редактор"
+
+#: .\gameforum\models.py:11
+msgid "game thread right"
+msgstr "право на игровую тему"
+
+#: .\gameforum\models.py:12
+msgid "game thread rights"
+msgstr "права на игровые темы"
+
+#: .\gameforum\models.py:26 .\gameforum\models.py:65 .\games\models.py:460
+#: .\games\models.py:544 .\games\templates\games\game_edit\roles.haml:17
+#: .\old_site_migrate\models.py:281
+#: .\players\templates\profile\invites.haml:17
+#: .\players\templates\profile\invites.haml:56 .\stories\models.py:409
+#: .\stories\models.py:537
+msgid "role"
+msgstr "роль"
+
+#: .\gameforum\models.py:41
+msgid "trust mark"
+msgstr "отметка доверия"
+
+#: .\gameforum\models.py:42
+msgid "trust marks"
+msgstr "отметки доверия"
+
+#: .\gameforum\models.py:57 .\gameforum\templates\gameforum\base.haml:20
+#: .\gameforum\templates\gameforum\search.haml:17
+#: .\gameforum\templates\gameforum\search_form.haml:26 .\games\models.py:142
+#: .\stories\models.py:313 .\stories\models.py:417 .\stories\models.py:644
+#: .\stories\models.py:725
+msgid "variation"
+msgstr "вариация"
+
+#: .\gameforum\models.py:72 .\old_site_migrate\models.py:239
+msgid "value"
+msgstr "значение"
+
+#: .\gameforum\comments\__init__.py:13
+msgid "Leader"
+msgstr "Ведущий"
+
+#: .\gameforum\comments\__init__.py:19
+#, python-format
+msgctxt "It"
+msgid "%s said"
+msgstr "%s сказало:"
+
+#: .\gameforum\comments\__init__.py:21
+#, python-format
+msgctxt "They"
+msgid "%s said"
+msgstr "%s сказали:"
+
+#: .\gameforum\search\forms.py:10
+msgid "from characters"
+msgstr "от персонажей"
+
+#: .\gameforum\search\forms.py:13
+msgid "not from characters"
+msgstr "не от персонажей"
+
+#: .\gameforum\search\views.py:80
+msgid "From characters: "
+msgstr "От персонажей: "
+
+#: .\gameforum\search\views.py:84
+msgid "Not from characters: "
+msgstr "Не от персонажей: "
+
+#: .\gameforum\templates\gameforum\base.haml:17
+msgid "Game"
+msgstr "Игры"
+
+#: .\gameforum\templates\gameforum\snippets\fast_reply.haml:12
+msgid "Character:"
+msgstr "Персонаж:"
+
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:56
+#: .\games\templates\games\game.haml:55
+#: .\players\templates\players\snippets\played_table.haml:10
+#: .\stories\templates\stories\story.haml:44
+#: .\stories\templates\stories\edit_story\index.haml:41
+msgid "Characters"
+msgstr "Персонажи"
+
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:75
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:120
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:169
+#: .\gameforum\templates\gameforum\snippets\online_roles.haml:5
+#: .\games\templates\games\games_list.haml:69
+msgid "Messages:"
+msgstr "Сообщений:"
+
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:84
+#: .\games\templates\games\game.haml:60
+#: .\stories\templates\stories\story.haml:49
+#: .\stories\templates\stories\edit_story\index.haml:53
+msgid "Materials"
+msgstr "Материалы"
+
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:91
+#: .\games\templates\games\game.haml:50
+#: .\stories\templates\stories\story.haml:39
+#: .\stories\templates\stories\edit_story\index.haml:83
+msgid "Introduction"
+msgstr "Вводная"
+
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:105
+#: .\stories\templates\stories\variation\role_view_text.haml:8
+msgid "Roles"
+msgstr "Роли"
+
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:124
+msgid "Comments:"
+msgstr "Комментариев:"
+
+#: .\gameforum\templates\gameforum\snippets\forum_actions_menu.haml:165
+#: .\gameforum\templates\gameforum\snippets\post.haml:48
+msgid "All trust:"
+msgstr "Общее доверие:"
+
+#: .\gameforum\templates\gameforum\snippets\online_roles.haml:8
+msgid "Current time:"
+msgstr "Текущее время:"
+
+#: .\gameforum\templates\gameforum\snippets\online_roles.haml:16
+msgid "Online characters:"
+msgstr "Персонажи присутствуют:"
+
+#: .\gameforum\templates\gameforum\snippets\post.haml:54
+msgid "My trust:"
+msgstr "Мое доверие:"
+
+#: .\gameforum\trustmarks\views.py:13
+msgid "You can`t vote for yourself!"
+msgstr "Вы не можете голосовать сами за себя!"
+
+#: .\gameforum\trustmarks\views.py:15
+msgid "You can`t vote for characters in variation!"
+msgstr "Вы не можете голосовать в вариации!"
+
+#: .\gameforum\trustmarks\views.py:17
+msgid "You can`t vote in this game!"
+msgstr "Вы не можете голосовать в этой игре!"
+
+#: .\games\catalog.py:7 .\games\models.py:134 .\templates\home.haml:31
+msgid "games"
+msgstr "игры"
+
+#: .\games\forms.py:17 .\stories\edit_variation_forms.py:30
+msgid "Role"
+msgstr "Роль"
+
+#: .\games\forms.py:24 .\games\forms.py:48
+msgid "User"
+msgstr "Пользователь"
+
+#: .\games\forms.py:29
+msgid "Message"
+msgstr "Сообщение"
+
+#: .\games\forms.py:39
+msgid "New story"
+msgstr "Новый сюжет"
+
+#: .\games\game_edit_catalog.py:23 .\stories\edit_story_cataloging.py:20
+msgid "texts"
+msgstr "Тексты"
+
+#: .\games\game_edit_catalog.py:25 .\stories\edit_story_cataloging.py:22
+msgid "graphics"
+msgstr "Графика"
+
+#: .\games\game_edit_catalog.py:26 .\stories\edit_variation_catalog.py:14
+#: .\stories\models.py:410
+msgid "roles"
+msgstr "роли"
+
+#: .\games\game_edit_catalog.py:27 .\stories\edit_story_cataloging.py:25
+#: .\stories\edit_variation_catalog.py:15
+msgid "illustrations"
+msgstr "иллюстрации"
+
+#: .\games\game_edit_catalog.py:28 .\stories\edit_story_cataloging.py:26
+#: .\stories\edit_variation_catalog.py:16
+msgid "materials"
+msgstr "материалы"
+
+#: .\games\game_edit_catalog.py:29
+msgid "request form"
+msgstr "форма заявки"
+
+#: .\games\game_edit_catalog.py:30
+msgid "requests"
+msgstr "заявки"
+
+#: .\games\game_edit_catalog.py:42
+msgid "winners"
+msgstr "победители"
+
+#: .\games\game_edit_views.py:53 .\games\game_edit_views.py:383
+msgid "game was successfully updated"
+msgstr "игра успешно обновлена"
+
+#: .\games\game_edit_views.py:135 .\stories\edit_variation.py:131
+msgid "role was successfully updated"
+msgstr "Роль успешно обновлена"
+
+#: .\games\game_edit_views.py:166
+#: .\games\templates\games\game_edit\roles.haml:98
+#: .\stories\edit_variation.py:100
+#: .\stories\templates\stories\variation\roles.haml:53
+msgid "Add role"
+msgstr "Добавить роль"
+
+#: .\games\game_edit_views.py:167 .\stories\edit_variation.py:93
+msgid "role was successfully added"
+msgstr "Роль успешно добавлена"
+
+#: .\games\game_edit_views.py:186 .\stories\story_edit_views.py:315
+msgid "Additional material was successfully added"
+msgstr "Дополнительный материал был успешно добавлен"
+
+#: .\games\game_edit_views.py:296 .\stories\story_edit_views.py:260
+msgid "Illustration was successfully updated"
+msgstr "Иллюстрация успешно обновлёна"
+
+#: .\games\game_edit_views.py:302 .\stories\story_edit_views.py:291
+msgid "Additional material was successfully updated"
+msgstr "Дополнительный материал был успешно обновлен"
+
+#: .\games\game_edit_views.py:377
+msgid "requests form was successfully updated"
+msgstr "форма заявки успешно обновлена"
+
+#: .\games\models.py:12 .\games\models.py:212
+msgid "skin"
+msgstr "тема оформления"
+
+#: .\games\models.py:13
+msgid "skins"
+msgstr "темы оформления"
+
+#: .\games\models.py:35
+msgid "new"
+msgstr "новая"
+
+#: .\games\models.py:36
+msgid "open for registration"
+msgstr "открыта для регистрации"
+
+#: .\games\models.py:37
+msgid "registration completed"
+msgstr "ожидает старта"
+
+#: .\games\models.py:38
+msgid "in progress"
+msgstr "идёт"
+
+#: .\games\models.py:39
+msgid "finishing"
+msgstr "завершается"
+
+#: .\games\models.py:40
+msgid "completed"
+msgstr "завершена"
+
+#: .\games\models.py:41
+msgid "completed and open"
+msgstr "завершена и открыта"
+
+#: .\games\models.py:133 .\games\models.py:343 .\games\models.py:367
+#: .\games\models.py:391 .\games\models.py:415 .\games\models.py:476
+#: .\old_site_migrate\models.py:213 .\old_site_migrate\models.py:265
+#: .\old_site_migrate\models.py:334 .\old_site_migrate\models.py:373
+#: .\old_site_migrate\models.py:412 .\old_site_migrate\models.py:451
+#: .\players\templates\profile\invites.haml:15
+#: .\players\templates\profile\invites.haml:54 .\stories\models.py:338
+msgid "game"
+msgstr "игра"
+
+#: .\games\models.py:146
+msgid "serial number"
+msgstr "порядковый номер"
+
+#: .\games\models.py:157 .\games\models.py:559
+#: .\games\templates\games\snippets\games_table.haml:25
+#: .\old_site_migrate\models.py:229
+#: .\players\templates\profile\invites.haml:60
+msgid "status"
+msgstr "состояние"
+
+#: .\games\models.py:163 .\stories\models.py:58
+msgid "announcement"
+msgstr "анонс"
+
+#: .\games\models.py:168 .\stories\models.py:63
+msgid "announcement preview"
+msgstr "превью анонса"
+
+#: .\games\models.py:174 .\stories\models.py:69
+msgid "short comment"
+msgstr "краткий комментарий"
+
+#: .\games\models.py:179 .\old_site_migrate\models.py:235
+#: .\stories\models.py:74
+msgid "introduction"
+msgstr "вводная"
+
+#: .\games\models.py:185
+msgid "requests text"
+msgstr "Текст выбора роли"
+
+#: .\games\models.py:191 .\stories\models.py:91
+msgid "playing card image"
+msgstr "изображение игральной карты"
+
+#: .\games\models.py:197 .\old_site_migrate\models.py:480
+#: .\stories\models.py:97 .\stories\story_edit_views.py:73
+msgid "top banner"
+msgstr "верхний баннер"
+
+#: .\games\models.py:203 .\old_site_migrate\models.py:484
+#: .\stories\models.py:103 .\stories\story_edit_views.py:74
+msgid "bottom banner"
+msgstr "нижний баннер"
+
+#: .\games\models.py:208
+msgid "show announcement"
+msgstr "показывать анонс"
+
+#: .\games\models.py:296
+msgid "Specify game serial number"
+msgstr "Укажите порядковый номер игры."
+
+#: .\games\models.py:303
+msgid "Game serial number must be unique in story. This number of game "
+msgstr ""
+"Порядковый номер игры должен быть уникален внутри сюжета. Этот принадлежит "
+"игре "
+
+#: .\games\models.py:335
+msgid "game admin"
+msgstr "Админ игры"
+
+#: .\games\models.py:336
+msgid "game admins"
+msgstr "админы игры"
+
+#: .\games\models.py:359
+msgid "game guest"
+msgstr "гость игры"
+
+#: .\games\models.py:360
+msgid "game guests"
+msgstr "гости игры"
+
+#: .\games\models.py:383
+msgid "game winner"
+msgstr "победитель игры"
+
+#: .\games\models.py:384
+msgid "game winners"
+msgstr "победители игры"
+
+#: .\games\models.py:408 .\games\models.py:448 .\games\models.py:502
+msgid "role request"
+msgstr "запрос на роль"
+
+#: .\games\models.py:409
+msgid "role requests"
+msgstr "запросы на роль"
+
+#: .\games\models.py:440
+msgid "role request selection"
+msgstr "выбор роли"
+
+#: .\games\models.py:441
+msgid "role request selections"
+msgstr "выборы роли"
+
+#: .\games\models.py:453
+msgid "prefer order"
+msgstr "приоритет"
+
+#: .\games\models.py:469
+msgid "request question"
+msgstr "вопрос заявки"
+
+#: .\games\models.py:470
+msgid "request questions"
+msgstr "вопросы заявок"
+
+#: .\games\models.py:484
+msgid "question"
+msgstr "вопрос"
+
+#: .\games\models.py:495
+msgid "request question answer"
+msgstr "ответ на вопрос заявки"
+
+#: .\games\models.py:496
+msgid "request question answers"
+msgstr "ответы на вопросы заявок"
+
+#: .\games\models.py:509 .\games\models.py:516
+msgid "answer"
+msgstr "ответ"
+
+#: .\games\models.py:525
+msgid "new invite"
+msgstr "новое"
+
+#: .\games\models.py:526
+msgid "accepted invite"
+msgstr "принято"
+
+#: .\games\models.py:527
+msgid "declined invite"
+msgstr "отклонено"
+
+#: .\games\models.py:528
+msgid "occupied invite"
+msgstr "роль занята"
+
+#: .\games\models.py:536
+msgid "game invite"
+msgstr "приглашение на игру"
+
+#: .\games\models.py:537
+msgid "game invites"
+msgstr "приглашения на игры"
+
+#: .\games\models.py:567 .\players\templates\profile\invites.haml:19
+#: .\players\templates\profile\invites.haml:58
+msgid "sender"
+msgstr "отправитель"
+
+#: .\games\requests_view.py:59
+msgid "make request"
+msgstr "сделать запрос"
+
+#: .\games\requests_view.py:74
+msgid "You must answer on question"
+msgstr "Вы должны ответить на вопрос"
+
+#: .\games\requests_view.py:102
+msgid "Game request was successfully created"
+msgstr "Запрос на игру успешно отправлен"
+
+#: .\games\views.py:44
+msgid "You are admin of this game"
+msgstr "Вы администратор этой игры"
+
+#: .\games\views.py:54
+msgid "You sended request to play this game"
+msgstr "Вы отправили запрос на эту игру"
+
+#: .\games\views.py:58
+msgid "This game is open for registration, you can send request to play it"
+msgstr "Эта игра открыта для регистрации, вы можете отправить запрос на нее"
+
+#: .\games\views.py:62
+msgid "You can`t join this game, it is full"
+msgstr "Все роли заняты"
+
+#: .\games\views.py:69
+msgid "You participate in this game"
+msgstr "Вы участник этой игры"
+
+#: .\games\views.py:71
+msgid "You are a guest in this game"
+msgstr "Вы гость этой игры"
+
+#: .\games\views.py:82 .\games\templates\games\index.haml:15
+#: .\games\templates\games\game_edit\requests.haml:67
+#: .\games\templates\games\game_edit\role_assign.haml:76
+msgid "New games"
+msgstr "Новые игры"
+
+#: .\games\views.py:84 .\games\templates\games\index.haml:19
+#, fuzzy
+msgid "Reception of requests to play"
+msgstr "Заявка на игру "
+
+#: .\games\views.py:86 .\games\templates\games\index.haml:23
+#, fuzzy
+msgid "Awaiting start games"
+msgstr "Ожидают старта"
+
+#: .\games\views.py:87 .\games\views.py:125
+#: .\games\templates\games\index.haml:27
+#: .\games\templates\games\game_edit\requests.haml:71
+#: .\games\templates\games\game_edit\role_assign.haml:80
+#: .\players\templates\profile\games.haml:7 .\templates\base.haml:67
+#: .\templates\base_game.haml:38 .\templates\home.haml:85
+#: .\templates\home.haml.py:105
+msgid "Current games"
+msgstr "Текущие игры"
+
+#: .\games\views.py:88 .\games\templates\games\index.haml:31
+msgid "Completed games"
+msgstr "Завершённые игры"
+
+#: .\games\views.py:90 .\games\templates\games\index.haml:35
+msgid "Completed open games"
+msgstr "Завершённые и открытые"
+
+#: .\games\views.py:113 .\templates\base.haml:58 .\templates\base_game.haml:29
+#: .\templates\home.haml:64 .\templates\home.haml.py:96
+msgid "Announced games"
+msgstr "Анонсы игр"
+
+#: .\games\views.py:117 .\templates\base.haml:61 .\templates\base_game.haml:32
+#: .\templates\home.haml:99
+msgid "Accepting requests"
+msgstr "Прием заявок"
+
+#: .\games\views.py:121 .\templates\base.haml:64 .\templates\base_game.haml:35
+#: .\templates\home.haml:78 .\templates\home.haml.py:102
+msgid "Awaiting start"
+msgstr "Ожидают старта"
+
+#: .\games\views.py:134 .\templates\base.haml:70 .\templates\base_game.haml:41
+#: .\templates\home.haml:108
+msgid "Opened completed"
+msgstr "Завершенные и открытые"
+
+#: .\games\views.py:177
+msgid "game was successfully created"
+msgstr "игра успешно создана"
+
+#: .\games\views.py:182 .\stories\models.py:588
+msgid "create game"
+msgstr "создать игру"
+
+#: .\games\templates\games\add_game.haml:6
+msgid "creating a game with variation:"
+msgstr "создание игры по вариации:"
+
+#: .\games\templates\games\add_game.haml:9
+#: .\games\templates\games\game.haml:36
+#: .\games\templates\games\snippets\games_table.haml:19 .\stories\models.py:45
+#: .\stories\models.py:156 .\stories\models.py:261 .\stories\models.py:321
+#: .\stories\models.py:576 .\stories\models.py:611 .\stories\models.py:636
+#: .\stories\models.py:717
+msgid "story"
+msgstr "сюжет"
+
+#: .\games\templates\games\change_story.haml:5
+msgid "Change story of "
+msgstr "Изменить сюжет игры "
+
+#: .\games\templates\games\change_story.haml:22
+msgid "Submit"
+msgstr "Отправить"
+
+#: .\games\templates\games\delete_game.haml:6
+#: .\games\templates\games\delete_game.haml:9
+#: .\games\templates\games\delete_game.haml:19
+#: .\stories\templates\stories\edit_story\delete_variation.haml:6
+#: .\stories\templates\stories\edit_story\delete_variation.haml:9
+#: .\stories\templates\stories\edit_story\delete_variation.haml:19
+msgid "Confirm deletion"
+msgstr "Подтверждение удаления"
+
+#: .\games\templates\games\delete_game.haml:15
+#: .\games\templates\games\index.haml:9
+#: .\players\templates\profile\index.haml:44 .\templates\base.haml:49
+#: .\templates\base_game.haml:20 .\templates\home.haml:92
+msgid "Games"
+msgstr "Игры"
+
+#: .\games\templates\games\delete_game.haml:27
+msgid "Are you shure you want to delete game:"
+msgstr "Вы уверены, что хотите удалить игру:"
+
+#: .\games\templates\games\delete_game.haml:31
+#: .\stories\templates\stories\edit_story\delete_variation.haml:31
+msgid "from story:"
+msgstr "из сюжета:"
+
+#: .\games\templates\games\game.haml:17
+msgid "enter"
+msgstr "Войти"
+
+#: .\games\templates\games\game.haml:23
+#: .\games\templates\games\games_list.haml:32
+#: .\games\templates\games\snippets\game_as_list_actions.haml:10
+#: .\games\templates\games\snippets\game_as_list_short.haml:14
+msgid "Make request"
+msgstr "отправить заявку"
+
+#: .\games\templates\games\game.haml:31
+#: .\stories\templates\stories\story.haml:28
+msgid "Authors:"
+msgstr "Авторы:"
+
+#: .\games\templates\games\game_request.haml:5
+msgid "Request to play "
+msgstr "Заявка на игру "
+
+#: .\games\templates\games\game_request.haml:18
+msgid "Request form"
+msgstr "Заявка на игру"
+
+#: .\games\templates\games\game_request.haml:43
+msgid "Your comment"
+msgstr "Ваш комментарий"
+
+#: .\games\templates\games\game_request.haml:46
+msgid "Role preferences"
+msgstr "Предпочтительные персонажи"
+
+#: .\games\templates\games\game_request.haml:48
+msgid " Select roles in order of your preference"
+msgstr "Выберите желаемых персонажей в порядке вашего предпочтения"
+
+#: .\games\templates\games\game_request.haml:54
+#: .\players\templates\players\messages.haml:13
+msgid "Send"
+msgstr "Отправить"
+
+#: .\games\templates\games\game_role.haml:15
+#: .\stories\templates\stories\variation\role_view_text.haml:10
+msgid "to roles"
+msgstr "к ролям"
+
+#: .\games\templates\games\game_role.haml:18
+msgid "to game"
+msgstr "к игре"
+
+#: .\games\templates\games\game_role.haml:37
+#: .\games\templates\games\game_edit\roles.haml:95
+#: .\stories\templates\stories\variation\role_view_text.haml:34
+msgid "No role text"
+msgstr "Нет текста роли"
+
+#: .\games\templates\games\games_list.haml:24
+#: .\templates\snippets\index_games.haml:9
+msgid "(finishing)"
+msgstr "(завершается)"
+
+#: .\games\templates\games\games_list.haml:35
+#: .\games\templates\games\snippets\game_as_list_actions.haml:14
+#: .\games\templates\games\snippets\game_as_list_short.haml:19
+msgid "Cancel request"
+msgstr "отменить заявку"
+
+#: .\games\templates\games\games_list.haml:38
+#: .\games\templates\games\snippets\game_as_list_actions.haml:18
+#: .\games\templates\games\snippets\game_as_list_short.haml:28
+msgid "Enter"
+msgstr "Войти"
+
+#: .\games\templates\games\games_list.haml:43
+#: .\games\templates\games\snippets\game_as_list_info.haml:8
+#: .\games\templates\games\snippets\game_as_list_short.haml:23
+msgid "no places"
+msgstr "нет мест"
+
+#: .\games\templates\games\games_list.haml:46
+#: .\games\templates\games\snippets\game_as_list_info.haml:12
+#: .\games\templates\games\snippets\game_as_list_short.haml:37
+msgid "Your role:"
+msgstr "Ваш персонаж:"
+
+#: .\games\templates\games\games_list.haml:51
+msgid "Our characters have posted:"
+msgstr "Наши персонажи оставили сообщений:"
+
+#: .\games\templates\games\games_list.haml:55
+msgid "Present characters:"
+msgstr "Присутствующие персонажи:"
+
+#: .\games\templates\games\games_list.haml:89
+msgid "There is no such games."
+msgstr "В данный момент таких игр нет."
+
+#: .\games\templates\games\game_edit\graphics.haml:17
+#: .\players\templates\profile\files.haml:32
+#: .\stories\templates\stories\edit_story\graphics.haml:17
+msgid "Download"
+msgstr "Скачать"
+
+#: .\games\templates\games\game_edit\graphics.haml:19
+#: .\stories\templates\stories\edit_story\graphics.haml:19
+msgid "Not loaded yet"
+msgstr "Пока не загружено"
+
+#: .\games\templates\games\game_edit\requests.haml:11
+msgid "Total requests:"
+msgstr "Всего заявок:"
+
+#: .\games\templates\games\game_edit\requests.haml:20
+#: .\games\templates\games\game_edit\role_assign.haml:21
+msgid "preferences"
+msgstr "предпочтения"
+
+#: .\games\templates\games\game_edit\requests.haml:22
+#: .\games\templates\games\game_edit\role_assign.haml:23
+msgid "occupation"
+msgstr "занятость"
+
+#: .\games\templates\games\game_edit\requests.haml:42
+#: .\games\templates\games\game_edit\requests.haml:57
+msgid "View role"
+msgstr "Просмотр роли"
+
+#: .\games\templates\games\game_edit\requests.haml:45
+#: .\games\templates\games\game_edit\requests.haml:60
+#: .\games\templates\games\game_edit\roles.haml:73
+msgid "Assign"
+msgstr "Назначить"
+
+#: .\games\templates\games\game_edit\requests.haml:62
+msgid "All roles are busy."
+msgstr "Все роли заняты."
+
+#: .\games\templates\games\game_edit\requests.haml:75
+#: .\games\templates\games\game_edit\role_assign.haml:84
+msgid "Complited games"
+msgstr "завершённые игры"
+
+#: .\games\templates\games\game_edit\requests.haml:78
+#: .\games\templates\games\game_edit\role_assign.haml:88
+msgid "Answers"
+msgstr "Ответы"
+
+#: .\games\templates\games\game_edit\requests.haml:90
+msgid "There are no requests yet"
+msgstr "Пока нет заявок"
+
+#: .\games\templates\games\game_edit\role_assign.haml:19
+msgid "assigned"
+msgstr "назначено"
+
+#: .\games\templates\games\game_edit\role_assign.haml:34
+#: .\games\templates\games\game_edit\role_assign.haml:61
+#: .\games\templates\games\game_edit\role_assign.haml:70
+msgid "assign"
+msgstr "назначить"
+
+#: .\games\templates\games\game_edit\role_assign.haml:46
+msgid "clear"
+msgstr "очистить"
+
+#: .\games\templates\games\game_edit\role_assign.haml:49
+#: .\games\templates\games\game_edit\roles.haml:60
+#: .\games\templates\games\game_edit\roles.haml:88
+#: .\stories\templates\stories\edit_story\characters.haml:36
+#: .\stories\templates\stories\materials\materials.haml:29
+#: .\stories\templates\stories\materials\materials.haml:55
+msgid "no"
+msgstr "нет"
+
+#: .\games\templates\games\game_edit\roles.haml:19 .\stories\models.py:253
+#: .\stories\models.py:424 .\stories\templates\stories\variation\roles.haml:17
+msgid "character"
+msgstr "персонаж"
+
+#: .\games\templates\games\game_edit\roles.haml:23
+msgid "req."
+msgstr "запр."
+
+#: .\games\templates\games\game_edit\roles.haml:43
+#: .\stories\templates\stories\variation\roles.haml:38
+msgid "Edit role text"
+msgstr "Редактировать текст роли"
+
+#: .\games\templates\games\game_edit\roles.haml:46
+#: .\stories\templates\stories\variation\roles.haml:41
+msgid "View role text"
+msgstr "Просмотр текст роли"
+
+#: .\games\templates\games\game_edit\roles.haml:66
+msgid "User profile"
+msgstr "Профиль пользователя"
+
+#: .\games\templates\games\game_edit\roles.haml:69
+msgid "Clear"
+msgstr "Очистить"
+
+#: .\games\templates\games\game_edit\roles.haml:76
+#: .\games\templates\games\game_edit\roles.haml:114
+msgid "Invite"
+msgstr "Пригласить"
+
+#: .\games\templates\games\game_edit\roles.haml:79
+msgid "Invited:"
+msgstr "Приглашены:"
+
+#: .\games\templates\games\game_edit\roles.haml:86
+#: .\stories\templates\stories\edit_story\characters.haml:34
+#: .\stories\templates\stories\materials\materials.haml:27
+#: .\stories\templates\stories\materials\materials.haml:53
+msgid "yes"
+msgstr "да"
+
+#: .\games\templates\games\game_edit\roles.haml:89
+msgid "Role text"
+msgstr "Текст роли"
+
+#: .\games\templates\games\game_edit\roles.haml:105
+msgid "Invite user"
+msgstr "Пригласить пользователя"
+
+#: .\games\templates\games\game_edit\roles.haml:108
+msgid "Player invited!"
+msgstr "Пользователь успешно приглашен!"
+
+#: .\games\templates\games\game_edit\users.haml:10
+#: .\stories\templates\stories\edit_story\users.haml:13
+msgid "admins"
+msgstr "администраторы"
+
+#: .\games\templates\games\game_edit\users.haml:14
+msgid "guests"
+msgstr "гости"
+
+#: .\games\templates\games\snippets\game_as_list_actions.haml:22
+#: .\games\templates\games\snippets\game_as_list_short.haml:33
+msgid "delete"
+msgstr "удалить"
+
+#: .\games\templates\games\snippets\game_as_list_element.haml:16
+msgid "change"
+msgstr "изменить"
+
+#: .\games\templates\games\snippets\graphicupload.html:22
+#: .\stories\templates\snippets\graphicupload.html:22
+msgid "Load file"
+msgstr "Загрузить файл"
+
+#: .\old_site_migrate\models.py:13 .\old_site_migrate\models.py:14
+msgid "old news"
+msgstr "старые новости"
+
+#: .\old_site_migrate\models.py:19 .\old_site_migrate\models.py:61
+#: .\old_site_migrate\models.py:205 .\old_site_migrate\models.py:257
+#: .\old_site_migrate\models.py:326 .\old_site_migrate\models.py:365
+#: .\old_site_migrate\models.py:404 .\old_site_migrate\models.py:443
+#: .\old_site_migrate\models.py:505
+msgid "old_id"
+msgstr "old id"
+
+#: .\old_site_migrate\models.py:27
+msgid "news item"
+msgstr "новость"
+
+#: .\old_site_migrate\models.py:55
+msgid "old user"
+msgstr "пользователь"
+
+#: .\old_site_migrate\models.py:56
+msgid "old users"
+msgstr "Пользователи"
+
+#: .\old_site_migrate\models.py:76
+msgid "user name"
+msgstr "Имя пользователя"
+
+#: .\old_site_migrate\models.py:82
+msgid "password"
+msgstr "Пароль"
+
+#: .\old_site_migrate\models.py:88
+msgid "email"
+msgstr "E-mail"
+
+#: .\old_site_migrate\models.py:94
+msgid "icq"
+msgstr "icq"
+
+#: .\old_site_migrate\models.py:100
+msgid "aol"
+msgstr "aol"
+
+#: .\old_site_migrate\models.py:106
+msgid "msn"
+msgstr "msn"
+
+#: .\old_site_migrate\models.py:112
+msgid "yahoo"
+msgstr "yahoo"
+
+#: .\old_site_migrate\models.py:118
+msgid "website"
+msgstr "web сайт"
+
+#: .\old_site_migrate\models.py:124
+msgid "city"
+msgstr "город"
+
+#: .\old_site_migrate\models.py:130
+msgid "profession"
+msgstr "профессия"
+
+#: .\old_site_migrate\models.py:136
+msgid "hobby"
+msgstr "хобби"
+
+#: .\old_site_migrate\models.py:140
+msgid "subpost"
+msgstr "подпись"
+
+#: .\old_site_migrate\models.py:144
+msgid "show email"
+msgstr "показывать email"
+
+#: .\old_site_migrate\models.py:148
+msgid "hide on forum"
+msgstr "скрыть на форуме"
+
+#: .\old_site_migrate\models.py:152
+msgid "show subpost"
+msgstr "показывать подпись"
+
+#: .\old_site_migrate\models.py:156
+msgid "html"
+msgstr "html"
+
+#: .\old_site_migrate\models.py:160
+msgid "smiles"
+msgstr "Смайлы"
+
+#: .\old_site_migrate\models.py:164
+msgid "last visited"
+msgstr "последнее посещение"
+
+#: .\old_site_migrate\models.py:170
+msgid "ip"
+msgstr "IP"
+
+#: .\old_site_migrate\models.py:174
+msgid "convert smiles"
+msgstr "превращать смайлы"
+
+#: .\old_site_migrate\models.py:178
+msgid "notify by email"
+msgstr "уведомлять по email"
+
+#: .\old_site_migrate\models.py:182
+msgid "hide trust"
+msgstr "скрывать доверие"
+
+#: .\old_site_migrate\models.py:199
+msgid "old game"
+msgstr "старая игра"
+
+#: .\old_site_migrate\models.py:200
+msgid "old games"
+msgstr "старые игры"
+
+#: .\old_site_migrate\models.py:251
+msgid "old role"
+msgstr "старая роль"
+
+#: .\old_site_migrate\models.py:252
+msgid "old roles"
+msgstr "старые роли"
+
+#: .\old_site_migrate\models.py:297 .\stories\models.py:477
+msgid "requestable"
+msgstr "запрашиваемый"
+
+#: .\old_site_migrate\models.py:301
+#: .\stories\templates\stories\edit_story\characters.haml:19
+msgid "show"
+msgstr "Отображать"
+
+#: .\old_site_migrate\models.py:305
+msgid "show_trust"
+msgstr "отображать оценки доверия"
+
+#: .\old_site_migrate\models.py:320
+msgid "old game admin"
+msgstr "старый админ игры"
+
+#: .\old_site_migrate\models.py:321
+msgid "old game admins"
+msgstr "старые админы игры"
+
+#: .\old_site_migrate\models.py:350
+msgid "admin"
+msgstr "администраторы"
+
+#: .\old_site_migrate\models.py:359 .\old_site_migrate\models.py:360
+msgid "old game guest"
+msgstr "гость игры"
+
+#: .\old_site_migrate\models.py:389 .\old_site_migrate\models.py:428
+msgid "guest"
+msgstr "гости"
+
+#: .\old_site_migrate\models.py:398 .\old_site_migrate\models.py:399
+msgid "old game winner"
+msgstr "победитель игры"
+
+#: .\old_site_migrate\models.py:437
+msgid "old post"
+msgstr "старый пост"
+
+#: .\old_site_migrate\models.py:438
+msgid "old posts"
+msgstr "старые посты"
+
+#: .\old_site_migrate\models.py:459
+msgid "illustration"
+msgstr "иллюстрация"
+
+#: .\old_site_migrate\models.py:464
+msgid "param1"
+msgstr "param1"
+
+#: .\old_site_migrate\models.py:470
+msgid "ext"
+msgstr "расширение"
+
+#: .\old_site_migrate\models.py:488
+msgid "param2"
+msgstr "param2"
+
+#: .\old_site_migrate\models.py:499
+msgid "old forum smile"
+msgstr "старый смайл"
+
+#: .\old_site_migrate\models.py:500
+msgid "old forum smiles"
+msgstr "старые смайлы"
+
+#: .\old_site_migrate\models.py:512
+msgid "url"
+msgstr "URL"
+
+#: .\players\admin.py:6 .\players\templates\players\player_history.haml:12
+#: .\players\templates\players\player_list.haml:15
+msgid "players"
+msgstr "игроки"
+
+#: .\players\forms.py:30
+msgid "Email"
+msgstr "E-mail"
+
+#: .\players\forms.py:34
+msgid "New password"
+msgstr "Новый пароль"
+
+#: .\players\forms.py:39
+msgid "Repeat password"
+msgstr "Пароль(еще раз)"
+
+#: .\players\forms.py:44
+msgid "Current password"
+msgstr "Текущий пароль"
+
+#: .\players\forms.py:54
+msgid "You need current password to change this settings"
+msgstr "Вам нужно указать текущий пароль, что бы изменить эти настройки"
+
+#: .\players\forms.py:57
+msgid "Invalid password"
+msgstr "Неверный пароль"
+
+#: .\players\forms.py:69
+msgid "Passwords don`t match"
+msgstr "Пароли не совпадают"
+
+#: .\players\forms.py:85
+msgid "stories count"
+msgstr "количеству сюжетов"
+
+#: .\players\forms.py:86
+msgid "games played count increasing"
+msgstr "сыгранных игр по возрастанию"
+
+#: .\players\forms.py:87
+msgid "games played count decreasing"
+msgstr "сыгранных игр по убыванию"
+
+#: .\players\forms.py:88
+msgid "registration date"
+msgstr "дате регистрации"
+
+#: .\players\forms.py:89
+msgid "alphabetical"
+msgstr "алфавиту"
+
+#: .\players\forms.py:97 .\players\templates\players\player_list.haml:21
+msgid "Player"
+msgstr "Игрок"
+
+#: .\players\forms.py:103 .\players\templates\players\player_list.haml:24
+msgid "sort by"
+msgstr "сортировать по"
+
+#: .\players\forms.py:109
+msgid "enabled"
+msgstr "включено"
+
+#: .\players\models.py:9
+msgid "player star"
+msgstr "звезда игрока"
+
+#: .\players\models.py:10
+msgid "player stars"
+msgstr "звезды игрока"
+
+#: .\players\models.py:16 .\players\templates\players\statistics.haml:20
+msgid "Games won"
+msgstr "Выигранные игры"
+
+#: .\players\views.py:96 .\players\views.py:212
+msgid "rank was successfully updated"
+msgstr "ранг успешно обновлен"
+
+#: .\players\views.py:131
+msgid "message send"
+msgstr "Сообщение отправлено"
+
+#: .\players\views.py:252 .\templates\base.haml:79
+#: .\templates\base_game.haml:50 .\templates\home.haml:117
+msgid "Forums"
+msgstr "Форумы"
+
+#: .\players\templates\players\exceptions.haml:14
+#: .\players\templates\players\index.haml:12
+#: .\players\templates\players\played.haml:13
+#: .\players\templates\players\player_list.haml:12 .\templates\base.haml:73
+#: .\templates\base_game.haml:44 .\templates\home.haml:111
+msgid "Players"
+msgstr "Игроки"
+
+#: .\players\templates\players\exceptions.haml:26
+msgid "Excptions of user:"
+msgstr "Исключения пользователя:"
+
+#: .\players\templates\players\exceptions.haml:32
+msgid "Here you can see all exceptions created by this user. "
+msgstr "Тут вы можете увидеть все исключения, созданные этим пользователем."
+
+#: .\players\templates\players\exceptions.haml:33
+msgid ""
+"Exceptions in most cases not mean a bug - it occure, for example, when "
+"access is blocked."
+msgstr ""
+"В большистве случаев исключения не являются багом - они возникают, к "
+"примеру, когда пользователь открывает страницу, куда ему запрещен доступ."
+
+#: .\players\templates\players\exceptions.haml:34
+msgid ""
+"But every time it is a potential bug sitation, so, all information about "
+"occured exceptions is colleced here."
+msgstr ""
+"Но в каждом случае, это ситуация - потенциальный баг. Так что вся "
+"информация  о произошедших исключениях собрана здесь."
+
+#: .\players\templates\players\exceptions.haml:35
+msgid "Its can be used by developers for bug investigation."
+msgstr "Она может быть использована разработчиками для анализа."
+
+#: .\players\templates\players\index.haml:31
+#: .\players\templates\profile\index.haml:26
+#: .\stories\templates\stories\edit_story\index.haml:25
+msgid "Main"
+msgstr "Главная"
+
+#: .\players\templates\players\index.haml:35
+#: .\players\templates\profile\index.haml:30
+msgid "Messages"
+msgstr "Сообщения"
+
+#: .\players\templates\players\messages.haml:15
+#: .\players\templates\players\player_history.haml:20
+msgid "Message history"
+msgstr "История сообщений"
+
+#: .\players\templates\players\played.haml:21
+#: .\players\templates\players\played.haml:24
+#: .\players\templates\profile\played.haml:17
+#: .\players\templates\profile\played.haml:20
+msgid "Played games and characters"
+msgstr "Сыгранные игры и персонажи"
+
+#: .\players\templates\players\player_history.haml:23
+msgid "Message history with "
+msgstr "История сообщений с "
+
+#: .\players\templates\players\player_info.haml:16
+#: .\players\templates\profile\main.haml:25
+msgid "Rank:"
+msgstr "Ранг:"
+
+#: .\players\templates\players\player_info.haml:24
+msgid "Sex:"
+msgstr "Пол:"
+
+#: .\players\templates\players\player_info.haml:28
+msgid "ICQ:"
+msgstr "ICQ:"
+
+#: .\players\templates\players\player_info.haml:33
+msgid "Skype:"
+msgstr "Skype:"
+
+#: .\players\templates\players\player_info.haml:36
+#: .\players\templates\profile\main.haml:40
+msgid "Registred:"
+msgstr "Зарегистрирован:"
+
+#: .\players\templates\players\player_info.haml:41
+msgid "User exceptions..."
+msgstr "Исключения пользователя..."
+
+#: .\players\templates\players\player_info.haml:49
+#: .\players\templates\profile\main.haml:49
+msgid "All played games and characters"
+msgstr "Все сыгранные игры и персонажи"
+
+#: .\players\templates\players\player_info.haml:54
+msgid "All played games"
+msgstr "Все сыгранные игры"
+
+#: .\players\templates\players\player_info.haml:59
+msgid "All played characters"
+msgstr "Все сыгранные персонажи"
+
+#: .\players\templates\players\player_list.haml:27
+msgid "filter"
+msgstr "фильтр"
+
+#: .\players\templates\players\player_list.haml:48
+msgid "Stories authored:"
+msgstr "Автор сюжетов:"
+
+#: .\players\templates\players\player_list.haml:51
+msgid "Games played:"
+msgstr "Сыграно игр:"
+
+#: .\players\templates\players\statistics.haml:5
+msgid "Forum posts"
+msgstr "Сообщений на форуме"
+
+#: .\players\templates\players\statistics.haml:10
+msgid "Game posts"
+msgstr "Сообщений в играх"
+
+#: .\players\templates\players\statistics.haml:15
+msgid "Total games"
+msgstr "Всего игр"
+
+#: .\players\templates\players\statistics.haml:25
+msgid "Games admin"
+msgstr "Администратор игр"
+
+#: .\players\templates\players\statistics.haml:31
+msgid "Story author"
+msgstr "Автор сюжетов"
+
+#: .\players\templates\players\snippets\messages.haml:11
+msgid "You"
+msgstr "Вы"
+
+#: .\players\templates\players\snippets\played_table.haml:8
+#: .\players\templates\players\snippets\played_table.haml:27
+#: .\players\templates\profile\snippets\played_table.haml:7
+msgid "Played games"
+msgstr "Сыгранные игры"
+
+#: .\players\templates\players\snippets\played_table.haml:42
+#: .\players\templates\profile\snippets\played_table.haml:9
+msgid "Played characters"
+msgstr "Сыгранные персонажи"
+
+#: .\players\templates\profile\avatar_upload.html:10
+#: .\players\templates\profile\avatar_upload.html:25
+#: .\stories\templates\snippets\avatarupload.html:27
+msgid "Reload avatar"
+msgstr "Заменить аватар"
+
+#: .\players\templates\profile\avatar_upload.html:27
+msgid "Load avatar"
+msgstr "Загрузить аватар"
+
+#: .\players\templates\profile\favorites.haml:3
+msgid "Here presented posts, you marked as your favorite."
+msgstr "Тут отображаются сообщения, отмеченные вами как избранные."
+
+#: .\players\templates\profile\favorites.haml:19
+msgid "You have no favorite posts yet."
+msgstr "У вас пока нет избранных сообщений"
+
+#: .\players\templates\profile\files.haml:3
+msgid "Here presented files, you have attached to your posts."
+msgstr "Тут отображаются файлы, которые вы прикрепили к сообщениям."
+
+#: .\players\templates\profile\files.haml:10
+msgid "File name"
+msgstr "Имя файла"
+
+#: .\players\templates\profile\files.haml:12 .\templates\statistics.haml:26
+msgid "Type"
+msgstr "Тип"
+
+#: .\players\templates\profile\files.haml:14
+msgid "Size"
+msgstr "Размер"
+
+#: .\players\templates\profile\files.haml:24
+msgid "Uploaded:"
+msgstr "Загружен:"
+
+#: .\players\templates\profile\files.haml:35
+msgid "You have not uploaded files yet."
+msgstr "Вы пока не загрузили ни одного файла."
+
+#: .\players\templates\profile\found_bugs.haml:4
+msgid ""
+"Here presented bugs you reported. You can see work progress on it and "
+"developers or administrators feedback. "
+msgstr ""
+"Тут отображены проблемы о которых вы сообщали. Вы можете следить за "
+"прогрессом по ним и ответами разработчиков или администраторов сайта."
+
+#: .\players\templates\profile\found_bugs.haml:10
+msgid "Key"
+msgstr "Ключ"
+
+#: .\players\templates\profile\found_bugs.haml:12
+msgid "Summary"
+msgstr "Краткое описание"
+
+#: .\players\templates\profile\found_bugs.haml:14
+msgid "Assignee"
+msgstr "Исполнитель"
+
+#: .\players\templates\profile\found_bugs.haml:18
+#: .\players\templates\profile\subscriptions.haml:12
+msgid "Status"
+msgstr "Статус"
+
+#: .\players\templates\profile\found_bugs.haml:20
+msgid "Created"
+msgstr "Создан"
+
+#: .\players\templates\profile\games.haml:2
+msgid "Here are presented your games:"
+msgstr "Тут отображаются ваши игры:"
+
+#: .\players\templates\profile\games.haml:17
+msgid "You have no current games now."
+msgstr "У вас сейчас нет текущих игр"
+
+#: .\players\templates\profile\games.haml:20
+msgid "Administrated games"
+msgstr "Администрируемые игры"
+
+#: .\players\templates\profile\games.haml:30
+msgid "You do not admin any games yet."
+msgstr "Вы не администруруете игр"
+
+#: .\players\templates\profile\games.haml:33
+msgid "Archive"
+msgstr "Архив"
+
+#: .\players\templates\profile\games.haml:43
+msgid "You do no finished games yet"
+msgstr "У вас еще нет ни одной загруженной игры"
+
+#: .\players\templates\profile\index.haml:15
+#: .\players\templates\profile\index.haml:18
+#: .\players\templates\profile\played.haml:13
+msgid "Personal cabinet"
+msgstr "Личный кабинет"
+
+#: .\players\templates\profile\index.haml:34
+msgid "Favorites"
+msgstr "Избранное"
+
+#: .\players\templates\profile\index.haml:39 .\templates\base.haml:76
+#: .\templates\base_game.haml:47 .\templates\home.haml:114
+msgid "Stories"
+msgstr "Сюжеты"
+
+#: .\players\templates\profile\index.haml:48
+msgid "Invites"
+msgstr "Приглашения"
+
+#: .\players\templates\profile\index.haml:60
+msgid "Problems"
+msgstr "Проблемы"
+
+#: .\players\templates\profile\index.haml:64
+msgid "Subscriptions"
+msgstr "Подписки"
+
+#: .\players\templates\profile\invites.haml:4
+msgid "Here presented invites to games, that you received."
+msgstr "Тут отображаются полученные вами приглашения на игры."
+
+#: .\players\templates\profile\invites.haml:8
+msgid "New invites"
+msgstr "Новые приглашения"
+
+#: .\players\templates\profile\invites.haml:38
+msgid "Accept"
+msgstr "Принять"
+
+#: .\players\templates\profile\invites.haml:41
+msgid "Decline"
+msgstr "Отклонить"
+
+#: .\players\templates\profile\invites.haml:43
+msgid "You have no new invites."
+msgstr "У вас нет новых приглашений."
+
+#: .\players\templates\profile\invites.haml:47
+msgid "Old invites"
+msgstr "Старые приглашения"
+
+#: .\players\templates\profile\invites.haml:78
+msgid "You have no old invites."
+msgstr "У вас нет старых приглашений."
+
+#: .\players\templates\profile\main.haml:38
+msgid "Assign VK profile"
+msgstr "Прикрепить профиль ВКонтакте"
+
+#: .\players\templates\profile\messages.haml:23
+msgid "You have no messages yet"
+msgstr "У вас пока нет сообщений"
+
+#: .\players\templates\profile\settings.haml:7
+msgid "Settings saved"
+msgstr "Настройки сохранены"
+
+#: .\players\templates\profile\settings.haml:15
+#: .\players\templates\profile\subscriptions.haml:27
+msgid "save"
+msgstr "Cохранить"
+
+#: .\players\templates\profile\settings_form.haml:4
+msgid "Personal settings"
+msgstr "Личные настройки"
+
+#: .\players\templates\profile\settings_form.haml:11
+msgid "Email and password"
+msgstr "E-mail и пароль"
+
+#: .\players\templates\profile\stories.haml:8
+msgid "Story"
+msgstr "Сюжет"
+
+#: .\players\templates\profile\stories.haml:10
+msgid "Action"
+msgstr "Действие"
+
+#: .\players\templates\profile\stories.haml:12
+msgid "Genres"
+msgstr "Жанры"
+
+#: .\players\templates\profile\subscriptions.haml:10
+msgid "Name"
+msgstr "Имя"
+
+#: .\players\templates\profile\subscriptions.haml:14
+msgid "Description"
+msgstr "Описание"
+
+#: .\stories\catalog.py:7
+msgid "story catalog"
+msgstr "каталог сюжетов"
+
+#: .\stories\edit_story_cataloging.py:23 .\stories\models.py:254
+msgid "characters"
+msgstr "персонажи"
+
+#: .\stories\edit_story_cataloging.py:24 .\stories\models.py:150
+msgid "avatars"
+msgstr "аватары"
+
+#: .\stories\edit_story_cataloging.py:27 .\stories\models.py:314
+msgid "variations"
+msgstr "вариации"
+
+#: .\stories\edit_variation.py:47 .\stories\story_edit_views.py:29
+msgid "story was successfully updated"
+msgstr "Сюжет успешно обновлён"
+
+#: .\stories\edit_variation.py:114 .\stories\story_edit_views.py:313
+#: .\stories\templates\stories\materials\materials.haml:63
+#: .\stories\templates\stories\materials\materials.haml:66
+#: .\stories\templates\stories\materials\materials.haml:69
+msgid "Add material"
+msgstr "Добавить материал"
+
+#: .\stories\edit_variation.py:205
+msgid "Role cant be deleted - it has threads on game forum."
+msgstr "Роль не может быть удалена - у нее есть темы на игровом форуме."
+
+#: .\stories\edit_variation.py:213
+msgid "Role cant be deleted - it has comments on game forum."
+msgstr "Роль не может быть удалена - у нее есть комментарии на игровом форуме."
+
+#: .\stories\forms.py:13 .\stories\templates\stories\index.haml:15
+msgid "Author"
+msgstr "Автор"
+
+#: .\stories\forms.py:18 .\stories\templates\stories\index.haml:18
+msgid "Genre"
+msgstr "Жанр"
+
+#: .\stories\forms.py:23 .\stories\templates\stories\index.haml:22
+msgid "Creation year"
+msgstr "Год создания"
+
+#: .\stories\forms.py:52 .\stories\forms.py:53
+#: .\stories\templates\stories\add_story.haml:8
+#: .\stories\templates\stories\add_story.haml:11
+#: .\stories\templates\stories\add_story.haml:13
+msgid "Add story"
+msgstr "Добавить сюжет"
+
+#: .\stories\models.py:15 .\stories\templates\stories\index.haml:43
+msgid "genre"
+msgstr "жанр"
+
+#: .\stories\models.py:16 .\stories\models.py:85
+msgid "genres"
+msgstr "жанры"
+
+#: .\stories\models.py:39 .\stories\models.py:40 .\stories\models.py:46
+#: .\templates\home.haml:34
+msgid "stories"
+msgstr "сюжеты"
+
+#: .\stories\models.py:79 .\stories\templates\stories\index.haml:45
+msgid "creation year"
+msgstr "год создания"
+
+#: .\stories\models.py:108
+msgid "hidden"
+msgstr "Скрыть"
+
+#: .\stories\models.py:149 .\stories\models.py:209 .\stories\models.py:293
+#: .\stories\models.py:431
+#: .\stories\templates\stories\edit_story\characters.haml:13
+#: .\stories\templates\stories\variation\roles.haml:13
+msgid "avatar"
+msgstr "аватар"
+
+#: .\stories\models.py:202
+msgid "avatar alternative"
+msgstr "альтернативный аватар"
+
+#: .\stories\models.py:203
+msgid "avatars alternaties"
+msgstr "альтернативные аватары"
+
+#: .\stories\models.py:215
+msgid "height"
+msgstr "высота"
+
+#: .\stories\models.py:220
+msgid "width"
+msgstr "ширина"
+
+#: .\stories\models.py:247
+msgid "Middle"
+msgstr "Средний"
+
+#: .\stories\models.py:248
+msgid "Plural"
+msgstr "Множественное число"
+
+#: .\stories\models.py:275
+msgid "order"
+msgstr "порядок"
+
+#: .\stories\models.py:298 .\stories\models.py:458
+msgid "show in character list"
+msgstr "отображать в списке персонажей игры"
+
+#: .\stories\models.py:346
+msgid "new forum"
+msgstr "новый форум"
+
+#: .\stories\models.py:356
+msgid "comments_count"
+msgstr "комментарии"
+
+#: .\stories\models.py:462
+msgid "show in online characters"
+msgstr "отображать в онлайн списке"
+
+#: .\stories\models.py:466
+msgid "show trust marks"
+msgstr "отображать оценки доверия"
+
+#: .\stories\models.py:497
+msgid "comments count"
+msgstr "комментарии"
+
+#: .\stories\models.py:504
+msgid "trust value"
+msgstr "оценка доверия"
+
+#: .\stories\models.py:530
+msgid "role delete mark"
+msgstr "отметка удаления роли"
+
+#: .\stories\models.py:531
+msgid "roles delete marks"
+msgstr "отметки удаления ролей"
+
+#: .\stories\models.py:559
+#, python-format
+msgid "%(role)s deleted by %(user)s at %(time)s"
+msgstr "%(role)s удалена %(user)s в %(time)s"
+
+#: .\stories\models.py:564
+msgid "story admin"
+msgstr "администратор сюжета"
+
+#: .\stories\models.py:565
+msgid "story admins"
+msgstr "администраторы сюжета"
+
+#: .\stories\models.py:569
+msgid "No"
+msgstr "Нет"
+
+#: .\stories\models.py:570
+msgid "Yes"
+msgstr "Да"
+
+#: .\stories\models.py:595
+msgid "games admin"
+msgstr "админ игры"
+
+#: .\stories\models.py:603
+msgid "story author"
+msgstr "автор сюжета"
+
+#: .\stories\models.py:604
+msgid "story authors"
+msgstr "авторы сюжета"
+
+#: .\stories\models.py:629
+msgid "additional material"
+msgstr "дополнительный материал"
+
+#: .\stories\models.py:630
+msgid "additional materials"
+msgstr "дополнительные материалы"
+
+#: .\stories\models.py:661 .\stories\models.py:737
+msgid "Hide in materials"
+msgstr "скрыть в материалах"
+
+#: .\stories\models.py:742
+#: .\stories\templates\stories\edit_story\avatars.haml:13
+#: .\stories\templates\stories\materials\illustrations.haml:13
+#: .\stories\templates\stories\materials\illustrations.haml:43
+msgid "image"
+msgstr "изображение"
+
+#: .\stories\models.py:747
+msgid "thumb"
+msgstr "миниатюра"
+
+#: .\stories\story_edit_views.py:72
+msgid "card image"
+msgstr "изображение игральной карты"
+
+#: .\stories\story_edit_views.py:141
+#: .\stories\templates\stories\edit_story\variations.haml:38
+msgid "Add new variation"
+msgstr "Добавить новую вариацию"
+
+#: .\stories\story_edit_views.py:159
+msgid "variation was successfully added"
+msgstr "Вариация успешно добавлена"
+
+#: .\stories\story_edit_views.py:184
+#: .\stories\templates\stories\edit_story\characters.haml:39
+msgid "Add new character"
+msgstr "Добавить новый персонаж"
+
+#: .\stories\story_edit_views.py:185
+msgid "character was successfully added"
+msgstr "Персонаж успешно добавлен"
+
+#: .\stories\story_edit_views.py:191
+msgid "character was successfully updated"
+msgstr "Персонаж успешно обновлен"
+
+#: .\stories\story_edit_views.py:240
+msgid "avatar was successfully updated"
+msgstr "Аватар успешно обновлен"
+
+#: .\stories\views.py:61
+msgid "story was successfully added"
+msgstr "Сюжет успешно добавлен"
+
+#: .\stories\templates\snippets\avatarupload.html:29
+msgid "Add avatar"
+msgstr "Добавить аватар"
+
+#: .\stories\templates\stories\base.haml:9
+#: .\stories\templates\stories\base.haml:13
+#: .\stories\templates\stories\base.haml:16
+#: .\stories\templates\stories\base_game.haml:9
+#: .\stories\templates\stories\base_game.haml:13
+#: .\stories\templates\stories\base_game.haml:16
+msgid "Story catalog"
+msgstr "Каталог сюжетов"
+
+#: .\stories\templates\stories\index.haml:10
+msgid "add story"
+msgstr "добавить сюжет"
+
+#: .\stories\templates\stories\index.haml:25
+msgid "Filter"
+msgstr "фильтр"
+
+#: .\stories\templates\stories\index.haml:28
+msgid "filtered"
+msgstr "отфильтровано"
+
+#: .\stories\templates\stories\index.haml:35
+msgid "total plots count"
+msgstr "всего сюжетов"
+
+#: .\stories\templates\stories\index.haml:49
+#: .\stories\templates\stories\edit_story\users.haml:10
+msgid "authors"
+msgstr "авторы"
+
+#: .\stories\templates\stories\index.haml:62
+msgid "review"
+msgstr "Просмотреть"
+
+#: .\stories\templates\stories\index.haml:95
+msgid "No stories yet"
+msgstr "Пока нет сюжетов"
+
+#: .\stories\templates\stories\story.haml:25
+msgid "year"
+msgstr "год"
+
+#: .\stories\templates\stories\edit_story\avatars.haml:17
+msgid "actions"
+msgstr "Действия"
+
+#: .\stories\templates\stories\edit_story\avatars.haml:19
+msgid "sizes"
+msgstr "Размеры"
+
+#: .\stories\templates\stories\edit_story\avatars.haml:37
+#: .\stories\templates\stories\materials\illustrations.haml:29
+#: .\stories\templates\stories\materials\materials.haml:23
+msgid "Remove"
+msgstr "Удалить"
+
+#: .\stories\templates\stories\edit_story\characters.haml:17
+#: .\stories\templates\stories\edit_story\variations.haml:15
+msgid "decription"
+msgstr "Описание"
+
+#: .\stories\templates\stories\edit_story\delete_variation.haml:27
+msgid "Are you shure you want to delete variation:"
+msgstr "Вы уверены, что хотите удалить вариацию:"
+
+#: .\stories\templates\stories\edit_story\index.haml:29
+msgid "Texts"
+msgstr "Тексты"
+
+#: .\stories\templates\stories\edit_story\index.haml:33
+msgid "Users"
+msgstr "Пользователи"
+
+#: .\stories\templates\stories\edit_story\index.haml:37
+msgid "Graphics"
+msgstr "Графика"
+
+#: .\stories\templates\stories\edit_story\index.haml:45
+msgid "Avatars"
+msgstr "Аватары"
+
+#: .\stories\templates\stories\edit_story\index.haml:49
+msgid "Illustrations"
+msgstr "Иллюстрации"
+
+#: .\stories\templates\stories\edit_story\index.haml:57
+msgid "Variations"
+msgstr "Вариации"
+
+#: .\stories\templates\stories\edit_story\index.haml:75
+msgid "Announcement"
+msgstr "Анонс"
+
+#: .\stories\templates\stories\edit_story\index.haml:79
+msgid "Announcement preview"
+msgstr "Превью анонса"
+
+#: .\stories\templates\stories\edit_story\variations.haml:17
+#: .\stories\templates\stories\edit_story\variations.haml:32
+msgid "Forum"
+msgstr "Форум"
+
+#: .\stories\templates\stories\materials\illustrations.haml:17
+#: .\stories\templates\stories\materials\illustrations.haml:47
+#: .\stories\templates\stories\materials\materials.haml:14
+#: .\stories\templates\stories\materials\materials.haml:45
+msgid "link"
+msgstr "ссылка"
+
+#: .\stories\templates\stories\materials\illustrations.haml:38
+msgid "story illustrations"
+msgstr "иллюстрации сюжета"
+
+#: .\stories\templates\stories\materials\illustrationscript.html:31
+msgid "Reload illustration"
+msgstr "Перезагрузить"
+
+#: .\stories\templates\stories\materials\illustrationscript.html:33
+msgid "Add illustration"
+msgstr "Добавить иллюстрацию"
+
+#: .\stories\templates\stories\materials\materials.haml:12
+#: .\stories\templates\stories\materials\materials.haml:43
+msgid "admins only"
+msgstr "только для админов"
+
+#: .\stories\templates\stories\materials\materials.haml:36
+msgid "story materials"
+msgstr "материалы сюжета"
+
+#: .\stories\templates\stories\materials\materials.haml:75
+msgid "Delete material"
+msgstr "Удалить материал"
+
+#: .\stories\templates\stories\materials\materials.haml:77
+msgid "Are you shure you want to delete"
+msgstr "Вы уверены что хотите удалить"
+
+#: .\stories\templates\stories\snippets\delete_role.haml:8
+msgid "Delete role"
+msgstr "Удалить роль"
+
+#: .\stories\templates\stories\snippets\delete_role.haml:11
+msgid "Role deleted!"
+msgstr "Роль успешно удалена!"
+
+#: .\stories\templates\stories\variation\main.haml:12
+msgid "Create game"
+msgstr "Создать игру"
+
+#: .\templates\404.html:5 .\templates\500.haml:5
+msgid "Oooops!"
+msgstr "Оооой!"
+
+#: .\templates\404.html:18
+msgid ""
+"Sorry, but page no found. If you think it is exists, you can say us about it "
+"by 'Found bug' button."
+msgstr ""
+"Извините, но страница не найдена. Если вы считаете что она существует, "
+"можете сообщить нам об этом с помощью кнопки 'Найден баг?' внизу справа."
+
+#: .\templates\500.haml:14
+msgid "We got internal server error here. Error type is"
+msgstr "Произошла внутренняя ошибка сайта. Тип ошибки"
+
+#: .\templates\500.haml:19
+msgid ""
+"All error information was saved for investigation. You can help us in "
+"solving this problem by sending additional info."
+msgstr ""
+"Вся информация об этом событии была сохранена для дальнейшего исследования. "
+"Вы можете помочь нам в устранении этой проблемы, отправив нам дополнительную "
+"информацию."
+
+#: .\templates\500.haml:20
+msgid ""
+"for that press 'Found bug' button at the lefr side of bottom of this page "
+"and describe actions you did to get this message."
+msgstr ""
+"Для этого нажмите кнопку 'Найден баг?' справа в нижней части страницы и "
+"опишите, какие ваши действия привели к появлению этого сообщения."
+
+#: .\templates\500.haml:22
+msgid "Also add to this information following info:"
+msgstr "Также добавте следующую информацию:"
+
+#: .\templates\500.haml:24
+msgid "Exception ID:"
+msgstr "Идентификатор исключения:"
+
+#: .\templates\500.haml:27
+msgid "We are very sorry for that, and are working om getting site better."
+msgstr "Мы очень извиняемся за произошедшее и стараемся сделать сайт лучше."
+
+#: .\templates\base.haml:54 .\templates\base_game.haml:25
+msgid "All games"
+msgstr "Все игры"
+
+#: .\templates\base.haml:82 .\templates\base_game.haml:53
+#: .\templates\home.haml:51 .\templates\home.haml.py:120
+#: .\templates\news\newsitem_detail.haml:9
+#: .\templates\news\newsitem_list.haml:9
+#: .\templates\news\newsitem_list.haml:12
+#: .\templates\news\newsitem_list.haml:15
+msgid "News"
+msgstr "Новости"
+
+#: .\templates\base.haml:85 .\templates\base_game.haml:57
+#: .\templates\home.haml:123 .\templates\flatpages\default.haml:12
+#: .\templates\flatpages\list.haml:6 .\templates\flatpages\list.haml.py:12
+msgid "Flatpages"
+msgstr "Статьи"
+
+#: .\templates\base.haml:90 .\templates\base_game.haml:62
+msgid "All articles"
+msgstr "Все статьи"
+
+#: .\templates\base.haml:99 .\templates\statistics.haml:8
+#: .\templates\statistics.haml.py:11 .\templates\statistics.haml:14
+msgid "Statistics"
+msgstr "Статистика"
+
+#: .\templates\base.haml:111 .\templates\base_game.haml:74
+msgid "Admin site"
+msgstr "Админка"
+
+#: .\templates\base.haml:119 .\templates\base_game.haml:82
+msgid "Your exceptions"
+msgstr "Ваши исключения"
+
+#: .\templates\base.haml:122 .\templates\base_game.haml:85
+msgid "Django admin site"
+msgstr "Джанго админка"
+
+#: .\templates\base.haml:131 .\templates\base.haml.py:227
+#: .\templates\base_game.haml:94
+msgid "Switch user"
+msgstr "Сменить пользователя"
+
+#: .\templates\base.haml:140 .\templates\base_game.haml:103
+msgid "Invites!"
+msgstr "Приглашения!"
+
+#: .\templates\base.haml:140 .\templates\base_game.haml:103
+msgid "You got invite to play a game."
+msgstr "Вы приглашены на игру."
+
+#: .\templates\base.haml:147 .\templates\base_game.haml:110
+msgid "Greetings,"
+msgstr "Приветствуем вас, "
+
+#: .\templates\base.haml:154 .\templates\base_game.haml:117
+msgid "Logout"
+msgstr "Выйти"
+
+#: .\templates\base.haml:158 .\templates\base.haml.py:164
+#: .\templates\base_game.haml:121 .\templates\base_game.haml.py:127
+msgid "login"
+msgstr "войти"
+
+#: .\templates\base.haml:161 .\templates\base.haml.py:167
+#: .\templates\base_game.haml:124 .\templates\base_game.haml.py:130
+msgid "sign up"
+msgstr "зарегистрироваться"
+
+#: .\templates\base.haml:214 .\templates\base_game.haml:177
+msgid "Service usage rules"
+msgstr "Правила пользования сервисом"
+
+#: .\templates\base.haml:218 .\templates\base_game.haml:181
+msgid "Confidential policy"
+msgstr "Политика конфиденциальности"
+
+#: .\templates\base.haml:234
+msgid "Switch"
+msgstr "Сменить"
+
+#: .\templates\base.haml:240 .\templates\base.haml.py:252
+#: .\templates\accounts\auth\login.haml:7
+#: .\templates\accounts\auth\login.haml:10
+#: .\templates\accounts\auth\login.haml:19
+msgid "Login"
+msgstr "Войти"
+
+#: .\templates\base.haml:244 .\templates\base.haml.py:262
+msgid "Username"
+msgstr "Имя пользователя"
+
+#: .\templates\base.haml:247 .\templates\base.haml.py:268
+msgid "Password"
+msgstr "Пароль"
+
+#: .\templates\base.haml:259 .\templates\base.haml.py:283
+#: .\templates\registration\registration_form.haml:28
+msgid "Sign up"
+msgstr "Зарегистрироваться"
+
+#: .\templates\base.haml:265
+msgid "E-mail"
+msgstr "E-mail"
+
+#: .\templates\base.haml:271
+msgid "Password repeat"
+msgstr "Пароль (ещё раз)"
+
+#: .\templates\base.haml:275
+#: .\templates\registration\registration_form.haml:21
+msgid "By sign up you apply"
+msgstr "Регистрируясь, вы соглашаетесь с"
+
+#: .\templates\base.haml:276
+#: .\templates\registration\registration_form.haml:22
+msgid "service usage rules"
+msgstr "правилами пользования сервисом"
+
+#: .\templates\base.haml:279
+#: .\templates\registration\registration_form.haml:25
+msgid "Data you submit is protected by service"
+msgstr "Данные, которые вы отправляете, защищены"
+
+#: .\templates\base.haml:280
+#: .\templates\registration\registration_form.haml:26
+msgid "confidential policy"
+msgstr "политикой конфиденциальности"
+
+#: .\templates\home.haml:40
+msgid "news"
+msgstr "новости"
+
+#: .\templates\home.haml:43
+msgid "profile"
+msgstr "профиль"
+
+#: .\templates\home.haml:71
+msgid "Registration opened"
+msgstr "Прием заявок"
+
+#: .\templates\statistics.haml:30 .\templates\statistics.haml.py:34
+#: .\templates\statistics.haml:38
+msgid "Report"
+msgstr "Отчет"
+
+#: .\templates\statistics.haml:41
+msgid "Period"
+msgstr "Период"
+
+#: .\templates\statistics.haml:44
+msgid "Show"
+msgstr "Показать"
+
+#: .\templates\statistics.haml:57
+msgid "Graph"
+msgstr "График"
+
+#: .\templates\statistics.haml:61
+msgid "Table"
+msgstr "Таблица"
+
+#: .\templates\news\newsitem_list.haml:19
+msgid "RSS"
+msgstr "RSS"
+
+#: .\templates\registration\activate.haml:11
+#: .\templates\registration\activation_complete.haml:11
+#: .\templates\registration\registration_complete.haml:9
+msgid "Register"
+msgstr "Зарегистрироваться"
+
+#: .\templates\registration\activate.haml:14
+#: .\templates\registration\activate.haml:18
+msgid "Profile activation failed"
+msgstr "Активация профиля провалилась"
+
+#: .\templates\registration\activate.haml:20
+msgid "Provided activation key doesn't seem to be correct, sorry."
+msgstr "Предоставленный вами ключ активации не является корректным"
+
+#: .\templates\registration\activation_complete.haml:14
+#: .\templates\registration\activation_complete.haml:18
+msgid "Profile activation complete"
+msgstr "Активация профиля завершена"
+
+#: .\templates\registration\activation_complete.haml:20
+msgid "Great! Now you can simply log in using your username and password"
+msgstr "Ура! Теперь вы можете просто войти на сайт, используя логин и пароль"
+
+#: .\templates\registration\activation_email.txt:2
+msgid "Welcome to "
+msgstr "Добро пожаловать на "
+
+#: .\templates\registration\activation_email.txt:2
+msgid "web site!"
+msgstr "веб сайт!"
+
+#: .\templates\registration\activation_email.txt:4
+msgid ""
+"You just registred on our web site, and your account need to be verified."
+msgstr ""
+"Вы только что зарегистрировались на нашем сайте, и ваша учетная запись "
+"требует подтверждения."
+
+#: .\templates\registration\activation_email.txt:5
+msgid "To vo verify, that you registred on our site just visit next link:"
+msgstr ""
+"Что-бы подтвердить, что вы зарегистрировались на нашем сайте, просто "
+"пройдите по ссылке:"
+
+#: .\templates\registration\activation_email.txt:9
+msgid "If you not registred on our site, than just ignore this mail."
+msgstr ""
+"Если вы не регистрировались на сайте, просто проигнорируйте это письмо."
+
+#: .\templates\registration\activation_email_subject.txt:27
+msgid "Registration on "
+msgstr "Регистрация на "
+
+#: .\templates\registration\registration_complete.haml:13
+#: .\templates\registration\registration_complete.haml:22
+#: .\templates\registration\registration_complete.haml:25
+msgid "Successful registration completion"
+msgstr "Успешное завершение регистрации"
+
+#: .\templates\registration\registration_complete.haml:17
+msgid ""
+"We've send an activation link to provided e-mail. Check your mailbox, we "
+"hope to see you logged in very soon ;)"
+msgstr ""
+"Мы послали вам на указанную почту активационную ссылку. Проверьте свой "
+"почтовый ящик - мы надеемся вскоре увидеть вас вновь."
+
+#: .\templates\registration\registration_form.haml:8
+#: .\templates\registration\registration_form.haml:11
+msgid "Registration"
+msgstr "Регистрация"
+
+#: .\theming\models.py:9
+msgid "emotion"
+msgstr "смайл"
+
+#: .\theming\models.py:10
+msgid "emotions"
+msgstr "смайлы"
+
+#: .\theming\models.py:27
+msgid "filename"
+msgstr "Имя файла"
+
+#: .\vk\templates\vk\auth.html:5
+msgid "Warning!"
+msgstr "Внимание!"
+
+#: .\vk\templates\vk\auth.html:7
+msgid "If you already have account, please read "
+msgstr "Если у вы уже зарегистрированы на сайте, то, пожалуйста, прочтите"
+
+#: .\vk\templates\vk\auth.html:8
+msgid "this"
+msgstr "ЭТО"
+
+#: .\vk\templates\vk\auth.html:12
+msgid "Enter through:"
+msgstr "Войти через:"
+
+#: .\vk\templates\vk\auth.html:18
+msgid "Enter by login:"
+msgstr "Вход по логину:"

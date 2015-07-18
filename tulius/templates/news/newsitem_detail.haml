@@ -1,0 +1,25 @@
+- extends 'base.haml'
+- load i18n
+- load url from future
+
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: '{% url "news:list" %}'}
+            {% trans "News" %}
+    %li
+        .divider
+        %a{href: '{% url "news:detail" object.id %}'}
+            = object.caption
+
+- block caption
+    = object.caption
+
+- block content
+    %time.news_datetime.pull-right{datetime: '{{ object.published_at }}', pubdate: 'pubdate'}
+        = object.published_at
+    .full_text
+        - if object.full_text
+            = object.full_text|safe
+        - else
+            = object.announcement|safe

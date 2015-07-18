@@ -1,0 +1,23 @@
+{% extends 'base.haml' %}
+{% load i18n %}
+
+{% block caption %}
+    {% trans "Oooops!" %}
+{% endblock %}
+{% block content %}
+    <table class="markup-table">
+        <tr>
+            <td>
+                <img src="{{ MEDIA_URL}}error.png"/>
+            </td>
+            <td valign="top" style="padding-left: 20px">
+            
+            <h1>404</h1>
+            <br/>
+            <p>
+                {% trans "Sorry, but page no found. If you think it is exists, you can say us about it by 'Found bug' button." %}
+            </p>
+            </td>
+        </tr>
+    </table>
+{% endblock %}

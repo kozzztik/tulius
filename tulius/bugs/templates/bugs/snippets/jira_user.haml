@@ -1,0 +1,9 @@
+- load i18n
+- if jira_user
+    - if jira_user.user
+        %a{'href': '{{ jira_user.user.get_absolute_url }}'}
+            = jira_user.user
+    - else
+        = jira_user.jiraid
+- else
+    {% trans "Not assigned" %}

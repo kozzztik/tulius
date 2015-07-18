@@ -1,0 +1,47 @@
+- load i18n
+
+%table.message_list.table.table-striped.table-bordered.table-condensed
+	%thead
+		%tr
+			%th.sender
+				{% trans "Sender" %}
+			%th.receiver
+				{% trans "Receiver" %}
+			%th.body
+				{% trans "Message" %}
+			%th.sent_at
+				{% trans "Sent at" %}
+	%tbody
+		- for message in private_messages
+			%tr{'class': '{% ifequal message.sender request.user %}outbox_message{% endifequal %} {% ifequal message.receiver request.user %}inbox_message{% endifequal %} {% if not message.is_read %} unread {%endif %}'}
+				%td
+					= message.sender
+					-#{% if message.sender.avatar %}
+					-#	{% load fb_versions %}
+					-#	<a href="{{ message.sender.avatar.url }}"/><img
+					-#		src="{% version message.sender.avatar.path '80x80' %}"/></a>
+					-#	<br/>
+					-#{% endif %}
+					-#{% ifequal message.sender request.user %}
+					-#	<a href="{% url dashboard:index %}">{{ request.user }} (Это вы)</a>
+					-#{% else %}
+					-#	<a href="{% url pm:history message.sender.id %}">{{ message.sender }}</a>
+					-#{% endifequal %}
+				%td
+					= message.receiver
+					-#{% if message.receiver.avatar %}
+					-#	{% load fb_versions %}
+					-#	<a href="{{ message.receiver.avatar.url }}"/><img
+					-#		src="{% version message.receiver.avatar.path '80x80' %}"/></a>
+					-#	<br/>
+					-#{% endif %}
+					-#{% ifequal message.receiver request.user %}
+					-#	<a href="{% url dashboard:index %}">{{ request.user }} (Это вы)</a>
+					-#{% else %}
+					-#<a href="{% url pm:history message.receiver.id %}">{{ message.receiver }}</a>
+					-#{% endifequal %}
+				%td
+					%a{'href': '{% url pm:message_details message.id %}'}
+						= message.body
+				%td
+					= message.created_at

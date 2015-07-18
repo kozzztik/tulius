@@ -1,0 +1,29 @@
+- extends 'html5_empty.haml'
+- load i18n
+
+- block title
+    {% trans "Smiles"%}
+
+- block additional_scripts
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}tinymce/jscripts/tiny_mce/tiny_mce_popup.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}tinymce/jscripts/tiny_mce/plugins/emotions/js/emotions.js'}
+    %script{'type': 'text/javascript', 'src': '{{ STATIC_URL }}djfw/jquery/js/jquery-1.8.2.min.js'}
+    %script{'type': 'text/javascript', 'src': '{{ STATIC_URL }}tinymce/insert_emotions.js'}
+    
+- block body
+    %body{style: 'display: none', role: 'application', aria-labelledby: 'app_title'}
+        %span#app_title{style: 'display:none;'}
+            {% trans "Choose smile:" %}
+        %div{align: 'center'}
+            %div.title
+                {% trans "Choose smile:" %}
+                %br
+                %br
+            %table#emoticon_table{role: 'presentation', border: '0', cellspacing: '0', cellpadding: '4'}
+                - for emotion_line in emotions
+                    %tr
+                        - for emotion in emotion_line
+                            %td
+                                %a.emoticon_link{role: 'button', href: '#', filename: '{{ emotion.filename }}', text: '{{ emotion.text|safe}}', title: '{{ emotion.name }}'}
+                                    %img{src: '{{ STATIC_URL }}tinymce/jscripts/tiny_mce/plugins/emotions/img/{{ emotion.filename }}', border: '0', alt: '{{ emotion.name }}'}
+

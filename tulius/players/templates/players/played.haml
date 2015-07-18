@@ -1,0 +1,41 @@
+- extends 'base.haml'
+- load i18n
+- load url from future
+
+- block extra_scripts
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-players.css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-forum.css'}
+
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: '{% url "players:index" %}'}
+            {% trans "Players" %}
+    %li
+        .divider
+        %a{href: '{% url "players:player_details" player.id %}'}
+            =player.username|capfirst
+    %li
+        .divider
+        %a{href: ''}
+            {% trans "Played games and characters" %}
+                
+- block caption
+    {% trans "Played games and characters"%}
+    
+- block content
+    - load pagination_tags
+    - if player.show_played_characters
+        - autopaginate played_roles items_on_page
+            - paginate
+
+            - include 'players/snippets/played_table.haml'
+
+            - paginate
+    - else
+        - autopaginate played_games items_on_page
+            - paginate
+
+            - include 'players/snippets/played_table.haml'
+
+            - paginate

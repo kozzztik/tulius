@@ -1,0 +1,28 @@
+- extends 'base.haml'
+- load i18n
+- load url from future
+
+- block breadcrumbs_block
+
+- block title
+    {% trans "Registration" %}
+    
+- block caption
+    {% trans "Registration" %}
+    
+- block content
+    %form{method: 'POST', action: '{% url "registration_register" %}', style: 'text-align: center;'}
+        %fieldset
+            - csrf_token
+            - for field in form
+                - include 'snippets/form_field.haml'
+            - if datablocks.usage_rules
+                 %p
+                    {% trans "By sign up you apply" %}
+                    <a href="{{ datablocks.usage_rules }}">{% trans "service usage rules" %}</a>.
+            - if datablocks.confident
+                 %p
+                    {% trans "Data you submit is protected by service" %}
+                    <a href="{{ datablocks.confident }}">{% trans "confidential policy" %}</a>.
+        %button.btn.btn-primary{type: 'submit'}
+            {% trans "Sign up" %}

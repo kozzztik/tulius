@@ -1,0 +1,27 @@
+- extends 'base.haml'
+- load i18n
+
+- block caption
+    {% trans "Oooops!" %}
+    
+- block content
+    %table
+        %tr
+            %td
+                %img{'src': '{{ MEDIA_URL}}error.png'}
+            %td{'valign': 'top', 'style': 'padding-left: 20px;'}
+                %p
+                    {% trans "We got internal server error here. Error type is" %}
+                    = request.bug_message.classname
+                    !
+                %br
+                %p
+                    {% trans "All error information was saved for investigation. You can help us in solving this problem by sending additional info." %}
+                    {% trans "for that press 'Found bug' button at the lefr side of bottom of this page and describe actions you did to get this message." %}
+                %p
+                    {% trans "Also add to this information following info:" %}
+                .alert.alert-info
+                    {% trans "Exception ID:"%}
+                    = request.bug_message.id
+                %p
+                    {% trans "We are very sorry for that, and are working om getting site better." %}

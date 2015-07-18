@@ -1,0 +1,21 @@
+- load i18n
+%h4
+    = voting.voting_name
+    
+- if voting.voting_body
+    = voting.voting_body
+- else
+    %br
+- for choice in voting.finished_choices
+    %br
+    = choice.name
+    %br
+    %img{src: "/static/voting/voting_bar.jpg", width: "{{ choice.vote_length }}%", style: "height:10px"}
+    {{ choice.vote_count }} ({{choice.vote_persent}}%)
+    %br
+
+%br
+{% trans "Total votes:" %}
+= voting.votes_count
+%br
+%br

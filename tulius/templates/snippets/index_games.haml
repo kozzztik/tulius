@@ -1,0 +1,11 @@
+- load i18n
+%ul.announcements
+    - for game in games
+        %li
+            %a{'href':'{{ game.get_absolute_url }}'}
+                %h3
+                    = game.name
+                    - if game.is_finishing
+                        {% trans "(finishing)" %}
+            %div.announcement
+                = game.announcement_preview|safe

@@ -1,0 +1,22 @@
+- load i18n
+
+%br
+%br
+%form.form-horizontal{enctype: '{% if form.handle_files %}multipart/form-data{% else %}application/x-www-form-urlencoded{% endif %}', method: '{% if form_method %}{{ form_method }}{% else %}POST{% endif %}', action: '{% if form_action %}{{ form_action }}{% else %}{% endif %}', class: '{{ form.html_class }}', id: '{% if form.html_id %}{{ form.html_id }}{% else %}{{ form.html_class }}{% endif %}'}
+    - csrf_token
+    = form.media
+    = form.management_form
+    - if form.non_field_errors
+        .alert.alert-error
+            = form.non_field_errors
+    - include 'snippets/form_fields_only.haml'
+    - block form_actions
+        %fieldset
+            .form-actions
+                %button.submit.btn.btn-primary{'type': 'submit'}
+                    - if form_submit_title
+                        {% trans form_submit_title %}
+                    - else
+                        {% trans "edit" %}
+                %button.submit.btn{'type': 'reset'}
+                    {% trans "reset" %}

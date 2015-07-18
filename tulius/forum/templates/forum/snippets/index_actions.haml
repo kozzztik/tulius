@@ -1,0 +1,17 @@
+- load i18n
+- if not request.user.is_anonymous
+    .btn-toolbar.forum-menu
+        .btn-group{class: '{% if dropupmenu %}dropup{% endif %}'}
+            %button.btn.dropdown-toggle{data-toggle: 'dropdown'}
+                {% trans "Actions"%} 
+                %span.caret
+            %ul.dropdown-menu
+                %li
+                    %a{href: '{{ forum_site.urlizer.mark_as_readed }}'}
+                    
+                       {% trans "Mark all as readed" %}
+                - if request.user.is_superuser
+                    %li
+                        %a{href: '{{ forum_site.urlizer.add_root_room }}'}
+                            {% trans "add room" %}
+        - block search_form

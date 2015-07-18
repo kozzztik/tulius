@@ -1,0 +1,75 @@
+- load i18n adminmedia admin_modify
+- if object_id
+    %link{rel: 'stylesheet', href:'{{ STATIC_URL }}ajaxuploader/css/fileuploader.css', type: 'text/css'}
+    %link{rel: 'stylesheet', href:'{{ STATIC_URL }}photos/jquery-lightbox/css/lightbox.css', type: 'text/css'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}ajaxuploader/js/fileuploader.js'}
+    %script{'type': 'text/javascript', 'src': '{{ STATIC_URL }}photos/jquery-lightbox/js/lightbox.js'}
+    
+    .inline-group{id: "{{ inline_admin_formset.formset.prefix }}-group"}
+        .tabular.inline-related{class: "{% if forloop.last %}last-related{% endif %}"}
+            {{ inline_admin_formset.formset.management_form }}
+            %fieldset.module.well
+                %h2
+                    = inline_admin_formset.opts.verbose_name_plural|capfirst
+                = inline_admin_formset.formset.non_form_errors
+                %table.table.table-striped.tabular-inline.table-condensed.table-bordered
+                    %thead
+                        %tr
+                            %th{style: 'width: 160px;'}
+                                &nbsp
+                            %th
+                                {% trans "Header and description" %}
+                            %th
+                                {% trans "Tags" %}
+                            %th
+                                {% trans "Size" %}
+                            - if inline_admin_formset.formset.can_delete 
+                                %th
+                                    {% trans "Delete?" %}
+                    %tbody
+                        - for inline_admin_form in inline_admin_formset
+                            - if inline_admin_form.form.non_field_errors
+                                %tr
+                                    %td{colspan: "{{ inline_admin_form|cell_count }}"}
+                                        = inline_admin_form.form.non_field_errors
+                            %tr{class: '{% cycle "row1" "row2" %} {% if inline_admin_form.original or inline_admin_form.show_url %}has_original{% endif %}{% if forloop.last %} empty-form{% endif %}', id: "{{ inline_admin_formset.formset.prefix }}-{% if not forloop.last %}{{ forloop.counter0 }}{% else %}empty{% endif %}"}
+                                %td.original{style: 'text-align: center'}
+                                    - if inline_admin_form.original.thumbnail
+                                        %a{'href': '{{ inline_admin_form.original.image.url }}', 'rel': 'lightbox[photos]', 'title': '{{ inline_admin_form.original.title }}'}
+                                           %img{src: '{{ inline_admin_form.original.thumbnail.url }}'}
+                                    - if inline_admin_form.has_auto_field
+                                        = inline_admin_form.pk_field.field
+                                    = inline_admin_form.fk_field.field
+                                    - spaceless
+                                        - for fieldset in inline_admin_form
+                                            - for line in fieldset 
+                                                - for field in line
+                                                    - if field.is_hidden
+                                                        = field.field
+                                %td
+                                    - for fieldset in inline_admin_form
+                                        - for line in fieldset
+                                            - for field in line
+                                            
+                                                - if field.is_readonly
+                                                    %p
+                                                        = field.contents
+                                                - else
+                                                    = field.field.errors.as_ul
+                                                    = field.field
+                                %td
+                                    = inline_admin_form.original.big_tag
+                                    %br
+                                    = inline_admin_form.original.short_tag
+                                %td
+                                    = inline_admin_form.original.file_length|filesizeformat
+                                - if inline_admin_formset.formset.can_delete
+                                    %td.delete
+                                        - if inline_admin_form.original
+                                            = inline_admin_form.deletion_field.field
+                #file-uploader.wrapper.controls{style: 'float: right'}
+                    #file-uploader-button.button
+                        %script{'type': 'text/javascript'}
+                            - include 'photos/uploader.html'
+- else
+    {{ inline_admin_formset.formset.management_form }}

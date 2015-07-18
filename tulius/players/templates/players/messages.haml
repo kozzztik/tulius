@@ -1,0 +1,15 @@
+- load i18n
+- load url from future
+
+.messages-area
+    - include 'players/snippets/messages.haml'
+
+%form.messages-form{method: 'POST', action: '{% url "players:player_send_message" player.id %}'}
+    - csrf_token
+    = form.management_form
+    = form.body
+    %br
+    %button.submit.btn.btn-primary{'type': 'submit'}
+        {% trans "Send" %}
+    %a{'href': '{% url "players:player_history" player.id %}'}
+        {% trans "Message history" %}

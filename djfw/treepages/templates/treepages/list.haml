@@ -1,0 +1,14 @@
+- extends 'html5_empty.haml'
+- load i18n
+
+- block title
+    {% trans "Tree pages" %}
+
+- block body
+    %ul.unstyled.treepages
+        - for treepage in treepages
+            %li.treepage
+                %a.treepages_title{'href': '{{ treepage.get_absolute_url }}'}
+                    = treepage.title|capfirst
+                .treepage_preview
+                    = treepage.content|truncatewords_html:100|safe

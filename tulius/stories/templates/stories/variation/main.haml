@@ -1,0 +1,14 @@
+- extends 'base_cataloged_navig_game.haml'
+- load i18n
+- load catalog_paging
+- load url from future
+
+- block caption
+    {% catalog_caption catalog_page %}
+            
+- block page_content
+    - if variation.create_game
+        %a.submit.btn.btn-primary.pull-right{href: '{% url "games:add_game" variation.id %}'}
+            {% trans "Create game" %}
+
+    - include "snippets/form.haml"

@@ -1,0 +1,17 @@
+- extends 'forum/base.haml'
+- load i18n
+- load url from future
+
+- block breadcrumbs
+    %ul.breadcrumb
+        <li>{% include 'home_link.haml' %}</li>
+        <li><a href="{% url "forum:index" %}">{% trans "forums" %}</a></li>
+        <li>{% trans "Access denied" %}</li>
+        
+- block caption
+        {% trans "Access denied" %}
+    
+- block forum_content
+        {% trans "You have no access to this page" %}
+        %br
+        %br

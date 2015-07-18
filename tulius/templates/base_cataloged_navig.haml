@@ -1,0 +1,26 @@
+- extends 'base.haml'
+- load i18n
+- load catalog_paging
+
+- block extra_scripts
+    %link{'rel':'stylesheet','type': 'text/css', 'href':'{{MEDIA_URL}}css/navig.css'}
+    
+- block breadcrumbs
+    {% catalog_breadcrumbs %}
+    
+- block custom_content
+    .content.simple.navigation-caption
+        .caption{align: "center"}
+            .captionleft
+            .captioncontent
+                    - block caption
+                        {% catalog_caption catalog_page %}
+            .captionright
+        - block content
+            %table.navigation.wide
+                %tbody
+                    %tr
+                        %td.navigation-index
+                            {% catalog_index catalog_page %}
+                        %td.content.simple
+                            - block page_content

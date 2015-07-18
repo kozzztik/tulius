@@ -1,0 +1,3 @@
+{% for smile in smiles %}
+{title:"{{ smile.name }}", img: '<img src="{{ smile.image.url }}" class="sm">', bbcode:"{{ smile.text}}"},
+{% endfor %}

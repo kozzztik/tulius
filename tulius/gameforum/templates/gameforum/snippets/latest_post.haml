@@ -1,0 +1,8 @@
+- if comment
+    %a{'href': '{{ comment.get_absolute_url }}'}
+        - if comment.role
+            = comment.role
+        - else
+            \---
+    %br
+    {{ comment.create_time|date:"d.m.Y, H:i" }}

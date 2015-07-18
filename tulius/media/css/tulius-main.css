@@ -1,0 +1,173 @@
+.modal{
+    z-index: 20;   
+}
+.modal-backdrop {
+    z-index: 10;
+}​
+table.vertical-center td { vertical-align: middle; }
+
+.form-inline label {padding: 6px}
+
+.navigation {margin-top: 5px;}
+.navigation-index {vertical-align: top; width: 15%}
+.navigation-content {
+    background-color: rgb(221, 210, 190); 
+    border-radius: 6px; 
+    padding: 30px 0% 20px 0%;
+ }
+ 
+.navigation form {
+    margin-bottom: 0px;
+}
+#.navigation-caption {height: 0px;}
+ 
+.navigation-content .table {
+    border: 1px solid white;
+}
+.catalogindex { list-style: none inside; text-transform: capitalize; margin: 0px }
+.catalogindex li { 
+    padding: 5px; 
+    border: 1px solid rgb(205, 195, 183);
+    background: url("../jquery/css/images/ui-bg_glass_70_ede4d4_1x400.png") repeat-x scroll 50% 50%;
+    margin-bottom: 1px; 
+    border-radius: 6px 0px 0px 6px;
+    margin-right: -1px;
+}
+
+.catalogindex li a {
+    color: black;
+    text-decoration: underline;
+}
+.catalogindex li a:hover{ color: rgb(203, 132, 46); }
+
+.catalogindex li ul {list-style: none inside; text-transform: capitalize; }
+.catalogindex li ul li { border: none;}
+
+.qq-uploader .qq-upload-button {
+    background: none repeat scroll 0% 0% rgb(42, 120, 0);
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    border-radius: 6px; 
+    color: rgb(255, 255, 255);
+}
+
+.qq-uploader .qq-upload-button:hover { background: none repeat scroll 0% 0% rgb(60, 171, 0); }
+
+.pagination ul li a {
+     border-color: #A97441; 
+     color: #E4D396; 
+}
+
+.pagination ul li a:hover { color: rgb(182, 152, 73); }
+
+.pagination ul > li > a, .pagination ul > li > span { 
+    -moz-border-bottom-colors: none; 
+    -moz-border-left-colors: none; 
+    -moz-border-right-colors: none; 
+    -moz-border-top-colors: none; 
+    background-color: #B27A19; 
+    background-image: linear-gradient(to right, #57594C, #44443B); 
+    border-color: #A97441; 
+    border-radius: 15px; 
+    border-style: solid; 
+    border-width: 2px 2px 2px 0; 
+    float: left; 
+    line-height: 17px; 
+    margin: 2px; 
+    padding: 4px 10px; 
+    text-decoration: none; 
+}
+
+.pagination ul > .disabled > span, 
+.pagination ul > .disabled > a, 
+.pagination ul > .disabled > a:hover, 
+.pagination ul > .disabled > a:focus { 
+    background-color: rgba(0, 0, 0, 0); 
+    color: #BBBBBB; 
+    cursor: default; 
+} 
+
+.pagination ul > .active > a, 
+.pagination ul > .active > span { 
+    color: #BBBBBB; 
+    cursor: default; 
+} 
+ 
+small { font-size: 80%; }
+
+.new_invites_count { background-color: green; }
+
+.modal-body { color: black }
+
+.character-menu-list { margin: 0px}
+.character-menu-list img { 
+    width: 50px; 
+    margin-right: 3px; 
+}
+
+.player-avatar {
+    display: block;
+    margin: 0 auto;
+    width: 100px; 
+    height: 100px; 
+    vertical-align: middle;
+ }
+ 
+ .player-avatar-image {
+    vertical-align: middle;
+    display: table-cell;
+    width: 100px; 
+    height: 100px; 
+}
+
+.player-avatar-image img {max-height: 100px; max-width: 100px}
+
+#change_mobile_view_form input {
+    background-color: rgb(0, 0, 0);
+    color: white;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    height: auto;
+}
+    
+td .dropdown { display: inline-block; }
+
+body .wysibb-body ul, body ol {
+    padding: 0px 0px 0px 0px;
+}
+
+body .wbb-list {
+    max-height: 320px;
+}
+
+table { background-color: transparent; }
+
+.navigation.wide {
+    width: 100%;
+}
+
+body .btn-primary:focus,
+body .btn-primary:hover { 
+    background-color: #71716B !important; 
+    background-image: linear-gradient(to bottom, #71716B, #2F2F1E) !important; 
+    background-position: 0px 0px;
+}
+
+body .btn-primary { 
+    background-color: #71716B  !important; 
+    background-image: linear-gradient(to bottom, #71716B, #2F2F1E) !important; 
+    background-repeat: repeat-x; 
+    border-color: #B27A19; 
+    border-radius: 15px; 
+    border-width: 2px; 
+    color: #E4D396; 
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25); 
+} 
+
+.form-actions {
+    background-color: inherit;
+    margin-bottom: 0px;
+}
+
+.wysibb .powered { bottom: 0px}
+
+body .wysibb {margin-bottom: 0px !important;}

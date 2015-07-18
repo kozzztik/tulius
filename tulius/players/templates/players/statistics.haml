@@ -1,0 +1,33 @@
+-load i18n
+%table.table.stat-table
+    %tr
+        %td.stat-label
+            {% trans "Forum posts" %}
+        %td.stat-val 
+            =stats.posts
+    %tr
+        %td.stat-label
+            {% trans "Game posts" %}
+        %td.stat-val 
+            =stats.game_posts
+    %tr
+        %td.stat-label
+            {% trans "Total games" %}
+        %td.stat-val 
+            =stats.total_games
+    %tr
+        %td.stat-label
+            {% trans "Games won" %}
+        %td.stat-val 
+            =stats.games_won
+    %tr
+        %td.stat-label
+            {% trans "Games admin" %}
+        %td.stat-val 
+            =stats.games_admin
+
+    %tr
+        %td.stat-label
+            {% trans "Story author" %}
+        %td.stat-val 
+            =stats.story_author

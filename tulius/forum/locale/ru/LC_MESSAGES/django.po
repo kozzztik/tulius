@@ -1,0 +1,743 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-07-11 01:53+0400\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+
+#: admin.py:5
+msgid "forum"
+msgstr ""
+
+#: models.py:20
+msgid "room group"
+msgstr ""
+
+#: models.py:21
+msgid "room groups"
+msgstr ""
+
+#: models.py:26 models.py:205 models.py:472
+msgid "title"
+msgstr ""
+
+#: models.py:40
+msgid "uploaded file"
+msgstr ""
+
+#: models.py:41
+msgid "uploaded files"
+msgstr ""
+
+#: models.py:48 models.py:451 models.py:645 models.py:698 models.py:741
+#: models.py:782 models.py:816 models.py:848 models.py:955
+msgid "user"
+msgstr "пользователь"
+
+#: models.py:54 models.py:863 models.py:929
+msgid "name"
+msgstr "имя"
+
+#: models.py:60
+msgid "mime type"
+msgstr ""
+
+#: models.py:65
+msgid "file"
+msgstr ""
+
+#: models.py:69
+msgid "file length"
+msgstr ""
+
+#: models.py:74
+msgid "uploaded at"
+msgstr ""
+
+#: models.py:99
+msgid "access not set"
+msgstr ""
+
+#: models.py:100
+msgid "free access"
+msgstr ""
+
+#: models.py:101
+msgid "read only access"
+msgstr ""
+
+#: models.py:102
+msgid "private(no access)"
+msgstr ""
+
+#: models.py:106
+msgid "read and write rights"
+msgstr ""
+
+#: models.py:107
+msgid "read right"
+msgstr ""
+
+#: models.py:108
+msgid "read, write and moderate"
+msgstr ""
+
+#: models.py:109
+msgid "write only right"
+msgstr ""
+
+#: models.py:110
+msgid "read and moderate right(no write)"
+msgstr ""
+
+#: models.py:196 models.py:443 models.py:484 models.py:637 models.py:733
+#: models.py:829 templates/forum/snippets/thread_list.haml:9
+msgid "thread"
+msgstr ""
+
+#: models.py:197 templates/forum/snippets/room_list.haml:11
+msgid "threads"
+msgstr ""
+
+#: models.py:211 models.py:476
+msgid "body"
+msgstr ""
+
+#: models.py:219
+msgid "parent thread"
+msgstr ""
+
+#: models.py:224 models.py:677 templates/forum/snippets/room_list.haml:9
+msgid "room"
+msgstr ""
+
+#: models.py:230 models.py:498 templates/forum/snippets/thread_list.haml:11
+msgid "author"
+msgstr ""
+
+#: models.py:236 models.py:490
+msgid "plugin"
+msgstr ""
+
+#: models.py:241
+msgid "access type"
+msgstr ""
+
+#: models.py:247 models.py:511
+msgid "created at"
+msgstr ""
+
+#: models.py:252 models.py:875
+msgid "closed"
+msgstr "закрыто"
+
+#: models.py:257
+msgid "important"
+msgstr ""
+
+#: models.py:262 models.py:536 models.py:753 models.py:794
+msgid "deleted"
+msgstr ""
+
+#: models.py:267
+msgid "protected threads"
+msgstr ""
+
+#: models.py:273 models.py:286
+msgid "first comment"
+msgstr ""
+
+#: models.py:279
+msgid "last comment"
+msgstr ""
+
+#: models.py:293
+msgid "max_num"
+msgstr ""
+
+#: models.py:299 models.py:555
+msgid "public comments"
+msgstr ""
+
+#: models.py:305 models.py:561
+msgid "protected comments"
+msgstr ""
+
+#: models.py:434
+msgid "thread access right"
+msgstr ""
+
+#: models.py:435
+msgid "threads access rights"
+msgstr ""
+
+#: models.py:456
+msgid "access rights"
+msgstr ""
+
+#: models.py:465 models.py:706 models.py:774 models.py:857
+msgid "comment"
+msgstr ""
+
+#: models.py:466
+msgid "comments"
+msgstr ""
+
+#: models.py:506
+msgid "edited by"
+msgstr ""
+
+#: models.py:517
+msgid "edited at"
+msgstr ""
+
+#: models.py:525
+msgid "reply to"
+msgstr ""
+
+#: models.py:531 models.py:841 models.py:922 models.py:947
+#: comments/forms.py:20
+msgid "voting"
+msgstr "голосование"
+
+#: models.py:543
+msgid "likes"
+msgstr ""
+
+#: models.py:549
+msgid "Number"
+msgstr ""
+
+#: models.py:629
+msgid "thread read mark"
+msgstr ""
+
+#: models.py:630
+msgid "thread read marks"
+msgstr ""
+
+#: models.py:653
+msgid "readed comment"
+msgstr ""
+
+#: models.py:661
+msgid "not readed comment"
+msgstr ""
+
+#: models.py:669
+msgid "room group link"
+msgstr ""
+
+#: models.py:670
+msgid "room group links"
+msgstr ""
+
+#: models.py:685 threads/forms.py:122
+msgid "group"
+msgstr ""
+
+#: models.py:690
+msgid "comment like"
+msgstr ""
+
+#: models.py:691
+msgid "comments likes"
+msgstr ""
+
+#: models.py:726
+msgid "thread delete mark"
+msgstr ""
+
+#: models.py:727
+msgid "threads delete marks"
+msgstr ""
+
+#: models.py:746 models.py:787
+msgid "description"
+msgstr ""
+
+#: models.py:758 models.py:800
+#, fuzzy
+msgid "deleted at"
+msgstr "Удалить голосование"
+
+#: models.py:762 models.py:804
+#, python-format
+msgid "%(post)s deleted by %(user)s at %(time)s"
+msgstr ""
+
+#: models.py:767
+msgid "comment delete mark"
+msgstr ""
+
+#: models.py:768
+msgid "comments delete marks"
+msgstr ""
+
+#: models.py:809
+msgid "online user"
+msgstr ""
+
+#: models.py:810
+msgid "online users"
+msgstr ""
+
+#: models.py:822
+msgid "visit time"
+msgstr ""
+
+#: models.py:842
+msgid "votings"
+msgstr "голосования"
+
+#: models.py:869
+msgid "voting text"
+msgstr "текст"
+
+#: models.py:881
+msgid "anonymous"
+msgstr "анонимно"
+
+#: models.py:887
+msgid "show results before close of voting"
+msgstr "показывать результаты до закрытия голосования"
+
+#: models.py:893
+msgid "add preview results button"
+msgstr "добавить кнопку предварительного просмотра результатов"
+
+#: models.py:915
+msgid "voting choice"
+msgstr "пункт голосования"
+
+#: models.py:916
+msgid "voting choices"
+msgstr "пункты голосования"
+
+#: models.py:939
+msgid "voting vote"
+msgstr "голос"
+
+#: models.py:940
+msgid "voting votes"
+msgstr "голоса"
+
+#: comments/core.py:13 comments/views.py:56 threads/core.py:15
+msgid "there were some errors during form validation"
+msgstr ""
+
+#: comments/core.py:49
+msgid "edit post"
+msgstr ""
+
+#: comments/core.py:51
+msgid "add post"
+msgstr ""
+
+#: comments/core.py:75
+msgid "comment was successfully added"
+msgstr ""
+
+#: comments/core.py:77
+msgid "comment was successfully updated"
+msgstr ""
+
+#: comments/core.py:108
+#, python-format
+msgid "Comment not found %(post_id)s."
+msgstr ""
+
+#: comments/core.py:113
+#, python-format
+msgid "You have no rights to delete comment %(post_id)s."
+msgstr ""
+
+#: comments/core.py:121
+msgid "Comment successfully deleted!"
+msgstr ""
+
+#: comments/forms.py:10 threads/forms.py:20 threads/forms.py:51
+msgid "Title"
+msgstr ""
+
+#: comments/forms.py:15 threads/forms.py:25 threads/forms.py:56
+msgid "Body"
+msgstr ""
+
+#: comments/forms.py:30 threads/forms.py:7
+msgid "post"
+msgstr ""
+
+#: comments/forms.py:36 threads/forms.py:13
+msgid "Delete message"
+msgstr ""
+
+#: comments/plugin.py:40
+msgid "said"
+msgstr ""
+
+#: comments/views.py:46 threads/views.py:109
+msgid "add"
+msgstr ""
+
+#: comments/views.py:126 threads/core.py:29
+msgid "Post was deleted"
+msgstr ""
+
+#: comments/views.py:128
+msgid "Comment was deleted"
+msgstr ""
+
+#: comments/views.py:152 threads/views.py:142
+msgid "Form not valid"
+msgstr ""
+
+#: search/forms.py:5
+msgid "search"
+msgstr ""
+
+#: templates/forum/403.haml:7 templates/forum/base.haml:23
+#: templates/forum/base.haml.py:29 templates/forum/base.haml:35
+msgid "forums"
+msgstr ""
+
+#: templates/forum/403.haml:8 templates/forum/403.haml.py:11
+msgid "Access denied"
+msgstr ""
+
+#: templates/forum/403.haml:14
+msgid "You have no access to this page"
+msgstr ""
+
+#: templates/forum/add_post.haml:45
+msgid "main"
+msgstr ""
+
+#: templates/forum/add_post.haml:50
+msgid "Access rights"
+msgstr ""
+
+#: templates/forum/add_post.haml:55 threads/forms.py:79
+#, fuzzy
+msgid "Voting"
+msgstr "голосование"
+
+#: templates/forum/add_post.haml:76
+#: templates/forum/snippets/forum_actions_menu.haml:41
+msgid "edit"
+msgstr ""
+
+#: templates/forum/add_post.haml:78
+msgid "reset"
+msgstr ""
+
+#: templates/forum/add_post.haml:81
+#: templates/forum/snippets/fast_reply_form.haml:23
+msgid "Preview"
+msgstr ""
+
+#: templates/forum/base.haml:11
+#: templates/forum/snippets/forum_actions_menu.haml:44
+#, fuzzy
+msgid "Delete room"
+msgstr "Удалить голосование"
+
+#: templates/forum/base.haml:12
+#, fuzzy
+msgid "Delete thread"
+msgstr "Удалить голосование"
+
+#: templates/forum/base.haml:13
+#, fuzzy
+msgid "Delete comment"
+msgstr "Удалить голосование"
+
+#: templates/forum/index.haml:20
+msgid "other"
+msgstr ""
+
+#: templates/forum/preview.haml:6
+msgid "Previewed message"
+msgstr ""
+
+#: templates/forum/preview.haml:25 templates/forum/snippets/post.haml:32
+msgid "Up"
+msgstr ""
+
+#: templates/forum/room.haml:10
+msgid "Rooms"
+msgstr ""
+
+#: templates/forum/room.haml:18
+msgid "Threads"
+msgstr ""
+
+#: templates/forum/room.haml:25
+msgid "This room is empty."
+msgstr ""
+
+#: templates/forum/search.haml:5 templates/forum/search.haml.py:8
+#, fuzzy
+msgid "search results"
+msgstr "Показать результаты"
+
+#: templates/forum/thread.haml:14
+msgid "Wait..."
+msgstr ""
+
+#: templates/forum/thread.haml:15
+msgid "Error"
+msgstr ""
+
+#: templates/forum/thread.haml:40 templates/forum/thread.haml.py:58
+msgid "Loading..."
+msgstr ""
+
+#: templates/forum/comments/avatar.haml:24
+msgid "Stories author"
+msgstr ""
+
+#: templates/forum/fixes/success.haml:5
+msgid "Success!"
+msgstr ""
+
+#: templates/forum/snippets/delete_post.haml:22
+#, fuzzy
+msgid "Delete"
+msgstr "Удалить голосование"
+
+#: templates/forum/snippets/delete_post.haml:24
+msgid "Cancel"
+msgstr ""
+
+#: templates/forum/snippets/fast_reply_form.haml:10
+msgid "Answer:"
+msgstr ""
+
+#: templates/forum/snippets/fast_reply_form.haml:18
+msgid "Reply"
+msgstr ""
+
+#: templates/forum/snippets/fast_reply_form.haml:21
+msgid "Extended form..."
+msgstr ""
+
+#: templates/forum/snippets/forum_actions_menu.haml:6
+msgid "Answer with quote"
+msgstr ""
+
+#: templates/forum/snippets/forum_actions_menu.haml:11
+#, fuzzy
+msgid "Quoting"
+msgstr "голосование"
+
+#: templates/forum/snippets/forum_actions_menu.haml:13
+msgid "Quoting now is simple! Just select text with mouse:"
+msgstr ""
+
+#: templates/forum/snippets/forum_actions_menu.haml:16
+msgid ""
+"And press \"Answer\" button. Fast reply form will appear under this post, "
+"and selected text will be added as quote."
+msgstr ""
+
+#: templates/forum/snippets/forum_actions_menu.haml:20
+#, fuzzy
+msgid "Close"
+msgstr "закрыто"
+
+#: templates/forum/snippets/forum_actions_menu.haml:24
+#: templates/forum/snippets/index_actions.haml:6
+msgid "Actions"
+msgstr ""
+
+#: templates/forum/snippets/forum_actions_menu.haml:29
+#: templates/forum/snippets/index_actions.haml:12
+msgid "Mark all as readed"
+msgstr ""
+
+#: templates/forum/snippets/forum_actions_menu.haml:33
+#: templates/forum/snippets/index_actions.haml:16 threads/forms.py:35
+msgid "add room"
+msgstr ""
+
+#: templates/forum/snippets/forum_actions_menu.haml:37 threads/forms.py:87
+msgid "add thread"
+msgstr ""
+
+#: templates/forum/snippets/forum_actions_menu.haml:52
+#: templates/forum/snippets/index_actions.haml:24
+msgid "Search"
+msgstr ""
+
+#: templates/forum/snippets/online_users.haml:6
+msgid "In this room:"
+msgstr ""
+
+#: templates/forum/snippets/online_users.haml:8
+msgid "In this thread:"
+msgstr ""
+
+#: templates/forum/snippets/online_users.haml:10
+msgid "Online users:"
+msgstr ""
+
+#: templates/forum/snippets/pagination.haml:10
+#: templates/forum/snippets/pagination.haml:14
+msgid "previous"
+msgstr ""
+
+#: templates/forum/snippets/pagination.haml:31
+#: templates/forum/snippets/pagination.haml:35
+msgid "next"
+msgstr ""
+
+#: templates/forum/snippets/post.haml:57
+msgid "Edited by:"
+msgstr ""
+
+#: templates/forum/snippets/post.haml:61
+msgid "#"
+msgstr ""
+
+#: templates/forum/snippets/room_list.haml:13
+#: templates/forum/snippets/thread_list.haml:13
+msgid "posts"
+msgstr ""
+
+#: templates/forum/snippets/room_list.haml:15
+#: templates/forum/snippets/thread_list.haml:15
+msgid "latest post"
+msgstr ""
+
+#: templates/forum/snippets/room_list.haml:35
+msgid "Moderators"
+msgstr ""
+
+#: templates/forum/snippets/room_list.haml:40
+#: templates/forum/snippets/thread_list.haml:44
+msgid "Opened for"
+msgstr ""
+
+#: templates/forum/snippets/room_list.haml:55
+msgid "No rooms in this group"
+msgstr ""
+
+#: templates/forum/snippets/thread_list.haml:49
+msgid "pages"
+msgstr ""
+
+#: templates/forum/voting/closed_results.haml:10
+msgid "Voting results are hidden until it will be finished."
+msgstr "Результаты голосования скрыты, пока оно не будет завершено."
+
+#: templates/forum/voting/closed_results.haml:12
+#: templates/forum/voting/voting.haml:29
+#: templates/forum/voting/voting_results.haml:18
+msgid "Total votes:"
+msgstr "Всего голосов:"
+
+#: templates/forum/voting/closed_results.haml:17
+msgid "You voted for:"
+msgstr "Вы проголосовали за:"
+
+#: templates/forum/voting/closed_results.haml:20
+msgid "You can not vote."
+msgstr "Вы не можете голосовать."
+
+#: templates/forum/voting/voting.haml:34
+msgid "Show results"
+msgstr "Показать результаты"
+
+#: templates/forum/voting/voting.haml:35
+msgid "Do vote"
+msgstr "Голосовать"
+
+#: threads/core.py:251
+msgid "room was successfully added"
+msgstr ""
+
+#: threads/core.py:253
+msgid "room was successfully updated"
+msgstr ""
+
+#: threads/core.py:321
+msgid "thread was successfully added"
+msgstr ""
+
+#: threads/core.py:323
+msgid "thread was successfully updated"
+msgstr ""
+
+#: threads/core.py:345
+#, python-format
+msgid "Thread not found %(post_id)s."
+msgstr ""
+
+#: threads/core.py:348
+#, python-format
+msgid "You have no rights to delete thread %(post_id)s."
+msgstr ""
+
+#: threads/core.py:359
+msgid "Room successfully deleted!"
+msgstr ""
+
+#: threads/core.py:359
+msgid "Thread successfully deleted!"
+msgstr ""
+
+#: threads/forms.py:31 threads/forms.py:62
+msgid "Access type"
+msgstr ""
+
+#: threads/forms.py:35
+msgid "edit room"
+msgstr ""
+
+#: threads/forms.py:67
+#, fuzzy
+msgid "Closed"
+msgstr "закрыто"
+
+#: threads/forms.py:73
+msgid "Important"
+msgstr ""
+
+#: threads/forms.py:89
+msgid "edit thread"
+msgstr ""
+
+#: voting/forms.py:7
+msgid "Delete voting"
+msgstr "Удалить голосование"
+
+#: voting/forms.py:10
+msgid "Close voting"
+msgstr "Закончить голосование"
+
+#~ msgid "voting category"
+#~ msgstr "категория голосования"
+
+#~ msgid "voting categories"
+#~ msgstr "категории голосования"
+
+#~ msgid "category"
+#~ msgstr "категория"
+
+#~ msgid "target"
+#~ msgstr "цель"

@@ -1,0 +1,123 @@
+@media (min-width: 767px) {
+    .body_main_area { margin-top: 60px; }
+    
+    body.home_page {
+        font-family: 'Philosopher', sans-serif;
+        background-color: black;
+        background-image: url(scena.png);
+        background-repeat: no-repeat;
+        background-position: -120px 150px;
+        color: #999999; 
+    }
+    
+    a { color: #b69849; }
+    
+    a:hover { color: white; }
+    .modal a:hover { color: #b69849; }
+    
+    header { margin-bottom: 0em; }
+    
+    header #logo {
+        width: 390px;
+        height: 170px;
+        background: 0 50% transparent url("logo-home.png") no-repeat;
+        text-indent: -9999px;
+        float: left; 
+    }
+    
+    .home-picture-column {
+        width: 750px;
+        vertical-align: top;
+    }
+    
+    .home-body { min-height: 850px}
+    
+    .home_page #links li { width: 200px; }
+    
+    .home_page #links li a {
+        padding: 0.25em 0;
+        font-size: 1.5em;
+        text-transform: capitalize;
+        color: #b69849; 
+    }
+    
+    .home_page #links li a:hover {
+        color: white;
+        background: transparent; 
+    }
+    .home_page #links a { background: transparent; }
+    
+    .home_page #links li:nth-child(1) > a { padding-left: 0em; }
+    
+    .home_page #links li:nth-child(2) > a { padding-left: 1em; }
+    
+    .home_page #links li:nth-child(3) > a { padding-left: 2em; }
+    
+    .home_page #links li:nth-child(4) > a { padding-left: 3em; }
+    
+    .home_page #links li:nth-child(5) > a { padding-left: 4em; }
+    
+    .home_page #links li:nth-child(6) > a { padding-left: 5em; }
+    
+    .home_page .userinfo { float: right; text-align: right; }
+    
+    #home_scene {
+      min-height: 630px;
+    }
+    
+    #home_scene .markup-table tr td {
+        background: rgba(0, 0, 0, 0.7);
+    }
+    
+    #home_scene .epigraph {
+        color: #999;
+        font-size: 1.2em;
+        line-height: 1.5em;
+        text-align: right;
+        padding-left: 35%;
+    }
+    
+    #right_blocks h2 {
+        color: #b69849;
+        font-size: 2em;
+        padding-left: 1em;
+        line-height: 1.5em;
+        background: 0% 50% transparent url("cap_curl.png") no-repeat; 
+    }
+    
+    #right_blocks .gameset {
+        margin-top: 1em;
+        margin-bottom: 1em;
+        min-height: 150px;
+    }
+    
+    #right_blocks .gameset:nth-child(odd) { margin-left: 0; }
+    
+    #right_blocks ul.announcements { list-style: none; }
+    
+    #right_blocks ul.announcements li { list-style: none; }
+    
+    #right_blocks ul.announcements li a { color: #999999; }
+    
+    #right_blocks ul.announcements li a h3 { color: #b69849; }
+    
+    #news { width: 390px }
+    
+    .announcement { color: #999999 }
+    
+    .markup-table tr td {vertical-align: top}
+    
+    #foot { clear: both }
+    
+    .home_page footer.footer {
+        position: static;
+        margin-top: 2em;
+        border-top: 1px solid #b69849; 
+    }
+        
+    footer .container { padding: 1em; }
+}
+
+.home_page ul.announcements > li {margin-bottom: 10px; } 
+
+.news_item {margin-bottom: 20px; } 

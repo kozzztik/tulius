@@ -1,0 +1,17 @@
+- extends 'base.haml'
+- load i18n
+
+- block extra_scripts
+    %link{rel: 'stylesheet', href: '{{ MEDIA_URL }}css/tulius-bugs.css', type: 'text/css'}
+    
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: ""}
+            = page_caption
+                
+- block caption
+    = page_caption
+
+- block content
+    - include 'bugtracker/snippets/issue_list.html'

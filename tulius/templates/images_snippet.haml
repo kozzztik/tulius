@@ -1,0 +1,8 @@
+- load fb_versions
+- if images
+	%ul.attached_images.images.thumbnails
+		- for attached_image in images
+			- with image=attached_image.image
+				%li
+					%a.thumbnail{'href': '{% version image.path "1000x1000" %}'}
+						%img.version200x200{'alt':'{{ attached_image.title }}', 'title': '{{ attached_image.title }}', 'src': '{% version image.path "200x200" %}'}

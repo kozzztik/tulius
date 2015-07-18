@@ -1,0 +1,18 @@
+{% load url from future %}
+<script type="text/javascript" charset="utf-8">
+    (function($) {
+        $(document).ready(function() {
+            $.ajax({
+                mode: "abort",
+                port: "time_selector",
+                dataType: "html",
+                url: "{% url 'profiler:set_time_selector' %}",
+                data: {},
+                success: function(data) {
+                    body = $('#time_period_selector');
+                    body.replaceWith(data);
+                },
+            });
+        });
+    })(jQuery);
+</script>

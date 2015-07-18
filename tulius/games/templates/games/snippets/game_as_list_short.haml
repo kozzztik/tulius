@@ -1,0 +1,44 @@
+- load i18n
+- load url from future
+
+%a{href:'{{ game.get_absolute_url }}'}
+    = game
+- if game.edit
+    (
+    %a{href:'{{ game.get_edit_url }}'}
+        {% trans "edit" %}
+    )
+- if game.request
+    (
+    %a{href:'{{ game.get_request_url }}'}
+        {% trans "Make request" %}
+    )
+- if game.cancel_request
+    (
+    %a{href:'{{ game.get_cancel_request_url }}'}
+        {% trans "Cancel request" %}
+    )
+- if game.full
+    (
+    {% trans "no places" %}
+    )
+- if game.enter
+    (
+    %a{href:'{{ game.enter_url }}'}
+        {% trans "Enter" %}
+    )
+- if request.user.is_superuser
+    (
+    %a{href:'{% url "games:delete_game" game.id %}'}
+        {% trans "delete" %}
+    )
+- if game.user_roles
+    %br
+    {% trans "Your role:"%}
+    - for role in game.user_roles
+        %a{href: '{{ role.text_url }}'}
+            = role.name
+- else
+    - if game.text_hint
+        %br
+        = game.text_hint

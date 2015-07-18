@@ -1,0 +1,29 @@
+- extends 'base.haml'
+- load i18n
+- load url from future
+
+- block breadcrumbs
+    %ul.breadcrumb
+        %li
+            - include 'home_link.haml'
+        %li
+            %a{href: '{% url "registration_register" }'}
+                {% trans 'Register' %}
+        %li
+            %a{href: '{% url "registration_activation_complete" }'}
+                {% trans 'Profile activation complete' %}
+
+- block content
+    %h2
+        {% trans "Profile activation complete" %}
+    %p
+        {% trans "Great! Now you can simply log in using your username and password" %}
+        %br
+        %a{data-toggle: 'modal', href: '#loginModal'}
+            {% trans "Use this link" %}
+
+-#**registration/activation_complete.html**
+-#
+-#Used after successful account activation. This template has no context
+-#variables of its own, and should simply inform the user that their
+-#account is now active.

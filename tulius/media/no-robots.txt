@@ -1,0 +1,5 @@
+Host: tulius.com
+Sitemap: http://tulius.com/sitemap.xml
+
+User-agent: *
+Disallow: /

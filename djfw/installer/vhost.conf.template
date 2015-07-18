@@ -1,0 +1,66 @@
+<VirtualHost *:80>
+	ServerName %PWN%
+	ServerAlias %PWN%
+
+	ErrorLog %PWD%/error.log
+	
+	Alias /static %PWD%/%PWN%/static
+	Alias /favicon.ico %PWD%/%PWN%/media/favicon.ico
+	
+	<Directory /static>
+        Order allow,deny
+        Allow from all
+        SetHandler None
+        FileETag none
+        Options FollowSymLinks
+
+        <IfModule mod_expires.c>
+            ExpiresActive On
+            ExpiresByType image/gif "access plus 30 days"
+            ExpiresByType image/jpg "access plus 30 days"
+            ExpiresByType image/png "access plus 30 days"
+            ExpiresByType image/jpeg "access plus 30 days"
+            ExpiresByType text/css "access plus 30 days"
+            ExpiresByType application/x-javascript "modification plus 2 years"
+        </IfModule>
+
+        <IfModule mod_headers.c>
+            Header append Vary Accept-Encoding
+        </IfModule>
+
+        AddOutputFilterByType DEFLATE text/html text/css text/plain
+	</Directory>
+
+	Alias /media %PWD%/%PWN%/media
+	<Directory /media>
+        Order allow,deny
+        Allow from all
+        SetHandler None
+        FileETag none
+        Options FollowSymLinks
+
+        <IfModule mod_expires.c>
+            ExpiresActive On
+            ExpiresByType image/gif "access plus 30 days"
+            ExpiresByType image/jpg "access plus 30 days"
+            ExpiresByType image/png "access plus 30 days"
+            ExpiresByType image/jpeg "access plus 30 days"
+            ExpiresByType text/css "access plus 30 days"
+            ExpiresByType application/x-javascript "modification plus 2 years"
+        </IfModule>
+
+        <IfModule mod_headers.c>
+            Header append Vary Accept-Encoding
+        </IfModule>
+
+        AddOutputFilterByType DEFLATE text/html text/css text/plain
+	</Directory>
+
+	WSGIScriptAlias / %PWD%/bin/apache.py
+
+	<Directory />
+		Options +ExecCGI
+		Order allow,deny
+		Allow from all
+	</Directory>
+</VirtualHost>

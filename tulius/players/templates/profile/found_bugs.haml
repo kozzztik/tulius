@@ -1,0 +1,42 @@
+- load i18n
+- load bugtracker
+%p
+    {% trans "Here presented bugs you reported. You can see work progress on it and developers or administrators feedback. "%}
+%br
+%table.table
+    %thead
+        %tr
+            %th
+                {% trans "Key" %}
+            %th
+                {% trans "Summary" %}
+            %th
+                {% trans "Assignee" %}
+            %th
+                &nbsp;
+            %th
+                {% trans "Status" %}
+            %th
+                {% trans "Created" %}
+    %tbody
+        - for bug in bugs
+            %tr
+                %td
+                    %img{src: '{{ bug.bug_type.icon.url }}', title: '{{ bug.bug_type.name }}'}
+                    %a{href: '{% bug_url bug.id %}'}
+                        = bug.key
+                %td{style: 'text-align: left'}
+                    %a{href: '{% bug_url bug.id %}'}
+                        = bug.summary
+                %td
+                    - with jira_user=bug.assignee
+                        - include 'bugs/snippets/jira_user.haml'
+                %td
+                    %div{style: 'color: {{bug.priority.status_color}};'}
+                        %img{src: '{{ bug.priority.icon.url }}', title: '{{ bug.priority.name }}'}
+                %td
+                    %img{src: '{{ bug.status.icon.url }}'}
+                        = bug.status.name
+                %td
+                    = bug.create_time
+                        

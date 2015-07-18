@@ -1,0 +1,9 @@
+<ul class="breadcrumb">
+{% for item in list %}
+    <li> 
+        <a href='{{ item.url }}'>
+            {{ item.name|capfirst }}
+        </a>
+    </li>
+{% endfor %}
+</ul>

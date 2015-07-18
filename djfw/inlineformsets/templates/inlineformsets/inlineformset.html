@@ -1,0 +1,58 @@
+{% load i18n %}
+{% load inlineformfield %}
+
+        <div style="display:none">
+            <table>
+                <tr id="id_{{ formset.prefix }}_form_template">
+                {% with form=template %}
+                {% inline_form_fields form formset 0 %}
+                {% endwith %}
+                <td>
+                </td>
+                </tr>
+            </table>
+        </div>
+        {% if formset.errors %}
+        <div class="alert alert-error">
+            {% for error in formset.errors %}
+            {% for err1, err2 in error.items %}
+            {{ err2 }}
+            {% endfor %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        <table id="id_{{ formset.prefix }}_table" class="{{ formset.tableclass }}">
+            <thead>
+                <tr>
+                {% inline_form_fields template formset 1 %}
+                    {% if formset.dinamic %}
+                    <th></th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for form in formset.forms %}
+                    <tr id="{{ form.prefix }}-row">
+                    {% inline_form_fields form formset 0 %}
+                    </tr>
+                {% empty %}
+                    <tr>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p>
+            {{ formset.management_form }}
+        </p>
+        {% if formset.dinamic %}
+        <script type="text/javascript">
+           $(function() {
+                $('#id_{{ formset.prefix }}_table tbody tr').formset({
+                    prefix: '{{ formset.prefix }}',
+                    addText: '{% trans "add" %}',
+                    deleteText: '{% trans "remove" %}',
+                    formTemplate: '#id_{{ formset.prefix }}_form_template'
+                })
+           })
+        </script>
+        {% endif %}

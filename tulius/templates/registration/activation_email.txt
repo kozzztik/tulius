@@ -1,0 +1,9 @@
+{% load i18n %}{% load url from future %}
+{% trans "Welcome to "%}{{ site.name }} {% trans "web site!"%}
+    
+{% trans "You just registred on our web site, and your account need to be verified." %}
+{% trans "To vo verify, that you registred on our site just visit next link:" %}
+    
+http://{{site.domain}}{% url "registration_activate" activation_key %}
+
+{% trans "If you not registred on our site, than just ignore this mail." %}

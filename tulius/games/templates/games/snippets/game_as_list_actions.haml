@@ -1,0 +1,22 @@
+- load i18n
+- load url from future
+
+- if game.edit
+    %a{href:'{{ game.get_edit_url }}'}
+        {% trans "edit" %}
+    %br    
+- if game.request
+    %a{href:'{{ game.get_request_url }}'}
+        {% trans "Make request" %}
+    %br    
+- if game.cancel_request
+    %a{href:'{{ game.get_cancel_request_url }}'}
+        {% trans "Cancel request" %}
+    %br      
+- if game.enter
+    %a{href:'{{ game.enter_url }}'}
+        {% trans "Enter" %}
+    %br    
+- if request.user.is_superuser
+    %a{href:'{% url "games:delete_game" game.id %}'}
+        {% trans "delete" %}    

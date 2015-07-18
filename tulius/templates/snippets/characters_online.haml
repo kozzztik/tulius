@@ -1,0 +1,19 @@
+- load gameforum
+- load i18n
+
+- characters_on_site as characters
+- characters_on_page as same_page_characters
+
+%p
+	{{ characters.count }} active characters{{ character|pluralize }}
+%p
+	{{ same_page_characters.count }} of {{ characters.count }} active characters{{ character|pluralize }}
+	{% ifequal same_page_characters.count 1 %}is{% else %}are{% endifequal %} on this page
+%p
+	Characters in game:
+	- for character in characters
+		= character
+%p
+	Characters on page:
+	- for character in same_page_characters
+		= character

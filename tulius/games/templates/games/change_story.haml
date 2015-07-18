@@ -1,0 +1,22 @@
+- extends 'base.haml'
+- load i18n
+
+- block caption
+    {% trans "Change story of " %}
+    = game.name
+    
+- block content
+    %br
+    %form.form-horizontal{method: 'POST', action: ''}
+        - csrf_token
+        = form.media
+        = form.management_form
+        - if form.non_field_errors
+            .alert.alert-error
+                = form.non_field_errors
+        - include 'snippets/form_fields_only.haml'
+        - block form_actions
+            %fieldset
+                .form-actions
+                    %button.submit.btn.btn-primary{type: 'submit'}
+                        {% trans "Submit" %}

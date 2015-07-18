@@ -1,0 +1,43 @@
+- load i18n
+%table.table.ajax-formset{formset_url: '{{ view.url }}', id: '{{ view.id }}'}
+    %thead
+        %tr
+            %th
+                = view.opts.verbose_name_plural|capfirst
+            %th
+                {% trans "Actions" %}
+    %tbody
+        - for item in view.items
+            %tr.ajax-formset-row{id: '{{ item.html_id }}', item_id: '{{ item.id }}'}
+                %td
+                    = item
+                %td
+                    - if item.edit_right
+                        %a.delete-link{href: 'javascript: delete_formset_item("{{ item.html_id }}")'}
+                            {% trans "Delete" %}
+        - empty
+            %tr
+                %td.ajax-formset-row{colspan: 2}
+                    {% trans "No items" %}
+        - if view.edit_right
+            - if viewform.non_field_errors
+                %tr.ajax-errors
+                    %td{colspan: 2}
+                        .alert.alert-error
+                            = view.form.non_field_errors
+            %tr.ajax-add-row
+                %td
+                    %form.ajax-add-form{method: 'POST'}
+                        - for field in view.form
+                            %fieldset.control-group{class: '{% if field.errors %} error {% endif %}{% if field.field.required %} required {% endif %}'}
+                                .control-label
+                                    %label{for: '{{ field.auto_id }}'}
+                                        = field.label|capfirst
+                                .controls
+                                    = field
+                                    - if field.errors
+                                        .help-inline
+                                            = field.errors
+                %td
+                    %a.add-link{href: 'javascript: add_formset_item("{{ view.id }}")'}
+                        {% trans "Add" %}

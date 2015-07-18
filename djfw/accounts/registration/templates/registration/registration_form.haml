@@ -1,0 +1,30 @@
+- extends 'base.haml'
+- load i18n
+- load url from future
+
+- block breadcrumbs
+    %ul.breadcrumb
+        %li
+            - include 'home_link.haml'
+        %li
+            %a{href: '{% url "registration_register" }'}
+                {% trans 'Register' %}
+
+- block content
+    %h2
+        {% trans "Registration" %}
+    %form.well{method: 'POST', action: '{% url "registration_register" %}'}
+        - csrf_token
+        = form
+        %button.btn.btn-primary{type: 'submit'}
+            {% trans "Sign up" %}
+
+-#**registration/registration_form.html**
+-#Used to show the form users will fill out to register. By default, has
+-#the following context:
+-#
+-#``form``
+-#    The registration form. This will be an instance of some subclass
+-#    of ``django.forms.Form``; consult `Django's forms documentation
+-#    <http://docs.djangoproject.com/en/dev/topics/forms/>`_ for
+-#    information on how to display this in a template.

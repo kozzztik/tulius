@@ -1,0 +1,200 @@
+{% load i18n %}
+<div class="well">
+    <table class="table">
+        <tbody>
+            <tr>
+                <td>{% trans "User raised:" %}</td>
+                <td>
+                    <b>
+                        {% if original.user %}
+                            <a href="{{ original.user.get_absolute_url }}">
+                                {{ original.user }}
+                            </a>
+                        {% else %}
+                            {% trans "Guest" %}
+                        {% endif %}
+                    </b>
+                </td>
+            </tr>
+            <tr>
+                <td>{% trans "Time:" %}</td>
+                <td>
+                    <b>
+                        {{ original.create_time }}
+                    </b>
+                </td>
+            </tr>
+            <tr>
+                <td>{% trans "Path:" %}</td>
+                <td>
+                    <b>
+                        <a href="{{ original.path }}">
+                            {{ original.path }}
+                        </a>
+                    </b>
+                </td>
+            </tr>
+            <tr>
+                <td>{% trans "Exception class:" %}</td>
+                <td>
+                    <b>
+                        {{ original.classname }}
+                    </b>
+                </td>
+            </tr>
+            {% if original.title %}
+            <tr>
+                <td>{% trans "Exception text:" %}</td>
+                <td>
+                    <b>
+                        {{ original.title }}
+                    </b>
+                </td>
+            </tr>
+            {% endif %}
+            <tr>
+                <td>{% trans "Location:" %}</td>
+                <td>
+                    <b>
+                        {{ original.location }}
+                    </b>
+                </td>
+            </tr>
+            {% if original.bugs %}
+            <tr>
+                <td>{% trans "Created bug:" %}</td>
+                <td>
+                    {% for bug in original.bugs %}
+                        <img src="{{ bug.bug.bug_type.icon.url }}" title="{{ bug.bug.bug_type.name }}" />
+                        <a href="{{ bug.bug.get_absolute_url }}">
+                            {{ bug.bug.key }}
+                            {{ bug.bug.summary }}
+                        </a>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<div class="well">
+    <h3>
+        {% trans "Callstack" %}
+    </h3>
+    </br>
+    <table class="table">
+        <tbody>
+            {% for trace in original.traceback.all %}
+                <tr>
+                    <td colspan="2">
+                        {{ trace.filename }}
+                        {% trans "in"%}
+                        {{ trace.function_name }}
+                    </td>
+                </tr>
+                <tr>
+                    <td width="100px">
+                        {{ trace.line_num }}
+                    </td>
+                    <td>
+                        <b>
+                            {{ trace.body }}
+                        </b>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if original.get_data or original.post_data %}
+<div class="well">
+    <h3>
+        {% trans "Request" %}
+    </h3>
+    </br>
+    <table class="table table-bordered">
+        <thead class="ui-widget-header">
+            <tr class="ui-widget-header">
+                <th width=100px">
+                    {% trans "Parameter" %}
+                </th>
+                <th>
+                    {% trans "Value" %}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if original.get_data %}
+            <tr>
+                <td>
+                    GET
+                </td>
+                <td>
+                    {{ original.get_data }}
+                </td>
+            </tr>
+            {% endif %}
+            {% if original.post_data %}
+            <tr>
+                <td>
+                    POST
+                </td>
+                <td>
+                    {{ original.post_data }}
+                </td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% if original.cookies.all %}
+<div class="well">
+    <h3>
+        Cookies
+    </h3>
+    </br>
+    <table class="table table-bordered">
+        <thead class="ui-widget-header">
+            <tr>
+                <td>{% trans "Name" %}</td>
+                <td>{% trans "Value" %}</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cookie in original.cookies.all %}
+                <tr>
+                    <td>{{ cookie.name }}</td>
+                    <td>{{ cookie.value }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<div class="well">
+    <h3>
+        META
+    </h3>
+    </br>
+    <table class="table table-bordered">
+        <thead class="ui-widget-header">
+            <tr>
+                <td>{% trans "Name" %}</td>
+                <td>{% trans "Value" %}</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for meta in original.metas.all %}
+                <tr>
+                    <td>{{ meta.name }}</td>
+                    <td>{{ meta.value }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

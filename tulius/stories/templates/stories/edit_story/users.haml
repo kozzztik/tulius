@@ -1,0 +1,15 @@
+- extends 'base_cataloged_navig_game.haml'
+- load i18n
+
+- block page_scripts
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}custom_views/formset/formset.js'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}custom_views/formset/formset.css'}
+
+- block page_content
+    %h3
+        {% trans "authors" %}
+    = view.widgets_list.authorformset
+    %h3
+        {% trans "admins" %}
+    = view.widgets_list.adminformset
+ 

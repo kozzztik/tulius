@@ -1,0 +1,36 @@
+- load i18n
+%br
+- if voting.choice
+    - if voting.finished_choices 
+        - with choices=voting.finished_choices
+            - include "forum/voting/voting_results.haml"
+    - else
+        - with choice=voting.choice
+            - include "forum/voting/closed_results.haml"
+- else
+    - if voting.finished_choices
+        - with choices=voting.finished_choices
+            - include "forum/voting/voting_results.haml"
+    - else
+        %span{id: "voting-{{ voting.id }}"}
+            %span{id: 'name-body-{{ voting.id }}'}
+                %h4
+                    = voting.voting_name
+                - if voting.voting_body
+                    = voting.voting_body
+                - else
+                    %br
+            %form
+                - for choice in voting.choices.all
+                    %input{type: "radio", name: "voting-radio-{{ voting.id }}", value: "{{ choice.id }}"}
+                    = choice.name
+                    %br
+                %span{id: 'votes-count-{{ voting.id }}'}
+                    {% trans "Total votes:" %}
+                    = voting.votes_count 
+                %br
+                %br
+                - if voting.preview_results
+                    %input{type: "button", value: '{% trans "Show results" %}', onClick: "javascript:do_vote_preview({{ voting.id }})"}
+                %input{type: "button", value: '{% trans "Do vote" %}', onClick: "javascript:do_vote({{ voting.id }})"}
+            %span{id: "voting-error-{{ voting.id }}"}

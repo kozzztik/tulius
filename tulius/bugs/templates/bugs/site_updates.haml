@@ -1,0 +1,67 @@
+- extends 'base.haml'
+- load i18n
+- load url from future
+
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: ''}
+            {% trans "Site updates" %}
+    
+- block caption
+    {% trans "Site updates" %}
+    
+- block title
+    {% trans "Site updates" %}
+    
+- block content
+    %table.table
+        %thead
+            %tr
+                %th
+                    {% trans "Revision" %}
+                %th
+                    {% trans "Time start" %}
+                %th
+                    {% trans "Time end" %}
+                %th{colspan: "3"}
+                    {% trans "Issues" %}
+                    %a{href: '{% url "bugs:updates_feed" %}'}
+                        %i.icon-rss.icon-2x.pull-right{style: "margin-top: -20px;"}
+        %tbody
+            - for site_update in object_list
+                - for issue_link in site_update.issues.all
+                    - with issue=issue_link.issue
+                        %tr
+                            %td
+                                - if forloop.first
+                                    - if site_update.revision
+                                        = site_update.revision
+                                    - else
+                                        \-
+                            %td
+                                - if forloop.first
+                                    = site_update.start_time
+                            %td
+                                - if forloop.first
+                                    = site_update.end_time
+                            %td
+                                %img{src: "{{ issue.bug_type.icon.url }}", title: "{{ issue.bug_type.name }}"}
+                            %td
+                                %a{href: '{% url "bugs:bugtracker_bug" issue.id %}'}
+                                   = issue.key
+                            %td
+                                %a{href: '{% url "bugs:bugtracker_bug" issue.id %}'}
+                                    = issue.summary
+                - empty
+                     %tr
+                        %td
+                            - if site_update.revision
+                                = site_update.revision
+                            - else
+                                \-
+                        %td
+                            = site_update.start_time
+                        %td
+                            = site_update.end_time
+                        %td{colspan: 3}

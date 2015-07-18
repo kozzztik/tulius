@@ -1,0 +1,38 @@
+- extends 'base_cataloged_navig_game.haml'
+
+- block extra_scripts
+    %script{'type': 'text/javascript', 'src': '/static/ajaxuploader/js/fileuploader.js'}
+    <link href="/static/ajaxuploader/css/fileuploader.css" media="screen" rel="stylesheet" type="text/css" />    
+
+- load i18n
+- load repeatblock
+- enablemacros
+
+- block page_content
+    %form{'enctype': '{% if form.handle_files %}multipart/form-data{% else %}application/x-www-form-urlencoded{% endif %}', 'method': '{% if form_method %}{{ form_method }}{% else %}POST{% endif %}', 'action': '{% if form_action %}{{ form_action }}{% else %}{% endif %}', 'class': '{{ form.html_class }} form-horizontal', 'id': '{% if form.html_id %}{{ form.html_id }}{% else %}{{ form.html_class }}{% endif %}'}
+        - csrf_token
+        = form.media
+        = form.management_form
+        - if form.non_field_errors
+            .alert.alert-error
+                = form.non_field_errors
+        - block form_actions
+            %fieldset
+                .form-actions
+                    %button.submit.btn.btn-primary{type: 'submit'}
+                        - if form_submit_title
+                            {% trans form_submit_title %}
+                        - else
+                            {% trans "edit" %}
+                    %button.submit.btn{type: 'reset'}
+                        {% trans "reset" %}
+        - include 'snippets/form_fields_only.haml'
+        %a.controls{href: '{{ illustration.url }}'} 
+            %img{src: '{{ illustration.thumb.url }}'}
+        %br
+        %br
+        %div.wrapper.controls{id: 'file-uploader'}
+            %div#file-uploader-button.button
+                %script{type: 'text/javascript'}
+                    - include 'stories/materials/illustrationscript.html'
+        - repeat form_actions

@@ -1,0 +1,23 @@
+- extends 'stories/base_game.haml'
+- load i18n
+
+- block story_breadcrumbs
+    %li
+        .divider
+        %a{href: '{{ story.get_absolute_url }}'}
+            = story
+    %li
+        .divider
+        %a{href: ''}
+            = character
+            
+- block caption
+    = character
+    
+- block title
+    = character
+    
+- block content
+    - if character.avatar
+        %img.pull-left{align: 'left', src: '{{ character.avatar.image.url }}'}
+    = character.description

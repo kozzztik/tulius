@@ -1,0 +1,1111 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-02-21 19:07+0400\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+
+#: admin_views.py:209
+msgid "Unresolved issues with priority "
+msgstr "Нерешенные задачи с приоритетом "
+
+#: admin_views.py:221
+msgid "Unresolved issues with status "
+msgstr "Нерешенные задачи со статусом "
+
+#: admin_views.py:233 admin_views.py:257 admin_views.py:293
+msgid "Unresolved issues of "
+msgstr "Нерешенные задачи "
+
+#: admin_views.py:245
+msgid "Unresolved issues of type  "
+msgstr "Нерешенные задачи типа "
+
+#: admin_views.py:269
+msgid "All issues of "
+msgstr "Все задачи "
+
+#: admin_views.py:281
+msgid "Solved issues of "
+msgstr "Решенные задачи "
+
+#: admin_views.py:300 templates/bugtracker/admin/base.haml:24
+msgid "Known bugs"
+msgstr "Известные проблемы"
+
+#: forms.py:24 models.py:210 models.py:790
+msgid "bug type"
+msgstr "тип задачи"
+
+#: forms.py:29 models.py:798
+msgid "priority"
+msgstr "приоритет"
+
+#: forms.py:34 models.py:929 models.py:954
+msgid "version"
+msgstr "версия"
+
+#: forms.py:39 models.py:806
+msgid "status"
+msgstr "статус"
+
+#: forms.py:46
+msgid "resolution status"
+msgstr "статус при разрешении задачи"
+
+#: forms.py:52
+msgid "default resolution"
+msgstr "резолюция по умолчанию"
+
+#: forms.py:57
+msgid "autosync bug on view"
+msgstr "автосинхронизация при просмотре задачи"
+
+#: forms.py:62
+msgid "autosync all bugs period(seconds)"
+msgstr "период синхронизации всех задач(в секундах)"
+
+#: forms.py:67
+msgid "comment"
+msgstr "комментарий"
+
+#: forms.py:74
+msgid "file"
+msgstr "файл"
+
+#: forms.py:82 models.py:814
+msgid "resolution"
+msgstr "резолюция"
+
+#: forms.py:99
+msgid "attach file"
+msgstr "прикрепить файл"
+
+#: models.py:14 models.py:85 models.py:114 models.py:142 models.py:173
+#: models.py:1018
+msgid "exception"
+msgstr "исключение"
+
+#: models.py:15
+msgid "exceptions"
+msgstr "исключения"
+
+#: models.py:23 models.py:562 models.py:1107 models.py:1142
+#: templates/bugtracker/admin/snippets/exceptions_list.haml:19
+#: templates/bugtracker/profiler/snippets/by_user_table.haml:6
+msgid "user"
+msgstr "пользователь"
+
+#: models.py:28
+msgid "Occur time"
+msgstr "время события"
+
+#: models.py:34
+msgid "class name"
+msgstr "имя класса"
+
+#: models.py:40
+msgid "title"
+msgstr "заголовок"
+
+#: models.py:46
+msgid "location"
+msgstr "расположение"
+
+#: models.py:52 templates/bugtracker/admin/snippets/exceptions_list.haml:25
+msgid "path"
+msgstr "путь"
+
+#: models.py:58
+msgid "get"
+msgstr "GET"
+
+#: models.py:64
+msgid "post"
+msgstr "POST"
+
+#: models.py:79
+msgid "exception cookie"
+msgstr "СOOKIE исключения"
+
+#: models.py:80
+msgid "exception cookies"
+msgstr "СOOKIE исключения"
+
+#: models.py:91 models.py:120 models.py:148 models.py:222 models.py:275
+#: models.py:327 models.py:420 models.py:473 models.py:525 models.py:649
+#: models.py:1086 models.py:1277
+msgid "name"
+msgstr "имя"
+
+#: models.py:97 models.py:124 models.py:154 models.py:1284
+msgid "value"
+msgstr "значение"
+
+#: models.py:108
+msgid "site setting"
+msgstr "настройка сайта"
+
+#: models.py:109
+msgid "site settings"
+msgstr "настройки сайта"
+
+#: models.py:136
+msgid "exception META value"
+msgstr "META значение исключения"
+
+#: models.py:137
+msgid "exception META values"
+msgstr "META значения исключений"
+
+#: models.py:167
+msgid "exception traceback record"
+msgstr "Запись стека исключения"
+
+#: models.py:168
+msgid "exception traceback records"
+msgstr "Записи стека исключения"
+
+#: models.py:179 models.py:1219
+msgid "file name"
+msgstr "имя файла"
+
+#: models.py:184
+msgid "Line number"
+msgstr "Номер строки"
+
+#: models.py:190 models.py:1312
+msgid "function name"
+msgstr "имя функции"
+
+#: models.py:196
+msgid "text"
+msgstr "текст"
+
+#: models.py:211
+msgid "bug types"
+msgstr "типы задач"
+
+#: models.py:235 models.py:1046
+msgid "subtask"
+msgstr "подзадача"
+
+#: models.py:241 models.py:293 models.py:449 models.py:501 models.py:1113
+msgid "icon"
+msgstr "иконка"
+
+#: models.py:263 models.py:264
+msgid "bug priority"
+msgstr "приоритет"
+
+#: models.py:269
+msgid "status color"
+msgstr "цвет статуса"
+
+#: models.py:281 models.py:333 models.py:426 models.py:479 models.py:655
+#: models.py:848
+msgid "description"
+msgstr "описание"
+
+#: models.py:320
+msgid "bug version"
+msgstr "версия"
+
+#: models.py:321
+msgid "bug versions"
+msgstr "версии"
+
+#: models.py:357
+msgid "release date"
+msgstr "дата выпуска"
+
+#: models.py:378
+msgid "user release date"
+msgstr "пользовательская дата выпуска"
+
+#: models.py:414
+msgid "bug status"
+msgstr "статус"
+
+#: models.py:415
+msgid "bug statuses"
+msgstr "статусы"
+
+#: models.py:467 models.py:468
+msgid "bug resolutions"
+msgstr "резолюции"
+
+#: models.py:513
+msgid "bug link type"
+msgstr "тип связи"
+
+#: models.py:514
+msgid "bug link types"
+msgstr "типы связей"
+
+#: models.py:531 models.py:993
+msgid "inward"
+msgstr "входящая связь"
+
+#: models.py:537
+msgid "outward"
+msgstr "исходящая связь"
+
+#: models.py:554 models.py:1155 models.py:1227
+msgid "jira user"
+msgstr "пользователь Jira"
+
+#: models.py:555
+msgid "jira users"
+msgstr "пользователи Jira"
+
+#: models.py:574
+msgid "jira_url"
+msgstr "jira url"
+
+#: models.py:580
+msgid "email"
+msgstr "email"
+
+#: models.py:586
+msgid "display name"
+msgstr "Отображаемое имя"
+
+#: models.py:597
+msgid "small icon"
+msgstr "маленькая иконка"
+
+#: models.py:604
+msgid "big icon"
+msgstr "большая иконка"
+
+#: models.py:637 models.py:1071
+msgid "component"
+msgstr "компонент"
+
+#: models.py:638
+msgid "components"
+msgstr "компоненты"
+
+#: models.py:674 models.py:688 models.py:838
+msgid "assignee"
+msgstr "исполнитель"
+
+#: models.py:702
+msgid "lead"
+msgstr "руководитель"
+
+#: models.py:779 models.py:921 models.py:946 models.py:1010 models.py:1038
+#: models.py:1063 models.py:1099 models.py:1134 models.py:1200
+msgid "bug"
+msgstr "баг"
+
+#: models.py:780
+msgid "bugs"
+msgstr "баги"
+
+#: models.py:822
+msgid "reporter"
+msgstr "автор"
+
+#: models.py:830
+msgid "jira_reporter"
+msgstr "автор в жире"
+
+#: models.py:844
+msgid "summary"
+msgstr "краткое описание"
+
+#: models.py:852
+msgid "environment"
+msgstr "окружение"
+
+#: models.py:857
+msgid "jira key"
+msgstr "ключ jira"
+
+#: models.py:868
+msgid "jira URL"
+msgstr "jira URL"
+
+#: models.py:873 models.py:1168 models.py:1232 models.py:1318
+msgid "create time"
+msgstr "создан"
+
+#: models.py:878 models.py:1173
+msgid "updated time"
+msgstr "обновлен"
+
+#: models.py:885
+msgid "resolution time"
+msgstr "разрешен"
+
+#: models.py:912
+msgid "bug fix version"
+msgstr "версия исправления"
+
+#: models.py:913
+msgid "bug fix versions"
+msgstr "версии исправления"
+
+#: models.py:938
+msgid "version bug"
+msgstr "версия"
+
+#: models.py:939
+msgid "versions bugs"
+msgstr "версии"
+
+#: models.py:963
+msgid "bug link"
+msgstr "связь"
+
+#: models.py:964
+msgid "bug links"
+msgstr "связи"
+
+#: models.py:977
+msgid "link_type"
+msgstr "тип связи"
+
+#: models.py:985
+msgid "outard"
+msgstr "исходящая связь"
+
+#: models.py:1002 models.py:1080
+msgid "bug exception"
+msgstr "исключение"
+
+#: models.py:1003 models.py:1081
+msgid "bug exceptions"
+msgstr "исключения"
+
+#: models.py:1030 models.py:1031
+msgid "bug subtask"
+msgstr "подзадача"
+
+#: models.py:1055
+msgid "bug component link"
+msgstr "ссылка на компонент"
+
+#: models.py:1056
+msgid "bugs component links"
+msgstr "ссылки на компоненты"
+
+#: models.py:1091
+msgid "upload time"
+msgstr "загружен"
+
+#: models.py:1126
+msgid "issue comment"
+msgstr "комментарий к задаче"
+
+#: models.py:1127
+msgid "issues comments"
+msgstr "комментарии к задачам"
+
+#: models.py:1163 models.py:1326
+msgid "jira updated user"
+msgstr "обновивший пользователь Jira"
+
+#: models.py:1177
+msgid "body"
+msgstr "сообщение"
+
+#: models.py:1192
+msgid "issue attachment"
+msgstr "вложение"
+
+#: models.py:1193
+msgid "issues attachments"
+msgstr "вложения"
+
+#: models.py:1213
+msgid "jira url"
+msgstr "jira url"
+
+#: models.py:1243
+msgid "MIME type"
+msgstr "тип MIME"
+
+#: models.py:1249
+msgid "content"
+msgstr "содержание"
+
+#: models.py:1255
+msgid "thumbnail"
+msgstr "предпросмотр"
+
+#: models.py:1269
+msgid "setting"
+msgstr "настройка"
+
+#: models.py:1270
+msgid "settings"
+msgstr "настройки"
+
+#: models.py:1294
+msgid "profiler message"
+msgstr "сообщение профилировщика"
+
+#: models.py:1295
+msgid "profiler messages"
+msgstr "сообщения профилировщика"
+
+#: models.py:1303
+msgid "module name"
+msgstr "модуль"
+
+#: models.py:1332
+msgid "execution time"
+msgstr "время исполнения"
+
+#: models.py:1338
+msgid "execution parameter"
+msgstr "параметр исполнения"
+
+#: atlassian/httplib2/__init__.py:400
+#, python-format
+msgid "Content purported to be compressed with %s but failed to decompress."
+msgstr "Предположительно содержимое сжато с %s, но неудалось распаковать"
+
+#: atlassian/httplib2/__init__.py:510
+#, python-format
+msgid "Unsupported value for qop: %s."
+msgstr "Неподдерживаемое значение для qop: %s"
+
+#: atlassian/httplib2/__init__.py:513 atlassian/httplib2/__init__.py:576
+#, python-format
+msgid "Unsupported value for algorithm: %s."
+msgstr "Неподдерживаемое значение для алгоритма: %s"
+
+#: atlassian/httplib2/__init__.py:573
+msgid "The challenge doesn't contain a server nonce, or this one is empty."
+msgstr ""
+
+#: atlassian/httplib2/__init__.py:579
+#, python-format
+msgid "Unsupported value for pw-algorithm: %s."
+msgstr ""
+
+#: atlassian/httplib2/__init__.py:1359
+msgid "Redirected but the response is missing a Location: header."
+msgstr ""
+
+#: templates/bugtracker/add_bug_button.haml:5
+#: templates/bugtracker/add_bug_button.haml:14
+msgid "Found bug?"
+msgstr "Найден баг?"
+
+#: templates/bugtracker/add_bug_button.haml:17
+msgid ""
+"Bug information successfuly sended! now you can see it in your personal "
+"cabinet!"
+msgstr ""
+"Информация о проблеме успешно отправлена! Теперь вы можете ее видеть в своем "
+"персональном кабинете."
+
+#: templates/bugtracker/add_bug_button.haml:25
+msgid "Wait please..."
+msgstr "Пожалуйста, подождите..."
+
+#: templates/bugtracker/add_bug_button.haml:29
+#: templates/bugtracker/admin/snippets/bug/actions.haml:58
+msgid "Send"
+msgstr "Отправить"
+
+#: templates/bugtracker/add_bug_form.haml:3
+msgid ""
+"Describe problem you found. More details will help us fix problem faster."
+msgstr ""
+"Опишите проблему, которую вы обнаружили. Большее количество деталей нам "
+"поможет при ее исправлении."
+
+#: templates/bugtracker/add_bug_form.haml:6
+msgid "Exception ID:"
+msgstr "ID исключения:"
+
+#: templates/bugtracker/add_bug_form.haml:11
+msgid ""
+"You are not logged in. We could not provide feedback on bug info, sended by "
+"anonymous users."
+msgstr "Вы не вошли в систему. Мы не сможем с вами связаться по этой проблеме."
+
+#: templates/bugtracker/bugtracker_not_set.haml:2
+msgid "Bugtracker not set! Administrator must set default bug paramenters:"
+msgstr ""
+"Багтрекер не настроен! Администратор должен настроить параметры багов по "
+"умолчанию:"
+
+#: templates/bugtracker/bugtracker_not_set.haml:5
+msgid "Status not set"
+msgstr "Статус не установлен"
+
+#: templates/bugtracker/bugtracker_not_set.haml:8
+msgid "Priority not set"
+msgstr "Приоритет не установлен"
+
+#: templates/bugtracker/bugtracker_not_set.haml:11
+msgid "Type not set"
+msgstr "Тип не установлен"
+
+#: templates/bugtracker/admin/base.haml:18
+#: templates/bugtracker/admin/snippets/main.haml:6
+msgid "Main"
+msgstr "Главная"
+
+#: templates/bugtracker/admin/base.haml:21
+#: templates/bugtracker/admin/exceptions.haml:5
+msgid "Exceptions"
+msgstr "Исключения"
+
+#: templates/bugtracker/admin/base.haml:27
+#: templates/bugtracker/profiler/main.haml:5
+msgid "Profiler"
+msgstr "Профилировщик"
+
+#: templates/bugtracker/admin/base.haml:31
+msgid "You:"
+msgstr "Вы:"
+
+#: templates/bugtracker/admin/base.haml:51
+msgid ""
+"(c) All rights reserved by CC Constant Development. Russia, Saint-Petersburg "
+"2012."
+msgstr ""
+"(c) Все права защищенны ЗАО 'Константа Девелопмент'. Россия, Санкт-Петербург "
+"2012."
+
+#: templates/bugtracker/admin/main.haml:12
+msgid "Bugtracker"
+msgstr "Багтрекер"
+
+#: templates/bugtracker/admin/snippets/bug.haml:10
+msgid "Details"
+msgstr "Подробности"
+
+#: templates/bugtracker/admin/snippets/bug.haml:13
+msgid "Type:"
+msgstr "Тип:"
+
+#: templates/bugtracker/admin/snippets/bug.haml:18
+msgid "Status:"
+msgstr "Статус:"
+
+#: templates/bugtracker/admin/snippets/bug.haml:24
+msgid "Priority:"
+msgstr "Приоритет:"
+
+#: templates/bugtracker/admin/snippets/bug.haml:30
+msgid "Resolution:"
+msgstr "Резолюция:"
+
+#: templates/bugtracker/admin/snippets/bug.haml:35
+msgid "No"
+msgstr "Нет"
+
+#: templates/bugtracker/admin/snippets/bug.haml:38
+msgid "Version:"
+msgstr "Версия:"
+
+#: templates/bugtracker/admin/snippets/bug.haml:44
+msgid "To fix:"
+msgstr "Исправить в:"
+
+#: templates/bugtracker/admin/snippets/bug.haml:51
+msgid "Components:"
+msgstr "Компоненты:"
+
+#: templates/bugtracker/admin/snippets/bug.haml:59
+msgid "Environment:"
+msgstr "Окружение:"
+
+#: templates/bugtracker/admin/snippets/bug.haml:65
+msgid "Exceptions:"
+msgstr "Исключения:"
+
+#: templates/bugtracker/admin/snippets/bug.haml:77
+msgid "Files:"
+msgstr "Вложения:"
+
+#: templates/bugtracker/admin/snippets/bug.haml:85
+msgid "Subtasks"
+msgstr "Подзадачи"
+
+#: templates/bugtracker/admin/snippets/bug.haml:93
+msgid "Links"
+msgstr "Связи"
+
+#: templates/bugtracker/admin/snippets/bug.haml:100
+msgid "Description"
+msgstr "Описание"
+
+#: templates/bugtracker/admin/snippets/bug.haml:107
+msgid "Comments"
+msgstr "Комментарии"
+
+#: templates/bugtracker/admin/snippets/bug.haml:116
+msgid "People"
+msgstr "Люди"
+
+#: templates/bugtracker/admin/snippets/bug.haml:119
+msgid "Assignee:"
+msgstr "Исполнитель:"
+
+#: templates/bugtracker/admin/snippets/bug.haml:127
+msgid "Author:"
+msgstr "Автор:"
+
+#: templates/bugtracker/admin/snippets/bug.haml:141
+msgid "Dates"
+msgstr "Даты"
+
+#: templates/bugtracker/admin/snippets/bug.haml:144
+msgid "Created:"
+msgstr "Создан:"
+
+#: templates/bugtracker/admin/snippets/bug.haml:149
+#: templates/bugtracker/admin/snippets/report.haml:63
+#: templates/bugtracker/admin/snippets/report.haml:82
+msgid "Updated:"
+msgstr "Обновлен:"
+
+#: templates/bugtracker/admin/snippets/bug.haml:155
+msgid "Resolved:"
+msgstr "Разрешен:"
+
+#: templates/bugtracker/admin/snippets/bug.haml:161
+msgid "Actions"
+msgstr "Действия"
+
+#: templates/bugtracker/admin/snippets/bug_list.haml:10
+msgid "Key"
+msgstr "Ключ"
+
+#: templates/bugtracker/admin/snippets/bug_list.haml:12
+msgid "Summary"
+msgstr "Описание"
+
+#: templates/bugtracker/admin/snippets/bug_list.haml:14
+msgid "Assignee"
+msgstr "исполнитель"
+
+#: templates/bugtracker/admin/snippets/bug_list.haml:17
+msgid "Status"
+msgstr "Статус"
+
+#: templates/bugtracker/admin/snippets/bug_list.haml:19
+msgid "Create time"
+msgstr "Создан"
+
+#: templates/bugtracker/admin/snippets/bug_list.haml:44
+msgid "No matching bugs found"
+msgstr "Подходящих задач не найдено"
+
+#: templates/bugtracker/admin/snippets/exception.haml:3
+msgid "User raised:"
+msgstr "Пользователь:"
+
+#: templates/bugtracker/admin/snippets/exception.haml:9
+#: templates/bugtracker/admin/snippets/exceptions_list.haml:40
+#: templates/bugtracker/profiler/snippets/by_user_table.haml:19
+msgid "Guest"
+msgstr "Гость"
+
+#: templates/bugtracker/admin/snippets/exception.haml:11
+msgid "Time:"
+msgstr "Время:"
+
+#: templates/bugtracker/admin/snippets/exception.haml:16
+msgid "Path:"
+msgstr "Путь:"
+
+#: templates/bugtracker/admin/snippets/exception.haml:20
+msgid "Exception class:"
+msgstr "Класс исключения:"
+
+#: templates/bugtracker/admin/snippets/exception.haml:24
+msgid "Exception text:"
+msgstr "Текст исключения:"
+
+#: templates/bugtracker/admin/snippets/exception.haml:28
+msgid "Location:"
+msgstr "Место:"
+
+#: templates/bugtracker/admin/snippets/exception.haml:33
+msgid "Created bug:"
+msgstr "Создана задача:"
+
+#: templates/bugtracker/admin/snippets/exception.haml:42
+msgid "Stack:"
+msgstr "Стэк:"
+
+#: templates/bugtracker/admin/snippets/exception.haml:45
+msgid "in"
+msgstr "в"
+
+#: templates/bugtracker/admin/snippets/exception.haml:55
+msgid "Request:"
+msgstr "Запрос:"
+
+#: templates/bugtracker/admin/snippets/exception.haml:60
+#: templates/bugtracker/admin/snippets/exception.haml:116
+msgid "Parameter"
+msgstr "Параметр"
+
+#: templates/bugtracker/admin/snippets/exception.haml:62
+#: templates/bugtracker/admin/snippets/exception.haml:84
+#: templates/bugtracker/admin/snippets/exception.haml:102
+#: templates/bugtracker/admin/snippets/exception.haml:118
+msgid "Value"
+msgstr "Значение"
+
+#: templates/bugtracker/admin/snippets/exception.haml:82
+#: templates/bugtracker/admin/snippets/exception.haml:100
+msgid "Name"
+msgstr "Имя"
+
+#: templates/bugtracker/admin/snippets/exception.haml:111
+msgid "Settings:"
+msgstr "Настройки:"
+
+#: templates/bugtracker/admin/snippets/exceptions_list.haml:6
+msgid "Here you can see all exceptions occured on site. "
+msgstr "Тут вы можете видеть все исключения, произошедшие на сайте. "
+
+#: templates/bugtracker/admin/snippets/exceptions_list.haml:7
+msgid ""
+"Exceptions in most cases not mean a bug - it occure, for example, when "
+"access is blocked."
+msgstr ""
+"Исключения в большинстве случаев не означают ошибку - они возникают, в том "
+"числе, при закрытом доступе к какому-либо разделу сайта."
+
+#: templates/bugtracker/admin/snippets/exceptions_list.haml:8
+msgid ""
+"But every time it is a potential bug sitation, so, all information about "
+"occured exceptions is colleced here."
+msgstr ""
+"Но во всех случаях эта ситуация - потенциальная ошибка. По этому вся "
+"информация о произошедших исключениях собрана тут."
+
+#: templates/bugtracker/admin/snippets/exceptions_list.haml:9
+msgid "Its can be used by developers for bug investigation."
+msgstr "Она может быть использована разработчиками для исследования."
+
+#: templates/bugtracker/admin/snippets/exceptions_list.haml:17
+#: templates/bugtracker/profiler/snippets/by_user_table.haml:8
+#: templates/bugtracker/profiler/snippets/main.haml:17
+msgid "time"
+msgstr "время"
+
+#: templates/bugtracker/admin/snippets/exceptions_list.haml:21
+msgid "class"
+msgstr "Класс"
+
+#: templates/bugtracker/admin/snippets/exceptions_list.haml:23
+msgid "message"
+msgstr "сообщение"
+
+#: templates/bugtracker/admin/snippets/jira_user.haml:9
+msgid "Not assigned"
+msgstr "Не назначен"
+
+#: templates/bugtracker/admin/snippets/main.haml:9
+msgid "Report"
+msgstr "Сводка"
+
+#: templates/bugtracker/admin/snippets/main.haml:12
+msgid "Work plan"
+msgstr "План работ"
+
+#: templates/bugtracker/admin/snippets/main.haml:15
+msgid "Settings"
+msgstr "Настройки"
+
+#: templates/bugtracker/admin/snippets/main.haml:18
+msgid "Users"
+msgstr "Пользователи"
+
+#: templates/bugtracker/admin/snippets/plan.haml:4
+msgid "Work plan and progress by versions."
+msgstr "План работ и прогресс по версиям."
+
+#: templates/bugtracker/admin/snippets/plan.haml:30
+msgid "Released:"
+msgstr "Выпущена:"
+
+#: templates/bugtracker/admin/snippets/plan.haml:35
+msgid "Release date:"
+msgstr "Дата выпуска:"
+
+#: templates/bugtracker/admin/snippets/plan.haml:41
+msgid "Watch issues"
+msgstr "Смотреть задачи версии"
+
+#: templates/bugtracker/admin/snippets/plan.haml:46
+msgid "from"
+msgstr "из"
+
+#: templates/bugtracker/admin/snippets/plan.haml:48
+msgid "was solved."
+msgstr "решены."
+
+#: templates/bugtracker/admin/snippets/report.haml:7
+msgid "Info"
+msgstr "Информация"
+
+#: templates/bugtracker/admin/snippets/report.haml:12
+msgid "Project:"
+msgstr "Проект:"
+
+#: templates/bugtracker/admin/snippets/report.haml:25
+msgid "Description:"
+msgstr "Описание:"
+
+#: templates/bugtracker/admin/snippets/report.haml:30
+msgid "Project lead:"
+msgstr "Руководитель проекта:"
+
+#: templates/bugtracker/admin/snippets/report.haml:36
+msgid "Versions: not released"
+msgstr "Версии: не выпущенные"
+
+#: templates/bugtracker/admin/snippets/report.haml:50
+msgid "Need attention"
+msgstr "Требуют внимания"
+
+#: templates/bugtracker/admin/snippets/report.haml:69
+msgid "Last updated"
+msgstr "Недавно обновленные"
+
+#: templates/bugtracker/admin/snippets/settings.haml:9
+msgid "sync by version"
+msgstr "Синхронизация по версии"
+
+#: templates/bugtracker/admin/snippets/settings.haml:21
+msgid "sync by status"
+msgstr "синхронизация по статусу"
+
+#: templates/bugtracker/admin/snippets/settings.haml:34
+msgid "Bug default settings"
+msgstr "Настройки задач по умолчанию"
+
+#: templates/bugtracker/admin/snippets/settings.haml:47
+msgid "Other settings"
+msgstr "Прочие настройки"
+
+#: templates/bugtracker/admin/snippets/settings.haml:65
+#: templates/bugtracker/admin/snippets/users.haml:26
+msgid "edit"
+msgstr "Сохранить"
+
+#: templates/bugtracker/admin/snippets/settings.haml:67
+#: templates/bugtracker/admin/snippets/users.haml:28
+#: templates/bugtracker/profiler/main.haml:9
+#: templates/bugtracker/profiler/snippets/main.haml:9
+#: templates/bugtracker/profiler/snippets/main.haml:32
+msgid "reset"
+msgstr "Сбросить"
+
+#: templates/bugtracker/admin/snippets/statistics.haml:10
+#: templates/bugtracker/admin/snippets/statistics.haml:28
+#: templates/bugtracker/admin/snippets/statistics.haml:51
+#: templates/bugtracker/admin/snippets/statistics.haml:101
+#: templates/bugtracker/admin/snippets/statistics.haml:116
+msgid "Not solved:"
+msgstr "Нерешенные:"
+
+#: templates/bugtracker/admin/snippets/statistics.haml:11
+msgid "by priority"
+msgstr "по приоритету"
+
+#: templates/bugtracker/admin/snippets/statistics.haml:29
+msgid "by assignee"
+msgstr "по исполнителю"
+
+#: templates/bugtracker/admin/snippets/statistics.haml:52
+msgid "by version"
+msgstr "по версии"
+
+#: templates/bugtracker/admin/snippets/statistics.haml:66
+msgid "Sync:"
+msgstr "Синхронизация:"
+
+#: templates/bugtracker/admin/snippets/statistics.haml:69
+#: templates/bugtracker/admin/snippets/statistics.haml:75
+msgid "Wait..."
+msgstr "Пожалуйста, подождите..."
+
+#: templates/bugtracker/admin/snippets/statistics.haml:69
+#: templates/bugtracker/admin/snippets/statistics.haml:75
+msgid "Error occured during sync"
+msgstr "Произошла ошибка"
+
+#: templates/bugtracker/admin/snippets/statistics.haml:69
+#: templates/bugtracker/admin/snippets/statistics.haml:75
+msgid "Success!"
+msgstr "Успех!"
+
+#: templates/bugtracker/admin/snippets/statistics.haml:71
+msgid "Sync bugs only"
+msgstr "Синхронизировать только задачи"
+
+#: templates/bugtracker/admin/snippets/statistics.haml:77
+msgid "Sync all data"
+msgstr "Синхронизировать всю информацию"
+
+#: templates/bugtracker/admin/snippets/statistics.haml:84
+msgid "By status:"
+msgstr "По статусу:"
+
+#: templates/bugtracker/admin/snippets/statistics.haml:102
+msgid "by component"
+msgstr "по компоненту"
+
+#: templates/bugtracker/admin/snippets/statistics.haml:117
+msgid "by type"
+msgstr "по типу"
+
+#: templates/bugtracker/admin/snippets/users.haml:6
+msgid ""
+"Here present ed users from Jira. They are automatically binded with local "
+"users with same name."
+msgstr ""
+"Тут представлены пользователи из Jira. Они автоматически привязаны к "
+"локальным пользователям с тем же именем."
+
+#: templates/bugtracker/admin/snippets/users.haml:7
+msgid "You can change this bindings below."
+msgstr "Вы можете изменить эти привязки ниже."
+
+#: templates/bugtracker/admin/snippets/bug/actions.haml:4
+#: templates/bugtracker/admin/snippets/bug/actions.haml:10
+msgid "Attach file"
+msgstr "Прикрепить файл"
+
+#: templates/bugtracker/admin/snippets/bug/actions.haml:20
+msgid "Attach"
+msgstr "Прикрепить"
+
+#: templates/bugtracker/admin/snippets/bug/actions.haml:26
+#: templates/bugtracker/admin/snippets/bug/actions.haml:32
+msgid "Resolve issue"
+msgstr "Решить задачу"
+
+#: templates/bugtracker/admin/snippets/bug/actions.haml:42
+#: templates/bugtracker/admin/snippets/bug/actions.haml:78
+msgid "Resolve"
+msgstr "Решить"
+
+#: templates/bugtracker/admin/snippets/bug/actions.haml:45
+#: templates/bugtracker/admin/snippets/bug/actions.haml:50
+msgid "Send to Jira"
+msgstr "Отправить в Jira"
+
+#: templates/bugtracker/admin/snippets/bug/actions.haml:53
+msgid ""
+"This will send issue information to developers and transform it to Jira "
+"issue."
+msgstr ""
+"Вся информация о задаче будет отправлена разработчикам, а задача будет "
+"преобразована в задачу Jira."
+
+#: templates/bugtracker/admin/snippets/bug/actions.haml:55
+msgid "This operation cannot be reverted. Are you sure?"
+msgstr "Эта операция не обратима. Вы уверены?"
+
+#: templates/bugtracker/admin/snippets/bug/actions.haml:60
+msgid "Cancel"
+msgstr "Отмена"
+
+#: templates/bugtracker/admin/snippets/bug/actions.haml:65
+#: templates/bugtracker/admin/snippets/bug/actions.haml:71
+msgid "Reopen issue"
+msgstr "Переоткрыть задачу"
+
+#: templates/bugtracker/admin/snippets/bug/actions.haml:84
+msgid "Syncronize"
+msgstr "Синхронизировать"
+
+#: templates/bugtracker/admin/snippets/bug/comments.haml:16
+msgid "added a comment"
+msgstr "добавил комментарий"
+
+#: templates/bugtracker/admin/snippets/bug/comments.haml:23
+msgid "This issue is not commented yet."
+msgstr "Эта задача еще не была откомментирована."
+
+#: templates/bugtracker/admin/snippets/bug/comments.haml:31
+msgid "Add comment"
+msgstr "Добавить комментарий"
+
+#: templates/bugtracker/profiler/by_user.haml:7
+#: templates/bugtracker/profiler/snippets/main.haml:28
+msgid "by user"
+msgstr "по пользователям"
+
+#: templates/bugtracker/profiler/snippets/by_user.haml:8
+msgid "Superusers"
+msgstr "Суперпользователи"
+
+#: templates/bugtracker/profiler/snippets/by_user.haml:12
+msgid "Guests"
+msgstr "Гости"
+
+#: templates/bugtracker/profiler/snippets/by_user.haml:18
+msgid "Simple users"
+msgstr "Простые пользователи"
+
+#: templates/bugtracker/profiler/snippets/by_user_table.haml:10
+#: templates/bugtracker/profiler/snippets/main.haml:19
+msgid "count"
+msgstr "количество"
+
+#: templates/bugtracker/profiler/snippets/by_user_table.haml:27
+msgid "Sum"
+msgstr "Итого"
+
+#: templates/bugtracker/profiler/snippets/distribution_graph.html:11
+#: templates/bugtracker/profiler/snippets/distribution_graph.html:48
+msgid "Distribution"
+msgstr "Распределение"
+
+#: templates/bugtracker/profiler/snippets/distribution_graph.html:12
+msgid "Time execution value distribution"
+msgstr "Распределение значения времени исполнения"
+
+#: templates/bugtracker/profiler/snippets/distribution_graph.html:23
+msgid "Measures count"
+msgstr "Количество измерений"
+
+#: templates/bugtracker/profiler/snippets/distribution_graph.html:38
+msgid "Count:"
+msgstr "Количество:"
+
+#: templates/bugtracker/profiler/snippets/main.haml:15
+msgid "function"
+msgstr "функция"
+
+#: templates/bugtracker/profiler/snippets/main.haml:41
+msgid "No functions"
+msgstr "Нет функций"
+
+#: templates/bugtracker/profiler/snippets/main.haml:43
+msgid "No statistics yet."
+msgstr "Пока еще нет статистики."
+

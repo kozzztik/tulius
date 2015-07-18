@@ -1,0 +1,56 @@
+- extends 'base_cataloged_navig.haml'
+- load i18n
+            
+- block caption
+    {% trans "Request to play " %}
+    = game
+
+- block content
+    %div{style: 'width:90%;position:relative;left:5%'}
+        %form{enctype: '{% if form.handle_files %}multipart/form-data{% else %}application/x-www-form-urlencoded{% endif %}', method: '{% if form_method %}{{ form_method }}{% else %}POST{% endif %}', action: '{% if form_action %}{{ form_action }}{% else %}{% endif %}', class: '{{ form.html_class }} form-horizontal', id: '{% if form.html_id %}{{ form.html_id }}{% else %}{{ form.html_class }}{% endif %}'}
+            - csrf_token
+            = form.media
+            = form.management_form
+            - if form.non_field_errors
+                .alert.alert-error
+                    = form.non_field_errors
+            %h3
+                {% trans "Request form" %}
+            %p
+                .controls
+                    {{ game.requests_text|safe }}
+            - if answer_errors
+                .alert.alert-error
+                    = answer_errors
+            - for answer_form in answersformset
+                %fieldset.control-group{class: '{% if answer_form.answer.errors %} error {% endif %}{% if answer_form.my_errors %} error {% endif %}{% if answer_form.answer.required %} required {% endif %}'}
+                    .control-label
+                        %label{for: '{{ answer_form.answer.auto_id }}'}
+                            = answer_form.question_text
+                    .controls
+                        = answer_form.answer
+                        - if answer_form.my_errors
+                            .help-inline
+                                %ul.errorlist
+                                    %li
+                                        = answer_form.my_errors
+                        - if answer_form.answer.help_text
+                            .help-block
+                                = answer_form.answer.help_text
+            %p
+                {{ answersformset.management_form }}
+            %h3
+                {% trans "Your comment" %}
+            - include 'snippets/form_fields_only.haml'
+            %h3
+                {% trans "Role preferences" %}
+            %p
+                {% trans " Select roles in order of your preference" %}
+            {{ selectionformset }}
+            - block form_actions
+                %fieldset
+                    .form-actions
+                        %button.submit.btn.btn-primary{type: 'submit'}
+                            {% trans "Send" %}
+                        %button.submit.btn{type: 'reset'}
+                            {% trans "reset" %}

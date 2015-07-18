@@ -1,0 +1,28 @@
+<form id="{{ widget.name }}Form" class="in well form-horizontal {{ widget.css_class }}" enctype="multipart/form-data" method="POST" action="?widget={{ widget.name }}">
+    {% csrf_token %}
+
+    {% for field in widget.form %}
+        <fieldset class="control-group{% if field.errors %} error {% endif %}{% if field.field.required %} required {% endif %}">
+            <div class="control-label">
+                {{ field.label_tag }}
+            </div>
+            <div class="controls">
+                {{ field }}
+                {% if field.errors %}
+                    <div class="help-inline">
+                        {{ field.errors }}
+                    </div>
+                {% endif %}
+                {% if field.help_text %}
+                    <div class="help-block">
+                        {{ field.help_text }}
+                    </div>
+                {% endif %}
+            </div>
+        </fieldset>
+    {% endfor %}
+
+    <button class="submit btn btn-primary" onclick="javascript: ajax_form_send('{{ widget.name }}Form')">
+        {{ widget.button_name }}
+    </button>
+</form>

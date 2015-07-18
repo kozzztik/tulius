@@ -1,0 +1,41 @@
+- load i18n
+
+- if is_paginated
+    .pagination.pagination-centered
+        %ul.pagination-btns
+            %li{class: "{% if page_num = 1 %}disabled{% endif %}"}
+                - if page_num = 1
+                    %a
+                        &lsaquo;&lsaquo; 
+                        {% trans "previous" %}
+                - else
+                    <a href="javascript:set_page({{ page_num }} - 1, 0, {% if bottom %}true{% else %}false{% endif %})">
+                        &lsaquo;&lsaquo; 
+                        {% trans "previous" %}
+                    </a>
+            - for page in pages
+                - if page
+                    %li{class: "{% ifequal page page_num %}active{% endifequal %}"}
+                        - ifequal page page_num
+                            %a
+                                = page
+                        - else
+                            <a href="javascript:set_page({{ page }}, 0, {% if bottom %}true{% else %}false{% endif %})">
+                                = page
+                            </a>
+                - else
+                    %li.disabled
+                        %a
+                            \...
+            %li{class: "{% if pages_count = page_num %}disabled{% endif %}"}
+                - if pages_count = page_num
+                    %a.disabled{href: "#"}
+                        {% trans "next" %} 
+                        &rsaquo;&rsaquo;
+                - else
+                    <a href="javascript:set_page({{ page_num }} + 1, 0, {% if bottom %}true{% else %}false{% endif %})">
+                        {% trans "next" %} 
+                        &rsaquo;&rsaquo;
+                    </a>
+        %ul.progress.progress-striped.active{style: "display: none"}
+            .bar{style: "width: 100%"}

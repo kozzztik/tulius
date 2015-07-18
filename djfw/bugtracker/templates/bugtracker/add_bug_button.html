@@ -1,0 +1,40 @@
+{% load i18n %}
+{% load url from future %}
+<link rel="stylesheet" href="{{ STATIC_URL }}bugtracker/bugtracker.css" type="text/css" />
+<script type="text/javascript" src="{{ STATIC_URL }}bugtracker/found_bug.js"></script>
+<a class="modalajax found_bug_btn" href="#foundBug">
+    {% trans "Found bug?" %}
+</a>
+<div id="exception-code">
+    {% if request.bug_message %}
+        {{ request.bug_message.id }}
+    {% endif %}
+</div>
+<form id="foundBug" class="modal hide fade in well form-horizontal" enctype="multipart/form-data" method="POST" action="{% if request.bug_message %}{% url "bugtracker:found_bug_with_exception" request.bug_message.id %}{% else %}{% url "bugtracker:found_bug" %}{% endif %}">
+    {% csrf_token %}
+    <div class="modal-header">
+        <a class="close" data-dismiss="modal">×</a>
+        <h3>{% trans "Found bug?" %}</h3>
+    </div>
+    <div id="foundBug_success" hidden="true">
+        <div class="alert alert-success">
+            {% trans "Bug information successfuly sended! now you can see it in your personal cabinet!" %}
+        </div>
+    </div>
+    <div id="foundBug_error" class="alert alert-error">
+        <div id="foundBug_err_content"></div>
+    </div>
+    <div id="foundBug_body" class="modal-body">
+        <div id="foundBug_content"></div>
+    </div>
+    <div id="foundBug_wait">
+        <br />
+        <p>{% trans "Wait please..." %}</p>
+        <br />
+    </div>
+    <div id="foundBug_footer" class="modal-footer">
+         <span id="foundBug_submit_btn" class="submit btn btn-primary">
+             {% trans "Send" %}
+         </span>
+    </div>
+</form>

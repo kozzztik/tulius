@@ -1,0 +1,27 @@
+- extends 'base.haml'
+- load i18n
+- load url from future
+
+- block breadcrumbs
+    %ul.breadcrumb
+        %li
+            - include 'home_link.haml'
+        %li
+            %a{href: '{% url "registration_register" }'}
+                {% trans 'Register' %}
+        %li
+            %a{href: '{% url "registration_activate" }'}
+                {% trans 'Profile activation failed' %}
+
+- block content
+    %h2
+        {% trans "Profile activation failed" %}
+    %p
+        {% trans "Provided activation key doesn't seem to be correct, sorry." %}
+
+-#**registration/activate.html**
+-#
+-#Used if account activation fails. With the default setup, has the following context:
+-#
+-#``activation_key``
+-#    The activation key used during the activation attempt.

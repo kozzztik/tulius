@@ -1,0 +1,4 @@
+{% load staticfiles %}
+{% for emotion in emotions %}
+{title:"{{ emotion.name }}", img: '<img src="{% static "tinymce/jscripts/tiny_mce/plugins/emotions/img/" %}{{ emotion.filename }}" class="sm">', bbcode:"{{ emotion.text}}"},
+{% endfor %}

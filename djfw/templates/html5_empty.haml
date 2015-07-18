@@ -1,0 +1,48 @@
+!!! 5
+
+%html{'lang':'{% block site_language %}ru{% endblock %}'}
+
+    - block head
+        %head
+            - block meta
+                %meta{charset: '{% block meta_charset %}utf-8{% endblock %}'}
+                %meta{name: 'viewport', content:'{% block meta_viewport %}width=device-width, initial-scale=1.0{% endblock %}'}
+                %meta{name: 'author', content:'{% block meta_author %}http://vk.com/kozzztik{% endblock %}'}
+                %meta{name: 'description', content:'{% block meta_description %}{% endblock %}'}
+                %meta{name: 'keywords', content:'{% block meta_keywords %}{% endblock %}'}
+            - block favicon
+                %link{rel: 'SHORTCUT ICON', href: '{{ MEDIA_URL }}favicon.ico'}
+            - block additional_meta
+            %title
+                - block title
+            - block styles
+                - block jquery_styles
+                    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}djfw/jquery/css/start/jquery-ui-1.10.3.custom.min.css'}
+                - block bootstrap_styles
+                    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}djfw/bootstrap/css/bootstrap.min.css'}
+                    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}djfw/bootstrap/css/bootstrap-responsive.min.css'}
+                    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}djfw/fortawesome/css/font-awesome.min.css'}
+                    <!--[if IE 7]>
+                    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}djfw/fortawesome/css/font-awesome-ie7.min.css'}
+                    <![endif]-->
+                - block sitewide_styles
+                - block page_styles
+                - block additional_styles
+                - block user_styles
+
+            - block scripts
+                - block jquery_scripts
+                    %script{type: 'text/javascript', src: '{{ STATIC_URL }}djfw/jquery/js/jquery-1.9.1.js'}
+                    %script{type: 'text/javascript', src: '{{ STATIC_URL }}djfw/jquery/js/jquery-ui-1.10.3.custom.min.js'}
+                    %script{type: 'text/javascript', src: '{{ STATIC_URL }}djfw/jquery/js/jquery.form.js'}
+                - block bootstrap_scripts
+                    %script{type: 'text/javascript', src: '{{ STATIC_URL }}djfw/bootstrap/js/bootstrap.min.js'}
+                - block ajax_scripts
+                    %script{type: 'text/javascript', src: '{{ STATIC_URL }}djfw/js/ajax_form.js'}
+                - block sitewide_scripts
+                - block additional_scripts
+                - block page_scripts
+                - block user_scripts
+                - block counters
+
+    - block body

@@ -1,0 +1,96 @@
+- extends 'stories/base.haml'
+- load i18n
+- load url from future
+
+- block content
+    - if request.user.is_superuser
+        .pull-right
+            %a.submit.btn.btn-primary{data-toggle: 'modal', href: '#AddStoryModal'}
+                %i.icon-plus
+                {% trans "add story" %}
+    %form.form-inline.hidden-phone{method: 'GET', 'action': ''}
+        - csrf_token
+        .visible-desktop
+            %label
+                {% trans "Author" %}
+            = stories_filter_form.filter_by_author
+        %label
+            {% trans "Genre" %}
+        = stories_filter_form.filter_by_genre
+        .visible-desktop
+            %label
+                {% trans "Creation year" %}
+            = stories_filter_form.filter_by_creation_year
+        %button.submit.btn.btn-small{type: 'submit'}
+            {% trans "Filter" %}
+    - if filtered
+        .counters
+            {% trans "filtered" %}
+            %span.filtered
+                = filtered_stories_count
+            %span.delimeter /
+            %span.total
+                = total_stories_count
+                (
+                {% trans "total plots count" %}
+                )
+    %table.table
+        %thead
+            %tr
+                %th{width: '34%'}
+                    {% trans "title" %}
+                %th{width: '15%'}
+                    {% trans "genre" %}
+                %th.visible-desktop{width: '12%'}
+                    {% trans "creation year" %}
+                %th.hidden-phone{width: '25%'}
+                    {% trans "description" %}
+                %th.visible-desktop{width: '14%'}
+                    {% trans "authors" %}
+        %tbody
+            - for story in stories
+                %tr
+                    %td 
+                        - if story.editable
+                       	   .dropdown
+                                %a.dropdown-toggle{href: '#', data-toggle: 'dropdown'}
+                                    = story
+                                    .caret
+                                %ul.dropdown-menu
+                                    %li
+                                        %a{href: '{% url "stories:story" story.id %}'}
+                                            {% trans "review" %}
+                                    %li
+                                        %a{href: '{{ story.get_edit_url }}'}
+                                            {% trans "edit" %}
+                        - else
+                            %a{href: '{% url "stories:story" story.id %}'}
+                                = story
+                    %td
+                        - if story.genres.all
+                            %ul.genres.unstyled
+                                - for genre in story.genres.all
+                                    %li
+                                        %a{href: '?filter_by_genre\={{ genre.id }}'}
+                                            = genre.name
+                    %td.visible-desktop
+                        %a{href: '?filter_by_creation_year\={{ story.creation_year }}'}
+                            = story.creation_year
+                    %td.hidden-phone
+                        = story.short_comment
+                    %td.visible-desktop
+                        - if story.authors.count
+                            %ul.authors.unstyled
+                                - for author in story.authors.all
+                                    %li
+                                        %a{href: '?filter_by_author\={{ author.user.id }}'}
+                                            = author
+    - if request.user.is_superuser
+        - with form_id='AddStoryModal'
+            - with form=add_form
+                - include 'snippets/ajax_form_modal.haml'
+    - if not stories
+        %br
+        %p
+            {% trans "No stories yet" %}
+        %br
