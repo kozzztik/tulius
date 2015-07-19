@@ -17,13 +17,13 @@ class Migration(SchemaMigration):
         db.rename_column('games_gamewinner', 'new_user_id', 'user_id')
         db.rename_column('games_gameadmin', 'new_user_id', 'user_id')
 
-        db.create_unique(u'games_gameadmin', ['game_id', 'user_id'])
-        db.create_unique(u'games_gameguest', ['game_id', 'user_id'])
+        #db.create_unique(u'games_gameadmin', ['game_id', 'user_id'])
+        #db.create_unique(u'games_gameguest', ['game_id', 'user_id'])
 
 
     def backwards(self, orm):
-        db.delete_unique(u'games_gameadmin', ['game_id', 'user_id'])
-        db.delete_unique(u'games_gameguest', ['game_id', 'user_id'])
+        #db.delete_unique(u'games_gameadmin', ['game_id', 'user_id'])
+        #db.delete_unique(u'games_gameguest', ['game_id', 'user_id'])
 
         db.rename_column('games_gameadmin', 'user_id', 'new_user_id')
         db.rename_column('games_gamewinner', 'user_id', 'new_user_id')

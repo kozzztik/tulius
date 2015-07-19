@@ -8,7 +8,7 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        db.delete_foreign_key(u'profiler_profilermessage', 'user_id')
+        #db.delete_foreign_key(u'profiler_profilermessage', 'user_id')
         # Removing index on 'ProfilerMessage', fields ['user_id']
         db.delete_index(u'profiler_profilermessage', ['user_id'])
 

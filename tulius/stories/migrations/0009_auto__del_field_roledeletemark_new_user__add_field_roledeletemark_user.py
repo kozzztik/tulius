@@ -19,12 +19,12 @@ class Migration(SchemaMigration):
         db.rename_column('stories_storyadmin', 'new_user_id', 'user_id')
 
         # Adding unique constraint on 'StoryAdmin', fields ['story', 'user']
-        db.create_unique(u'stories_storyadmin', ['story_id', 'user_id'])
+        #db.create_unique(u'stories_storyadmin', ['story_id', 'user_id'])
 
         db.rename_column('stories_storyauthor', 'new_user_id', 'user_id')
 
         # Adding unique constraint on 'StoryAuthor', fields ['story', 'user']
-        db.create_unique(u'stories_storyauthor', ['story_id', 'user_id'])
+        #db.create_unique(u'stories_storyauthor', ['story_id', 'user_id'])
 
         db.rename_column('stories_role', 'new_user_id', 'user_id')
 

@@ -7,30 +7,31 @@ from django.db import models
 class Migration(DataMigration):
 
     def forwards(self, orm):
-        from tulius.models import User
-        old_users = orm['auth.User'].objects.all().order_by('id')
-        for old_user in old_users:
-            new_user = User(pk=old_user.pk)
-            new_user.username = old_user.username
-            new_user.email = old_user.email
-            new_user.is_staff = old_user.is_staff
-            new_user.is_superuser = old_user.is_superuser
-            new_user.is_active = old_user.is_active
-            new_user.date_joined = old_user.date_joined
-            new_user.last_login = old_user.last_login
-            new_user.password = old_user.password
-            profiles = orm['players.UserProfile'].objects.filter(user=old_user)
-            if profiles:
-                profile = profiles[0]
-                new_user.avatar = profile.avatar
-                new_user.rank = profile.rank
-                new_user.show_played_games = profile.show_played_games
-                new_user.show_played_characters = profile.show_played_characters
-                new_user.show_online_status = profile.show_online_status
-                new_user.hide_trustmarks = profile.hide_trustmarks
-                new_user.signature = profile.signature
-                new_user.compact_text = profile.compact_text
-                new_user.save()
+        pass
+        # from tulius.models import User
+        # old_users = orm['auth.User'].objects.all().order_by('id')
+        # for old_user in old_users:
+        #     new_user = User(pk=old_user.pk)
+        #     new_user.username = old_user.username
+        #     new_user.email = old_user.email
+        #     new_user.is_staff = old_user.is_staff
+        #     new_user.is_superuser = old_user.is_superuser
+        #     new_user.is_active = old_user.is_active
+        #     new_user.date_joined = old_user.date_joined
+        #     new_user.last_login = old_user.last_login
+        #     new_user.password = old_user.password
+        #     profiles = orm['players.UserProfile'].objects.filter(user=old_user)
+        #     if profiles:
+        #         profile = profiles[0]
+        #         new_user.avatar = profile.avatar
+        #         new_user.rank = profile.rank
+        #         new_user.show_played_games = profile.show_played_games
+        #         new_user.show_played_characters = profile.show_played_characters
+        #         new_user.show_online_status = profile.show_online_status
+        #         new_user.hide_trustmarks = profile.hide_trustmarks
+        #         new_user.signature = profile.signature
+        #         new_user.compact_text = profile.compact_text
+        #         new_user.save()
 
     def backwards(self, orm):
         "Write your backwards methods here."

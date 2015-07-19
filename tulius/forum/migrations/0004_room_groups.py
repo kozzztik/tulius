@@ -8,8 +8,8 @@ class Migration(DataMigration):
 
     def forwards(self, orm):
         from tulius.forum.models import Thread
-        from django.contrib.auth.models import User
-        users = User.objects.filter(is_superuser=True, is_active=True).order_by('id')
+        from django.contrib.auth import get_user_model
+        users = get_user_model().objects.filter(is_superuser=True, is_active=True).order_by('id')
         if not users:
             return
         superuser = users[0]
