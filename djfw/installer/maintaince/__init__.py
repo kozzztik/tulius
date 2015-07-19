@@ -2,7 +2,6 @@ from django.utils.translation import ugettext_lazy as _
 from threading import Thread
 from django.utils.timezone import now, make_aware, get_default_timezone
 from django.conf import settings
-from workdir import PROJECTDIR, PROJECT_NAME
 import os
 import logging
 import datetime
@@ -15,8 +14,8 @@ class MaintainceWorker(Thread):
         self.log_obj = log_obj
         self.logger = logging.getLogger('installer')
         self.bin_dir = 'bin'
-        self.bin_path = os.path.join(PROJECTDIR, self.bin_dir)
-        self.path = PROJECTDIR
+        self.bin_path = os.path.join(settings.BASE_DIR, self.bin_dir)
+        self.path = settings.BASE_DIR
         try:
             from djfw.installer import models, signals
         except:

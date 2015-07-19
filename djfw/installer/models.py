@@ -122,10 +122,9 @@ class Backup(models.Model):
         super(Backup, self).delete(using=using)
         
 def get_lock_file_name():
-    from workdir import PROJECTDIR
     lock_file_name = getattr(settings, 'INSTALLER_LOCK_FILE', None)
     if not lock_file_name:
-        lock_file_name = PROJECTDIR + 'maintaince.lock'
+        lock_file_name = settings.BASE_DIR + 'maintaince.lock'
     return lock_file_name
 
 class Revision(models.Model):

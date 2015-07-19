@@ -1,0 +1,27 @@
+django == 1.6.3
+django-grappelli == 2.4.12
+MySQL-python
+# database migration
+south
+# simply better python shell
+ipython
+
+# for small pieces of AJAX
+simplejson
+
+# apparently best relational DB trees implementation
+django-mptt
+
+# hamlpy dependency
+pygments
+# HAML translator python realization
+hamlpy
+# makes hamlpy usage in django templates possible
+djaml
+django-appconf
+BeautifulSoup
+FeedParser
+pyyaml
+
+python-memcached
+django-memcache-status

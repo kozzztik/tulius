@@ -1,6 +1,6 @@
 from django.utils.translation import ugettext_lazy as _
 from repository import RepoUpdate
-from workdir import PROJECT_NAME
+from django.conf import settings
 from .backup import do_backup
 import os
 from .operation import Operation
@@ -55,7 +55,7 @@ class Buildout(Operation):
         django_conf = self.read_file(django_conf_name, bin_path)
         apache_conf = django_conf
         if django_conf.find('PYTHON_EGG_CACHE') < 0:
-            my_repl_str = repl_str.replace('$PROJECT_NAME', PROJECT_NAME).replace('$PROJECT_NAME', self.path)
+            my_repl_str = repl_str.replace('$PROJECT_NAME', settings.PROJECT_NAME).replace('$PROJECT_NAME', self.path)
             django_conf = django_conf.replace('import djangorecipe.manage', my_repl_str)
             self.write_file(django_conf_name, django_conf, bin_path)
         pos = apache_conf.find('import djangorecipe')
@@ -63,7 +63,7 @@ class Buildout(Operation):
             apache_conf = apache_conf[:pos]
         self.write_file('env.py', apache_conf, bin_path)
         apache_conf += apache_conf_addition
-        apache_conf = apache_conf.replace('$PROJECT_NAME', PROJECT_NAME).replace('$PROJECT_NAME', self.path)
+        apache_conf = apache_conf.replace('$PROJECT_NAME', settings.PROJECT_NAME).replace('$PROJECT_NAME', self.path)
         self.write_file('apache.py', apache_conf, bin_path)
         
 class UpdateVhost(Operation):

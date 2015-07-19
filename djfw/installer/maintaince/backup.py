@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.utils.importlib import import_module
 from django.core.exceptions import ImproperlyConfigured
-from workdir import PROJECTDIR
 import os
 import tarfile
 import logging
@@ -13,7 +12,7 @@ def subprocess(command, message_cmd=''):
     import subprocess
     is_windows = platform.system() == 'Windows'
     try:
-        proc = subprocess.Popen(command, shell=True, cwd=PROJECTDIR, stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+        proc = subprocess.Popen(command, shell=True, cwd=settings.BASE_DIR, stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
         stdout_buf = []
         stderr_buf = []
         (stdout, stderr) = proc.communicate()

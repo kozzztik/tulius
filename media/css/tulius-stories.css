@@ -1,0 +1,59 @@
+.inline-list {
+    padding: 0px;
+    margin: 0px;
+    list-style: none outside none;
+}
+
+.inline-list li {
+  display: inline-block;
+  *display: inline;
+  /* IE7 inline-block hack */
+
+  *zoom: 1;
+  text-shadow: 0 1px 0 #ffffff;
+}
+
+.inline-list li:after {content: ", "} 
+.inline-list .inline-list-ignore:after {content: ""}
+.inline-list li:last-child:after {content: ". "}
+
+h1 {
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.story-banner {
+    width: 100%;
+    background-color: black;
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 10px;
+} 
+
+.story-character > tbody > tr > td {
+    border-radius: 30px;
+    border: 10px solid white;
+    background-color: rgb(221, 210, 190);
+    width: 50%;
+}
+#id_filter_by_creation_year { width: 90px; }
+#id_filter_by_author { width: 150px; }
+#id_filter_by_genre {width: 190px;}
+.story-character > tbody > tr:nth-child(2n) > td {
+    background-color: rgb(221, 210, 190);
+}
+.story-character .character-avatar {padding: 10px; width: 20%;}
+.story-character .character-text h3 {padding: 10px; text-align:center }
+.story-character .character-text {vertical-align: middle; padding: 10px; text-align:center; }
+
+.character-avatar img {
+    max-width: none;
+}
+
+.additional-materials h1 {
+    margin-top: 15px;
+    margin-bottom: 15px
+}
+
+.story-character .wide { table-layout: auto; }
+
