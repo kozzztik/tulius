@@ -25,3 +25,5 @@ pyyaml
 
 python-memcached
 django-memcache-status
+
+pytest
