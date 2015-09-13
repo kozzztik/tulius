@@ -7,8 +7,8 @@ class Command(BaseCommand):
         
     def handle(self, category_name, **options):
         try:
-            from djfw.installer.backup import do_backup
+            from djfw.installer.maintaince.backup import do_backup
         except:
-            from installer.backup import do_backup
+            from installer.maintaince.backup import do_backup
         do_backup(category_name)
             
