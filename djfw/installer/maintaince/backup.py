@@ -7,12 +7,14 @@ import logging
 
 logger = logging.getLogger('installer')
 
+
 def subprocess(command, message_cmd=''):
     import platform
     import subprocess
     is_windows = platform.system() == 'Windows'
     try:
-        proc = subprocess.Popen(command, shell=True, cwd=settings.BASE_DIR, stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+        proc = subprocess.Popen(command, shell=True, cwd=settings.BASE_DIR, stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE)
         stdout_buf = []
         stderr_buf = []
         (stdout, stderr) = proc.communicate()
@@ -22,7 +24,6 @@ def subprocess(command, message_cmd=''):
         if stderr is not None:
             stderr_buf.append(stderr.decode('cp866' if is_windows else 'utf-8'))
         stderr = "\n".join(stderr_buf)
-        message = None
         if stdout is not None:
             stdout = stdout.rstrip()
         if proc.returncode != 0:
@@ -36,30 +37,33 @@ def subprocess(command, message_cmd=''):
         message = "Command failed with OSError. '%s':\n%s" % (message_cmd or command, ose)
         logger.error(message)
         raise
-        
+
+
 def backupmysql(category):
     database = settings.DATABASES['default']
-    if database['ENGINE'] <> 'django.db.backends.mysql':
+    if database['ENGINE'] != 'django.db.backends.mysql':
         return []
-    logger = logging.getLogger('installer')
     logger.info('Backup mysql...')
     print('Backup mysql...')
-    filename = os.path.join(PROJECTDIR, 'mysql.sql')
+    filename = os.path.join(settings.BASE_DIR, 'mysql.sql')
     
     if os.path.exists(filename):
         os.remove(filename) 
-    subprocess('mysqldump -u%s -p%s -h%s %s > %s' % (database['USER'], database['PASSWORD'], database['HOST'], database['NAME'], filename), 'Backup mysql')
+    subprocess('mysqldump -u%s -p%s -h%s %s > %s' % (database['USER'], database['PASSWORD'], database['HOST'],
+                                                     database['NAME'], filename), 'Backup mysql')
     logger.info('Mysql backup finished.')
     print('Mysql backup finished.')
     return [filename]
 
+
 def log(s):
     logger.info(s)
     print(s)
-    
+
+
 def add__to_backup(backup_file, file_path):
     log("Backuping " + file_path)
-    arch_name = file_path.replace(PROJECTDIR, '')
+    arch_name = file_path.replace(settings.BASE_DIR, '')
     try:
         file_path = unicode(file_path)
         arch_name = unicode(arch_name)
@@ -71,7 +75,8 @@ def add__to_backup(backup_file, file_path):
     except:
         log("Failed to add " + file_path + " as " + arch_name)
         raise
-        
+
+
 def do_backup(category_name):
     log("Starting backup...")
     try:
@@ -104,7 +109,7 @@ def do_backup(category_name):
         try:
             backupfile = tarfile.open(path, 'w:gz', encoding='utf-8')
             import sys
-            log("Filesystem %s , system %s" % ( sys.getfilesystemencoding(), sys.getdefaultencoding()))
+            log("Filesystem %s , system %s" % (sys.getfilesystemencoding(), sys.getdefaultencoding()))
         except:
             log("Failed to create tarfile.")
             raise
@@ -125,7 +130,6 @@ def do_backup(category_name):
             if proc:
                 log("Backup %s" % installer[0])
                 proc_val = proc(category)
-                files_list = []
                 if isinstance(proc_val, list):
                     files_list = proc_val
                 else:
