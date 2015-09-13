@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 ROOT_URLCONF = 'tulius.urls'
 
-TIME_ZONE = 'Europe/Kaliningrad'
+TIME_ZONE = 'Europe/Moscow'
 LANGUAGE_CODE = 'ru'
 USE_I18N = True
 USE_L10N = True
