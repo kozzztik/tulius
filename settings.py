@@ -33,6 +33,7 @@ AUTH_USER_MODEL = 'tulius.User'
 INSTALLED_APPS = (
     'south',
     'grappelli',
+    'raven.contrib.django.raven_compat',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -82,6 +83,7 @@ INSTALLED_APPS = (
 
 MIDDLEWARE_CLASSES = (
     'djfw.installer.middleware.MaintenanceMiddleware',
+    'raven.contrib.django.raven_compat.middleware.Sentry404CatchMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -100,8 +102,8 @@ STATICFILES_FINDERS = (
 )
 
 TEMPLATE_LOADERS = (
-    'djfw.hamlpy.template.loaders.HamlPyFilesystemLoader',
-    'djfw.hamlpy.template.loaders.HamlPyAppDirectoriesLoader',
+    'hamlpy.template.loaders.HamlPyFilesystemLoader',
+    'hamlpy.template.loaders.HamlPyAppDirectoriesLoader',
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
 )
@@ -184,6 +186,10 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'django.utils.log.NullHandler', 
         },
+        'sentry': {
+            'level': 'ERROR',
+            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+        },
         'mail_admins': {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
@@ -239,6 +245,10 @@ if DEBUG:
 
 THEMING_ROOT = MEDIA_ROOT + 'uploads/themes/'
 THEMING_URL = MEDIA_URL + 'uploads/themes/'
+
+RAVEN_CONFIG = {
+    'dsn': 'http://68b2f69f668848e58951db48491ed00c:92ab0a46958449058583ae592131bc14@sentry.co-de.org/3',
+}
 
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 25

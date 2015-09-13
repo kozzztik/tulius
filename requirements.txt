@@ -26,5 +26,5 @@ pyyaml
 
 python-memcached
 django-memcache-status
-
-pytest
+#sentry
+raven
