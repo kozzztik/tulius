@@ -1,9 +1,5 @@
 from django.template import loader, RequestContext
-try:
-    set
-except NameError:
-    from sets import Set as set
-    
+
 
 def get_pagination_context(request, page_num, pages_count, window=4):
     try:
@@ -74,6 +70,8 @@ def get_pagination_context(request, page_num, pages_count, window=4):
         to_return = {
             'pages': pages,
             'page_num': page_num,
+            'previous_page_num': page_num - 1 if page_num > 1 else None,
+            'next_page_num': page_num + 1 if pages_count > page_num else None,
             'pages_count': pages_count,
             'is_paginated': pages_count > 1,
         }
@@ -87,12 +85,14 @@ def get_pagination_context(request, page_num, pages_count, window=4):
         return to_return
     except KeyError, AttributeError:
         return {}
-    
+
+
 def get_custom_pagination(request, context, template_name='forum/snippets/pagination.haml'):
     c = RequestContext(request, context)
     t = loader.get_template(template_name)
     return t.render(c)
-    
+
+
 def get_pagination(request, page_num, pages_count, window=4, template_name='forum/snippets/pagination.haml'):
     context = get_pagination_context(request, page_num, pages_count, window)
     return get_custom_pagination(request, context, template_name)

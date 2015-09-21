@@ -25,7 +25,7 @@ MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
 
 LANGUAGES = (
-   ('ru', _('Russian')),
+    ('ru', _('Russian')),
 )
 
 AUTH_USER_MODEL = 'tulius.User'
@@ -91,7 +91,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'djfw.pagination.middleware.PaginationMiddleware',
-    'djfw.logger.middleware.ExceptionMiddleware',
     'djfw.flatpages.middleware.FlatpageFallbackMiddleware',
     'djfw.profiler.middleware.ProfilerMiddleware',
 )
@@ -231,7 +230,7 @@ LOGGING = {
             'propagate': True,
         },
         'bugtracker.jira': {
-            'handlers': ['console', 'db',],
+            'handlers': ['console', 'db', ],
             'level': 'DEBUG',
         },
     }
@@ -257,8 +256,8 @@ EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = False
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 
-#EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-#EMAIL_FILE_PATH = PROJECT_ROOT +  'mail_dump/'
+# EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+# EMAIL_FILE_PATH = PROJECT_ROOT +  'mail_dump/'
 
 MAIL_RECEIVERS = ['pm.mail.get_mail']
 
@@ -274,12 +273,12 @@ DATABASES = {
     }
 }
 
-#CACHES = {
-#    'default': {
-#        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-#        'LOCATION': '127.0.0.1:11211',
-#        'KEY_PREFIX': 'tulius',
-#    }
-#}
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+#         'LOCATION': '127.0.0.1:11211',
+#         'KEY_PREFIX': 'tulius',
+#     }
+# }
 #
-#SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+# SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
