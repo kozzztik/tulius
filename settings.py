@@ -67,6 +67,7 @@ INSTALLED_APPS = (
     'djfw.custom_views',
     'django_mailer',
     'pm',
+    'tulius',
     'tulius.players',
     'tulius.games',
     'tulius.forum',

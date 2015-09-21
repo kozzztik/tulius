@@ -16,6 +16,7 @@
 
 - block sitewide_styles
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}photos/jquery-lightbox/css/lightbox.css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}tulius/css/tulius2015.css'}
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius.css'}
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/baselayout.css'}
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-main.css'}
@@ -25,6 +26,7 @@
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}djfw/bootstrap/js/bootstrap.min.js'}
     
 - block sitewide_scripts
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}tulius/js/menu.js'}
     %script{type: 'text/javascript', src: '{{ MEDIA_URL }}js/jquery.cookie.js'}
     %script{type: 'text/javascript', src: '{{ MEDIA_URL }}js/jquery.history.js'}
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}photos/jquery-lightbox/js/lightbox.js'}
@@ -37,138 +39,125 @@
     
 - block body
     %body{class: '{% block body_class %}{% endblock %}'}
-        - block navbar
-            .navbar.navbar-fixed-top
-                .navbar-inner
-                    .container.newcontainer
-                        %a.brand.hidden-tablet{href: '/'}
-                            Tulius
-                        %ul.nav
-                            %li.dropdown.hidden-phone
-                                %a#auth-dropdown-toggler.dropdown-toggle{data-toggle: "dropdown"}
-                                    {% trans "Games" %}
-                                    %span.caret
-                                %ul.dropdown-menu
-                                    %li
-                                        %a{href: '{% url "games:index" %}'}
-                                            {% trans "All games" %}
-                                    %li.divider
-                                    %li
-                                        %a{href: '{% url "games:announced_games" %}'}
-                                            {% trans "Announced games" %}
-                                    %li
-                                        %a{href: '{% url "games:request_accepting_games" %}'}
-                                            {% trans "Accepting requests" %}
-                                    %li
-                                        %a{href: '{% url "games:awaiting_start_games" %}'}
-                                            {% trans "Awaiting start" %}
-                                    %li
-                                        %a{href: '{% url "games:current_games" %}'}
-                                            {% trans "Current games" %}
-                                    %li
-                                        %a{href: '{% url "games:completed_opened_games" %}'}
-                                            {% trans "Opened completed" %}
-                            %li.hidden-phone
-                                %a{href: '{% url "players:index" %}'}
-                                    {% trans "Players" %}
-                            %li.hidden-phone
-                                %a{href: '{% url "stories:index" %}'}
-                                    {% trans "Stories" %}
-                            %li.hidden-phone
-                                %a{href: '{% url "forum:index" %}'}
-                                    {% trans "Forums" %}
-                            %li.hidden-phone
-                                %a{href: '{% url "news:index" %}'}
-                                    {% trans "News" %}
-                                %li.dropdown.hidden-phone
-                                    %a#flatpages-dropdown-toggler.dropdown-toggle{data-toggle: 'dropdown'}
-                                        {% trans "Flatpages" %}
-                                        %span.caret
-                                    %ul#flatpages-dropdown.dropdown-menu
-                                        %li
-                                            %a{href: '{% url "flatpages" %}'}
-                                                {% trans "All articles" %}
-                                        %li
-                                            %a{href: '{% url "bugs:bugtracker_main" %}'}
-                                                {% trans "Bugtracker" %}
-                                        %li
-                                            %a{href: '{% url "bugs:site_updates" %}'}
-                                                {% trans "Site updates" %}
-                                        %li
-                                            %a{href: '{% url "stats" %}'}
-                                                {% trans "Statistics" %}
-                                        %li.divider
-                                        - for flatpage in flatpages
-                                            - if flatpage.show_on_home
-                                                %li
-                                                    %a{href: '{{ flatpage.url }}'}
-                                                        = flatpage.title
-                        %ul.nav.pull-right
-                            - if not request.user.is_anonymous
-                                - if request.user.is_superuser
-                                    %li.dropdown.hidden-phone
-                                        %a#adminsite-dropdown-toggler.dropdown.dropdown-toggle{data-toggle: 'dropdown'}
-                                           {% trans "Admin site" %}
-                                           %span.caret
-                                        %ul#adminsite-dropdown.dropdown-menu
-                                            %li
-                                                %a{href: '{% url "counters:index"%}'}
-                                                    {% trans "Counters" %}
-                                            %li
-                                                %a{href: '{% url "players:player_exceptions" user.id %}'}
-                                                    {% trans "Your exceptions" %}
-                                            %li
-                                                %a{href: '{% url "admin:index" %}'}
-                                                    {% trans "Django admin site" %}
-                                            %li
-                                                %a{href: '{% url "bugs:bugtracker_main" %}'}
-                                                    {% trans "Bugtracker" %}
-                                            %li
-                                                %a{href: '{% url "bugs:complaints" %}'}
-                                                    {% trans "Complaints" %}
-                                            %li
-                                                %a{data-toggle: 'modal', href: '#reloginModal'}
-                                                    {% trans "Switch user" %}
-                                %li
-                                   - if request.user.not_readed_messages
-                                        %a{href: '{% url "players:profile" %}#pm_messages'}
-                                            .unread_messages_count
-                                                = request.user.not_readed_messages
-                                - if request.user.new_invites
-                                    %li
-                                        %a#new_invites_menu{href: '{% url "players:profile" %}#invites', 
-                                            data-title: '{% trans "Invites!" %}', data-content: '{% trans "You got invite to play a game." %}'}
-                                            %span.new_invites_count.badge
-                                                = request.user.new_invites.count
-                                        <script>$('#new_invites_menu').popover({trigger: 'hover', placement: 'bottom'})</script>
-                                - if not request.user.is_superuser
-                                    %li.visible-desktop
-                                        %span.greetings
-                                            {% trans "Greetings," %}
-                                %li.portrait
-                                %li
-                                    %a.profilelink{href: '{% url "players:profile" %}'}
-                                        = request.user.username
-                                %li
-                                    %a{href: '{% url "auth:logout" %}'}
-                                       {% trans "Logout" %}
-                            - else
-                                %li.hidden-phone
-                                    %a{data-toggle: 'modal', href: '#loginModal'}
-                                        {% trans "login" %}
-                                %li.hidden-phone
-                                    %a{data-toggle: 'modal', href: '#signupModal'}
-                                        {% trans "sign up" %}
-                                %li.visible-phone
-                                    %a{href: '{% url "auth:login" %}'}
-                                        {% trans "login" %}
-                                %li.visible-phone
-                                    %a{href: '{% url "registration_register" %}'}
-                                        {% trans "sign up" %}
-
+        - block main_menu
+            .menu
+                %a.brand_icon{href: '/'}
+                    %img{src: '{{ STATIC_URL }}tulius/img/logo.png'}
+                .menu-notif-list
+                    %a{href: '/'}
+                        .new_messages
+                    %a{href: '/'}
+                        .new_invites
+                %ul.menu-list
+                    %li
+                        %a.catalog{href: '#', data-toggle: '#catalog-menu'}
+                    %li
+                        %a.profile{href: '#', data-toggle: '#profile-menu'}
+                    %li
+                        %a.articles{href: '#', data-toggle: '#articles-menu'}
+                    - if request.user.is_superuser
+                        %li
+                            %a.admin{href: '#', data-toggle: '#admin-menu'}
+                - if request.user.is_superuser
+                    %ul.menu-scroll
+                        %li
+                            %a.scroll-up{href: '#'}
+                        %li
+                            %a.scroll-down{href: '#'}
+                %ul.menu-login
+                    - if not request.user.is_anonymous
+                        %li
+                            %a.logout{href: '{% url "auth:logout" %}'}
+                    - else
+                        %li
+                            %a.login{data-toggle: 'modal', href: '#loginModal'}
+            %ul#catalog-menu.sub-menu
+                %li
+                    {% trans "Games" %}
+                    %ul
+                        %li
+                            %a{href: '{% url "games:index" %}'}
+                                {% trans "All games" %}
+                            %li
+                                %br
+                            %li
+                                %a{href: '{% url "games:announced_games" %}'}
+                                    {% trans "Announced games" %}
+                            %li
+                                %a{href: '{% url "games:request_accepting_games" %}'}
+                                    {% trans "Accepting requests" %}
+                            %li
+                                %a{href: '{% url "games:awaiting_start_games" %}'}
+                                    {% trans "Awaiting start" %}
+                            %li
+                                %a{href: '{% url "games:current_games" %}'}
+                                    {% trans "Current games" %}
+                            %li
+                                %a{href: '{% url "games:completed_opened_games" %}'}
+                                    {% trans "Opened completed" %}
+                %li
+                    %a{href: '{% url "players:index" %}'}
+                       {% trans "Players" %}
+                %li
+                    %a{href: '{% url "stories:index" %}'}
+                        {% trans "Stories" %}
+                %li
+                    %a{href: '{% url "forum:index" %}'}
+                        {% trans "Forums" %}
+                %li
+                    %a{href: '{% url "news:index" %}'}
+                        {% trans "News" %}
+            %ul#profile-menu.sub-menu
+                %li
+                    {% trans "Profile" %}
+                %li
+                    {% trans "Private messages" %}
+                %li
+                    {% trans "Favorites" %}
+                %li
+                    {% trans "Settings" %}
+            %ul#profile-menu.sub-menu
+                %li
+                    {% trans "Profile" %}
+                %li
+                    {% trans "Private messages" %}
+                %li
+                    {% trans "Favorites" %}
+                %li
+                    {% trans "Settings" %}
+            %ul#articles-menu.sub-menu
+                %li
+                    %a{href: '{% url "flatpages" %}'}
+                        {% trans "All articles" %}
+                %li.divider
+                - for flatpage in flatpages
+                    - if flatpage.show_on_home
+                        %li
+                            %a{href: '{{ flatpage.url }}'}
+                                = flatpage.title
+            - if request.user.is_superuser
+                %ul#admin-menu.sub-menu
+                    %li
+                        %a{href: '{% url "counters:index"%}'}
+                            {% trans "Counters" %}
+                    %li
+                        %a{href: '{% url "players:player_exceptions" user.id %}'}
+                            {% trans "Your exceptions" %}
+                    %li
+                        %a{href: '{% url "admin:index" %}'}
+                            {% trans "Django admin site" %}
+                    %li
+                        %a{href: '{% url "bugs:bugtracker_main" %}'}
+                            {% trans "Bugtracker" %}
+                    %li
+                        %a{href: '{% url "bugs:complaints" %}'}
+                            {% trans "Complaints" %}
+                    %li
+                        %a{data-toggle: 'modal', href: '#reloginModal'}
+                            {% trans "Switch user" %}
+            .menu-background
         - block body_main_area
-            #background
-              #content-center.container
+            #content-center.container
                 - block breadcrumbs_block
                     #top-breadcrumbs.rcrumbs
                         %ul.breadcrumb
@@ -199,8 +188,8 @@
                                 %a{href: '/'}
                                     .homelink
                             - repeat breadcrumbs
-            - block footer
-                %footer.footer
+                - block footer
+                  %footer.footer
                     .container.newcontainer
                         - block footer_content
                             %p.pull-left

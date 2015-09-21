@@ -121,14 +121,6 @@ small { font-size: 80%; }
 
 .player-avatar-image img {max-height: 100px; max-width: 100px}
 
-#change_mobile_view_form input {
-    background-color: rgb(0, 0, 0);
-    color: white;
-    padding-top: 0px;
-    padding-bottom: 0px;
-    height: auto;
-}
-    
 td .dropdown { display: inline-block; }
 
 body .wysibb-body ul, body ol {

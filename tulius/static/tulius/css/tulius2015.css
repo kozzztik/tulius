@@ -1,0 +1,132 @@
+.menu {
+    width: 63px;
+    left: 0px;
+    top: 0px;
+    bottom: 0px;
+    position: fixed;
+    background: url("../img/bg2.png") repeat-y;
+    padding-left: 10px;
+    padding-right: 10px;
+    background-position: top right;
+    z-index: 10;
+}
+
+.menu > * {
+    margin-top: 10px;
+}
+
+.menu .brand_icon {
+    display: block;
+    width: 52px;
+    height: 52px;
+    margin-left: 5px;
+}
+
+.menu .menu-notif-list {
+    background-color: #6b5c3d;
+    border-radius: 5px;
+    border: 2px solid #c8b077;
+    padding: 5px;
+}
+
+.menu .menu-notif-list .new_messages {
+    width: 50px;
+    height: 43px;
+    background: url("../img/indic.png");
+}
+
+.menu .menu-notif-list .new_invites {
+    width: 50px;
+    height: 43px;
+    background: url("../img/indic.png") repeat scroll 0% 100%;
+}
+
+.menu ul {
+    list-style: outside none none;
+    margin-left: 10px;
+}
+
+.menu > ul > li > a {
+    width: 70px;
+    height: 70px;
+    display: block;
+    background: url("../img/but.png") repeat scroll -13px 70px;
+}
+
+.menu .catalog {background-position: -13px 70px;}
+.menu .catalog.active {background-position: -13px 0px;}
+.menu .profile {background-position: -213px 70px;}
+.menu .profile.active {background-position: -213px 0px;}
+.menu .articles {background-position: -313px 70px;}
+.menu .articles.active {background-position: -313px 0px;}
+.menu .admin {background-position: -113px 70px;}
+.menu .admin.active {background-position: -113px 0px;}
+
+.menu .scroll-up {background-position: -713px 0px;}
+.menu .scroll-down {background-position: -613px 0px;}
+.menu .login {background-position: -413px 0px;}
+.menu .logout {background-position: -513px 0px;}
+
+.menu .menu-login {
+    bottom: 0px;
+    position: absolute;
+    margin-bottom: 0px;
+}
+
+.menu .menu-login li a, .menu .menu-scroll li a, .menu .active {
+    width: 65px;
+    margin-left: 8px;
+    height: 97px;
+}
+
+.menu .menu-scroll {
+    bottom: 150px;
+    position: absolute;
+}
+
+.menu-background {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    background-color: #000;
+    opacity: 0.5;
+    z-index: 5;
+    display: none;
+}
+
+ul.sub-menu {
+    list-style: outside none none;
+    width: 200px;
+    background-image: url("../img/bg5.gif");
+    position: fixed;
+    top: 0px;
+    bottom: 0px;
+    left: 83px;
+    margin: 0px;
+    z-index: 8;
+    padding: 25px;
+    color: black;
+    font-size: 17.5px;
+    display: none;
+}
+
+ul.sub-menu a:hover, ul.sub-menu a:focus {
+    color: black;
+}
+
+ul.sub-menu a { color: #AE1303; }
+
+body {
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    background-color: #333;
+}
+
+@media (max-height: 750px) {
+    .menu-scroll { display: none; }
+}
+
+@media (max-height: 850px) {
+    .scroll-down { display: none !important; }
+}

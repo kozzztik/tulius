@@ -1,11 +1,3 @@
-html { 
-}
-
-body { 
-    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
-    background-image: url("../img/baselayout/footer.gif");
-}
-
 #background {
     _background: black url("../img/baselayout/bg.gif") left top repeat;
     background-color: #333;
@@ -45,7 +37,6 @@ body {
 }
 
 #content-center { 
-    margin-top: 40px;  
     -moz-box-shadow: 0 0 20px rgba(0,0,0,0.6); /* Для Firefox */
     -webkit-box-shadow: 0 0 20px rgba(0,0,0,0.6); /* Для Safari и Chrome */
     box-shadow: 0 0 20px rgba(0,0,0,0.6); /* Параметры тени */
