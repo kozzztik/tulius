@@ -328,7 +328,6 @@ footer.footer a { color: #c8c29e}
 
 @media (max-width: 767px) {
     body {
-        padding-left: 0px;
         padding-right: 0px;
     }
 }
@@ -358,6 +357,7 @@ footer.footer a { color: #c8c29e}
     #content-center .content {
         margin-top: 0px;
         border-radius: 0px;
+        padding-left: 20px;
     }
     #content-center .content .caption {
         display: none;

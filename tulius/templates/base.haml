@@ -114,15 +114,30 @@
                     %li
                         - with player=request.user
                             - include 'players/snippets/avatar.haml'
+                    %li.player-info
+                            = request.user.username
+                            - with player=request.user
+                                - include 'players/snippets/stars.haml'
+                            - if request.user.rank
+                                = request.user.rank
                     %li
                         %a{href: '{% url "players:profile" %}'}
-                            {% trans "Private messages" %}
+                            {% trans "Profile" %}
+                    %li
+                        %a{href: '{% url "players:profile" %}'}
+                            {% trans "Messages" %}
                     %li
                         %a{href: '{% url "players:profile" %}'}
                             {% trans "Favorites" %}
                     %li
                         %a{href: '{% url "players:profile" %}'}
                             {% trans "Settings" %}
+                    %li
+                        %a{href: '{% url "players:profile" %}'}
+                            {% trans "Problems" %}
+                    %li
+                        %a{href: '{% url "players:profile" %}'}
+                            {% trans "Subscriptions" %}
                     %li
                         %a.profile-logout{href: '{% url "auth:logout" %}'}
                             {% trans "Logout" %}

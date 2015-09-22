@@ -5,7 +5,7 @@
     bottom: 0px;
     position: fixed;
     background: url("../img/bg2.png") repeat-y;
-    padding-left: 10px;
+    padding-left: 5px;
     padding-right: 10px;
     background-position: top right;
     z-index: 10;
@@ -102,34 +102,44 @@ ul.sub-menu {
     position: fixed;
     top: 0px;
     bottom: 0px;
-    left: 73px;
+    left: 68px;
     margin: 0px;
     z-index: 8;
     padding: 5px 25px 25px 30px;
     color: black;
-    font-size: 17.5px;
+    font-size: 20px;
+    font-weight: bold;
     display: none;
 }
 ul.sub-menu > li.header {
     border-bottom: solid 1px black;
     margin-bottom: 20px;
-    font-size: 18px;
-    font-weight: bold;
     line-height: 40px;
 }
 
-ul.submenu, ul.submenu li  ul {
-    list-style: outside none none;
+ul.sub-menu li {
+    margin-bottom: 20px;
 }
 
-ul.submenu li { line-height: 25px; }
+ul.sub-menu li ul {
+    list-style: outside none none;
+    margin-top: 10px;
+}
 
 ul.sub-menu a:hover, ul.sub-menu a:focus { color: black; }
 ul.sub-menu a { color: #AE1303; }
 
+#profile-menu .player-info {
+    line-height: 20px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
 body {
     font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
     background-color: #333;
+    padding-left: 68px;
+    padding-right: 0px  !important;
 }
 
 @media (max-height: 750px) {
@@ -142,7 +152,9 @@ body {
 
 @media (max-height: 500px) {
     .logout{ display: none !important; }
-    .profile-logout{}
+    #profile-menu .player-info  { display: none !important; }
+    #profile-menu .player-avatar  { display: none !important; }
+    ul.sub-menu li { margin-bottom: 10px !important; }
 }
 
 @media (min-height: 500px) {
@@ -151,4 +163,8 @@ body {
 
 @media (max-height: 330px) {
     .menu-login { display: none !important; }
+}
+
+@media (min-width: 768px) and (max-width: 1200px) {
+    .container { width: auto !important; }
 }
