@@ -352,19 +352,16 @@ msgstr "Не назначен"
 #: .\counters\templates\counters\success.haml:8
 #: .\counters\templates\counters\success.haml:12 .\templates\base.haml:116
 #: .\templates\base_game.haml:79
-#, fuzzy
 msgid "Counters"
-msgstr "Пользователи"
+msgstr "Счетчики"
 
 #: .\counters\templates\counters\index.haml:10
-#, fuzzy
 msgid "Update forum counters"
-msgstr "Обновить счетчики"
+msgstr "Обновить счетчики форума"
 
 #: .\counters\templates\counters\index.haml:13
-#, fuzzy
 msgid "Update personal messages counters"
-msgstr "Обновить счетчики"
+msgstr "Обновить личные счетчики сообщений"
 
 #: .\counters\templates\counters\success.haml:15
 #: .\forum\templates\forum\fixes\success.haml:5
@@ -1729,7 +1726,7 @@ msgstr "отправитель"
 
 #: .\games\requests_view.py:59
 msgid "make request"
-msgstr "сделать запрос"
+msgstr "подать заявку"
 
 #: .\games\requests_view.py:74
 msgid "You must answer on question"
@@ -1737,7 +1734,7 @@ msgstr "Вы должны ответить на вопрос"
 
 #: .\games\requests_view.py:102
 msgid "Game request was successfully created"
-msgstr "Запрос на игру успешно отправлен"
+msgstr "Заявка на игру успешно отправлена"
 
 #: .\games\views.py:44
 msgid "You are admin of this game"
@@ -1745,11 +1742,11 @@ msgstr "Вы администратор этой игры"
 
 #: .\games\views.py:54
 msgid "You sended request to play this game"
-msgstr "Вы отправили запрос на эту игру"
+msgstr "Вы отправили заявку на эту игру"
 
 #: .\games\views.py:58
 msgid "This game is open for registration, you can send request to play it"
-msgstr "Эта игра открыта для регистрации, вы можете отправить запрос на нее"
+msgstr "Эта игра открыта для регистрации, вы можете отправить заявку на нее"
 
 #: .\games\views.py:62
 msgid "You can`t join this game, it is full"
@@ -1770,12 +1767,10 @@ msgid "New games"
 msgstr "Новые игры"
 
 #: .\games\views.py:84 .\games\templates\games\index.haml:19
-#, fuzzy
 msgid "Reception of requests to play"
-msgstr "Заявка на игру "
+msgstr "Прием заявок на игру "
 
 #: .\games\views.py:86 .\games\templates\games\index.haml:23
-#, fuzzy
 msgid "Awaiting start games"
 msgstr "Ожидают старта"
 
@@ -2443,7 +2438,7 @@ msgid ""
 "But every time it is a potential bug sitation, so, all information about "
 "occured exceptions is colleced here."
 msgstr ""
-"Но в каждом случае, это ситуация - потенциальный баг. Так что вся "
+"Но во всяком случае, эта ситуация - потенциальный баг. Так что вся "
 "информация  о произошедших исключениях собрана здесь."
 
 #: .\players\templates\players\exceptions.haml:35
@@ -3403,7 +3398,7 @@ msgstr ""
 #: .\templates\registration\activation_email.txt:5
 msgid "To vo verify, that you registred on our site just visit next link:"
 msgstr ""
-"Что-бы подтвердить, что вы зарегистрировались на нашем сайте, просто "
+"Чтобы подтвердить, что вы зарегистрировались на нашем сайте, просто "
 "пройдите по ссылке:"
 
 #: .\templates\registration\activation_email.txt:9
