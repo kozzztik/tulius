@@ -30,14 +30,16 @@
 .menu .menu-notif-list .new_messages {
     width: 50px;
     height: 43px;
-    background: url("../img/indic.png");
+    background: url("../img/indic.png") 0px -86px;
 }
+.menu .new_messages.active {background-position: 0px 0px}
 
 .menu .menu-notif-list .new_invites {
     width: 50px;
     height: 43px;
-    background: url("../img/indic.png") repeat scroll 0% 100%;
+    background: url("../img/indic.png") repeat scroll 0px -129px;
 }
+.menu .new_invites.active {background-position: 0px -43px;}
 
 .menu ul {
     list-style: outside none none;
@@ -144,6 +146,7 @@ body {
 
 @media (max-height: 750px) {
     .menu-scroll, .menu .brand_icon { display: none; }
+    #profile-menu .player-info  { display: none !important; }
 }
 
 @media (max-height: 850px) {
@@ -152,7 +155,6 @@ body {
 
 @media (max-height: 500px) {
     .logout{ display: none !important; }
-    #profile-menu .player-info  { display: none !important; }
     #profile-menu .player-avatar  { display: none !important; }
     ul.sub-menu li { margin-bottom: 10px !important; }
 }

@@ -69,6 +69,7 @@ INSTALLED_APPS = (
     'pm',
     'tulius',
     'tulius.players',
+    'tulius.profile',
     'tulius.games',
     'tulius.forum',
     'tulius.stories',
@@ -134,7 +135,7 @@ CROWD = {
 AUTHENTICATION_BACKENDS = (
     'tulius.vk.backend.VKBackend',
     'django.contrib.auth.backends.ModelBackend',
-    'djfw.bugtracker.atlassian.crowd.CrowdBackend', 
+    #'djfw.bugtracker.atlassian.crowd.CrowdBackend',
 )
 
 BUGTRACKER = {

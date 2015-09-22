@@ -30,6 +30,8 @@ urlpatterns = patterns('',
     url(r'^statistics/$', StatisticsView.as_view(), name='stats'),
 
     url(r'^players/', include('tulius.players.urls', namespace='players')),
+    url(r'^profile/', include('tulius.profile.urls', namespace='profile')),
+    url(r'^pm/', include('pm.urls', namespace='pm')),
     url(r'^games/', include('tulius.games.urls',  namespace='games')),
     url(r'^forums/', include(forum.site.urls)),
     url(r'^stories/', include('tulius.stories.urls',  namespace='stories')),

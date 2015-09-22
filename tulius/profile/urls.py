@@ -1,0 +1,16 @@
+from django.conf.urls import patterns, url
+from .views import *
+#from .avatar_upload import profile_upload_avatar
+
+
+urlpatterns = patterns('',
+    url(r'^favorites/$', PlayerFavoritesView.as_view(), name='favorites'),
+    url(r'^stories/$', PlayerStoriesView.as_view(), name='stories'),
+    url(r'^games/$', PlayerGamesView.as_view(), name='games'),
+    url(r'^settings/$', PlayerSettingsView.as_view(), name='settings'),
+    url(r'^invites/$', InvitesView.as_view(), name='invites'),
+    url(r'^invite_accept(?P<invite_id>\d+)/$', PlayerInviteAcceptView.as_view(), name='invite_accept'),
+    url(r'^invite_decline(?P<invite_id>\d+)/$', PlayerInviteDeclineView.as_view(), name='invite_decline'),
+    url(r'^found_bugs/$', PlayerFoundBugsView.as_view(), name='found_bugs'),
+    url(r'^subscriptions/$', PlayerSubscriptionsView.as_view(), name='subscriptions'),
+)

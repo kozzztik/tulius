@@ -1,0 +1,60 @@
+- extends 'base.haml'
+- load i18n
+- load url from future
+
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: ''}
+            {% trans "Games" %}
+
+- block caption
+    {% trans "Games" %}
+
+- block content
+    {% trans "Here are presented your games:" %}
+
+    #games_accordion
+        %h3
+            %a{href: '#'}
+                {% trans "Current games" %}
+        %div
+            - if current_games
+                %table.table
+                    - for game in current_games
+                        %tr
+                            %td.profile-gamelist
+                                - include 'games/snippets/game_as_list_short.haml'
+            - if not current_games
+                %br
+                {% trans "You have no current games now." %}
+        %h3
+            %a{href: '#'}
+                {% trans "Administrated games" %}
+        %div
+            - if admined_games
+                %table.table
+                    - for game in admined_games
+                        %tr
+                            %td.profile-gamelist
+                                - include 'games/snippets/game_as_list_short.haml'
+            - if not admined_games
+                %br
+                {% trans "You do not admin any games yet." %}
+        %h3
+            %a{href: '#'}
+                {% trans "Archive" %}
+        %div
+            - if old_games
+                %table.table
+                    - for game in old_games
+                        %tr
+                            %td.profile-gamelist
+                                - include 'games/snippets/game_as_list_short.haml'
+            - if not old_games
+                %br
+                {% trans "You do no finished games yet" %}
+
+    <script>
+        $( "#games_accordion" ).accordion({ collapsible: true, heightStyle: "content" });
+    </script>
