@@ -1,5 +1,5 @@
 .menu {
-    width: 63px;
+    width: 53px;
     left: 0px;
     top: 0px;
     bottom: 0px;
@@ -19,14 +19,12 @@
     display: block;
     width: 52px;
     height: 52px;
-    margin-left: 5px;
 }
 
 .menu .menu-notif-list {
     background-color: #6b5c3d;
     border-radius: 5px;
     border: 2px solid #c8b077;
-    padding: 5px;
 }
 
 .menu .menu-notif-list .new_messages {
@@ -43,7 +41,7 @@
 
 .menu ul {
     list-style: outside none none;
-    margin-left: 10px;
+    margin-left: 0px;
 }
 
 .menu > ul > li > a {
@@ -51,6 +49,7 @@
     height: 70px;
     display: block;
     background: url("../img/but.png") repeat scroll -13px 70px;
+    margin-bottom: 5px;
 }
 
 .menu .catalog {background-position: -13px 70px;}
@@ -73,10 +72,10 @@
     margin-bottom: 0px;
 }
 
-.menu .menu-login li a, .menu .menu-scroll li a, .menu .active {
+.menu .menu-login li a, .menu .menu-scroll li a,
+.menu > ul > li > a.active {
     width: 65px;
     margin-left: 8px;
-    height: 97px;
 }
 
 .menu .menu-scroll {
@@ -103,19 +102,29 @@ ul.sub-menu {
     position: fixed;
     top: 0px;
     bottom: 0px;
-    left: 83px;
+    left: 73px;
     margin: 0px;
     z-index: 8;
-    padding: 25px;
+    padding: 5px 25px 25px 30px;
     color: black;
     font-size: 17.5px;
     display: none;
 }
-
-ul.sub-menu a:hover, ul.sub-menu a:focus {
-    color: black;
+ul.sub-menu > li.header {
+    border-bottom: solid 1px black;
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 40px;
 }
 
+ul.submenu, ul.submenu li  ul {
+    list-style: outside none none;
+}
+
+ul.submenu li { line-height: 25px; }
+
+ul.sub-menu a:hover, ul.sub-menu a:focus { color: black; }
 ul.sub-menu a { color: #AE1303; }
 
 body {
@@ -124,9 +133,22 @@ body {
 }
 
 @media (max-height: 750px) {
-    .menu-scroll { display: none; }
+    .menu-scroll, .menu .brand_icon { display: none; }
 }
 
 @media (max-height: 850px) {
     .scroll-down { display: none !important; }
+}
+
+@media (max-height: 500px) {
+    .logout{ display: none !important; }
+    .profile-logout{}
+}
+
+@media (min-height: 500px) {
+    .profile-logout { display: none !important; }
+}
+
+@media (max-height: 330px) {
+    .menu-login { display: none !important; }
 }

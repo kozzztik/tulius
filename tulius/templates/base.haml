@@ -51,8 +51,9 @@
                 %ul.menu-list
                     %li
                         %a.catalog{href: '#', data-toggle: '#catalog-menu'}
-                    %li
-                        %a.profile{href: '#', data-toggle: '#profile-menu'}
+                    - if not request.user.is_anonymous
+                        %li
+                            %a.profile{href: '#', data-toggle: '#profile-menu'}
                     %li
                         %a.articles{href: '#', data-toggle: '#articles-menu'}
                     - if request.user.is_superuser
@@ -70,31 +71,30 @@
                             %a.logout{href: '{% url "auth:logout" %}'}
                     - else
                         %li
-                            %a.login{data-toggle: 'modal', href: '#loginModal'}
+                            %a.login.hidden-phone{data-toggle: 'modal', href: '#loginModal'}
+                            %a.login.visible-phone{href: '{% url "auth:login" %}'}
             %ul#catalog-menu.sub-menu
+                %li.header
+                    {% trans "Sections" %}
                 %li
-                    {% trans "Games" %}
+                    %a{href: '{% url "games:index" %}'}
+                        {% trans "Games" %}
                     %ul
                         %li
-                            %a{href: '{% url "games:index" %}'}
-                                {% trans "All games" %}
-                            %li
-                                %br
-                            %li
-                                %a{href: '{% url "games:announced_games" %}'}
-                                    {% trans "Announced games" %}
-                            %li
-                                %a{href: '{% url "games:request_accepting_games" %}'}
-                                    {% trans "Accepting requests" %}
-                            %li
-                                %a{href: '{% url "games:awaiting_start_games" %}'}
-                                    {% trans "Awaiting start" %}
-                            %li
-                                %a{href: '{% url "games:current_games" %}'}
-                                    {% trans "Current games" %}
-                            %li
-                                %a{href: '{% url "games:completed_opened_games" %}'}
-                                    {% trans "Opened completed" %}
+                            %a{href: '{% url "games:announced_games" %}'}
+                                {% trans "Announced games" %}
+                        %li
+                            %a{href: '{% url "games:request_accepting_games" %}'}
+                                {% trans "Accepting requests" %}
+                        %li
+                            %a{href: '{% url "games:awaiting_start_games" %}'}
+                                {% trans "Awaiting start" %}
+                        %li
+                            %a{href: '{% url "games:current_games" %}'}
+                                {% trans "Current games" %}
+                        %li
+                            %a{href: '{% url "games:completed_opened_games" %}'}
+                                {% trans "Opened completed" %}
                 %li
                     %a{href: '{% url "players:index" %}'}
                        {% trans "Players" %}
@@ -107,25 +107,28 @@
                 %li
                     %a{href: '{% url "news:index" %}'}
                         {% trans "News" %}
-            %ul#profile-menu.sub-menu
-                %li
-                    {% trans "Profile" %}
-                %li
-                    {% trans "Private messages" %}
-                %li
-                    {% trans "Favorites" %}
-                %li
-                    {% trans "Settings" %}
-            %ul#profile-menu.sub-menu
-                %li
-                    {% trans "Profile" %}
-                %li
-                    {% trans "Private messages" %}
-                %li
-                    {% trans "Favorites" %}
-                %li
-                    {% trans "Settings" %}
+            - if not request.user.is_anonymous
+                %ul#profile-menu.sub-menu
+                    %li.header
+                        {% trans "Profile" %}
+                    %li
+                        - with player=request.user
+                            - include 'players/snippets/avatar.haml'
+                    %li
+                        %a{href: '{% url "players:profile" %}'}
+                            {% trans "Private messages" %}
+                    %li
+                        %a{href: '{% url "players:profile" %}'}
+                            {% trans "Favorites" %}
+                    %li
+                        %a{href: '{% url "players:profile" %}'}
+                            {% trans "Settings" %}
+                    %li
+                        %a.profile-logout{href: '{% url "auth:logout" %}'}
+                            {% trans "Logout" %}
             %ul#articles-menu.sub-menu
+                %li.header
+                    {% trans "Articles" %}
                 %li
                     %a{href: '{% url "flatpages" %}'}
                         {% trans "All articles" %}
@@ -137,6 +140,8 @@
                                 = flatpage.title
             - if request.user.is_superuser
                 %ul#admin-menu.sub-menu
+                    %li.header
+                        {% trans "Admin panel" %}
                     %li
                         %a{href: '{% url "counters:index"%}'}
                             {% trans "Counters" %}
