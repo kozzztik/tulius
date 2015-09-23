@@ -1,7 +1,8 @@
 - extends 'base.haml'
-- load bugtracker
 - load i18n
 - load url from future
+- load bbcodes
+
 
 - block extra_scripts
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-players.css'}
@@ -33,7 +34,7 @@
                         %td
                             .messages-text
                                 %a{href: '{% url "pm:to_user" talking.sender.pk %}'}
-                                    = talking.last.body|safe|truncatewords:20
+                                    = talking.last.body|bbcode|safe|truncatewords:20
     - else
         %br
         {% trans "You have no messages yet" %}
