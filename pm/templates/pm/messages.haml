@@ -32,7 +32,7 @@
                                 = talking.last.created_at
                         %td
                             .messages-text
-                                %a{href: '{{ talking.sender.get_absolute_url }}#pm_messages'}
+                                %a{href: '{% url "pm:to_user" talking.sender.pk %}'}
                                     = talking.last.body|safe|truncatewords:20
     - else
         %br

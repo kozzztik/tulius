@@ -10,7 +10,6 @@ urlpatterns = patterns('',
         UserExceptions.as_view(template_name='players/exceptions.haml', pk_url_kwarg='player_id'), 
         name='player_exceptions'),
 
-    url(r'^(?P<player_id>\d+)/send/$', PlayerSendMessageView.as_view(), name='player_send_message'),
     url(r'^(?P<player_id>\d+)/history/$', PlayerHistoryView.as_view(), name='player_history'),
     url(r'^(?P<player_id>\d+)/played/$', PlayerUserProfileView.as_view(), name='player_played'),
     

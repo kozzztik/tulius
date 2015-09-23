@@ -10,12 +10,6 @@ class RankForm(forms.models.ModelForm):
         fields = ('rank',)
 
 
-class SendMessageForm(forms.models.ModelForm):
-    class Meta:
-        model = PrivateMessage
-        fields = ('body',)
-    
-
 PLAYERS_SORT_STORIES_AUTHORED = 0
 PLAYERS_SORT_GAMES_PLAYED_INC = 1
 PLAYERS_SORT_GAMES_PLAYED_DEC = 2

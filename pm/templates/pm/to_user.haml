@@ -1,0 +1,35 @@
+- extends 'base.haml'
+- load bugtracker
+- load i18n
+- load url from future
+
+- block extra_scripts
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-players.css'}
+
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: '{% url "pm:messages" %}'}
+            {% trans "Messages" %}
+    %li
+        .divider
+        %a{href: ''}
+            = player.username
+
+- block caption
+    {% trans "Messages" %}
+
+- block content
+
+    .messages-area
+        - include 'players/snippets/messages.haml'
+
+    %form.messages-form{method: 'POST', action: ''}
+        - csrf_token
+        = form.management_form
+        = form.body
+        %br
+        %button.submit.btn.btn-primary{'type': 'submit'}
+            {% trans "Send" %}
+        %a{'href': '{% url "players:player_history" player.id %}'}
+            {% trans "Message history" %}

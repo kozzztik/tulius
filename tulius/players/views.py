@@ -14,7 +14,7 @@ from tulius.games.models import GameGuest
 from tulius.gameforum import GAMEFORUM_SITE_ID
 from tulius.models import User
 from .models import stars
-from .forms import SendMessageForm, PlayersFilterForm, PLAYERS_SORT_STORIES_AUTHORED,\
+from .forms import PlayersFilterForm, PLAYERS_SORT_STORIES_AUTHORED,\
     PLAYERS_SORT_GAMES_PLAYED_INC, PLAYERS_SORT_GAMES_PLAYED_DEC, PLAYERS_SORT_REG_DATE, PLAYERS_SORT_ALPH,\
     RankForm
 from pm.models import PrivateMessage
@@ -22,12 +22,16 @@ from pm.models import PrivateMessage
 
 stars.flush_stars_cache()
 
+
 def filter_by_games(players):
-    return players.filter(roles__variation__game__status__in=[GAME_STATUS_COMPLETED, GAME_STATUS_COMPLETED_OPEN]).annotate(
+    return players.filter(roles__variation__game__status__in=[GAME_STATUS_COMPLETED,
+                                                              GAME_STATUS_COMPLETED_OPEN]).annotate(
         games=Count('roles__variation__game', distinct=True))
+
 
 def filter_by_stories(players):
     return players.annotate(stories=Count('authored_stories')).order_by('-stories')
+
 
 class PlayersListView(TemplateView):
     template_name='players/player_list.haml'
@@ -60,6 +64,7 @@ class PlayersListView(TemplateView):
             show_stories = True
         return locals()
 
+
 class PlayerView(DetailView):
     queryset = User.objects.filter(is_active=True)
     pk_url_kwarg = 'player_id'
@@ -68,8 +73,9 @@ class PlayerView(DetailView):
     def post(self, *args, **kwargs):
         return self.get(*args, **kwargs)
 
+
 class PlayerDetailsView(PlayerView):
-    template_name='players/index.haml'
+    template_name = 'players/index.haml'
     
     def get_context_data(self, **kwargs):
         player = self.object
@@ -89,45 +95,11 @@ class PlayerDetailsView(PlayerView):
                     messages.success(self.request, _('rank was successfully updated'))
                 else:
                     messages.error(self.request, _('there were some errors during form validation'))
-        show_messages = (not user.is_anonymous()) and (player.id <> user.id)
-        if show_messages:
-            message_list_tmp = PrivateMessage.objects.talking(user, player)
-            
-            pre_unread_messages = PrivateMessage.objects.filter(receiver=user, is_read=False)
-            pre_unread_messages_count = pre_unread_messages.count()
-            
-            unread = PrivateMessage.objects.filter(receiver=user, sender=player, is_read=False)
-            unread_count = unread.count()
-            count = 5
-            if unread_count > 5 :
-                count = unread_count
-            message_list_tmp = message_list_tmp.order_by('-id')[:count].all()
-            message_list = []
-            for message in message_list_tmp:
-                message_list = [message] + message_list
-            unread.update(is_read=True)
-            user.update_not_readed()
-        if not user.is_anonymous():
-            form = SendMessageForm()
         return locals()
-    
-class PlayerSendMessageView(View):
-    @method_decorator(login_required)
-    def post(self, request, player_id):
-        player = get_object_or_404(User, is_active=True, pk=player_id)
-        form = SendMessageForm(data=request.POST or None)
-        if form.is_valid():
-            message = form.save(commit=False)
-            message.sender = request.user
-            message.receiver = player
-            message.save()
-            messages.success(request, _('message send'))
-        else:
-            messages.error(request, _('there were some errors during form validation'))
-        return HttpResponseRedirect(reverse('players:player_details', args=(player.id,)) + '#pm_messages')
-        
+
+
 class PlayerHistoryView(TemplateView):
-    template_name='players/player_history.haml'
+    template_name = 'players/player_history.haml'
     
     @method_decorator(login_required)
     def get(self, *args, **kwargs):
@@ -138,6 +110,7 @@ class PlayerHistoryView(TemplateView):
         message_list = PrivateMessage.objects.talking(self.request.user, player)
         message_on_page = 50
         return locals()
+
 
 class Statistics:
     def __init__(self, user):
@@ -151,14 +124,17 @@ class Statistics:
         self.story_admin = StoryAdmin.objects.filter(user=user).count()
         self.story_author = StoryAuthor.objects.filter(user=user).count()
         self.total_games = variations.count()   
-        
+
+
 def get_played(request_user, player=None):
     if player:
         user = player
     else:
         user = request_user
     played_games = []    
-    played_roles = Role.objects.filter(user=user, variation__game__status__in=[GAME_STATUS_COMPLETED, GAME_STATUS_COMPLETED_OPEN]).order_by('-variation__game__id')
+    played_roles = Role.objects.filter(user=user,
+                                       variation__game__status__in=[GAME_STATUS_COMPLETED, GAME_STATUS_COMPLETED_OPEN]
+                                       ).order_by('-variation__game__id')
     for role in played_roles:
         if role.variation.game.read_right(request_user):
             role.variation.game.url = role.variation.thread.get_absolute_url
@@ -168,14 +144,16 @@ def get_played(request_user, player=None):
         if game.read_right(request_user):
             game.url = game.variation.thread.get_absolute_url
     return played_roles, played_games_uniq
-        
+
+
 class LoginTemplateView(TemplateView):
     @method_decorator(login_required)
     def get(self, *args, **kwargs):
         return super(LoginTemplateView, self).get(*args, **kwargs)
 
+
 class PlayerProfileView(LoginTemplateView):
-    template_name='profile/index.haml'
+    template_name = 'profile/index.haml'
     
     @method_decorator(login_required)
     def post(self, *args, **kwargs):
@@ -201,16 +179,19 @@ class PlayerProfileView(LoginTemplateView):
                     messages.error(request, _('there were some errors during form validation'))
         return locals()
 
+
 class PlayerPlayedView(LoginTemplateView):
-    template_name='profile/played.haml'
+    template_name = 'profile/played.haml'
     
     def get_context_data(self, **kwargs):
         played_roles, played_games = get_played(self.request.user)
         roles_on_page = 50
         return locals()
 
+
 class PlayerUserProfileView(PlayerView):
-    template_name='players/played.haml'
+    template_name = 'players/played.haml'
+
     def get_context_data(self, **kwargs):
         player = self.object
         played_roles, played_games = get_played(self.request.user, player)
@@ -219,7 +200,7 @@ class PlayerUserProfileView(PlayerView):
 
 
 class PlayerUploadedFilesView(LoginTemplateView):
-    template_name='profile/files.haml'
+    template_name = 'profile/files.haml'
     
     def get_context_data(self, **kwargs):
         return {'files': UploadedFile.objects.filter(user=self.request.user)}
