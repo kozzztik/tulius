@@ -35,7 +35,7 @@
                         - if message.sender.id = request.user.id
                             {% trans "You" %}
                         - else
-                            %a{'href': '{{ message.sender.profile.get_absolute_url }}'}
+                            %a{'href': '{{ message.sender.get_absolute_url }}'}
                                 = message.sender
                         %br
                         %small

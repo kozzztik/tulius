@@ -42,6 +42,9 @@
                 - if player.rank
                     %p
                         = player.rank
+            - if not request.user.is_anonymous
+                %a.btn.btn-primary{href: '{% url "pm:to_user" player.pk %}'}
+                    {% trans "Send message" %}
             - if player.sex
                 %p
                     {% trans "Sex:" %}
