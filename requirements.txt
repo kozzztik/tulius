@@ -1,6 +1,6 @@
 django == 1.6.3
 django-grappelli == 2.4.12
-#pillow
+pillow
 MySQL-python
 # database migration
 south
@@ -31,4 +31,4 @@ raven
 gevent
 redis
 django-websocket-redis
-django-redis-sessions
+django-redis-cache
