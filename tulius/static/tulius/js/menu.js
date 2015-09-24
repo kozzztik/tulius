@@ -24,7 +24,7 @@ $(document).ready(function() {
 
 
     var ws4redis = WS4Redis({
-        uri: 'ws://127.0.0.1:8000/ws/pm?subscribe-user',
+        uri: websocket_uri + 'pm?subscribe-user',
         receive_message: receiveMessage,
         heartbeat_msg: 'heartbeat'
     });

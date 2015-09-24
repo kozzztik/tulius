@@ -32,6 +32,9 @@
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}autocomplete/autocomplete-select.js'}
     %script{type: 'text/javascript', src: '{{ MEDIA_URL }}rcrumbs/jquery.rcrumbs.min.js'}
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}js/ws4redis.js'}
+    <script type='text/javascript'>
+        var websocket_uri = '{{ WEBSOCKET_URI }}';
+    </script>
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}tulius/js/menu.js'}
 
     - include "inlineformsets/init.html"
