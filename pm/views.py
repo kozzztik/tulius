@@ -56,5 +56,13 @@ class PlayerSendMessageView(DetailView):
         self.object = self.get_object()
         form = PrivateMessageForm(request.user, self.object, data=request.POST or None)
         if form.is_valid():
-            form.save()
+            m = form.save()
+            # if the publisher is required only for fetching messages, use an
+            # empty constructor, otherwise reuse an existing redis_publisher
+            from ws4redis.publisher import RedisPublisher
+            from ws4redis.redis_store import RedisMessage
+            redis_publisher = RedisPublisher(facility='pm', users=[self.object.username])
+            message = RedisMessage(str(m.pk))
+            # and somewhere else
+            redis_publisher.publish_message(message)
         return HttpResponseRedirect(reverse('pm:to_user', args=(self.object.pk,)))

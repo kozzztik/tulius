@@ -21,4 +21,16 @@ $(document).ready(function() {
         var $elem = $('body');
         $('html, body').animate({scrollTop: $elem.height()}, 800);
    });
+
+
+    var ws4redis = WS4Redis({
+        uri: 'ws://127.0.0.1:8000/ws/pm?subscribe-user',
+        receive_message: receiveMessage,
+        heartbeat_msg: 'heartbeat'
+    });
+    // receive a message though the websocket from the server
+    function receiveMessage(msg) {
+        $('.new_messages').addClass('active')
+        //alert(msg);
+    }
 });

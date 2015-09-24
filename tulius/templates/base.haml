@@ -26,13 +26,14 @@
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}djfw/bootstrap/js/bootstrap.min.js'}
     
 - block sitewide_scripts
-    %script{type: 'text/javascript', src: '{{ STATIC_URL }}tulius/js/menu.js'}
     %script{type: 'text/javascript', src: '{{ MEDIA_URL }}js/jquery.cookie.js'}
     %script{type: 'text/javascript', src: '{{ MEDIA_URL }}js/jquery.history.js'}
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}photos/jquery-lightbox/js/lightbox.js'}
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}autocomplete/autocomplete-select.js'}
     %script{type: 'text/javascript', src: '{{ MEDIA_URL }}rcrumbs/jquery.rcrumbs.min.js'}
-        
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}js/ws4redis.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}tulius/js/menu.js'}
+
     - include "inlineformsets/init.html"
     
     - block extra_scripts

@@ -18,3 +18,4 @@ class PrivateMessageForm(forms.ModelForm):
         pm.receiver = self.receiver
         pm.sender = self.sender
         pm.save()
+        return pm
