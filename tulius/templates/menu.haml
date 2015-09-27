@@ -39,7 +39,7 @@
         - else
             %li
                 %a.login.hidden-phone{data-toggle: 'modal', href: '#loginModal', title: '{% trans "Login" %}'}
-                %a.login.visible-phone{href: '{% url "auth:login" %}', title: '{% trans "Login" %}'}
+                %a.login.visible-phone{href: '{% url "auth:login_choose" %}', title: '{% trans "Login" %}'}
 %ul#catalog-menu.sub-menu
     %li.header
         {% trans "Sections" %}

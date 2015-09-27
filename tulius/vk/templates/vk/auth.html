@@ -1,13 +1,4 @@
 {% load i18n %}
-{% if datablocks.social_warning %}
-<div class='alert alert-block'>
-    <h4>
-    {% trans "Warning!" %}
-    </h4>
-    {% trans "If you already have account, please read " %}
-    <a href="{{ datablocks.social_warning }}"> {% trans "this" %}</a>
-</div>
-{% endif %}
 <h4>
     {% trans "Enter through:" %}
 </h4>

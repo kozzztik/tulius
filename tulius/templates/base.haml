@@ -117,48 +117,7 @@
                         %h3
                             {% trans "Login" %}
                     .modal-body
-                        - include 'vk/auth.html'
-                        %label{for: 'id_username'}
-                            {% trans "Username" %}:
-                        %input#id_username{name: 'username', maxlength: '100', type: 'text'}
-                        %label{for: 'id_password'}
-                            {% trans "Password" %}:
-                        %input#id_password{name: 'password', maxlength: '100', type: 'password'}
-                        %input#id_next{name: 'next', maxlength: '100', type: 'hidden', value: '{{ request.get_full_path }}'}
-                    .modal-footer
-                        %button.btn.btn-primary{type: 'submit'}
-                            {% trans "Login" %}
-            - block auth_modal
-                %form#signupModal.modal.hide.fade.in.well{method: 'POST', action: '{% url "registration_register" %}'}
-                    - csrf_token
-                    .modal-header
-                        %a.close{data-dismiss: "modal"}×
-                        %h3
-                            {% trans "Sign up" %}
-                    .modal-body
-                        %label{for: 'id_username'}
-                            {% trans "Username" %}:
-                        %input#id_username{name: 'username', maxlength: '100', type: 'text'}
-                        %label{for: 'id_email'}
-                            {% trans "E-mail" %}:
-                        %input#id_email{name: 'email', maxlength: '100', type: 'text'}
-                        %label{for: 'id_password1'}
-                            {% trans "Password" %}:
-                        %input#id_password1{name: 'password1', maxlength: '100', type: 'password'}
-                        %label{for: 'id_password2'}
-                            {% trans "Password repeat" %}:
-                        %input#id_password2{name: 'password2', maxlength: '100', type: 'password'}
-                        - if datablocks.usage_rules
-                            %p
-                                {% trans "By sign up you apply" %}
-                                <a href="{{ datablocks.usage_rules }}">{% trans "service usage rules" %}</a>.
-                        - if datablocks.confident
-                            %p
-                                {% trans "Data you submit is protected by service" %}
-                                <a href="{{ datablocks.confident }}">{% trans "confidential policy" %}</a>.
-                    .modal-footer
-                        %button.btn.btn-primary{type: 'submit'}
-                            {% trans "Sign up" %}
+                        - include "login/snippets/login.haml"
         .hidden-phone
             - include 'bugtracker/add_bug_button.html'
     <script type="text/javascript">

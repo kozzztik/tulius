@@ -1,0 +1,22 @@
+- extends 'base.haml'
+- load i18n
+- load url from future
+
+- block breadcrumbs
+        %li
+            .divider
+            %a{href: '{% url "auth:registration_register" }'}
+                {% trans 'Register' %}
+        %li
+            .divider
+            %a{href: '{% url "" }'}
+                {% trans 'Activation' %}
+
+- block caption
+    {% trans "Activation" %}
+
+- block content
+    %h2
+        {% trans "Profile activation failed" %}
+    %p
+        {% trans "Provided activation key doesn't seem to be correct, sorry." %}

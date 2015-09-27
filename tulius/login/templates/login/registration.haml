@@ -1,0 +1,32 @@
+- extends 'base.haml'
+- load i18n
+
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: '{% url "auth:login_choose" %}'}
+            {% trans "Choose login type" %}
+    %li
+        .divider
+        %a{href: ''}
+            {% trans 'Registration' %}
+
+- block caption
+    {% trans "Registration" %}
+
+- block content
+    %p
+        {% trans "By sign up you apply" %}
+        %a{href: "{{ datablocks.usage_rules }}"}
+            {% trans "service usage rules" %}
+    %p
+        {% trans "Data you submit is protected by service" %}
+        %a{href: "{{ datablocks.confident }}"}
+            {% trans "confidential policy" %}
+    - include "snippets/form.haml"
+    -# %form{method: 'POST', action: ''}
+    -#    %fieldset
+    -#        - csrf_token
+    -#        = form
+    -#    %button.btn.btn-primary{type: 'submit'}
+    -#        {% trans "Sign up" %}
