@@ -26,12 +26,11 @@
         - if request.user.is_superuser
             %li
                 %a.admin{href: '#', data-toggle: '#admin-menu', title: '{% trans "Admin panel" %}'}
-    - if request.user.is_superuser
-        %ul.menu-scroll
-            %li
-                %a.scroll-up{href: '#', title: '{% trans "Go to page top" %}'}
-            %li
-                %a.scroll-down{href: '#', title: '{% trans "Go to page bottom" %}'}
+    %ul.menu-scroll
+        %li
+            %a.scroll-up{href: '#', title: '{% trans "Go to page top" %}'}
+        %li
+            %a.scroll-down{href: '#', title: '{% trans "Go to page bottom" %}'}
     %ul.menu-login
         - if not request.user.is_anonymous
             %li
