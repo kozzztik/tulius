@@ -254,6 +254,10 @@ ul.comma-list > li:last-child:after { content: '.'; }
     letter-spacing: 0.01em;
 }
 
+.post-title {
+    padding: 5px 5px 5px 15px;
+}
+
 #comments_container {
     min-height: 150px;
 }
