@@ -1,7 +1,6 @@
 django == 1.6.3
 django-grappelli == 2.4.12
-#pillow
-PIL
+pillow
 MySQL-python
 # database migration
 south
