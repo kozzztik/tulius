@@ -249,7 +249,7 @@ ul.comma-list > li:last-child:after { content: '.'; }
  }
  
  .post-compact,  .post-compact p {
-    font-size: 12px;
+    font-size: 13px;
     line-height: 14px;
 }
 
