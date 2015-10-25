@@ -2,7 +2,7 @@
 
 .menu
     %a.brand_icon{href: '/'}
-        %img{src: '{{ STATIC_URL }}tulius/img/logo.png'}
+        %img{src: '{{ STATIC_URL }}tulius/img/logo_small.png'}
     - if not request.user.is_anonymous
         .menu-notif-list
             %a{href: '{% url "pm:messages" %}'}
@@ -28,9 +28,9 @@
                 %a.admin{href: '#', data-toggle: '#admin-menu', title: '{% trans "Admin panel" %}'}
     %ul.menu-scroll
         %li
-            %a.scroll-up{href: '#', title: '{% trans "Go to page top" %}'}
+            %a.scroll-up.small{href: '#', title: '{% trans "Go to page top" %}'}
         %li
-            %a.scroll-down{href: '#', title: '{% trans "Go to page bottom" %}'}
+            %a.scroll-down.small{href: '#', title: '{% trans "Go to page bottom" %}'}
     %ul.menu-login
         - if not request.user.is_anonymous
             %li

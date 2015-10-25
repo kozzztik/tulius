@@ -1,11 +1,10 @@
 .menu {
-    width: 53px;
+    width: 38px;
     left: 0px;
     top: 0px;
     bottom: 0px;
     position: fixed;
     background: url("../img/bg2.png") repeat-y;
-    padding-left: 5px;
     padding-right: 10px;
     background-position: top right;
     z-index: 10;
@@ -13,33 +12,34 @@
 
 .menu > * {
     margin-top: 10px;
+    margin-left: 4px;
 }
 
 .menu .brand_icon {
     display: block;
-    width: 52px;
-    height: 52px;
+    width: 31px;
+    height: 31px;
 }
 
-.menu .menu-notif-list {
+/*.menu .menu-notif-list {
     background-color: #6b5c3d;
     border-radius: 5px;
     border: 2px solid #c8b077;
-}
+}*/
 
 .menu .menu-notif-list .new_messages {
-    width: 50px;
-    height: 43px;
-    background: url("../img/indic.png") 0px -86px;
+    width: 31px;
+    height: 30px;
+    background: url("../img/indic.png") 0px -59px;
 }
-.menu .new_messages.active {background-position: 0px 0px}
+.menu .new_messages.active {background-position: 0px 2px}
 
 .menu .menu-notif-list .new_invites {
-    width: 50px;
-    height: 43px;
-    background: url("../img/indic.png") repeat scroll 0px -129px;
+    width: 31px;
+    height: 31px;
+    background: url("../img/indic.png") repeat scroll 0px -88px;
 }
-.menu .new_invites.active {background-position: 0px -43px;}
+.menu .new_invites.active {background-position: 0px -27px;}
 
 .menu ul {
     list-style: outside none none;
@@ -47,26 +47,32 @@
 }
 
 .menu > ul > li > a {
-    width: 70px;
-    height: 70px;
+    width: 52px;
+    height: 51px;
     display: block;
-    background: url("../img/but.png") repeat scroll -13px 70px;
+    background: url("../img/butt.png") repeat scroll 22px 0px;
     margin-bottom: 5px;
 }
 
-.menu .catalog {background-position: -13px 70px;}
-.menu .catalog.active {background-position: -13px 0px;}
-.menu .profile {background-position: -213px 70px;}
-.menu .profile.active {background-position: -213px 0px;}
-.menu .articles {background-position: -313px 70px;}
-.menu .articles.active {background-position: -313px 0px;}
-.menu .admin {background-position: -113px 70px;}
-.menu .admin.active {background-position: -113px 0px;}
+.menu .active { height: 77px; }
+.menu .catalog {background-position: 0px 53px;}
+.menu .catalog.active {background-position: -22px 0px;}
+.menu .profile {background-position: -104px 53px;}
+.menu .profile.active {background-position: -115px 0px;}
+.menu .articles {background-position: -156px 53px;}
+.menu .articles.active {background-position: -159px 0px;}
+.menu .admin {background-position: -52px 53px;}
+.menu .admin.active {background-position: -69px 0px;}
 
-.menu .scroll-up {background-position: -713px 0px;}
-.menu .scroll-down {background-position: -613px 0px;}
-.menu .login {background-position: -413px 0px;}
-.menu .logout {background-position: -513px 0px;}
+.menu .scroll-up {background-position: -213px 53px;}
+.menu .scroll-down {background-position: -246px 53px;}
+.menu .login {background-position: -485px 0px;}
+.menu .logout {background-position: -520px 0px;}
+
+.menu .small {
+    width: 32px;
+    margin-left: 21px;
+}
 
 .menu .menu-login {
     bottom: 0px;
@@ -74,10 +80,18 @@
     margin-bottom: 0px;
 }
 
-.menu .menu-login li a, .menu .menu-scroll li a,
+.menu .menu-login > li > a {
+    width: 34px;
+    margin-left: 21px;
+    height: 55px;
+    margin-left: 18px;
+    margin-bottom: 0px;
+}
+
 .menu > ul > li > a.active {
-    width: 65px;
-    margin-left: 8px;
+    width: 46px;
+    margin-left: 7px;
+    margin-bottom: -21px;
 }
 
 .menu .menu-scroll {
@@ -104,23 +118,23 @@ ul.sub-menu {
     position: fixed;
     top: 0px;
     bottom: 0px;
-    left: 68px;
+    left: 48px;
     margin: 0px;
     z-index: 8;
     padding: 5px 25px 25px 30px;
     color: black;
-    font-size: 20px;
+    font-size: 17px;
     font-weight: bold;
     display: none;
 }
 ul.sub-menu > li.header {
     border-bottom: solid 1px black;
-    margin-bottom: 20px;
-    line-height: 40px;
+    margin-bottom: 15px;
+    line-height: 30px;
 }
 
 ul.sub-menu li {
-    margin-bottom: 20px;
+    margin-bottom: 5px;
 }
 
 ul.sub-menu li ul {
@@ -140,26 +154,26 @@ ul.sub-menu a { color: #AE1303; }
 body {
     font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
     background-color: #333;
-    padding-left: 68px;
+    padding-left: 48px;
     padding-right: 0px  !important;
 }
 
-@media (max-height: 750px) {
-    .menu-scroll, .menu .brand_icon { display: none; }
-    #profile-menu .player-info  { display: none !important; }
-}
-
-@media (max-height: 850px) {
-    .scroll-down { display: none !important; }
-}
-
-@media (max-height: 500px) {
+@media (max-height: 630px) {
     .logout{ display: none !important; }
-    #profile-menu .player-avatar  { display: none !important; }
-    ul.sub-menu li { margin-bottom: 10px !important; }
+    .menu-scroll {bottom: -20px !important;}
 }
 
-@media (min-height: 500px) {
+@media (max-height: 479px) {
+   .menu .brand_icon { display: none; }
+   #profile-menu .player-info  { display: none !important; }
+}
+
+@media (max-height: 420px) {
+    .menu-scroll { display: none; }
+    #profile-menu .player-avatar  { display: none !important; }
+}
+
+@media (min-height: 631px) {
     .profile-logout { display: none !important; }
 }
 
