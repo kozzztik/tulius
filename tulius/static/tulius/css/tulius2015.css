@@ -160,11 +160,14 @@ body {
 
 @media (max-height: 630px) {
     .logout{ display: none !important; }
-    .menu-scroll {bottom: -20px !important;}
+    .menu-scroll {bottom: 50px !important;}
 }
 
-@media (max-height: 479px) {
+@media (max-height: 530px) {
    .menu .brand_icon { display: none; }
+   .menu-scroll .scroll-down { display: none; }
+
+@media (max-height: 479px) {
    #profile-menu .player-info  { display: none !important; }
 }
 
@@ -177,7 +180,7 @@ body {
     .profile-logout { display: none !important; }
 }
 
-@media (max-height: 330px) {
+@media (max-height: 180px) {
     .menu-login { display: none !important; }
 }
 
