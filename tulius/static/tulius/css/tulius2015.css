@@ -165,8 +165,10 @@ ul.sub-menu a { color: #AE1303; }
 }
 
 
-body {
+body, body .rcrumbs{
     font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+}
+body {
     background-color: #333;
     padding-left: 48px;
     padding-right: 0px  !important;
