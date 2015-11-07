@@ -151,6 +151,20 @@ ul.sub-menu a { color: #AE1303; }
     margin-bottom: 30px;
 }
 
+#top-breadcrumbs {
+    margin-left: -20px;
+    margin-right: -20px;
+}
+#bottom-breadcrumbs {
+    margin-left: -20px;
+    margin-right: -20px;
+}
+.breadcrumbs-border {
+    margin-left: -20px;
+    margin-right: -20px;
+}
+
+
 body {
     font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
     background-color: #333;
@@ -166,6 +180,7 @@ body {
 @media (max-height: 530px) {
    .menu .brand_icon { display: none; }
    .menu-scroll .scroll-down { display: none; }
+}
 
 @media (max-height: 479px) {
    #profile-menu .player-info  { display: none !important; }
@@ -186,4 +201,17 @@ body {
 
 @media (min-width: 768px) and (max-width: 1200px) {
     .container { width: auto !important; }
+}
+
+@media (max-width: 1200px) {
+    .newcontainer {
+        padding-left: 0px;
+        max-width: 940px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 979px) {
+    #content-center {
+        max-width: 670px;
+    }
 }

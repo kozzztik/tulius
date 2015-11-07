@@ -409,7 +409,6 @@ ul {
     background-image: url("../img/baselayout/bg3.gif");
 }
 
-
 td.visible-phone, th.visible-phone, 
 td.visible-tablet, th.visible-tablet,
 td.visible-desktop, th.visible-desktop,
@@ -418,71 +417,21 @@ td.hidden-tablet, th.hidden-tablet,
 td.hidden-desktop, th.hidden-desktop {
     display: table-cell !important;
 }
+
 @media (min-width: 1200px) {
     td.hidden-desktop, th.hidden-desktop,
     td.visible-phone, th.visible-phone,
-    td.visible-tablet, th.visible-tablet, {
+    td.visible-tablet, th.visible-tablet {
         display: none !important;
     }
-    #content-center {
-        background: url(../img/baselayout/leftjpeg100with.jpg) 0% 0% repeat-y,
-        url(../img/baselayout/rightjpeg100.jpg) 100% 0% repeat-y ,
-        url(../img/baselayout/bg2.gif) 50% 0%;
-        padding-left: 228px;
-        padding-right: 275px;
-        max-width: 1420px;
-    }
-    #top-breadcrumbs {
-        margin-left: -20px;
-        margin-right: -23px;
-    }
-    #bottom-breadcrumbs {
-        margin-left: -20px;
-        margin-right: -23px;
-    }
-    .breadcrumbs-border {
-        margin-left: -20px;
-        margin-right: -23px;
-    }
-    .newcontainer {
-        padding-right: 35px;  
-        max-width: 860px;
-    }
-    .container {
-        width: 845px;
-    }
 }
-@media (max-width: 1200px) {
-    #content-center {
-        background: url(../img/baselayout/bg2.gif);
-        padding-left: 20px;
-        padding-right: 20px;
-        max-width: 940px;
-    }
-    #top-breadcrumbs {
-        margin-left: -20px;
-        margin-right: -20px;
-    }
-    #bottom-breadcrumbs {
-        margin-left: -20px;
-        margin-right: -20px;
-    }
-    .breadcrumbs-border {
-        margin-left: -20px;
-        margin-right: -20px;
-    }
-    .newcontainer {
-        padding-left: 0px;  
-        max-width: 940px; 
-    }        
-}
+
 @media (min-width: 768px) and (max-width: 979px) {
     td.visible-phone, th.visible-phone,
     td.visible-desktop, th.visible-desktop, 
     td.hidden-tablet, th.hidden-tablet {
         display: none !important;
     }
-
 }
 @media (max-width: 767px) { 
     td.visible-tablet, th.visible-tablet,
@@ -490,4 +439,11 @@ td.hidden-desktop, th.hidden-desktop {
     td.hidden-phone, th.hidden-phone {
         display: none !important;
     }
-    }
+}
+
+#content-center {
+        background: url(../img/baselayout/bg2.gif);
+        padding-left: 20px;
+        padding-right: 20px;
+        max-width: 870px;
+}
