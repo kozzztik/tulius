@@ -4,6 +4,7 @@ import logging
 
 logger = logging.getLogger('django.request')
 
+
 def get_mail(mail):
     receiver = mail.recipient_mail
     if not receiver.find('@tulius.com'):

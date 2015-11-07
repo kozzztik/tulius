@@ -7,6 +7,8 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from .forms import PrivateMessageForm
 from .models import PrivateTalking, PrivateMessage
+from websockets.publisher import RedisPublisher
+from ws4redis.redis_store import RedisMessage
 
 
 class PlayerMessagesView(TemplateView):
@@ -59,9 +61,7 @@ class PlayerSendMessageView(DetailView):
             m = form.save()
             # if the publisher is required only for fetching messages, use an
             # empty constructor, otherwise reuse an existing redis_publisher
-            from ws4redis.publisher import RedisPublisher
-            from ws4redis.redis_store import RedisMessage
-            redis_publisher = RedisPublisher(facility='pm', users=[self.object.username])
+            redis_publisher = RedisPublisher(facility='pm', users=[self.object])
             message = RedisMessage(str(m.pk))
             # and somewhere else
             redis_publisher.publish_message(message)

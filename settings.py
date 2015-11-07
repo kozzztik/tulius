@@ -274,7 +274,7 @@ WS4REDIS_CONNECTION = {
 WS4REDIS_EXPIRE = 60
 WS4REDIS_PREFIX = 'ws'
 WEBSOCKET_URL = '/ws/'
-#WS4REDIS_SUBSCRIBER = 'myapp.redis_store.RedisSubscriber'
+WS4REDIS_SUBSCRIBER = 'websockets.subscriber.RedisSubscriber'
 WSGI_APPLICATION = 'ws4redis.django_runserver.application'
 WS4REDIS_HEARTBEAT = 'heartbeat'
 
