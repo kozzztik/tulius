@@ -3,8 +3,8 @@
 .menu
     %a.brand_icon{href: '/'}
         %img{src: '{{ STATIC_URL }}tulius/img/logo_small.png'}
-    - if not request.user.is_anonymous
-        .menu-notif-list
+    .menu-notif-list
+        - if not request.user.is_anonymous
             %a{href: '{% url "pm:messages" %}'}
                 - if request.user.not_readed_messages
                     .new_messages.active{title: '{% trans "You have new messages!" %}'}

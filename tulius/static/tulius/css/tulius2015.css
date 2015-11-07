@@ -27,6 +27,8 @@
     border: 2px solid #c8b077;
 }*/
 
+.menu-notif-list { height: 61px; }
+
 .menu .menu-notif-list .new_messages {
     width: 31px;
     height: 30px;
