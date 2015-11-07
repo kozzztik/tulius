@@ -39,7 +39,9 @@ $(document).ready(function() {
     });
     // receive a message though the websocket from the server
     function receiveMessage(msg) {
+        if (msg > last_read_pm_id) {
         $('.new_messages').addClass('active')
         //alert(msg);
+        }
     }
 });

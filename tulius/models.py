@@ -122,7 +122,13 @@ class User(PermissionsMixin, AbstractBaseUser):
         editable=False,
         verbose_name=_(u'Show in game'),
     )
-     
+
+    last_read_pm_id = models.PositiveIntegerField(
+        default=0,
+        blank=False,
+        editable=False,
+    )
+
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
 
@@ -193,6 +199,9 @@ class User(PermissionsMixin, AbstractBaseUser):
         from pm.models import PrivateMessage
         count = PrivateMessage.objects.filter(receiver=self, is_read=False, removed_by_receiver=False).count()
         self.not_readed_messages = count
+        last = PrivateMessage.objects.filter(receiver=self, is_read=True).order_by('-id')[:1]
+        if last:
+            self.last_read_pm_id = last[0].pk
         self.save()
         
     def get_forum_reply_str(self):

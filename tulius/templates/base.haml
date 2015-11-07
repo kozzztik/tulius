@@ -34,6 +34,11 @@
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}js/ws4redis.js'}
     <script type='text/javascript'>
         var websocket_uri = '{{ WEBSOCKET_URI }}';
+        {% if not request.user.is_anonymous %}
+        var last_read_pm_id = {{ request.user.last_read_pm_id }};
+        {% else %}
+        var last_read_pm_id = 0;
+        {% endif %}
     </script>
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}tulius/js/menu.js'}
 
