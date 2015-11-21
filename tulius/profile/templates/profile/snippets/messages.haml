@@ -1,0 +1,23 @@
+- load i18n
+
+%table#messages-box.messages-table.wide
+    - for message in message_list
+        %tr{class: '{% if message.sender != request.user and not message.is_read %}unread-talking{% endif %}'}
+            %td.messages-avatar.hidden-phone
+              - if message.sender.avatar
+                  %img{width: '50px', height: '50px', src: '{{ message.sender.avatar.url }}'}
+            %td.messages-sender
+                - if message.sender.id = request.user.id
+                    {% trans "You" %}
+                - else
+                    %a{'href': '{{ message.sender.profile.get_absolute_url }}'}
+                        = message.sender
+                %br
+                %small
+                    = message.created_at
+            %td.messages-text
+                = message.body|linebreaksbr
+<script>
+    var v = $('#messages-box')[0];
+    v.scrollTo(500, 500);
+</script>
