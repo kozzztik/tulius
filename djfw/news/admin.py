@@ -49,5 +49,6 @@ class NewsItemAdmin(CustomModelAdmin):
         make_published,
         make_unpublished,
     ]
+    date_hierarchy = None
 
 admin.site.register(NewsItem, NewsItemAdmin)
