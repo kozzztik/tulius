@@ -6,7 +6,7 @@ chmod 600 /tmp/deploy_rsa
 ssh-add /tmp/deploy_rsa
 
 # Configure git remote
-git remote add deploy "travis@tulius.com:/home/travis/$TRAVIS_BRANCH"
+git remote add deploy "ssh://travis@tulius.com:33023/home/travis/$TRAVIS_BRANCH"
 git config user.name "Travis CI"
 git config user.email "travis@mywebsite.com"
 
