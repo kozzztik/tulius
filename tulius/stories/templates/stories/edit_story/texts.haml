@@ -16,7 +16,7 @@
             %ul
                 - for field in form
                     %li
-                        %a{'href': '\#{{ field.name }}'}
+                        %a{'href': '#{{ field.name }}'}
                             %span
                                 {{ field.label }}
             - for field in form
@@ -39,5 +39,7 @@
                     %button.submit.btn{'type': 'reset'}
                         {% trans "reset" %}
     <script>
-        $('#tabs').tabs();
+        $(document).ready(function() {
+            $('#tabs').tabs();
+        });
     </script>

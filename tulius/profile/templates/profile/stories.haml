@@ -1,0 +1,42 @@
+- extends 'base.haml'
+- load i18n
+- load url from future
+
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: ''}
+            {% trans "Stories" %}
+
+- block caption
+    {% trans "Stories" %}
+
+- block content
+    - if stories
+        %table.table
+            %thead
+                %tr
+                    %th
+                        {% trans "Story" %}
+                    %th
+                        {% trans "Action" %}
+                    %th
+                        {% trans "Genres" %}
+            %tbody
+                - for story in stories
+                    %tr
+                        %td.profile-gamelist
+                            %a{href:'{% url "stories:story" story.id %}'}
+                                = story
+                        %td
+                            %a{href: '{{ story.get_edit_url }}'}
+                                {% trans "edit" %}
+                        %td
+                            - if story.genres.all
+                                %ul.genres.unstyled
+                                    - for genre in story.genres.all
+                                        %li
+                                            %a{href: '?filter_by_genre\={{ genre.id }}'}
+                                                = genre.name
+    - else
+        {% trans "You have no stories, go and write one." %}

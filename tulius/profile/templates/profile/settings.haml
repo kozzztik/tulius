@@ -1,0 +1,34 @@
+- extends 'base.haml'
+- load i18n
+- load url from future
+
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: ''}
+            {% trans "Settings" %}
+
+- block caption
+    {% trans "Settings" %}
+
+- block content
+        <link rel="stylesheet" href="{{ STATIC_URL }}wysibb/theme/default/wbbtheme.css" type="text/css" />
+        %form#settings_form.form-horizontal{method: 'POST', action: ''}
+            - csrf_token
+            %h3
+                {% trans "Personal settings" %}
+            - with form=settings_form
+                - include 'snippets/form_fields_only.haml'
+            - with form=personal_settings_form
+                - include 'snippets/form_fields_only.haml'
+                - include 'wysibb/init.html'
+            %h3
+                {% trans "Email and password" %}
+            - with form=email_form
+                - include 'snippets/form_fields_only.haml'
+            %fieldset
+                .form-actions
+                    %button#submit_settings.submit.btn.btn-primary
+                        {% trans "save" %}
+                    %button.submit.btn{type: 'reset'}
+                        {% trans "reset" %}

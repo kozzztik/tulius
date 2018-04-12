@@ -1,0 +1,39 @@
+- extends 'base.haml'
+- load i18n
+- load url from future
+
+- block extra_scripts
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-forum.css'}
+
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: ''}
+            {% trans "Favorites" %}
+
+- block caption
+    {% trans "Favorites" %}
+
+- block content
+    {% trans "Here presented posts, you marked as your favorite." %}
+    %br
+    %br
+
+    #accordion
+        - for group in groups
+            %h3
+                %a{href: '#'}
+                    = group.name
+            %div
+                - with forum_site=group.forumsite
+                    - for comment in group.comments
+                        - include forum_site.templates.comment
+
+    - if not groups
+        %br
+        {% trans "You have no favorite posts yet." %}
+    %br
+    %br
+
+    %script
+        $( "#accordion" ).accordion({ collapsible: true, heightStyle: "content" });

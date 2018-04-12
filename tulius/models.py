@@ -25,6 +25,7 @@ USER_GAME_INLINE_CHOICES = (
     (USER_GAME_INLINE_POSTS, _('Messages count')),
 )
 
+
 class User(PermissionsMixin, AbstractBaseUser):
     username = models.CharField(_('username'), max_length=30, unique=True,
         help_text=_('Required. 30 characters or fewer. Letters, numbers and '
@@ -109,17 +110,25 @@ class User(PermissionsMixin, AbstractBaseUser):
         verbose_name=_(u'Animation speed'),
     )
     
-    vk_profile = models.ForeignKey(VK_Profile, 
+    vk_profile = models.ForeignKey(
+        VK_Profile,
         blank=True,
         null=True
-        )
+    )
+
     not_readed_messages = models.SmallIntegerField(
         default=0,
         blank=False,
         editable=False,
         verbose_name=_(u'Show in game'),
     )
-     
+
+    last_read_pm_id = models.PositiveIntegerField(
+        default=0,
+        blank=False,
+        editable=False,
+    )
+
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
 
@@ -190,6 +199,9 @@ class User(PermissionsMixin, AbstractBaseUser):
         from pm.models import PrivateMessage
         count = PrivateMessage.objects.filter(receiver=self, is_read=False, removed_by_receiver=False).count()
         self.not_readed_messages = count
+        last = PrivateMessage.objects.filter(receiver=self, is_read=True).order_by('-id')[:1]
+        if last:
+            self.last_read_pm_id = last[0].pk
         self.save()
         
     def get_forum_reply_str(self):
@@ -200,6 +212,7 @@ class User(PermissionsMixin, AbstractBaseUser):
         else:
             s = pgettext('Someone', '%s said')
         return s % self.username
+
 
 def on_pm_create(sender, **kwargs):
     sender.receiver.update_not_readed()

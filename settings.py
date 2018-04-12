@@ -44,13 +44,12 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'django.contrib.sitemaps',
     'memcache_status',
+    'ws4redis',
     'djaml',
     'djfw',
     'tulius',
     'djfw.datablocks',
     'djfw.logger',
-    'djfw.accounts',
-    'djfw.accounts.registration',
     'djfw.pagination',
     'djfw.flatpages',
     'djfw.tinymce',
@@ -67,12 +66,14 @@ INSTALLED_APPS = (
     'djfw.custom_views',
     'django_mailer',
     'pm',
+    'tulius',
+    'tulius.login',
     'tulius.players',
+    'tulius.profile',
     'tulius.games',
     'tulius.forum',
     'tulius.stories',
     'tulius.gameforum',
-    'tulius.theming',
     'tulius.bugs',
     'tulius.old_site_migrate',
     'djfw.installer',
@@ -118,8 +119,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.static',
     'django.contrib.messages.context_processors.messages',
     'django.contrib.auth.context_processors.auth',
+    'ws4redis.context_processors.default',
     'djfw.flatpages.context_processors.flatpages',
-    'djfw.accounts.auth.context_processors.relogin',
+    'tulius.login.context_processors.relogin',
     'djfw.datablocks.context_processors.datablocks',
 )
 
@@ -133,7 +135,7 @@ CROWD = {
 AUTHENTICATION_BACKENDS = (
     'tulius.vk.backend.VKBackend',
     'django.contrib.auth.backends.ModelBackend',
-    'djfw.bugtracker.atlassian.crowd.CrowdBackend', 
+    #'djfw.bugtracker.atlassian.crowd.CrowdBackend',
 )
 
 BUGTRACKER = {
@@ -261,6 +263,22 @@ DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 
 MAIL_RECEIVERS = ['pm.mail.get_mail']
 
+
+WS4REDIS_CONNECTION = {
+    'host': '127.0.0.1',
+    'port': 6379,
+    'db': 10,
+    'password': '',
+}
+
+WS4REDIS_EXPIRE = 60
+WS4REDIS_PREFIX = 'ws'
+WEBSOCKET_URL = '/ws/'
+WS4REDIS_SUBSCRIBER = 'websockets.subscriber.RedisSubscriber'
+WSGI_APPLICATION = 'ws4redis.django_runserver.application'
+WS4REDIS_HEARTBEAT = 'heartbeat'
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -275,8 +293,8 @@ DATABASES = {
 
 # CACHES = {
 #     'default': {
-#         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-#         'LOCATION': '127.0.0.1:11211',
+#         'BACKEND': 'redis_cache.RedisCache',
+#         'LOCATION': '/var/run/redis/redis.sock',
 #         'KEY_PREFIX': 'tulius',
 #     }
 # }

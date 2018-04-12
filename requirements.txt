@@ -1,4 +1,5 @@
 django == 1.6.3
+pitz
 django-grappelli == 2.4.12
 pillow
 MySQL-python
@@ -26,5 +27,9 @@ pyyaml
 
 python-memcached
 django-memcache-status
-#sentry
+# sentry
 raven
+gevent
+redis
+django-websocket-redis
+django-redis-cache

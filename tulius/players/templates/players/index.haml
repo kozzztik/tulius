@@ -22,23 +22,66 @@
     = player.username
 
 - block content
-    - if show_messages
-        #tabs
-            %ul
-                %li
-                    %a{href: '#main'}
-                        %span
-                            {% trans "Main" %}
-                %li
-                    %a{href: '#pm_messages'}
-                        %span
-                            {% trans "Messages" %}
-            #main
-                - include 'players/player_info.haml'
-            #pm_messages
-                - include "players/messages.haml"
-        <script>
-            $('#tabs').tabs();
-        </script>
-    - else
-        - include 'players/player_info.haml'
+    .profile-user
+        .profile-info
+            %table.player-info-table
+                %tr
+                    %td
+                        - include 'players/snippets/avatar.haml'
+                    %td
+                        %h3
+                            = player.username
+                        - include 'players/snippets/stars.haml'
+            - if rankform
+                %form{method: 'POST'}
+                    - csrf_token
+                    = rankform.management_form
+                    {% trans "Rank:" %}
+                    = rankform.rank
+            - else
+                - if player.rank
+                    %p
+                        = player.rank
+            - if not request.user.is_anonymous
+                %a.btn.btn-primary{href: '{% url "pm:to_user" player.pk %}'}
+                    {% trans "Send message" %}
+            - if player.sex
+                %p
+                    {% trans "Sex:" %}
+                    = player.get_sex_display
+            - if player.icq
+                %p
+                    {% trans "ICQ:" %}
+                    <img border="0" alt="*" src="http://icq-rus.com/icq/1/{{player.icq}}.gif" />
+                    = player.icq
+            - if player.skype
+                %p
+                    {% trans "Skype:" %}
+                    = player.skype
+            %p
+                {% trans "Registred:" %}
+                = player.date_joined
+            - if request.user.is_superuser
+                %p
+                    %a{href: '{% url "players:player_exceptions" player.id %}'}
+                        {% trans "User exceptions..." %}
+        .profile-stats
+            - include "players/statistics.haml"
+            - if played_roles and played_games
+                - include "players/snippets/played_table.haml"
+                - if played_games > 5
+                    - if player.show_played_games and player.show_played_characters
+                        %a{href: '{% url "players:player_played" player.id %}'}
+                            {% trans "All played games and characters" %}...
+                        %br
+                        %br
+                    - elif player.show_played_games
+                        %a{href: '{% url "players:player_played" player.id %}'}
+                            {% trans "All played games" %}...
+                        %br
+                        %br
+                    - elif player.show_played_characters
+                        %a{href: '{% url "players:player_played" player.id %}'}
+                            {% trans "All played characters" %}...
+                        %br
+                        %br
