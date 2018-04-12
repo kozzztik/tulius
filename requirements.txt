@@ -12,7 +12,7 @@ ipython
 simplejson
 
 # apparently best relational DB trees implementation
-django-mptt
+django-mptt == 0.7.4
 
 # hamlpy dependency
 pygments

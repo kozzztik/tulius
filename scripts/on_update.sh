@@ -7,7 +7,7 @@ python manage.py syncdb
 python manage.py migrate
 python manage.py compilemessages
 deactivate
-chown -R travis:www-data *
-chmod 775 *
+chown -R travis:www-data $PWD
+chmod 775 $PWD
 sudo /etc/init.d/uwsgi restart
 
