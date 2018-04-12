@@ -12,8 +12,8 @@ git config user.email "travis@mywebsite.com"
 
 # Push
 git status # debug
-git push deploy
+git push deploy HEAD:master
 echo "Git Push Done"
 
 # Do after deploy staff
-ssh -i /tmp/deploy_rsa -o UserKnownHostsFile=/dev/null travis@tulius.com 'cd /home/travis/$TRAVIS_BRANCH; echo hello; scripts/on_update.sh'
+ssh -i /tmp/deploy_rsa -o UserKnownHostsFile=/dev/null travis@tulius.com -p 33023 'cd /home/travis/$TRAVIS_BRANCH; echo hello; scripts/on_update.sh'
