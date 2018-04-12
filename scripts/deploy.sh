@@ -12,7 +12,7 @@ git config user.email "travis@mywebsite.com"
 
 # Push
 git status # debug
-git push -f deploy HEAD:master
+git push deploy
 echo "Git Push Done"
 
 # Do after deploy staff
