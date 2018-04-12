@@ -2,7 +2,7 @@ language: python
 install:
   - pip install tox
 script:
-  - tox -e $INTERP
+  - tox -e py27
 deploy:
   - provider: script
     script: bash scripts/deploy.sh test
