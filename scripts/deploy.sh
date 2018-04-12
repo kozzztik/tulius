@@ -5,15 +5,8 @@ eval "$(ssh-agent -s)"
 chmod 600 /tmp/deploy_rsa
 ssh-add /tmp/deploy_rsa
 
-# Configure git remote
-git remote add deploy "ssh://travis@tulius.com:33023/home/travis/$TRAVIS_BRANCH"
-git config user.name "Travis CI"
-git config user.email "travis@mywebsite.com"
-
-# Push
-git status # debug
-git push deploy HEAD:master
-echo "Git Push Done"
+# Download updates
+ssh -i /tmp/deploy_rsa travis@tulius.com -p 33023 'cd /home/travis/$TRAVIS_BRANCH; git pull origin'
 
 # Do after deploy staff
-ssh -i /tmp/deploy_rsa -o UserKnownHostsFile=/dev/null travis@tulius.com -p 33023 'cd /home/travis/$TRAVIS_BRANCH; echo hello; scripts/on_update.sh'
+ssh -i /tmp/deploy_rsa travis@tulius.com -p 33023 'cd /home/travis/$TRAVIS_BRANCH; echo hello; scripts/on_update.sh'
