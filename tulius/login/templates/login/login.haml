@@ -1,0 +1,33 @@
+- extends 'base.haml'
+- load i18n
+
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: '{% url "auth:login_choose" %}'}
+            {% trans "Choose login type" %}
+    %li
+        .divider
+        %a{href: ''}
+            {% trans "Login" %}
+
+- block caption
+    {% trans "Login" %}
+
+
+- block content
+    %p
+        {% trans "Enter yout Tulius login/password. If you have no Tulius login," %}
+        %a{href: '{% url "auth:login_choose" %}'}
+            {% trans "choose other way of authorize" %}
+        {% trans "or use old type of" %}
+        %a{href: '{% url "auth:registration_register" %}'}
+            {% trans "registration" %}
+	%form{'action': '', 'method': 'POST', 'style': 'text-align: center;'}
+		- csrf_token
+		%fieldset
+            - csrf_token
+            - for field in form
+                - include 'snippets/form_field.haml'
+		%button.btn.btn-info{'type': 'submit'}
+			{% trans "Login" %}

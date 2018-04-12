@@ -1,0 +1,11 @@
+- load i18n
+%h4
+    {% trans "Enter through:" %}
+#login_types
+    %a{href: "{% url 'vk:auth_oauth' %}"}
+        %img{src: '{{ MEDIA_URL }}img/vk.png'}
+    %a{href: '{% url "auth:login" %}'}
+        %img{src: '{{ STATIC_URL }}tulius/img/logo.png'}
+{% trans "Also you can use old way of"%}
+%a{href: '{% url "auth:registration_register" %}'}
+    {% trans "registration" %}

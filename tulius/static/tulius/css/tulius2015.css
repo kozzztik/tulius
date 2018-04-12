@@ -1,0 +1,278 @@
+@media (max-width: 768px) {
+    .menu {
+        height: 38px;
+        left: 0px;
+        top: 0px;
+        right: 0px;
+        background: url("../img/nav-bar.png") repeat-x;
+        padding-left: 40px;
+    }
+    .menu div, .menu ul {
+        display: inline-block;
+    }
+    body {
+        padding-top: 39px;
+        padding-left: 0px;
+    }
+    .menu-list > li, .menu-list > li > a {
+        display: inline-block;
+        margin-bottom: 0px;
+    }
+    .menu-list, .menu-login {
+        margin-bottom: 0px;
+        position: fixed;
+        top: 5px;
+        right: 0px;
+    }
+    .menu-login {padding-right: 5px}
+    .menu-list .catalog,  .menu-list .articles,  .menu-list .admin {
+        display: none;
+    }
+    .menu .profile:before {content: "Profile";}
+    .menu .login:before {content: "Login";}
+
+    .menu .brand_icon {
+        position: fixed;
+        top: 3px;
+        left: 5px;
+    }
+    .menu .brand_icon img {
+    }
+    ul.sub-menu {
+        right: 0px;
+    }
+    a.profile, a.profile:hover, a.profile:active,
+    a.login, a.login:hover, a.login:active, {
+        color: #AE1205;
+    }
+}
+
+@media (min-height: 631px)and(min-width: 769px) {
+    .profile-logout { display: none !important; }
+}
+
+@media (max-height: 530px)and(min-width: 769px) {
+   .menu .brand_icon { display: none; }
+}
+
+@media (min-width: 769px) {
+    .menu {
+        width: 38px;
+        left: 0px;
+        top: 0px;
+        bottom: 0px;
+        background: url("../img/bg2.png") repeat-y;
+    }
+    body {
+        padding-left: 48px;
+    }
+    .menu .brand_icon {
+        display: block;
+    }
+    .menu > ul > li > a {
+        display: block;
+    }
+    .menu > * {
+        margin-top: 10px;
+        margin-left: 4px;
+    }
+    .menu-notif-list { height: 61px; }
+    .menu > ul > li > a {
+        margin-bottom: 5px;
+    }
+    .menu > ul > li > a {
+        width: 52px;
+        height: 51px;
+        background: url("../img/butt.png") repeat scroll 22px 0px;
+    }
+    ul.sub-menu {
+        left: 48px;
+    }
+    .menu .menu-login {
+        bottom: 0px;
+        position: absolute;
+        margin-bottom: 0px;
+    }
+
+    .menu .menu-login > li > a {
+        width: 34px;
+        margin-left: 21px;
+        height: 55px;
+        margin-left: 18px;
+        margin-bottom: 0px;
+    }
+
+}
+
+.menu {
+    position: fixed;
+    padding-right: 10px;
+    background-position: top right;
+    z-index: 10;
+}
+
+.menu .brand_icon {
+    width: 31px;
+    height: 31px;
+}
+
+.menu .menu-notif-list .new_messages {
+    width: 31px;
+    height: 30px;
+    background: url("../img/indic.png") 0px -59px;
+}
+.menu .new_messages.active {background-position: 0px 2px}
+
+.menu .menu-notif-list .new_invites {
+    width: 31px;
+    height: 31px;
+    background: url("../img/indic.png") repeat scroll 0px -88px;
+}
+.menu .new_invites.active {background-position: 0px -27px;}
+
+.menu ul {
+    list-style: outside none none;
+    margin-left: 0px;
+}
+
+.menu .active { height: 77px; }
+.menu .catalog {background-position: 0px 53px;}
+.menu .catalog.active {background-position: -22px 0px;}
+.menu .profile {background-position: -104px 53px;}
+.menu .profile.active {background-position: -115px 0px;}
+.menu .articles {background-position: -156px 53px;}
+.menu .articles.active {background-position: -159px 0px;}
+.menu .admin {background-position: -52px 53px;}
+.menu .admin.active {background-position: -69px 0px;}
+
+.menu .scroll-up {background-position: -213px 53px;}
+.menu .scroll-down {background-position: -246px 53px;}
+.menu .login {background-position: -485px 0px;}
+.menu .logout {background-position: -520px 0px;}
+
+.menu .small {
+    width: 32px;
+    margin-left: 21px;
+}
+
+.menu > ul > li > a.active {
+    width: 46px;
+    margin-left: 7px;
+    margin-bottom: -21px;
+}
+
+.menu .menu-scroll {
+    bottom: 150px;
+    position: absolute;
+}
+
+.menu-background {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    background-color: #000;
+    opacity: 0.5;
+    z-index: 5;
+    display: none;
+}
+
+ul.sub-menu {
+    list-style: outside none none;
+    width: 200px;
+    background-image: url("../img/bg5.gif");
+    position: fixed;
+    top: 0px;
+    bottom: 0px;
+    margin: 0px;
+    z-index: 8;
+    padding: 5px 25px 25px 30px;
+    color: black;
+    font-size: 17px;
+    font-weight: bold;
+    display: none;
+}
+ul.sub-menu > li.header {
+    border-bottom: solid 1px black;
+    margin-bottom: 15px;
+    line-height: 30px;
+}
+
+ul.sub-menu li {
+    margin-bottom: 5px;
+}
+
+ul.sub-menu li ul {
+    list-style: outside none none;
+    margin-top: 10px;
+}
+
+ul.sub-menu a:hover, ul.sub-menu a:focus { color: black; }
+ul.sub-menu a { color: #AE1303; }
+
+#profile-menu .player-info {
+    line-height: 20px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+#top-breadcrumbs {
+    margin-left: -20px;
+    margin-right: -20px;
+}
+#bottom-breadcrumbs {
+    margin-left: -20px;
+    margin-right: -20px;
+}
+.breadcrumbs-border {
+    margin-left: -20px;
+    margin-right: -20px;
+}
+
+body, body .rcrumbs{
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+}
+body {
+    background-color: #333;
+    padding-right: 0px  !important;
+}
+
+@media (max-height: 630px) {
+    .logout{ display: none !important; }
+    .menu-scroll {bottom: 50px !important;}
+}
+
+@media (max-height: 530px) {
+   .menu-scroll .scroll-down { display: none; }
+}
+
+@media (max-height: 479px) {
+   #profile-menu .player-info  { display: none !important; }
+}
+
+@media (max-height: 420px) {
+    .menu-scroll { display: none; }
+    #profile-menu .player-avatar  { display: none !important; }
+}
+
+@media (max-height: 180px) {
+    .menu-login { display: none !important; }
+}
+
+@media (min-width: 768px) and (max-width: 1200px) {
+    .container { width: auto !important; }
+}
+
+@media (max-width: 1200px) {
+    .newcontainer {
+        padding-left: 0px;
+        max-width: 940px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 979px) {
+    #content-center {
+        max-width: 670px;
+    }
+}

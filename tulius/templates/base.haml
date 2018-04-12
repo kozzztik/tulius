@@ -16,6 +16,7 @@
 
 - block sitewide_styles
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}photos/jquery-lightbox/css/lightbox.css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}tulius/css/tulius2015.css'}
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius.css'}
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/baselayout.css'}
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-main.css'}
@@ -30,145 +31,27 @@
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}photos/jquery-lightbox/js/lightbox.js'}
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}autocomplete/autocomplete-select.js'}
     %script{type: 'text/javascript', src: '{{ MEDIA_URL }}rcrumbs/jquery.rcrumbs.min.js'}
-        
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}js/ws4redis.js'}
+    <script type='text/javascript'>
+        var websocket_uri = '{{ WEBSOCKET_URI }}';
+        {% if not request.user.is_anonymous %}
+        var last_read_pm_id = {{ request.user.last_read_pm_id }};
+        {% else %}
+        var last_read_pm_id = 0;
+        {% endif %}
+    </script>
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}tulius/js/menu.js'}
+
     - include "inlineformsets/init.html"
     
     - block extra_scripts
     
 - block body
     %body{class: '{% block body_class %}{% endblock %}'}
-        - block navbar
-            .navbar.navbar-fixed-top
-                .navbar-inner
-                    .container.newcontainer
-                        %a.brand.hidden-tablet{href: '/'}
-                            Tulius
-                        %ul.nav
-                            %li.dropdown.hidden-phone
-                                %a#auth-dropdown-toggler.dropdown-toggle{data-toggle: "dropdown"}
-                                    {% trans "Games" %}
-                                    %span.caret
-                                %ul.dropdown-menu
-                                    %li
-                                        %a{href: '{% url "games:index" %}'}
-                                            {% trans "All games" %}
-                                    %li.divider
-                                    %li
-                                        %a{href: '{% url "games:announced_games" %}'}
-                                            {% trans "Announced games" %}
-                                    %li
-                                        %a{href: '{% url "games:request_accepting_games" %}'}
-                                            {% trans "Accepting requests" %}
-                                    %li
-                                        %a{href: '{% url "games:awaiting_start_games" %}'}
-                                            {% trans "Awaiting start" %}
-                                    %li
-                                        %a{href: '{% url "games:current_games" %}'}
-                                            {% trans "Current games" %}
-                                    %li
-                                        %a{href: '{% url "games:completed_opened_games" %}'}
-                                            {% trans "Opened completed" %}
-                            %li.hidden-phone
-                                %a{href: '{% url "players:index" %}'}
-                                    {% trans "Players" %}
-                            %li.hidden-phone
-                                %a{href: '{% url "stories:index" %}'}
-                                    {% trans "Stories" %}
-                            %li.hidden-phone
-                                %a{href: '{% url "forum:index" %}'}
-                                    {% trans "Forums" %}
-                            %li.hidden-phone
-                                %a{href: '{% url "news:index" %}'}
-                                    {% trans "News" %}
-                                %li.dropdown.hidden-phone
-                                    %a#flatpages-dropdown-toggler.dropdown-toggle{data-toggle: 'dropdown'}
-                                        {% trans "Flatpages" %}
-                                        %span.caret
-                                    %ul#flatpages-dropdown.dropdown-menu
-                                        %li
-                                            %a{href: '{% url "flatpages" %}'}
-                                                {% trans "All articles" %}
-                                        %li
-                                            %a{href: '{% url "bugs:bugtracker_main" %}'}
-                                                {% trans "Bugtracker" %}
-                                        %li
-                                            %a{href: '{% url "bugs:site_updates" %}'}
-                                                {% trans "Site updates" %}
-                                        %li
-                                            %a{href: '{% url "stats" %}'}
-                                                {% trans "Statistics" %}
-                                        %li.divider
-                                        - for flatpage in flatpages
-                                            - if flatpage.show_on_home
-                                                %li
-                                                    %a{href: '{{ flatpage.url }}'}
-                                                        = flatpage.title
-                        %ul.nav.pull-right
-                            - if not request.user.is_anonymous
-                                - if request.user.is_superuser
-                                    %li.dropdown.hidden-phone
-                                        %a#adminsite-dropdown-toggler.dropdown.dropdown-toggle{data-toggle: 'dropdown'}
-                                           {% trans "Admin site" %}
-                                           %span.caret
-                                        %ul#adminsite-dropdown.dropdown-menu
-                                            %li
-                                                %a{href: '{% url "counters:index"%}'}
-                                                    {% trans "Counters" %}
-                                            %li
-                                                %a{href: '{% url "players:player_exceptions" user.id %}'}
-                                                    {% trans "Your exceptions" %}
-                                            %li
-                                                %a{href: '{% url "admin:index" %}'}
-                                                    {% trans "Django admin site" %}
-                                            %li
-                                                %a{href: '{% url "bugs:bugtracker_main" %}'}
-                                                    {% trans "Bugtracker" %}
-                                            %li
-                                                %a{href: '{% url "bugs:complaints" %}'}
-                                                    {% trans "Complaints" %}
-                                            %li
-                                                %a{data-toggle: 'modal', href: '#reloginModal'}
-                                                    {% trans "Switch user" %}
-                                %li
-                                   - if request.user.not_readed_messages
-                                        %a{href: '{% url "players:profile" %}#pm_messages'}
-                                            .unread_messages_count
-                                                = request.user.not_readed_messages
-                                - if request.user.new_invites
-                                    %li
-                                        %a#new_invites_menu{href: '{% url "players:profile" %}#invites', 
-                                            data-title: '{% trans "Invites!" %}', data-content: '{% trans "You got invite to play a game." %}'}
-                                            %span.new_invites_count.badge
-                                                = request.user.new_invites.count
-                                        <script>$('#new_invites_menu').popover({trigger: 'hover', placement: 'bottom'})</script>
-                                - if not request.user.is_superuser
-                                    %li.visible-desktop
-                                        %span.greetings
-                                            {% trans "Greetings," %}
-                                %li.portrait
-                                %li
-                                    %a.profilelink{href: '{% url "players:profile" %}'}
-                                        = request.user.username
-                                %li
-                                    %a{href: '{% url "auth:logout" %}'}
-                                       {% trans "Logout" %}
-                            - else
-                                %li.hidden-phone
-                                    %a{data-toggle: 'modal', href: '#loginModal'}
-                                        {% trans "login" %}
-                                %li.hidden-phone
-                                    %a{data-toggle: 'modal', href: '#signupModal'}
-                                        {% trans "sign up" %}
-                                %li.visible-phone
-                                    %a{href: '{% url "auth:login" %}'}
-                                        {% trans "login" %}
-                                %li.visible-phone
-                                    %a{href: '{% url "registration_register" %}'}
-                                        {% trans "sign up" %}
-
+        - block main_menu
+            - include "menu.haml"
         - block body_main_area
-            #background
-              #content-center.container
+            #content-center.container
                 - block breadcrumbs_block
                     #top-breadcrumbs.rcrumbs
                         %ul.breadcrumb
@@ -199,8 +82,8 @@
                                 %a{href: '/'}
                                     .homelink
                             - repeat breadcrumbs
-            - block footer
-                %footer.footer
+                - block footer
+                  %footer.footer
                     .container.newcontainer
                         - block footer_content
                             %p.pull-left
@@ -239,48 +122,7 @@
                         %h3
                             {% trans "Login" %}
                     .modal-body
-                        - include 'vk/auth.html'
-                        %label{for: 'id_username'}
-                            {% trans "Username" %}:
-                        %input#id_username{name: 'username', maxlength: '100', type: 'text'}
-                        %label{for: 'id_password'}
-                            {% trans "Password" %}:
-                        %input#id_password{name: 'password', maxlength: '100', type: 'password'}
-                        %input#id_next{name: 'next', maxlength: '100', type: 'hidden', value: '{{ request.get_full_path }}'}
-                    .modal-footer
-                        %button.btn.btn-primary{type: 'submit'}
-                            {% trans "Login" %}
-            - block auth_modal
-                %form#signupModal.modal.hide.fade.in.well{method: 'POST', action: '{% url "registration_register" %}'}
-                    - csrf_token
-                    .modal-header
-                        %a.close{data-dismiss: "modal"}×
-                        %h3
-                            {% trans "Sign up" %}
-                    .modal-body
-                        %label{for: 'id_username'}
-                            {% trans "Username" %}:
-                        %input#id_username{name: 'username', maxlength: '100', type: 'text'}
-                        %label{for: 'id_email'}
-                            {% trans "E-mail" %}:
-                        %input#id_email{name: 'email', maxlength: '100', type: 'text'}
-                        %label{for: 'id_password1'}
-                            {% trans "Password" %}:
-                        %input#id_password1{name: 'password1', maxlength: '100', type: 'password'}
-                        %label{for: 'id_password2'}
-                            {% trans "Password repeat" %}:
-                        %input#id_password2{name: 'password2', maxlength: '100', type: 'password'}
-                        - if datablocks.usage_rules
-                            %p
-                                {% trans "By sign up you apply" %}
-                                <a href="{{ datablocks.usage_rules }}">{% trans "service usage rules" %}</a>.
-                        - if datablocks.confident
-                            %p
-                                {% trans "Data you submit is protected by service" %}
-                                <a href="{{ datablocks.confident }}">{% trans "confidential policy" %}</a>.
-                    .modal-footer
-                        %button.btn.btn-primary{type: 'submit'}
-                            {% trans "Sign up" %}
+                        - include "login/snippets/login.haml"
         .hidden-phone
             - include 'bugtracker/add_bug_button.html'
     <script type="text/javascript">

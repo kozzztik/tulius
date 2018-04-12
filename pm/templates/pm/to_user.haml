@@ -1,0 +1,57 @@
+- extends 'base.haml'
+- load i18n
+- load url from future
+- load bbcodes
+
+- block extra_scripts
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-players.css'}
+    <link rel="stylesheet" href="{{ STATIC_URL }}wysibb/theme/default/wbbtheme.css" type="text/css" />
+
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: '{% url "pm:messages" %}'}
+            {% trans "Messages" %}
+    %li
+        .divider
+        %a{href: ''}
+            = player.username
+
+- block caption
+    {% trans "Messages" %}
+
+- block content
+    - include 'wysibb/init.html'
+
+    .messages-area
+        %table#messages-box.messages-table.wide
+            - for message in message_list
+                %tr{class: '{% if message.sender != request.user and not message.is_read %}unread-talking{% endif %}'}
+                    %td.messages-avatar.hidden-phone
+                      - if message.sender.avatar
+                          %img{width: '50px', height: '50px', src: '{{ message.sender.avatar.url }}'}
+                    %td.messages-sender
+                        - if message.sender.id = request.user.id
+                            {% trans "You" %}
+                        - else
+                            %a{'href': '{{ message.sender.get_absolute_url }}'}
+                                = message.sender
+                        %br
+                        %small
+                            = message.created_at
+                    %td.messages-text
+                        = message.body|bbcode|safe|linebreaksbr
+        <script>
+            var v = $('#messages-box')[0];
+            v.scrollTo(500, 500);
+        </script>
+
+    %form.messages-form{method: 'POST', action: ''}
+        - csrf_token
+        = form.management_form
+        = form.body
+        %br
+        %button.submit.btn.btn-primary{'type': 'submit'}
+            {% trans "Send" %}
+        %a{'href': '{% url "players:player_history" player.id %}'}
+            {% trans "Message history" %}

@@ -5,12 +5,14 @@ from common.models import AbstractBaseModel
 from pm.signals import private_message_created
 from tulius.models import User
 
+
 class PrivateMessageManager(models.Manager):
     def talking(self, user_me, user_him):
         query = Q(receiver=user_me, sender=user_him, removed_by_receiver=False)
         query = query | Q(receiver=user_him, sender=user_me, removed_by_sender=False)
         return self.filter(query).order_by('-id')
-       
+
+
 class PrivateMessage(AbstractBaseModel):
 
     class Meta(AbstractBaseModel.Meta):
@@ -39,6 +41,7 @@ class PrivateMessage(AbstractBaseModel):
         else:
             super(PrivateMessage, self).save(*args, **kwargs)
 
+
 class PrivateTalkingManager(models.Manager):
     def get_talking(self, sender, receiver):
         talkings = self.filter(sender=sender, receiver=receiver)
@@ -52,7 +55,8 @@ class PrivateTalkingManager(models.Manager):
         talking = self.get_talking(sender, receiver)
         talking.last = post
         talking.save()
-        
+
+
 class PrivateTalking(models.Model):
     class Meta(AbstractBaseModel.Meta):
         verbose_name = _('private talking')

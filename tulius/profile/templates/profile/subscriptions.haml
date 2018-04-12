@@ -1,0 +1,40 @@
+- extends 'base.haml'
+- load i18n
+- load url from future
+
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: ''}
+            {% trans "Subscriptions" %}
+
+- block caption
+    {% trans "Subscriptions" %}
+
+- block content
+    %form.form-horizontal{method: 'POST', action: ''}
+        - csrf_token
+        %table.table
+            %thead
+                %tr
+                    %th
+                        {% trans "Name" %}
+                    %th
+                        {% trans "Status" %}
+                    %th
+                        {% trans "Description" %}
+            %tbody
+                - for form in forms
+                    %tr
+                        %td
+                            = form.notification
+                        %td
+                            = form.enabled
+                        %td
+                            = form.notification.description
+        %fieldset
+            .form-actions
+                %button#submit_settings.submit.btn.btn-primary{type: 'submit'}
+                    {% trans "save" %}
+                %button.submit.btn{type: 'reset'}
+                    {% trans "reset" %}
