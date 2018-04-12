@@ -1,0 +1,14 @@
+language: python
+install:
+  - pip install tox
+script:
+  - tox -e $INTERP
+deploy:
+  - provider: script
+    script: bash scripts/deploy.sh test
+    on:
+      branch: dev
+  - provider: script
+    script: bash scripts/deploy.sh production
+    on:
+      branch: master
