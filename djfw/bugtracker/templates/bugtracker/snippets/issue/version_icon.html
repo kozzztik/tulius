@@ -1,9 +1,0 @@
-{% if version.archived %}
-    <img class="small-icon inline" src="{{ STATIC_URL }}bugtracker/img/version_archieved.png" />
-{% else %}
-    {% if version.release_date %}
-        <img class="small-icon inline" src="{{ STATIC_URL }}bugtracker/img/version_released.png" />
-    {% else %}
-        <img class="small-icon inline" src="{{ STATIC_URL }}bugtracker/img/version_in_work.png" />
-    {% endif %}
-{% endif %}
