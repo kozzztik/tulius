@@ -105,9 +105,6 @@
             %a{href: '{% url "profile:settings" %}'}
                 {% trans "Settings" %}
         %li
-            %a{href: '{% url "profile:found_bugs" %}'}
-                {% trans "Problems" %}
-        %li
             %a{href: '{% url "profile:subscriptions" %}'}
                 {% trans "Subscriptions" %}
         %li
@@ -132,9 +129,6 @@
         %li
             %a{href: '{% url "counters:index"%}'}
                 {% trans "Counters" %}
-        %li
-            %a{href: '{% url "players:player_exceptions" user.id %}'}
-                {% trans "Your exceptions" %}
         %li
             %a{href: '{% url "admin:index" %}'}
                 {% trans "Django admin site" %}

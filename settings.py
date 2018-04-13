@@ -1,8 +1,10 @@
+"""Django settings for tulius project."""
 import os
+
+from django.utils.translation import ugettext_lazy as _
+
 BASE_DIR = os.path.dirname(__file__) + '/'
 PROJECT_NAME = 'tulius'
-# Django settings for tulius project.
-from django.utils.translation import ugettext_lazy as _
 
 ROOT_URLCONF = 'tulius.urls'
 
@@ -32,7 +34,6 @@ AUTH_USER_MODEL = 'tulius.User'
 
 INSTALLED_APPS = (
     'south',
-    'grappelli',
     'raven.contrib.django.raven_compat',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,7 +57,6 @@ INSTALLED_APPS = (
     'djfw.wysibb',
     'djfw.autocomplete',
     'djfw.inlineformsets',
-    'djfw.bugtracker',
     'djfw.cataloging',
     'djfw.news',
     'djfw.uploader',
@@ -74,8 +74,6 @@ INSTALLED_APPS = (
     'tulius.forum',
     'tulius.stories',
     'tulius.gameforum',
-    'tulius.bugs',
-    'tulius.old_site_migrate',
     'djfw.installer',
     'events',
     'tulius.vk',
@@ -109,7 +107,8 @@ TEMPLATE_LOADERS = (
 )
 
 if not DEBUG:
-    TEMPLATE_LOADERS = (('django.template.loaders.cached.Loader', TEMPLATE_LOADERS),)
+    TEMPLATE_LOADERS = (
+        ('django.template.loaders.cached.Loader', TEMPLATE_LOADERS),)
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.debug',
@@ -125,27 +124,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'djfw.datablocks.context_processors.datablocks',
 )
 
-CROWD = {
-    'url': 'http://crowd.co-de.org:8095/crowd/rest',
-    'app_name': 'tulius_trunk',
-    'password': 'dsth5y3463563h5dfg55',
-    'superuser': True,
-}
-
 AUTHENTICATION_BACKENDS = (
     'tulius.vk.backend.VKBackend',
     'django.contrib.auth.backends.ModelBackend',
-    #'djfw.bugtracker.atlassian.crowd.CrowdBackend',
 )
-
-BUGTRACKER = {
-    'url': 'https://jira.co-de.org',
-    'login': 'Tulius',
-    'password': 'HSR70yvEnA',
-    'project': 'TULIUS',
-    'disable_certs': True,
-    'ca_certs': None
-}
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
@@ -231,10 +213,6 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
-        'bugtracker.jira': {
-            'handlers': ['console', 'db', ],
-            'level': 'DEBUG',
-        },
     }
 }
 
@@ -246,10 +224,6 @@ if DEBUG:
 
 THEMING_ROOT = MEDIA_ROOT + 'uploads/themes/'
 THEMING_URL = MEDIA_URL + 'uploads/themes/'
-
-RAVEN_CONFIG = {
-    'dsn': 'http://68b2f69f668848e58951db48491ed00c:92ab0a46958449058583ae592131bc14@sentry.co-de.org/3',
-}
 
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 25

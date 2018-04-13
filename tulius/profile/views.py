@@ -6,8 +6,6 @@ from django.utils.decorators import method_decorator
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from events.models import UserNotification, Notification
-from tulius.bugs.views import issue_views as bug_views
-from djfw.bugtracker.models import Bug
 from tulius.forum.models import UploadedFile, Comment, CommentLike
 from tulius.stories.models import StoryAdmin, Role, Variation, StoryAuthor
 from tulius.gameforum import GAMEFORUM_SITE_ID, site as gameforum_site
@@ -99,13 +97,6 @@ class PlayerFavoritesView(LoginTemplateView):
         block_trustmarks = True
         block_reply = True
         return locals()
-
-
-class PlayerFoundBugsView(LoginTemplateView):
-    template_name = 'profile/found_bugs.haml'
-
-    def get_context_data(self, **kwargs):
-        return {'bugs': Bug.objects.authored(self.request.user), 'urlizer': bug_views.urlizer}
 
 
 class PlayerSubscriptionsView(LoginTemplateView):
