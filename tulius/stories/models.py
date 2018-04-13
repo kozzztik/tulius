@@ -1,11 +1,12 @@
 from django.utils.translation import ugettext_lazy as _, pgettext
 from django.utils.timezone import now
 from django.db import models
-from common import CREATION_YEAR_CHOICES
+from djfw.common import CREATION_YEAR_CHOICES
 from tulius.forum.models import Thread
 from datetime import timedelta
 from djfw.sortable.models import SortableModelMixin
 from tulius.models import User
+
 
 class Genre(models.Model):
     """
