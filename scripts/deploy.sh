@@ -6,7 +6,7 @@ chmod 600 /tmp/deploy_rsa
 ssh-add /tmp/deploy_rsa
 
 # Download updates
-ssh -i /tmp/deploy_rsa travis@tulius.com -p 33023 "cd ~/$TRAVIS_BRANCH && git fetch --all && git reset --hard && git pull origin --rebase"
+ssh -i /tmp/deploy_rsa travis@tulius.com -p 33023 "cd ~/$TRAVIS_BRANCH && git fetch --all && git reset --hard && git pull --rebase"
 echo "Data updated"
 
 # Do after deploy staff
