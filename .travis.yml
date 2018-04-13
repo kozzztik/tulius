@@ -3,12 +3,14 @@ install:
   - pip install tox
 script:
   - tox -e py27
+addons:
+  ssh_known_hosts: tulius.com:33023
 deploy:
   - provider: script
     script: bash scripts/deploy.sh test
     on:
       branch: dev
   - provider: script
-    script: bash scripts/deploy.sh production
+    script: bash scripts/deploy.sh prod
     on:
       branch: master
