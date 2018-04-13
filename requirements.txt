@@ -33,3 +33,4 @@ gevent
 redis
 django-websocket-redis
 django-redis-cache
+requests
