@@ -133,12 +133,6 @@
             %a{href: '{% url "admin:index" %}'}
                 {% trans "Django admin site" %}
         %li
-            %a{href: '{% url "bugs:bugtracker_main" %}'}
-                {% trans "Bugtracker" %}
-        %li
-            %a{href: '{% url "bugs:complaints" %}'}
-                {% trans "Complaints" %}
-        %li
             %a{data-toggle: 'modal', href: '#reloginModal'}
                 {% trans "Switch user" %}
 .menu-background
