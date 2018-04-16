@@ -5,7 +5,7 @@ from mimetypes import guess_type
 from django.shortcuts import get_object_or_404
 from .models import Illustration
 from djfw.uploader import handle_upload, handle_download_file_path
-from common import generate_random_id
+from djfw.common import generate_random_id
 import os
 from PIL import Image
 import StringIO

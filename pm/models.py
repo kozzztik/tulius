@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.db.models.query_utils import Q
-from common.models import AbstractBaseModel
+from djfw.common.models import AbstractBaseModel
 from pm.signals import private_message_created
 from tulius.models import User
 
