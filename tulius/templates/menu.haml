@@ -24,7 +24,7 @@
         %li
             %a.articles{href: '#', data-toggle: '#articles-menu', title: '{% trans "Articles" %}'}
         - if request.user.is_superuser
-            %lipip
+            %li
                 %a.admin{href: '#', data-toggle: '#admin-menu', title: '{% trans "Admin panel" %}'}
     %ul.menu-scroll
         %li
