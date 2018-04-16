@@ -1,6 +1,7 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from .core import ThreadsCorePlugin
-from .views import Room, Index, EditView, Thread, DeleteThread, MoveThreadSelect, MoveThreadConfirm
+from . import views
+
 
 class ThreadsPlugin(ThreadsCorePlugin):
     room_list_template = 'forum/snippets/room_list.haml'
@@ -15,7 +16,8 @@ class ThreadsPlugin(ThreadsCorePlugin):
 
     def thread_move_confirm(self, thread, new_parent):
         if new_parent:
-            return self.reverse('thread_move_confirm', thread.id, new_parent.id)
+            return self.reverse(
+                'thread_move_confirm', thread.id, new_parent.id)
         else:
             return self.reverse('thread_move_confirm', thread.id)
         
@@ -56,30 +58,47 @@ class ThreadsPlugin(ThreadsCorePlugin):
         self.templates['thread_list'] = self.thread_list_template
         self.templates['index_actions'] = 'forum/snippets/index_actions.haml'
         self.templates['thread'] = 'forum/thread.haml'
-        self.templates['delete_thread_form'] = 'forum/snippets/delete_post.haml'
-        self.templates['thread_move_select'] = 'forum/threads/move_select.haml'
-        self.templates['thread_move_confirm'] = 'forum/threads/move_confirm.haml'
+        self.templates['delete_thread_form'] = \
+            'forum/snippets/delete_post.haml'
+        self.templates['thread_move_select'] = \
+            'forum/threads/move_select.haml'
+        self.templates['thread_move_confirm'] = \
+            'forum/threads/move_confirm.haml'
         self.core['Thread_get_edit_url'] = self.thread_edit_url
         self.core['move_thread_confirm_url'] = self.thread_move_confirm
         self.urlizer['Thread_get_absolute_url'] = self.thread_url
         self.urlizer['Thread_get_add_room_url'] = self.get_add_room_url
         self.urlizer['Thread_get_add_thread_url'] = self.get_add_thread_url
-        self.urlizer['Thread_get_comments_page_url'] = self.get_comments_page_url
+        self.urlizer['Thread_get_comments_page_url'] = \
+            self.get_comments_page_url
         self.urlizer['Thread_get_delete_url'] = self.delete_thread_url
         self.urlizer['Thread_get_move_url'] = self.thread_move
         
     def get_urls(self):
-        return patterns('',
-            url(r'^$', Index.as_view(self), name='index'),
-            url(r'^room/(?P<parent_id>\d+)/$', Room.as_view(self), name='room'),
-            url(r'^add_room/$', EditView.as_view(self, self_is_room=True), name='add_room'),
-            url(r'^add_room/(?P<parent_id>\d+)/$', EditView.as_view(self, self_is_room=True), name='add_room'),
-            url(r'^edit_room/(?P<thread_id>\d+)/$', EditView.as_view(self, self_is_room=True), name='edit_room'),
-            url(r'^add_thread/(?P<parent_id>\d+)/$', EditView.as_view(self, self_is_room=False), name='add_thread'),
-            url(r'^edit_thread/(?P<thread_id>\d+)/$', EditView.as_view(self, self_is_room=False), name='edit_thread'),
-            url(r'^thread/(?P<parent_id>\d+)/$', Thread.as_view(self), name='thread'),
-            url(r'^thread/(?P<parent_id>\d+)/move/$', MoveThreadSelect.as_view(self), name='thread_move'),
-            url(r'^thread/(?P<parent_id>\d+)/move/(?P<thread_id>\d+)/$', MoveThreadConfirm.as_view(self), name='thread_move_confirm'),
-            url(r'^thread/(?P<parent_id>\d+)/move/root/$', MoveThreadConfirm.as_view(self), name='thread_move_confirm'),
-            url(r'^delete_thread/$', DeleteThread.as_view(self), name='delete_thread'),
-        )
+        return [
+            url(r'^$', views.Index.as_view(self), name='index'),
+            url(r'^room/(?P<parent_id>\d+)/$', views.Room.as_view(self),
+                name='room'),
+            url(r'^add_room/$', views.EditView.as_view(
+                self, self_is_room=True), name='add_room'),
+            url(r'^add_room/(?P<parent_id>\d+)/$', views.EditView.as_view(
+                self, self_is_room=True), name='add_room'),
+            url(r'^edit_room/(?P<thread_id>\d+)/$', views.EditView.as_view(
+                self, self_is_room=True), name='edit_room'),
+            url(r'^add_thread/(?P<parent_id>\d+)/$', views.EditView.as_view(
+                self, self_is_room=False), name='add_thread'),
+            url(r'^edit_thread/(?P<thread_id>\d+)/$', views.EditView.as_view(
+                self, self_is_room=False), name='edit_thread'),
+            url(r'^thread/(?P<parent_id>\d+)/$', views.Thread.as_view(self),
+                name='thread'),
+            url(r'^thread/(?P<parent_id>\d+)/move/$',
+                views.MoveThreadSelect.as_view(self), name='thread_move'),
+            url(r'^thread/(?P<parent_id>\d+)/move/(?P<thread_id>\d+)/$',
+                views.MoveThreadConfirm.as_view(self),
+                name='thread_move_confirm'),
+            url(r'^thread/(?P<parent_id>\d+)/move/root/$',
+                views.MoveThreadConfirm.as_view(self),
+                name='thread_move_confirm'),
+            url(r'^delete_thread/$', views.DeleteThread.as_view(self),
+                name='delete_thread'),
+        ]

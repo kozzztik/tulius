@@ -1,8 +1,9 @@
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.template import loader, Context
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse
 from django import forms
-from httplib import HTTPResponse
+from django.forms.models import fields_for_model, modelform_factory
+
 
 class SortableViewMixin(object):
     class Meta:
@@ -40,6 +41,7 @@ class SortableViewMixin(object):
             queryset.filter(pk=item).update(**{self.sortable_field: order})
         return HttpResponse("{}")
 
+
 class SortableDetailViewMixin(SortableViewMixin):
     sortable_fk = None
     
@@ -57,6 +59,7 @@ class SortableDetailViewMixin(SortableViewMixin):
                                             'cls': self.__class__.__name__
                                     })
 
+
 class DecoratorChainingMixin(object):
     def dispatch(self, *args, **kwargs):
         decorators = getattr(self, 'decorators', [])
@@ -65,7 +68,8 @@ class DecoratorChainingMixin(object):
         for decorator in decorators:
             base = decorator(base)
         return base(*args, **kwargs)
-    
+
+
 class ActionableBase(object):
     class Meta:
         static_js = []
@@ -134,16 +138,19 @@ class ActionableBase(object):
 #        obj._meta = meta
 #        return obj
 
+
 class ActionableViewMixin(ActionableBase):
-#    widgets = {'my_widget': {'class': MyWidget}}
+    #    widgets = {'my_widget': {'class': MyWidget}}
     widgets_param = 'widget'
+
     def __init__(self, *args, **kwargs):
         super(ActionableViewMixin, self).__init__(*args, **kwargs)
         widgets_list = {}
         for widget_name in self.widgets.keys():
             widget_data = self.widgets[widget_name].copy()
             widget_class = widget_data.pop('class')
-            widgets_list[widget_name] = widget_class(self, widget_name, **widget_data)
+            widgets_list[widget_name] = widget_class(
+                self, widget_name, **widget_data)
         self.widgets_list = widgets_list
         
     def get_context_data(self, **kwargs):
@@ -179,7 +186,8 @@ class ActionableViewMixin(ActionableBase):
             widget = self.widgets_list[widget_name]
             return widget.post(request, *args, **kwargs)
         else:
-            return super(ActionableViewMixin, self).post(request, *args, **kwargs)
+            return super(ActionableViewMixin, self).post(
+                request, *args, **kwargs)
         
     def __getitem__(self, key):
         return self.widgets_list[key]
@@ -187,7 +195,8 @@ class ActionableViewMixin(ActionableBase):
     def __iter__(self):
         for name in self.widgets_list:
             yield self[name]
-    
+
+
 class WidgetBase(ActionableBase):
     view = None
     name = ''
@@ -198,7 +207,8 @@ class WidgetBase(ActionableBase):
         cls = self.__class__
         for key, value in kwargs.iteritems():
             if not hasattr(cls, key):
-                raise TypeError(u"%s() received an invalid keyword %r" % (cls.__name__, key))
+                raise TypeError(
+                    u"%s() received an invalid keyword %r" % (cls.__name__, key))
             setattr(self, key, value)
 
     def get_read_right(self, **kwargs):
@@ -206,7 +216,8 @@ class WidgetBase(ActionableBase):
 
     def get_post_right(self, **kwargs):
         return self.view.get_post_right(widget=self, widget_name=self.name)
-    
+
+
 class TemplatedWidget(WidgetBase):
     template_name = ''
     widget_context_name = ''
@@ -224,6 +235,7 @@ class TemplatedWidget(WidgetBase):
         c = Context(self.get_context_data())
         t = loader.get_template(self.get_template_name())
         return t.render(c)
+
 
 class FormWidget(TemplatedWidget):
     class Meta:
@@ -273,20 +285,22 @@ class FormWidget(TemplatedWidget):
             template = t.render(c)
         else:
             template = self.__unicode__()
-        return HTTPResponse(template)
+        return HttpResponse(template)
      
     def invalid_form(self, form):
         return HTTPResponse(self.__unicode__())
-    
+
+
 class TwitterFormWidget(FormWidget):
     template_name = 'custom_views/twitter_form.html'
     
-from django.forms.models import fields_for_model, modelform_factory
 
 class FormsetWidget(TemplatedWidget):
     template_name = 'custom_views/formset.html'
     model = None
-    actions = {'add_item': {'method': 'add_item'}, 'delete_item': {'method': 'delete_item'}}
+    actions = {
+        'add_item': {'method': 'add_item'},
+        'delete_item': {'method': 'delete_item'}}
     form_class = None
     fk = ''
     queryset = None
@@ -301,7 +315,6 @@ class FormsetWidget(TemplatedWidget):
         super(FormsetWidget, self).__init__(*args, **kwargs)
         
     def get_editable(self):
-        print 'try2'
         if callable(self.editable):
             return self.editable(self.view)
         else:
@@ -339,13 +352,17 @@ class FormsetWidget(TemplatedWidget):
         self.formset = self.prepare_formset()
         self.editable = self.get_editable()
         if not hasattr(self, 'form'):
-            self.form = self.get_formclass()(initial=self.form_initials, prefix=self.name)
+            self.form = self.get_formclass()(
+                initial=self.form_initials, prefix=self.name)
         return context
     
     def add_item(self):
         if not self.get_editable():
             raise PermissionDenied()
-        form = self.get_formclass()(data=self.view.request.POST, initial=self.form_initials, prefix=self.name)
+        form = self.get_formclass()(
+            data=self.view.request.POST,
+            initial=self.form_initials,
+            prefix=self.name)
         if form.is_valid():
             obj = form.save(commit=False)
             parent = self.get_parent_object()
@@ -354,7 +371,7 @@ class FormsetWidget(TemplatedWidget):
             obj.save()
         else:
             self.form = form
-        return HttpResponse(unicode(self))
+        return HttpResponse(str(self))
     
     def delete_item(self):
         if not self.get_editable():
@@ -369,19 +386,25 @@ class FormsetWidget(TemplatedWidget):
     def get_formfield(self, obj, name, formfield):
         display = getattr(obj, 'get_' + name + '_display', None)
         if display:
-            return unicode(display())
-        return unicode(getattr(obj, name, ''))
+            return str(display())
+        return str(getattr(obj, name, ''))
     
     def prepare_formset(self):
         formset = []
         queryset = self.get_queryset()
         model = queryset.model
-        fields =  fields_for_model(model, self.fields, self.exclude_fields, None, self.get_formfield_callback())
+        fields = fields_for_model(
+            model, self.fields, self.exclude_fields, None,
+            self.get_formfield_callback())
         for obj in queryset:
             form = {'obj': obj}
             form_fields = []
             for field in fields.keys():
-                form_fields += [{'name': field, 'value': self.get_formfield(obj, field, fields[field])}]
+                form_fields += [
+                    {
+                        'name': field,
+                        'value': self.get_formfield(obj, field, fields[field])
+                    }]
             form['fields'] = form_fields
             formset += [form]
         formset_fields = []
@@ -396,5 +419,6 @@ class FormsetWidget(TemplatedWidget):
     def get_formclass(self):
         if not self.form_class:
             model = self.get_queryset().model
-            self.form_class = modelform_factory(model, fields=self.fields, exclude=self.exclude_fields)
+            self.form_class = modelform_factory(
+                model, fields=self.fields, exclude=self.exclude_fields)
         return self.form_class

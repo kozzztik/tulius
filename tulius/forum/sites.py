@@ -1,6 +1,5 @@
-#from django.core.exceptions import ImproperlyConfigured
-from django.conf.urls import patterns
 from django.conf import settings
+
 
 class SitesManager():
     sites = []
@@ -15,8 +14,10 @@ class SitesManager():
             if site.site_id == site_id:
                 return site
         return None 
-    
+
+
 sites_manager = SitesManager()
+
 
 class SiteCore(object):
     def __init__(self, site):
@@ -35,7 +36,8 @@ class SiteCore(object):
 
     def __setitem__(self, key, value):
         self.content[key] = value
-        
+
+
 class BaseForumSite(object):
     plugins = {}
     plugin_classes = ()
@@ -44,7 +46,8 @@ class BaseForumSite(object):
     urlizer = None
     signals = None
     
-    def __init__(self, name='forum', app_name='forum', site_id=None, plugins=()):
+    def __init__(
+            self, name='forum', app_name='forum', site_id=None, plugins=()):
         self.app_name = app_name
         self.name = name
         self.site_id = site_id
@@ -59,11 +62,11 @@ class BaseForumSite(object):
         sites_manager.add_site(self)
     
     def init_core(self):
-        import models
+        from . import models
         self.core.models = models
 
     def get_own_urls(self):
-        return patterns('')
+        return []
     
     def check_dependencies(self):
         for plugin in self.plugins.values():
@@ -93,7 +96,8 @@ class BaseForumSite(object):
     @property
     def urls(self):
         return self.get_urls(), self.app_name, self.name
-    
+
+
 class ForumSite(BaseForumSite):
 
     def init_core(self):

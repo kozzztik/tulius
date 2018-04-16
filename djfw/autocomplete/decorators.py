@@ -1,8 +1,10 @@
+import json
+import sys
+
 from django.utils.decorators import wraps
 from django.http import HttpResponse
-from django.utils import simplejson
 from django.http import Http404
-import sys
+
 
 def autocomplete_result(func):
     @wraps(func)
@@ -17,9 +19,9 @@ def autocomplete_result(func):
         try:
             items = func(*args, **kwargs)
         except:
-            return HttpResponse('CACHE_MISS ' +  unicode(sys.exc_info()))
+            return HttpResponse('CACHE_MISS ' + str(sys.exc_info()))
         result = []
         for item in items:
             result.append((item.id, str(item)))
-        return HttpResponse(simplejson.dumps(result))
+        return HttpResponse(json.dumps(result))
     return inner

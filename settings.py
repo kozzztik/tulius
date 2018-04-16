@@ -33,7 +33,6 @@ LANGUAGES = (
 AUTH_USER_MODEL = 'tulius.User'
 
 INSTALLED_APPS = (
-    'south',
     'raven.contrib.django.raven_compat',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,7 +47,6 @@ INSTALLED_APPS = (
     'ws4redis',
     'djaml',
     'djfw',
-    'tulius',
     'djfw.datablocks',
     'djfw.logger',
     'djfw.pagination',
@@ -167,11 +165,12 @@ LOGGING = {
     'handlers': {
         'null': {
             'level': 'DEBUG',
-            'class': 'django.utils.log.NullHandler', 
+            'class': 'logging.NullHandler',
         },
         'sentry': {
             'level': 'ERROR',
-            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+            'class':
+                'raven.contrib.django.raven_compat.handlers.SentryHandler',
         },
         'mail_admins': {
             'level': 'ERROR',
