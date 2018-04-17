@@ -1,10 +1,11 @@
 """
 Forum engine models for Tulius project
 """
-from django.utils.translation import ugettext_lazy as _
 from django.db import models, transaction
-from mptt.models import MPTTModel, TreeForeignKey, TreeManager
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.translation import ugettext_lazy as _
+from mptt.models import MPTTModel, TreeForeignKey, TreeManager
+
 from tulius.models import User
 
 COMMENTS_ON_PAGE = 25
@@ -19,7 +20,7 @@ class UploadedFile(models.Model):
         verbose_name_plural = _('uploaded files')
 
     user = models.ForeignKey(
-        User, 
+        User, models.PROTECT,
         null=False, 
         blank=False, 
         related_name='forum_files', 
@@ -49,7 +50,7 @@ class UploadedFile(models.Model):
     )
     
     def is_image(self):
-        return (self.mime[0:5] == 'image')
+        return self.mime[0:5] == 'image'
     
     def filename(self):
         return self.name
@@ -205,7 +206,7 @@ class Thread(MPTTModel, SitedModelMixin):
         verbose_name=_('body')
     )
     parent = TreeForeignKey(
-        'self', 
+        'self', models.PROTECT,
         null=True, 
         blank=True, 
         related_name='children', 
@@ -216,7 +217,7 @@ class Thread(MPTTModel, SitedModelMixin):
         verbose_name=_(u'room')
     )
     user = models.ForeignKey(
-        User, 
+        User, models.PROTECT,
         related_name='forum_threads', 
         verbose_name=_('author')
     )
@@ -360,14 +361,14 @@ class ThreadAccessRight(models.Model):
         unique_together = ('thread', 'user')
         
     thread = models.ForeignKey(
-        Thread, 
+        Thread, models.PROTECT,
         null=False, 
         blank=False, 
         related_name='rights', 
         verbose_name=_('thread')
     )
     user = models.ForeignKey(
-        User, 
+        User, models.PROTECT,
         null=False, 
         blank=False, 
         related_name='forum_theads_rights', 
@@ -390,13 +391,13 @@ class ThreadCollapseStatus(models.Model):
         unique_together = ('thread', 'user')
         
     thread = models.ForeignKey(
-        Thread, 
+        Thread, models.PROTECT,
         null=False, 
         blank=False, 
         verbose_name=_('thread')
     )
     user = models.ForeignKey(
-        User, 
+        User, models.PROTECT,
         null=False, 
         blank=False, 
         verbose_name=_('user')
@@ -434,21 +435,21 @@ class Comment(SitedModelMixin):
     )
     
     parent = TreeForeignKey(
-        Thread, 
+        Thread, models.PROTECT,
         null=False, 
         blank=False, 
         related_name='comments', 
         verbose_name=_('thread')
     )
     user = models.ForeignKey(
-        User, 
+        User, models.PROTECT,
         null=False, 
         blank=False, 
         related_name='forum_comments', 
         verbose_name=_('author')
     )
     editor = models.ForeignKey(
-        User,
+        User, models.PROTECT,
         null=True,
         blank=True, 
         related_name='forum_comments_edited', 
@@ -464,7 +465,7 @@ class Comment(SitedModelMixin):
         verbose_name=_('edited at'),
     )
     reply = models.ForeignKey(
-        'self', 
+        'self', models.PROTECT,
         null=True, 
         blank=True, 
         related_name='answers', 
@@ -574,28 +575,28 @@ class ThreadReadMark(models.Model):
         verbose_name_plural = _('thread read marks')
     
     thread = models.ForeignKey(
-        Thread, 
+        Thread, models.PROTECT,
         null=False, 
         blank=False, 
         related_name='read_marks', 
         verbose_name=_('thread'),
     )
     user = models.ForeignKey(
-        User, 
+        User, models.PROTECT,
         null=False, 
         blank=False, 
         related_name='forum_readed_threads', 
         verbose_name=_('user'),
     )
     readed_comment = models.ForeignKey(
-        Comment, 
+        Comment, models.PROTECT,
         null=False, 
         blank=False, 
         related_name='readed_users', 
         verbose_name=_('readed comment'),
     )
     not_readed_comment = models.ForeignKey(
-        Comment, 
+        Comment, models.PROTECT,
         null=True, 
         blank=True, 
         related_name='not_readed_users', 
@@ -609,14 +610,14 @@ class CommentLike(models.Model):
         verbose_name_plural = _('comments likes')
 
     user = models.ForeignKey(
-        User, 
+        User, models.PROTECT,
         null=False, 
         blank=False, 
         related_name='liked_comments', 
         verbose_name=_('user'),
     )
     comment = models.ForeignKey(
-        Comment, 
+        Comment, models.PROTECT,
         null=False, 
         blank=False, 
         related_name='liked', 
@@ -647,14 +648,14 @@ class ThreadDeleteMark(models.Model):
         verbose_name_plural = _(u'threads delete marks')
         
     thread = models.ForeignKey(
-        Thread,
+        Thread, models.PROTECT,
         blank=False,
         null=False,
         verbose_name=_(u'thread'),
         related_name='delete_marks',
     )
     user = models.ForeignKey(
-        User, 
+        User, models.PROTECT,
         blank=False,
         null=False,
         verbose_name=_(u'user'),
@@ -688,14 +689,14 @@ class CommentDeleteMark(models.Model):
         verbose_name_plural = _(u'comments delete marks')
         
     comment = models.ForeignKey(
-        Comment,
+        Comment, models.PROTECT,
         blank=False,
         null=False,
         verbose_name=_(u'comment'),
         related_name='delete_marks',
     )
     user = models.ForeignKey(
-        User, 
+        User, models.PROTECT,
         blank=False,
         null=False,
         verbose_name=_(u'user'),
@@ -727,7 +728,7 @@ class OnlineUser(models.Model):
         verbose_name_plural = _(u'online users')
         
     user = models.ForeignKey(
-        User, 
+        User, models.PROTECT,
         blank=False,
         null=False,
         verbose_name=_(u'user'),
@@ -738,7 +739,7 @@ class OnlineUser(models.Model):
         verbose_name=_('visit time'),
     )
     thread = models.ForeignKey(
-        Thread,
+        Thread, models.PROTECT,
         blank=False,
         null=False,
         verbose_name=_(u'thread'),
@@ -758,14 +759,14 @@ class Voting(models.Model):
         verbose_name_plural = _('votings')
     
     user = models.ForeignKey(
-        User, 
+        User, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'user'),
         related_name='create_votings',
     )
     comment = models.ForeignKey(
-        Comment,
+        Comment, models.PROTECT,
         null=False, 
         blank=False, 
         related_name='voting_list', 
@@ -827,7 +828,7 @@ class VotingChoice(models.Model):
         verbose_name_plural = _('voting choices')
     
     voting = models.ForeignKey(
-        Voting,
+        Voting, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'voting'),
@@ -854,14 +855,14 @@ class VotingVote(models.Model):
         unique_together = ('choice', 'user')
         
     choice = models.ForeignKey(
-        VotingChoice,
+        VotingChoice, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'voting'),
         related_name='voting_choices',
     )
     user = models.ForeignKey(
-        User, 
+        User, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'user'),

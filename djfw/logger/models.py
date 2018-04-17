@@ -1,7 +1,9 @@
+import logging
+
+from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
-import logging
+
 
 LOGGING_LEVEL_CHOICES = (
     (logging.NOTSET, _(u'NOT SET')),
@@ -68,11 +70,12 @@ class ExceptionMessage(models.Model):
         ordering = ['-id']
         
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, 
+        settings.AUTH_USER_MODEL,
+        models.PROTECT,
         null=True,
         blank=True,
         related_name='exceptions', 
-        verbose_name=_('user')
+        verbose_name=_('user'),
     )
     
     create_time = models.DateTimeField(
@@ -150,7 +153,8 @@ class ExceptionCookie(models.Model):
         ordering = ["name"]
         
     exception_message = models.ForeignKey(
-        ExceptionMessage, 
+        ExceptionMessage,
+        models.PROTECT,
         related_name='cookies', 
         verbose_name=_('exception')
     )
@@ -182,7 +186,8 @@ class ExceptionMETAValue(models.Model):
         ordering = ["name"]
         
     exception_message = models.ForeignKey(
-        ExceptionMessage, 
+        ExceptionMessage,
+        models.PROTECT,
         related_name='metas', 
         verbose_name=_('exception')
     )
@@ -213,7 +218,8 @@ class ExceptionTraceback(models.Model):
         verbose_name_plural = _('exception traceback records')
         
     exception_message = models.ForeignKey(
-        ExceptionMessage, 
+        ExceptionMessage,
+        models.PROTECT,
         related_name='traceback', 
         verbose_name=_('exception')
     )

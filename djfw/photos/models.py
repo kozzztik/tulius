@@ -1,7 +1,9 @@
-from django.utils.translation import ugettext_lazy as _
+import os
+
 from django.conf import settings
 from django.db import models
-import os
+from django.utils.translation import ugettext_lazy as _
+
 
 class PhotoAlbum(models.Model):
     class Meta:
@@ -26,7 +28,8 @@ class PhotoAlbum(models.Model):
     )
     
     title_photo = models.ForeignKey(
-        'Photo', 
+        'Photo',
+        models.PROTECT,
         null=True,
         blank=True,
         verbose_name=_('title photo'),
@@ -37,8 +40,10 @@ class PhotoAlbum(models.Model):
             return None
         if not self.title_photo.thumbnail:
             return None
-        image_path = os.path.join(settings.MEDIA_URL, self.title_photo.thumbnail.url)
-        return '<img src="'+ str(image_path) +'" style="max-height: 100px; max-width: 100px"/>'
+        image_path = os.path.join(
+            settings.MEDIA_URL, self.title_photo.thumbnail.url)
+        return '<img src="' + str(image_path) +\
+               '" style="max-height: 100px; max-width: 100px"/>'
     
     def photo_count(self):
         return self.photos.all().count()
@@ -53,14 +58,16 @@ class PhotoAlbum(models.Model):
     photo_count.short_description = _('photo count')
     tags.short_description = _('Tag')
     preview_image_url.allow_tags = True
-    
+
+
 class Photo(models.Model):
     class Meta:
         verbose_name = _('photo')
         verbose_name_plural = _('photos')
         
     album = models.ForeignKey(
-        PhotoAlbum, 
+        PhotoAlbum,
+        models.PROTECT,
         null=False,
         blank=False,
         related_name='photos', 
@@ -68,7 +75,8 @@ class Photo(models.Model):
     )
     
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, 
+        settings.AUTH_USER_MODEL,
+        models.PROTECT,
         null=True,
         blank=True,
         related_name='photos', 
@@ -101,8 +109,8 @@ class Photo(models.Model):
     )
 
     created_at = models.DateTimeField(
-        auto_now_add    = True,
-        verbose_name    = _('created at'),
+        auto_now_add=True,
+        verbose_name=_('created at'),
     )
     
     def __unicode__(self):
@@ -112,7 +120,8 @@ class Photo(models.Model):
         if not self.thumbnail:
             return None
         image_path = os.path.join(settings.MEDIA_URL, self.thumbnail.url)
-        return '<img src="'+ str(image_path) +'" style="max-height: 100px; max-width: 100px"/>'
+        return '<img src="' + str(image_path) +\
+               '" style="max-height: 100px; max-width: 100px"/>'
     
     def get_absolute_url(self):
         return self.image.url if self.image else None
@@ -131,4 +140,3 @@ class Photo(models.Model):
     preview_image_url.short_description = _('image')
     file_size.short_description = _('file length')
     preview_image_url.allow_tags = True
-    

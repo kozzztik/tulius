@@ -1,7 +1,9 @@
-from django.utils.translation import ugettext_lazy as _
+import os
+
 from django.conf import settings
 from django.db import models
-import os
+from django.utils.translation import ugettext_lazy as _
+
 
 class Emotion(models.Model):
     """
@@ -31,7 +33,8 @@ class Emotion(models.Model):
 
     def __unicode__(self):
         return self.name
-    
+
+
 class FileUpload(models.Model):
     """
     Editor uploaded files
@@ -53,7 +56,8 @@ class FileUpload(models.Model):
     )
     
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, 
+        settings.AUTH_USER_MODEL,
+        models.PROTECT,
         null=True,
         blank=True,
         related_name='tinymce_uploads', 
@@ -61,8 +65,8 @@ class FileUpload(models.Model):
     )
     
     created_at = models.DateTimeField(
-        auto_now_add    = True,
-        verbose_name    = _('created at'),
+        auto_now_add=True,
+        verbose_name=_('created at'),
     )
     
     mime = models.CharField(
@@ -91,8 +95,10 @@ class FileUpload(models.Model):
         if self.is_image():
             image_path = os.path.join(settings.MEDIA_URL, self.body.url)
         else:
-            image_path = os.path.join(settings.STATIC_URL, 'tinymce/img/box_address.png')
-        return '<img src="'+ str(image_path) +'" style="max-height: 85px; max-width: 85px"/>'
+            image_path = os.path.join(
+                settings.STATIC_URL, 'tinymce/img/box_address.png')
+        return f'<img src="{image_path}" style="max-height: 85px; ' \
+               f'max-width: 85px"/>'
     
     def get_absolute_url(self):
         return self.body.url if self.body else None
@@ -105,4 +111,3 @@ class FileUpload(models.Model):
     preview_image_url.short_description = _('image')
     file_size.short_description = _('file length')
     preview_image_url.allow_tags = True
-    

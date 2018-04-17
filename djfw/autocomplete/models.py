@@ -1,2 +1,1 @@
-import monkey
-
+from . import monkey

@@ -1,12 +1,15 @@
-from django.utils.translation import ugettext_lazy as _, pgettext
+import re
+
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
+from django.contrib.auth import models as auth_models
 from django.core.mail import send_mail
 from django.core import validators
 from django.utils import timezone
-import re
+from django.utils.translation import ugettext_lazy as _, pgettext
+
 from tulius.vk.models import VK_Profile
 from pm.signals import private_message_created
+
 
 USER_SEX_UNDEFINED = 0
 USER_SEX_MALE = 1
@@ -26,18 +29,23 @@ USER_GAME_INLINE_CHOICES = (
 )
 
 
-class User(PermissionsMixin, AbstractBaseUser):
-    username = models.CharField(_('username'), max_length=30, unique=True,
+class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
+    username = models.CharField(
+        _('username'), max_length=30, unique=True,
         help_text=_('Required. 30 characters or fewer. Letters, numbers and '
                     '@/./+/-/_ characters'),
         validators=[
-            validators.RegexValidator(re.compile('^[\w.@+-]+$', re.U), _('Enter a valid username.'), 'invalid')
+            validators.RegexValidator(
+                re.compile('^[\w.@+-]+$', re.U),
+                _('Enter a valid username.'), 'invalid')
         ])
     email = models.EmailField(_('email address'), blank=True)
-    is_staff = models.BooleanField(_('staff status'), default=False,
+    is_staff = models.BooleanField(
+        _('staff status'), default=False,
         help_text=_('Designates whether the user can log into this admin '
                     'site.'))
-    is_active = models.BooleanField(_('active'), default=True,
+    is_active = models.BooleanField(
+        _('active'), default=True,
         help_text=_('Designates whether this user should be treated as '
                     'active. Unselect this instead of deleting accounts.'))
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
@@ -112,6 +120,7 @@ class User(PermissionsMixin, AbstractBaseUser):
     
     vk_profile = models.ForeignKey(
         VK_Profile,
+        models.PROTECT,
         blank=True,
         null=True
     )
@@ -132,7 +141,7 @@ class User(PermissionsMixin, AbstractBaseUser):
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
 
-    objects = UserManager()
+    objects = auth_models.UserManager()
 
     class Meta:
         verbose_name = _('user')
@@ -157,16 +166,20 @@ class User(PermissionsMixin, AbstractBaseUser):
 
     def full_stars(self):
         from tulius.stories.models import Variation, Role
-        from tulius.games.models import GAME_STATUS_COMPLETED, GAME_STATUS_COMPLETED_OPEN
+        from tulius.games import models as game_models
         from tulius.players.models import stars
 
         self.full_stars_cache = getattr(self, 'full_stars_cache', None)
         if not (self.full_stars_cache is None):
             return self.full_stars_cache
         self.full_stars_cache = 0
-        variation_ids = [role['variation'] for role in Role.objects.filter(user=self).values('variation').distinct()]
+        variation_ids = [role['variation'] for role in Role.objects.filter(
+            user=self).values('variation').distinct()]
         variations = Variation.objects.filter(id__in=variation_ids)
-        games_played = variations.filter(game__status__in=[GAME_STATUS_COMPLETED, GAME_STATUS_COMPLETED_OPEN]).count()
+        games_played = variations.filter(
+            game__status__in=[
+                game_models.GAME_STATUS_COMPLETED,
+                game_models.GAME_STATUS_COMPLETED_OPEN]).count()
         big_stars = games_played / 100
         games_played -= big_stars * 100
         small_stars = 0
@@ -175,7 +188,8 @@ class User(PermissionsMixin, AbstractBaseUser):
                 small_stars += 1
             else:
                 break
-        self.full_stars_cache = 'b' * big_stars + 's' * small_stars + 'e' * (stars.stars_count - small_stars)
+        self.full_stars_cache = 'b' * big_stars + 's' * small_stars + 'e' * (
+                stars.stars_count - small_stars)
         return self.full_stars_cache
     
     def stories_author(self):
@@ -187,7 +201,8 @@ class User(PermissionsMixin, AbstractBaseUser):
     def new_invites(self):
         from tulius.games.models import GAME_INVITE_STATUS_NEW, GameInvite
         if self.new_invites_cache is None:
-            self.new_invites_cache = GameInvite.objects.filter(user=self, status=GAME_INVITE_STATUS_NEW) 
+            self.new_invites_cache = GameInvite.objects.filter(
+                user=self, status=GAME_INVITE_STATUS_NEW)
         return self.new_invites_cache
     
     def send_pm(self, sender, body):
@@ -197,9 +212,11 @@ class User(PermissionsMixin, AbstractBaseUser):
         
     def update_not_readed(self):
         from pm.models import PrivateMessage
-        count = PrivateMessage.objects.filter(receiver=self, is_read=False, removed_by_receiver=False).count()
+        count = PrivateMessage.objects.filter(
+            receiver=self, is_read=False, removed_by_receiver=False).count()
         self.not_readed_messages = count
-        last = PrivateMessage.objects.filter(receiver=self, is_read=True).order_by('-id')[:1]
+        last = PrivateMessage.objects.filter(
+            receiver=self, is_read=True).order_by('-id')[:1]
         if last:
             self.last_read_pm_id = last[0].pk
         self.save()
@@ -216,5 +233,6 @@ class User(PermissionsMixin, AbstractBaseUser):
 
 def on_pm_create(sender, **kwargs):
     sender.receiver.update_not_readed()
-    
+
+
 private_message_created.connect(on_pm_create)

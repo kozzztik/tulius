@@ -1,7 +1,8 @@
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from tulius.forum.models import *
 from tulius.stories.models import Variation, Role
-from django.conf import settings
+
 
 class GameThreadRight(models.Model):
     """
@@ -13,14 +14,14 @@ class GameThreadRight(models.Model):
         unique_together = ('thread', 'role')
     
     thread = models.ForeignKey(
-        Thread,
+        Thread, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'thread'),
         related_name='access_roles',
     )
     role = models.ForeignKey(
-        Role,
+        Role, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'role'),
@@ -32,7 +33,8 @@ class GameThreadRight(models.Model):
         verbose_name=_(u'access rights'),
         choices=THREAD_ACCESS_CHOICES,
     )
-    
+
+
 class Trustmark(models.Model):
     """
     TrustMark
@@ -43,7 +45,7 @@ class Trustmark(models.Model):
         unique_together = ('variation', 'user', 'role')
     
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        settings.AUTH_USER_MODEL, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'user'),
@@ -51,7 +53,7 @@ class Trustmark(models.Model):
     )
     
     variation = models.ForeignKey(
-        Variation,
+        Variation, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'variation'),
@@ -59,7 +61,7 @@ class Trustmark(models.Model):
     )
 
     role = models.ForeignKey(
-        Role,
+        Role, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'role'),

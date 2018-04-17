@@ -1,6 +1,8 @@
-from django.db import models
-from django_mailer import constants, managers
 import datetime
+
+from django.db import models
+
+from django_mailer import constants, managers
 
 
 PRIORITIES = (
@@ -48,9 +50,9 @@ class QueuedMessage(models.Model):
     messages are sent first (secondarily sorted by the oldest message).
     
     """
-    message = models.OneToOneField(Message, editable=False)
-    priority = models.PositiveSmallIntegerField(choices=PRIORITIES,
-                                            default=constants.PRIORITY_NORMAL)
+    message = models.OneToOneField(Message, models.PROTECT, editable=False)
+    priority = models.PositiveSmallIntegerField(
+        choices=PRIORITIES, default=constants.PRIORITY_NORMAL)
     deferred = models.DateTimeField(null=True, blank=True)
     retries = models.PositiveIntegerField(default=0)
     date_queued = models.DateTimeField(auto_now_add=True)
@@ -87,7 +89,7 @@ class Log(models.Model):
     A log used to record the activity of a queued message.
     
     """
-    message = models.ForeignKey(Message, editable=False)
+    message = models.ForeignKey(Message, models.PROTECT, editable=False)
     result = models.PositiveSmallIntegerField(choices=RESULT_CODES)
     date = models.DateTimeField(auto_now_add=True)
     log_message = models.TextField()
