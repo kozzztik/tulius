@@ -12,6 +12,7 @@ LOGGING_LEVEL_CHOICES = (
     (logging.CRITICAL, _(u'CRITICAL')),
 )
 
+
 class LogMessage(models.Model):
     """
     log message
@@ -29,13 +30,13 @@ class LogMessage(models.Model):
     )
     
     create_time = models.DateTimeField(
-        auto_now_add    = True,
-        verbose_name    = _('create time'),
+        auto_now_add=True,
+        verbose_name=_('create time'),
     )
     
     logger_name = models.CharField(
         max_length=255, 
-        default = '',
+        default='',
         blank=True,
         null=True,
         verbose_name=_('logger name')
@@ -43,7 +44,7 @@ class LogMessage(models.Model):
     
     module_name = models.CharField(
         max_length=255, 
-        default = '',
+        default='',
         blank=True,
         null=True,
         verbose_name=_('module name')
@@ -75,8 +76,8 @@ class ExceptionMessage(models.Model):
     )
     
     create_time = models.DateTimeField(
-        auto_now_add    = True,
-        verbose_name    = _('Occur time'),
+        auto_now_add=True,
+        verbose_name=_('Occur time'),
     )
     
     classname = models.CharField(
@@ -120,23 +121,14 @@ class ExceptionMessage(models.Model):
     
     def user_link(self):
         if self.user_id:
-            return '<a href="%s">%s</a>' % (self.user.get_absolute_url(), unicode(self.user), )
+            return '<a href="%s">%s</a>' % (
+                self.user.get_absolute_url(), str(self.user), )
         else:
             return ""
     
     def path_link(self):
         return '<a href="%s">%s</a>' % (self.path, self.path,)
 
-    def bugs(self):
-        from django.conf import settings
-        if 'djfw.bugtracker' in settings.INSTALLED_APPS:
-            from djfw.bugtracker.models import BugException
-        elif 'bugtracker' in settings.INSTALLED_APPS:
-            from bugtracker.models import BugException
-        else:
-            return None
-        return BugException.objects.filter(exception_message_id=self.id)
-        
     user_link.allow_tags = True
     user_link.short_description = _('user')
     path_link.allow_tags = True
@@ -144,8 +136,9 @@ class ExceptionMessage(models.Model):
     
     @models.permalink
     def get_absolute_url(self):
-        return 'admin:logger_exceptionmessage_change', ( self.id, ), {}
-    
+        return 'admin:logger_exceptionmessage_change', (self.id, ), {}
+
+
 class ExceptionCookie(models.Model):
     """
     Exception cookie
@@ -154,7 +147,7 @@ class ExceptionCookie(models.Model):
     class Meta:
         verbose_name = _('exception cookie')
         verbose_name_plural = _('exception cookies')
-        ordering=["name"]
+        ordering = ["name"]
         
     exception_message = models.ForeignKey(
         ExceptionMessage, 
@@ -186,7 +179,7 @@ class ExceptionMETAValue(models.Model):
     class Meta:
         verbose_name = _('exception META value')
         verbose_name_plural = _('exception META values')
-        ordering=["name"]
+        ordering = ["name"]
         
     exception_message = models.ForeignKey(
         ExceptionMessage, 
@@ -208,7 +201,8 @@ class ExceptionMETAValue(models.Model):
     
     def __unicode__(self):
         return "%s = %s" % (self.name, self.value)
-    
+
+
 class ExceptionTraceback(models.Model):
     """
     Exception traceback record
@@ -249,4 +243,3 @@ class ExceptionTraceback(models.Model):
     
     def __unicode__(self):
         return "%s %s %s" % (self.filename, self.line_num, self.function_name)
-    

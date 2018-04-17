@@ -4,12 +4,12 @@ Forum engine models for Tulius project
 from django.utils.translation import ugettext_lazy as _
 from django.db import models, transaction
 from mptt.models import MPTTModel, TreeForeignKey, TreeManager
-#from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from tulius.models import User
 
 COMMENTS_ON_PAGE = 25
-    
+
+
 class UploadedFile(models.Model):
     """
     Uploaded Files
@@ -44,8 +44,8 @@ class UploadedFile(models.Model):
         verbose_name=_(u'file length'),
     )
     create_time = models.DateTimeField(
-        auto_now_add    = True,
-        verbose_name    = _('uploaded at'),
+        auto_now_add=True,
+        verbose_name=_('uploaded at'),
     )
     
     def is_image(self):
@@ -59,7 +59,8 @@ class UploadedFile(models.Model):
         Provides unicode string post representation
         """
         return self.name
-    
+
+
 THREAD_ACCESS_TYPE_NOT_SET = 0
 THREAD_ACCESS_TYPE_OPEN = 1
 THREAD_ACCESS_TYPE_NO_WRITE = 2
@@ -67,7 +68,8 @@ THREAD_ACCESS_TYPE_NO_READ = 3
 THREAD_ACCESS_READ = 1
 THREAD_ACCESS_WRITE = 2
 THREAD_ACCESS_MODERATE = 4
-THREAD_ACCESS_MODERATOR = THREAD_ACCESS_READ + THREAD_ACCESS_WRITE + THREAD_ACCESS_MODERATE
+THREAD_ACCESS_MODERATOR = THREAD_ACCESS_READ + THREAD_ACCESS_WRITE + \
+                          THREAD_ACCESS_MODERATE
 
 THREAD_ACCESS_TYPE_CHOICES = (
     (THREAD_ACCESS_TYPE_NOT_SET, _(u'access not set')),
@@ -77,16 +79,27 @@ THREAD_ACCESS_TYPE_CHOICES = (
 )
 
 THREAD_ACCESS_CHOICES = (
-    (THREAD_ACCESS_READ + THREAD_ACCESS_WRITE, _(u'read and write rights')),
-    (THREAD_ACCESS_READ, _(u'read right')),
-    (THREAD_ACCESS_READ + THREAD_ACCESS_WRITE + THREAD_ACCESS_MODERATE, _(u'read, write and moderate')),
-    (THREAD_ACCESS_WRITE, _(u'write only right')),
-    (THREAD_ACCESS_READ + THREAD_ACCESS_MODERATE, _(u'read and moderate right(no write)')),
+    (
+        THREAD_ACCESS_READ + THREAD_ACCESS_WRITE,
+        _(u'read and write rights')),
+    (
+        THREAD_ACCESS_READ,
+        _(u'read right')),
+    (
+        THREAD_ACCESS_READ + THREAD_ACCESS_WRITE + THREAD_ACCESS_MODERATE,
+        _(u'read, write and moderate')),
+    (
+        THREAD_ACCESS_WRITE,
+        _(u'write only right')),
+    (
+        THREAD_ACCESS_READ + THREAD_ACCESS_MODERATE,
+        _(u'read and moderate right(no write)')),
 )
+
 
 class SitedModelMixin(models.Model):
     class Meta:
-        abstract    = True
+        abstract = True
     plugin_id = models.PositiveIntegerField(
         null=True, 
         blank=True, 
@@ -119,7 +132,8 @@ class SitedModelMixin(models.Model):
             from .sites import sites_manager
             self._site = sites_manager.get_site(self.plugin_id)
             if not self._site:
-                raise ImproperlyConfigured("Forum site id = %s is not configured" % self.plugin_id)
+                raise ImproperlyConfigured(
+                    'Forum site id = %s is not configured' % self.plugin_id)
         return self._site
     
     def __getattribute__(self, attr):
@@ -127,6 +141,7 @@ class SitedModelMixin(models.Model):
             return super(SitedModelMixin, self).__getattribute__(attr)
         except AttributeError:
             return self.get_site_attr(attr)
+
 
 class ThreadManager(TreeManager):
     def rooms(self, parent, plugin=None):
@@ -137,28 +152,37 @@ class ThreadManager(TreeManager):
     def threads(self, parent):
         if parent and not parent.descendant_count():
             return []
-        return self.filter(parent=parent, room=False).order_by('-important', 'id')
+        return self.filter(parent=parent, room=False).order_by(
+            '-important', 'id')
     
     def get_ancestors(self, parent):
         if parent.tree_id:
-            return self.filter(tree_id=parent.tree_id, lft__lt=parent.lft, rght__gt=parent.rght)
+            return self.filter(
+                tree_id=parent.tree_id, lft__lt=parent.lft,
+                rght__gt=parent.rght)
         else:
             if not parent.parent_id:
                 return self.none()
-            return self.filter(tree_id=parent.parent.tree_id, lft__lte=parent.parent.lft, rght__gte=parent.parent.rght)
+            return self.filter(
+                tree_id=parent.parent.tree_id,
+                lft__lte=parent.parent.lft, rght__gte=parent.parent.rght)
             
     def get_descendants(self, parent):
         if parent.get_descendant_count():
-            return self.filter(tree_id=parent.tree_id, lft__gt=parent.lft, rght__lt=parent.rght, deleted=False)
+            return self.filter(
+                tree_id=parent.tree_id, lft__gt=parent.lft,
+                rght__lt=parent.rght, deleted=False)
         else:
             return self.none()
         
     def get_protected_descendants(self, parent):
         if parent.get_descendant_count():
-            return self.get_descendants(parent).exclude(access_type__lt=THREAD_ACCESS_TYPE_NO_READ)
+            return self.get_descendants(parent).exclude(
+                access_type__lt=THREAD_ACCESS_TYPE_NO_READ)
         else:
             return self.none()
-        
+
+
 class Thread(MPTTModel, SitedModelMixin):
     """
     Forum thread
@@ -202,8 +226,8 @@ class Thread(MPTTModel, SitedModelMixin):
         choices=THREAD_ACCESS_TYPE_CHOICES,
     )
     create_time = models.DateTimeField(
-        auto_now_add    = True,
-        verbose_name    = _('created at'),
+        auto_now_add=True,
+        verbose_name=_('created at'),
     )
     closed = models.BooleanField(
         default=False, 
@@ -247,6 +271,7 @@ class Thread(MPTTModel, SitedModelMixin):
         blank=True, 
         verbose_name=_(u'protected comments'),
     )
+
     def __unicode__(self):
         return self.title[:40] if self.title else self.body[:40]
         
@@ -309,7 +334,9 @@ class Thread(MPTTModel, SitedModelMixin):
         return (self.rght - self.lft - 1) / 2
     
     def room_comments_count(self):
-        comments = Thread.objects.get_descendants(self).filter(room=False, deleted=False).aggregate(comments_sum=models.Sum('comments_count'))
+        comments = Thread.objects.get_descendants(self).filter(
+            room=False, deleted=False).aggregate(
+            comments_sum=models.Sum('comments_count'))
         return comments['comments_sum']
         
     def save(self, *args, **kwargs):
@@ -318,9 +345,11 @@ class Thread(MPTTModel, SitedModelMixin):
                 self.site().signals.thread_on_create.send(self)
             else:
                 old_thread = Thread.objects.select_for_update().get(id=self.id)
-                self.site().signals.thread_on_update.send(self, old_thread=old_thread)
+                self.site().signals.thread_on_update.send(
+                    self, old_thread=old_thread)
             super(Thread, self).save(*args, **kwargs)
-    
+
+
 class ThreadAccessRight(models.Model):
     """
     Right to access forum thread
@@ -349,7 +378,8 @@ class ThreadAccessRight(models.Model):
         verbose_name=_(u'access rights'),
         choices=THREAD_ACCESS_CHOICES,
     )
-    
+
+
 class ThreadCollapseStatus(models.Model):
     """
     Collapsing status rememberer
@@ -382,6 +412,7 @@ class ThreadCollapseStatus(models.Model):
         null=False, 
         blank=False, 
     )
+
 
 class Comment(SitedModelMixin):
     """
@@ -424,13 +455,13 @@ class Comment(SitedModelMixin):
         verbose_name=_('edited by')
     )
     create_time = models.DateTimeField(
-        auto_now_add    = True,
-        verbose_name    = _('created at'),
+        auto_now_add=True,
+        verbose_name=_('created at'),
     )
     edit_time = models.DateTimeField(
         null=True, 
         blank=True,
-        verbose_name = _('edited at'),
+        verbose_name=_('edited at'),
     )
     reply = models.ForeignKey(
         'self', 
@@ -482,7 +513,7 @@ class Comment(SitedModelMixin):
             return None
     
     def is_thread(self):
-        return (self.id == self.parent.first_comment_id)
+        return self.id == self.parent.first_comment_id
     
     def save(self, fast_save=False, *args, **kwargs):
         if fast_save:
@@ -495,20 +526,26 @@ class Comment(SitedModelMixin):
             # before safe work
             if not was_none:
                 old_self = Comment.objects.select_for_update().get(id=self.id)
-                if old_self.deleted <> self.deleted:
+                if old_self.deleted != self.deleted:
                     delete_changed = True
-                    thread = Thread.objects.select_for_update().get(id=self.parent.id)
+                    thread = Thread.objects.select_for_update().get(
+                        id=self.parent.id)
                     if old_self.deleted:
-                        self.site().signals.before_add_comment.send(self, thread=thread, restore=True)
+                        self.site().signals.before_add_comment.send(
+                            self, thread=thread, restore=True)
                     else:
-                        self.site().signals.before_delete_comment.send(self, thread=thread)
+                        self.site().signals.before_delete_comment.send(
+                            self, thread=thread)
                     thread.save()
                 else:
-                    self.site().signals.before_save_comment.send(self, old_comment=old_self)
+                    self.site().signals.before_save_comment.send(
+                        self, old_comment=old_self)
             else:
-                if (not self.reply_id) and (self.parent.first_comment_id <> self.id):
+                if (not self.reply_id) and (
+                        self.parent.first_comment_id != self.id):
                     self.reply_id = self.parent.first_comment_id
-                self.site().signals.before_add_comment.send(self, thread=thread, restore=False)
+                self.site().signals.before_add_comment.send(
+                    self, thread=thread, restore=False)
             # real safe
             super(Comment, self).save(*args, **kwargs)
             # after save
@@ -517,12 +554,16 @@ class Comment(SitedModelMixin):
                     thread.first_comment_id = self.id
                 thread.last_comment_id = self.id
                 thread.save()
-                self.site().signals.after_add_comment.send(self, thread=thread, restore=False)
+                self.site().signals.after_add_comment.send(
+                    self, thread=thread, restore=False)
             elif delete_changed:
                 if self.deleted:
-                    self.site().signals.after_delete_comment.send(self, thread=thread)
+                    self.site().signals.after_delete_comment.send(
+                        self, thread=thread)
                 else:
-                    self.site().signals.after_add_comment.send(self, thread=thread, restore=True)
+                    self.site().signals.after_add_comment.send(
+                        self, thread=thread, restore=True)
+
 
 class ThreadReadMark(models.Model):
     """
@@ -560,7 +601,8 @@ class ThreadReadMark(models.Model):
         related_name='not_readed_users', 
         verbose_name=_('not readed comment'),
     )
-    
+
+
 class CommentLike(models.Model):
     class Meta:
         verbose_name = _('comment like')
@@ -584,17 +626,20 @@ class CommentLike(models.Model):
     def save(self, *args, **kwargs):
         with transaction.commit_on_success():
             if self.id is None:
-                comment = Comment.objects.select_for_update().get(id=self.comment_id)
+                comment = Comment.objects.select_for_update().get(
+                    id=self.comment_id)
                 comment.likes += 1
                 comment.save() 
             super(CommentLike, self).save(*args, **kwargs)
             
     def delete(self, using=None):
         with transaction.commit_on_success():
-            comment = Comment.objects.select_for_update().get(id=self.comment_id)
+            comment = Comment.objects.select_for_update().get(
+                id=self.comment_id)
             comment.likes -= 1
             comment.save() 
             super(CommentLike, self).delete(using)
+
 
 class ThreadDeleteMark(models.Model):
     class Meta:
@@ -627,14 +672,16 @@ class ThreadDeleteMark(models.Model):
     )
     
     delete_time = models.DateTimeField(
-        auto_now_add    = True,
-        verbose_name    = _('deleted at'),
+        auto_now_add=True,
+        verbose_name=_('deleted at'),
     )
     
     def __unicode__(self):
-        return _("%(post)s deleted by %(user)s at %(time)s") % {'post': unicode(self.thread), 'user': unicode(self.user), 
-            'time': self.delete_time}
-        
+        return _("%(post)s deleted by %(user)s at %(time)s") % \
+               {'post': str(self.thread), 'user': str(self.user),
+                'time': self.delete_time}
+
+
 class CommentDeleteMark(models.Model):
     class Meta:
         verbose_name = _(u'comment delete mark')
@@ -664,13 +711,15 @@ class CommentDeleteMark(models.Model):
         verbose_name=_(u'deleted')
     )
     delete_time = models.DateTimeField(
-        auto_now_add    = True,
-        verbose_name    = _('deleted at'),
+        auto_now_add=True,
+        verbose_name=_('deleted at'),
     )
     
     def __unicode__(self):
-        return _("%(post)s deleted by %(user)s at %(time)s") % {'post': unicode(self.comment), 'user': unicode(self.user), 
+        return _("%(post)s deleted by %(user)s at %(time)s") % {
+            'post': str(self.comment), 'user': str(self.user),
             'time': self.delete_time}
+
 
 class OnlineUser(models.Model):
     class Meta:
@@ -685,8 +734,8 @@ class OnlineUser(models.Model):
         related_name='forum_visit',
     )
     visit_time = models.DateTimeField(
-        auto_now_add    = True,
-        verbose_name    = _('visit time'),
+        auto_now_add=True,
+        verbose_name=_('visit time'),
     )
     thread = models.ForeignKey(
         Thread,
@@ -697,8 +746,9 @@ class OnlineUser(models.Model):
     )
     
     def __unicode__(self):
-        return unicode(self.user)
-    
+        return str(self.user)
+
+
 class Voting(models.Model):
     """
     Voting
@@ -766,7 +816,8 @@ class Voting(models.Model):
             return vote.choice
         else:
             return None
-        
+
+
 class VotingChoice(models.Model):
     """
     Voting choice
@@ -788,9 +839,11 @@ class VotingChoice(models.Model):
         blank=True,
         verbose_name=_('name')
     )
+
     def __unicode__(self):
         return "%s - %s" % (self.voting.voting_name, self.name)
-    
+
+
 class VotingVote(models.Model):
     """
     Voting choice
@@ -816,4 +869,5 @@ class VotingVote(models.Model):
     )
     
     def __unicode__(self):
-        return "%s - %s(%s)" % (self.choice.voting.voting_name, self.choice.name, self.user)
+        return "%s - %s(%s)" % (
+            self.choice.voting.voting_name, self.choice.name, self.user)
