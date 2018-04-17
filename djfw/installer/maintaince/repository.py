@@ -57,7 +57,7 @@ class SVNClient():
     def changelist_to_head(self):
         try:
             revisions = self.client.log(self.path, revision_end=self.revision)
-        except Exception, e:
+        except Exception as e:
             self.log(e)
             self.log('failed')
             if not self.no_pass:
@@ -66,7 +66,8 @@ class SVNClient():
             else:
                 self.log('no pass')
                 raise RepoPasswordRequired()
-        revisions = [revision for revision in revisions if revision.revision.number <> self.revision.number]
+        revisions = [revision for revision in revisions if
+                     revision.revision.number != self.revision.number]
         dict_revisions = []
         Revision = self.operation.models.Revision
         for log in revisions:

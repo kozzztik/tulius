@@ -1,12 +1,15 @@
-from django.utils.translation import ugettext_lazy as _
-from django.contrib import admin
 from django import forms
-from .models import Genre, Story
+from django.contrib import admin
+
+from .models import Genre
+
 
 class GenreForm(forms.ModelForm):
     class Meta:
         model = Genre
-    
+        fields = '__all__'
+
+
 class GenreAdmin(admin.ModelAdmin):
     form = GenreForm
     
@@ -21,5 +24,6 @@ class GenreAdmin(admin.ModelAdmin):
     list_editable = (
         'name',
     )
-    
+
+
 admin.site.register(Genre, GenreAdmin)

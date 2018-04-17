@@ -1,10 +1,14 @@
-from django.contrib import admin
 from django import forms
+from django.contrib import admin
+
 from .models import Smile, UploadedImage, UploadedFile
+
 
 class SmileForm(forms.ModelForm):
     class Meta:
         model = Smile
+        fields = '__all__'
+
 
 class SmileAdmin(admin.ModelAdmin):
     form = SmileForm
@@ -21,14 +25,17 @@ class SmileAdmin(admin.ModelAdmin):
         'name',
         'text',
     )
-    
+
+
 admin.site.register(Smile, SmileAdmin)
+
 
 class UploadedImageForm(forms.ModelForm):
     class Meta:
         model = UploadedImage
         exclude = ('image', 'thumb')
-        
+
+
 class UploadedImageAdmin(admin.ModelAdmin):
     form = UploadedImageForm
 
@@ -47,14 +54,17 @@ class UploadedImageAdmin(admin.ModelAdmin):
     
     def has_add_permission(self, request):
         return False
-    
+
+
 admin.site.register(UploadedImage, UploadedImageAdmin)
+
 
 class UploadedFileForm(forms.ModelForm):
     class Meta:
         model = UploadedFile
         exclude = ('body',)
-        
+
+
 class UploadedFileAdmin(admin.ModelAdmin):
     form = UploadedFileForm
 
@@ -71,7 +81,9 @@ class UploadedFileAdmin(admin.ModelAdmin):
     
     list_editable = (
     )
+
     def has_add_permission(self, request):
         return False
-    
+
+
 admin.site.register(UploadedFile, UploadedFileAdmin)

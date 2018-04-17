@@ -1,13 +1,13 @@
-# -*- coding: utf-8 -*-
 from django.utils import translation
 from django.contrib import admin
-from .models import NewsItem
+
 from djfw.common.admin import CustomModelAdmin
-from djfw.common.admin.actions import export_as_csv
+from .models import NewsItem
+
 
 class NewsItemAdmin(CustomModelAdmin):
     
-    list_display    = (
+    list_display = (
         'id',
         '__unicode__',
         'caption',
@@ -31,8 +31,10 @@ class NewsItemAdmin(CustomModelAdmin):
         'announcement',
         'full_text'
     )
+
     def queryset(self, request):
-        return super(NewsItemAdmin, self).queryset(request).filter(language=translation.get_language())
+        return super(NewsItemAdmin, self).queryset(request).filter(
+            language=translation.get_language())
     
     def make_published(self, request, queryset):
         queryset.update(is_published=True)
@@ -45,10 +47,10 @@ class NewsItemAdmin(CustomModelAdmin):
     make_unpublished.short_description = u'unpublish selected news'
     
     actions = [
-        export_as_csv,
         make_published,
         make_unpublished,
     ]
     date_hierarchy = None
+
 
 admin.site.register(NewsItem, NewsItemAdmin)

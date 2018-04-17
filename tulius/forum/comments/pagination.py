@@ -83,16 +83,19 @@ def get_pagination_context(request, page_num, pages_count, window=4):
         else:
             to_return['getvars'] = ''
         return to_return
-    except KeyError, AttributeError:
+    except (KeyError, AttributeError):
         return {}
 
 
-def get_custom_pagination(request, context, template_name='forum/snippets/pagination.haml'):
+def get_custom_pagination(
+        request, context, template_name='forum/snippets/pagination.haml'):
     c = RequestContext(request, context)
     t = loader.get_template(template_name)
     return t.render(c)
 
 
-def get_pagination(request, page_num, pages_count, window=4, template_name='forum/snippets/pagination.haml'):
+def get_pagination(
+        request, page_num, pages_count, window=4,
+        template_name='forum/snippets/pagination.haml'):
     context = get_pagination_context(request, page_num, pages_count, window)
     return get_custom_pagination(request, context, template_name)

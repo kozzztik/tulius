@@ -81,7 +81,7 @@ class BaseForumSite(object):
             self.templates.content.update(plugin.templates)
             self.urlizer.content.update(plugin.urlizer)
             self.signals.content.update(plugin.signals)
-        for plugin in self.plugins.itervalues():
+        for plugin in self.plugins.values():
             plugin.post_init()
         if settings.DEBUG:
             self.check_dependencies()

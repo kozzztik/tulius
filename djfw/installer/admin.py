@@ -1,11 +1,13 @@
 from django.contrib import admin
-from django.contrib.admin.util import unquote
+from django.contrib.admin.utils import unquote
+from django.core.exceptions import PermissionDenied
 from django.utils.translation import ugettext_lazy as _
 from .models import Backup, BackupCategory, MaintenanceLog
 from .views import AddMaintainceView, ChangeMaintainceView
 from django.utils import timezone
 
 _('installer')
+
 
 class BackupAdmin(admin.ModelAdmin):
     list_filter = ['category']
@@ -25,8 +27,10 @@ class BackupAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
-    
+
+
 admin.site.register(Backup, BackupAdmin)
+
 
 class BackupCategoryAdmin(admin.ModelAdmin):
     
@@ -48,9 +52,10 @@ class BackupCategoryAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
-    
+
+
 admin.site.register(BackupCategory, BackupCategoryAdmin)
-from django.core.exceptions import PermissionDenied
+
 
 class MaintenanceLogAdmin(admin.ModelAdmin):
     
@@ -83,14 +88,17 @@ class MaintenanceLogAdmin(admin.ModelAdmin):
     def add_view(self, request, form_url='', extra_context=None):
         if not self.has_add_permission(request):
             raise PermissionDenied
-        view = AddMaintainceView.as_view(modeladmin=self, extra_context=extra_context)
+        view = AddMaintainceView.as_view(
+            modeladmin=self, extra_context=extra_context)
         return view(request)
     
     def change_view(self, request, object_id, form_url='', extra_context=None):
         obj = self.get_object(request, unquote(object_id))
         if not self.has_change_permission(request, obj):
             raise PermissionDenied
-        view = ChangeMaintainceView.as_view(modeladmin=self, extra_context=extra_context, obj=obj)
+        view = ChangeMaintainceView.as_view(
+            modeladmin=self, extra_context=extra_context, obj=obj)
         return view(request)
-        
+
+
 admin.site.register(MaintenanceLog, MaintenanceLogAdmin)
