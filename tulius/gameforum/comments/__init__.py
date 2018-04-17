@@ -1,7 +1,8 @@
 from django.utils.translation import ugettext_lazy as _, pgettext
 # TODO: fix this when module moved
-from tulius.forum import CommentsPlugin
+from tulius.forum.comments.plugin import CommentsPlugin
 from tulius.stories.models import *
+
 
 class GameCommentsPlugin(CommentsPlugin):
     comment_template = 'gameforum/snippets/post.haml'
@@ -46,7 +47,7 @@ class GameCommentsPlugin(CommentsPlugin):
 
     def before_save_comment(self, sender, **kwargs):
         old_comment = kwargs['old_comment']
-        if sender.data1 <> old_comment.data1:
+        if sender.data1 != old_comment.data1:
             self.update_role_comments_count(old_comment.data1, -1)
             self.update_role_comments_count(sender.data1, 1)
 

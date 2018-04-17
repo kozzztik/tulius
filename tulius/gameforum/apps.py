@@ -2,7 +2,7 @@ from django.apps import AppConfig
 
 
 class GameForumConfig(AppConfig):
-    name = 'gameforum'
+    name = 'tulius.gameforum'
     verbose_name = "Game forum"
     site = None
     GAME_FORUM_SITE_ID = 1
