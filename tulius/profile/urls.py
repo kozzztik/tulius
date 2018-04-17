@@ -1,9 +1,10 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from .views import *
 
+app_name = 'tulius.profile'
 
-urlpatterns = patterns(
-    '',
+
+urlpatterns = [
     url(r'^favorites/$', PlayerFavoritesView.as_view(), name='favorites'),
     url(r'^stories/$', PlayerStoriesView.as_view(), name='stories'),
     url(r'^games/$', PlayerGamesView.as_view(), name='games'),
@@ -20,4 +21,4 @@ urlpatterns = patterns(
     url(
         r'^subscriptions/$', PlayerSubscriptionsView.as_view(),
         name='subscriptions'),
-)
+]

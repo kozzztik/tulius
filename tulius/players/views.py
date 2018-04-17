@@ -23,7 +23,10 @@ from pm.models import PrivateMessage
 
 game_forum = apps.get_app_config('gameforum')
 
-stars.flush_stars_cache()
+try:
+    stars.flush_stars_cache()
+except:
+    pass
 
 
 def filter_by_games(players):

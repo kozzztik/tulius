@@ -1,6 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 
+
 class PlayerStar(models.Model):
     """
     Player star show rule
@@ -16,6 +17,7 @@ class PlayerStar(models.Model):
         verbose_name=_('Games won')
     )
 
+
 class StarsCache():    
     stars_count = 0
     stars_list = []
@@ -26,5 +28,6 @@ class StarsCache():
         self.stars_list = []
         for star in stars:
             self.stars_list += [star.games]
-            
+
+
 stars = StarsCache()
