@@ -1,11 +1,13 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from .views import *
 from .avatar_upload import profile_upload_avatar
 
 
-urlpatterns = patterns(
-    '',
+app_name = 'tulius.players'
+
+
+urlpatterns = [
     url(r'^$', PlayersListView.as_view(), name='index'),
     url(
         r'^(?P<player_id>\d+)/$', PlayerDetailsView.as_view(),
@@ -26,4 +28,4 @@ urlpatterns = patterns(
     url(
         r'^profile/played/$', PlayerPlayedView.as_view(),
         name='profile_played'),
-)
+]
