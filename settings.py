@@ -261,6 +261,9 @@ DATABASES = {
         'PASSWORD': 'tulius',
         'PORT': '',
         'CONN_MAX_AGE': 20,
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+        }
     }
 }
 
