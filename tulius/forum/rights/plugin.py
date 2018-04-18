@@ -27,7 +27,7 @@ class RightsPlugin(ForumPlugin):
         special_read = False
         special_write = False
         special_moderate = False
-        if (not user.is_anonymous()) and (
+        if (not user.is_anonymous) and (
                 thread.room or (
                 thread.access_type > self.models.THREAD_ACCESS_TYPE_NOT_SET)):
             rights = self.models.ThreadAccessRight.objects.filter(
@@ -43,7 +43,7 @@ class RightsPlugin(ForumPlugin):
     
     def is_superuser_equal(self, thread, user, parent_moderate):
         return (
-            (not user.is_anonymous()) and user.is_superuser) or parent_moderate
+            (not user.is_anonymous) and user.is_superuser) or parent_moderate
         
     def limited_read_list(self, thread):
         persons = [
@@ -56,7 +56,7 @@ class RightsPlugin(ForumPlugin):
     
     def get_rights(self, thread):
         user = thread.view_user
-        author = (not user.is_anonymous()) and (
+        author = (not user.is_anonymous) and (
                 (user.id == thread.user_id) or user.is_superuser)
         (parent_read, parent_write, parent_moderate) = \
             self.get_parent_rights(thread, user)
@@ -88,7 +88,7 @@ class RightsPlugin(ForumPlugin):
         write_right = author or write_right or special_write or moderate_right
         view_right = read_right or author or moderate_right
         edit_right = author or moderate_right
-        if thread.closed or user.is_anonymous():
+        if thread.closed or user.is_anonymous:
             write_right = False
         if thread.deleted:
             read_right = False
@@ -103,7 +103,7 @@ class RightsPlugin(ForumPlugin):
     def get_free_descendants(self, thread):
         query = Q(access_type__lt=self.models.THREAD_ACCESS_TYPE_NO_READ)
         if thread and thread.view_user and (
-                not thread.view_user.is_anonymous()):
+                not thread.view_user.is_anonymous):
             query = query | Q(user=thread.view_user)
         return self.models.Thread.objects.get_descendants(thread).filter(query)
     
@@ -115,7 +115,7 @@ class RightsPlugin(ForumPlugin):
                 access_type=self.models.THREAD_ACCESS_TYPE_NO_READ,
                 deleted=False)
         else:
-            if user.is_anonymous():
+            if user.is_anonymous:
                 return []
             rights = self.models.ThreadAccessRight.objects.filter(
                 user=user, thread__tree_id=thread.tree_id,
@@ -130,7 +130,7 @@ class RightsPlugin(ForumPlugin):
         threads = self.models.Thread.objects.filter(
             access_type__lt=self.models.THREAD_ACCESS_TYPE_NO_READ,
             parent_id=int(thread.id))
-        if user.is_anonymous():
+        if user.is_anonymous:
             query = Q(access_type__lt=self.models.THREAD_ACCESS_TYPE_NO_READ)
         else:
             query = (Q(
@@ -143,7 +143,7 @@ class RightsPlugin(ForumPlugin):
             access_type__lt=self.models.THREAD_ACCESS_TYPE_NO_READ)
         threads = threads.filter(
             plugin_id=self.site_id, level=level, deleted=False)
-        if user.is_anonymous():
+        if user.is_anonymous:
             query = Q(access_type__lt=self.models.THREAD_ACCESS_TYPE_NO_READ)
         else:
             query = (Q(
@@ -158,7 +158,7 @@ class RightsPlugin(ForumPlugin):
                 parent=thread,
                 access_type=self.models.THREAD_ACCESS_TYPE_NO_READ)
         else:
-            if user.is_anonymous():
+            if user.is_anonymous:
                 return []
             query = Q(
                 thread__parent=thread,
@@ -175,7 +175,7 @@ class RightsPlugin(ForumPlugin):
                 access_type=self.models.THREAD_ACCESS_TYPE_NO_READ,
                 plugin_id=self.site_id, level=level, deleted=False)
         else:
-            if user.is_anonymous():
+            if user.is_anonymous:
                 return []
             query = Q(
                 thread__level=level,

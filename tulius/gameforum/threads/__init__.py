@@ -28,7 +28,7 @@ class GameThreadsPlugin(ThreadsPlugin):
                         role.avatar = avatar
                         break
         thread.edit_marks = variation.game and variation.game.write_right(user)
-        if not user.is_anonymous():
+        if not user.is_anonymous:
             trustmarks = Trustmark.objects.filter(
                 variation=variation, user=user)
             for mark in trustmarks:

@@ -55,7 +55,7 @@ class BasePluginView(TemplateView):
         return super(BasePluginView, self).as_view(**initkwargs)
     
     def get_context_data(self, **kwargs):
-        if self.require_user and self.request.user.is_anonymous():
+        if self.require_user and self.request.user.is_anonymous:
             raise PermissionDenied()
         return {'forum_site': self.site, 'core': self.core}
     

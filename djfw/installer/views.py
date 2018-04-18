@@ -12,7 +12,7 @@ from django.conf import settings
 
 
 def download_backup(request, object_id):
-    if request.user.is_anonymous():
+    if request.user.is_anonymous:
         raise Http404()
     if not request.user.is_staff:
         raise Http404()

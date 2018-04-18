@@ -1,31 +1,39 @@
-from django.utils.timezone import now
 from datetime import timedelta
+
+from django.utils.timezone import now
+
 # TODO: fix this when module moved
 from tulius.forum.plugins import ForumPlugin
+
 
 class OnlineStatusPlugin(ForumPlugin):
     online_list_template = 'forum/snippets/online_users.haml'
     
     def update_online_status(self, user, thread):
-        if (not user.is_anonymous()) and thread:
-            online_mark = self.site.models.OnlineUser.objects.get_or_create(user=user, thread=thread)[0]
+        if (not user.is_anonymous) and thread:
+            online_mark = self.site.models.OnlineUser.objects.get_or_create(
+                user=user, thread=thread)[0]
             online_mark.visit_time = now()
             online_mark.save()
     
     def get_online_users(self, user, thread, do_update=True):
         if do_update:
             self.update_online_status(user, thread)
-        users = self.site.models.OnlineUser.objects.select_related('user').filter(visit_time__gte=now() - timedelta(minutes=3), 
-                                                                 thread__tree_id=thread.tree_id, thread__lft__gte=thread.lft, 
-                                                                 thread__rght__lte=thread.rght)
+        users = self.site.models.OnlineUser.objects.select_related(
+            'user').filter(
+            visit_time__gte=now() - timedelta(minutes=3),
+            thread__tree_id=thread.tree_id, thread__lft__gte=thread.lft,
+            thread__rght__lte=thread.rght)
         users_list = {}
         for user in users:
             users_list[user.user.id] = user.user
         return users_list.values()
     
     def get_all_online_users(self):
-        users = self.site.models.OnlineUser.objects.select_related('user').filter(visit_time__gte=now() - timedelta(minutes=3), 
-                                                                 thread__plugin_id=self.site_id)
+        users = self.site.models.OnlineUser.objects.select_related(
+            'user').filter(
+            visit_time__gte=now() - timedelta(minutes=3),
+            thread__plugin_id=self.site_id)
         users_list = {}
         for user in users:
             users_list[user.user.id] = user.user
@@ -35,9 +43,9 @@ class OnlineStatusPlugin(ForumPlugin):
         context = kwargs['context']
         if sender:
             user = kwargs["user"]
-            context['online_users'] =  self.get_online_users(user, sender)
+            context['online_users'] = self.get_online_users(user, sender)
         else:
-            context['online_users'] =  self.get_all_online_users()
+            context['online_users'] = self.get_all_online_users()
             
     def comments_page(self, sender, **kwargs):
         user = kwargs["user"] 

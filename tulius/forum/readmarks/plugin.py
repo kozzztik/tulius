@@ -48,7 +48,7 @@ class ReadMarksPlugin(ForumPlugin):
     def comments_readed(self, sender, **kwargs):
         user = kwargs['user']
         comments = kwargs['comments']
-        if not user.is_anonymous():
+        if not user.is_anonymous:
             last_readed = None
             readmark = sender.get_read_mark
             if readmark:
@@ -86,7 +86,7 @@ class ReadMarksPlugin(ForumPlugin):
     def threads_list_view(self, sender, **args):
         user = sender.view_user
         threads = args['threads']
-        if not user.is_anonymous():
+        if not user.is_anonymous:
             read_marks = self.models.ThreadReadMark.objects.filter(
                 thread__parent_id=sender.id, user=user)
             for thread in threads:
@@ -107,7 +107,7 @@ class ReadMarksPlugin(ForumPlugin):
                         thread.unreaded = self.models.Comment.objects.get(
                             id=thread.unreaded_id)
         important_threads = [thread for thread in threads if thread.important]
-        if not user.is_anonymous():
+        if not user.is_anonymous:
             unreaded_threads = [
                 thread for thread in threads if (not thread.important) and
                 thread.unreaded_id]
@@ -125,7 +125,7 @@ class ReadMarksPlugin(ForumPlugin):
         threads = kwargs['threads']
         user = kwargs['user']
         read_marks = []
-        if not user.is_anonymous():
+        if not user.is_anonymous:
             read_marks = self.models.ThreadReadMark.objects.filter(
                 thread__tree_id=sender.tree_id,
                 thread__lft__gt=sender.lft,
@@ -147,7 +147,7 @@ class ReadMarksPlugin(ForumPlugin):
                              sender.unreaded_id)):
                         sender.unreaded_id = read_mark.not_readed_comment_id
             else:
-                if user.is_anonymous():
+                if user.is_anonymous:
                     sender.unreaded_id = False
                 else:
                     if thread.first_comment_id:
@@ -161,7 +161,7 @@ class ReadMarksPlugin(ForumPlugin):
     
     def read_comments_page(self, thread, user, comments):
         unreaded = []
-        if not user.is_anonymous():
+        if not user.is_anonymous:
             last_readed = None
             readmark = thread.get_read_mark
             unreaded_id = None

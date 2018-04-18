@@ -125,14 +125,14 @@ class Story(models.Model):
         return 'stories:edit_story_main', (self.id,), {}
         
     def edit_right(self, user):
-        if user.is_anonymous():
+        if user.is_anonymous:
             return False
         if user.is_superuser:
             return True
         return StoryAdmin.objects.filter(user=user, story=self).count() > 0
     
     def create_right(self, user):
-        if user.is_anonymous():
+        if user.is_anonymous:
             return False
         if user.is_superuser:
             return True

@@ -1,7 +1,7 @@
+from django import forms
+from django import http
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.template import loader, Context
-from django.http import HttpResponse
-from django import forms
 from django.forms.models import fields_for_model, modelform_factory
 
 
@@ -20,14 +20,14 @@ class SortableViewMixin(object):
             if self.sortable_model:
                 return self.sortable_model._default_manager.all()
             else:
-                raise ImproperlyConfigured(u"%(cls)s is missing a sortable queryset. Define "
-                                           u"%(cls)s.sortable_model or %(cls)s.sortable_queryset." % {
-                                                'cls': self.__class__.__name__
-                                        })
+                raise ImproperlyConfigured(
+                    "%(cls)s is missing a sortable queryset. Define "
+                    "%(cls)s.sortable_model or %(cls)s.sortable_queryset." % {
+                        'cls': self.__class__.__name__})
         return self.queryset._clone()
     
     def post(self, request, *args, **kwargs):
-        if self.login_required and self.request.user.is_anonymous():
+        if self.login_required and self.request.user.is_anonymous:
             raise PermissionDenied('Login required')
         items = request.POST['items']
         items = items.split(',')
@@ -39,7 +39,7 @@ class SortableViewMixin(object):
         for item in items:
             order += 1
             queryset.filter(pk=item).update(**{self.sortable_field: order})
-        return HttpResponse("{}")
+        return http.HttpResponse("{}")
 
 
 class SortableDetailViewMixin(SortableViewMixin):
@@ -49,15 +49,18 @@ class SortableDetailViewMixin(SortableViewMixin):
         self.object = self.get_object()
         queryset = super(SortableDetailViewMixin, self).get_sortable_queryset()
         if self.sortable_model and self.model:
-            fk = forms.models._get_foreign_key(self.model, self.sortable_model, fk_name=self.sortable_fk)
+            fk = forms.models._get_foreign_key(
+                self.model, self.sortable_model, fk_name=self.sortable_fk)
             return queryset.filter(**{fk.name: self.object.pk})
         elif self.sortable_fk:
             return queryset.filter(**{self.sortable_fk: self.object.pk})
         else:
-            raise ImproperlyConfigured(u"%(cls)s is missing a sortable foreign key. Define "
-                                       u"%(cls)s.sortable_model and %(cls)s.model, or %(cls)s.sortable_fk." % {
-                                            'cls': self.__class__.__name__
-                                    })
+            raise ImproperlyConfigured(
+                "%(cls)s is missing a sortable foreign key. Define "
+                "%(cls)s.sortable_model and %(cls)s.model, or "
+                "%(cls)s.sortable_fk." % {
+                    'cls': self.__class__.__name__
+                })
 
 
 class DecoratorChainingMixin(object):
@@ -167,9 +170,11 @@ class ActionableViewMixin(ActionableBase):
     def get_media(self):
         media = ''
         for css in self.get_css_list():
-            media += '<link rel="stylesheet" type="text/css" href="%s" />\r\n' % css
+            media += '<link rel="stylesheet" ' \
+                     'type="text/css" href="%s" />\r\n' % css
         for js in self.get_js_list():
-            media += '<script type="text/javascript" src="%s"></script>\r\n' % js
+            media += '<script type="text/javascript" ' \
+                     'src="%s"></script>\r\n' % js
         return media
 
     def get(self, request, *args, **kwargs):
@@ -208,7 +213,8 @@ class WidgetBase(ActionableBase):
         for key, value in kwargs.iteritems():
             if not hasattr(cls, key):
                 raise TypeError(
-                    u"%s() received an invalid keyword %r" % (cls.__name__, key))
+                    "%s() received an invalid keyword %r" % (
+                        cls.__name__, key))
             setattr(self, key, value)
 
     def get_read_right(self, **kwargs):
@@ -285,10 +291,10 @@ class FormWidget(TemplatedWidget):
             template = t.render(c)
         else:
             template = self.__unicode__()
-        return HttpResponse(template)
+        return http.HttpResponse(template)
      
     def invalid_form(self, form):
-        return HTTPResponse(self.__unicode__())
+        return http.HTTPResponse(self.__unicode__())
 
 
 class TwitterFormWidget(FormWidget):
@@ -304,9 +310,9 @@ class FormsetWidget(TemplatedWidget):
     form_class = None
     fk = ''
     queryset = None
-    fields = None # ['field1']
-    exclude_fields = None # ['field2']
-    form_initials = None # {'field1': 1}
+    fields = None  # ['field1']
+    exclude_fields = None  # ['field2']
+    form_initials = None  # {'field1': 1}
     prefix = ''
     table_class = ''
     editable = True
@@ -342,7 +348,7 @@ class FormsetWidget(TemplatedWidget):
         obj = self.get_parent_object()
         exclude = self.exclude_fields or []
         exclude = list(exclude)
-        if not self.fk in exclude:
+        if self.fk not in exclude:
             self.exclude_fields = exclude + [self.fk]
         self.queryset = self.model._default_manager.filter(**{self.fk: obj})
         return self.queryset
@@ -371,14 +377,14 @@ class FormsetWidget(TemplatedWidget):
             obj.save()
         else:
             self.form = form
-        return HttpResponse(str(self))
+        return http.HttpResponse(str(self))
     
     def delete_item(self):
         if not self.get_editable():
             raise PermissionDenied()
         pk = self.view.request.POST['id']
         self.get_queryset().filter(pk=pk).delete()
-        return HttpResponse("{}")
+        return http.HttpResponse("{}")
     
     def get_formfield_callback(self):
         return None

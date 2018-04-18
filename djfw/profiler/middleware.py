@@ -1,26 +1,34 @@
-from .wrappers import templates_decorator, local_counter, cursor_exec_decorator, CursorWrapper
-from .models import ProfilerMessage
-from ua_parser import user_agent_parser
 from threading import current_thread, Lock
 import time
+import logging
+
+from .wrappers import templates_decorator, local_counter, \
+    cursor_exec_decorator, CursorWrapper
+from .models import ProfilerMessage
+from .ua_parser import user_agent_parser
 
 decorators_lock = Lock()
 decorated = False
 
+
 class ProfilerMiddleware():
-    def __init__(self):
-        decorators_lock.acquire()
-        try:
-            global decorated
-            if not decorated:
-                from django.template.base import Template
-                Template.render = templates_decorator(Template.render)
-                from django.db.backends import util 
-                util.CursorWrapper = CursorWrapper
-                util.CursorDebugWrapper.execute = cursor_exec_decorator(util.CursorDebugWrapper.execute) 
-                decorated = True
-        finally:
-            decorators_lock.release()
+    def __init__(self, get_response):
+        self.get_response = get_response
+        # TODO: DB logging broken after django 2.0 migration
+        # decorators_lock.acquire()
+        # try:
+        #     global decorated
+        #     if not decorated:
+        #         from django.template.base import Template
+        #         Template.render = templates_decorator(Template.render)
+        #         from django.db.backends import util
+        #         util.CursorWrapper = CursorWrapper
+        #         util.CursorDebugWrapper.execute = cursor_exec_decorator(
+        #             util.CursorDebugWrapper.execute)
+        #         decorated = True
+        # finally:
+        #     decorators_lock.release()
+
     def process_view(self, request, view_func, view_args, view_kwargs):
         rec = ProfilerMessage()
         rec.module_name = view_func.__module__[:255]
@@ -33,7 +41,7 @@ class ProfilerMiddleware():
                 return
         rec.func_name = rec.func_name[:255]
         user = getattr(request, 'user', None)
-        if user and (not user.is_anonymous()):
+        if user and (not user.is_anonymous):
             rec.user_id = user.pk
         rec.exec_time = int(time.clock() * 1000)
         local_counter.clear()
@@ -55,7 +63,9 @@ class ProfilerMiddleware():
                 pass
         rec.ip = request.META['REMOTE_ADDR']
         try:
-            user_data = user_agent_parser.Parse(request.META['HTTP_USER_AGENT'] if 'HTTP_USER_AGENT' in request.META else '')
+            user_data = user_agent_parser.Parse(
+                request.META['HTTP_USER_AGENT']
+                if 'HTTP_USER_AGENT' in request.META else '')
             user_agent = user_data['user_agent']
             rec.browser = user_agent['family']
             rec.browser_version = user_agent['major']
@@ -74,11 +84,13 @@ class ProfilerMiddleware():
             device = user_data['device']
             device_family = device['family']
             rec.device = device_family
-            rec.mobile = True if ((device_family) and not (device_family == 'Spider')) else False
+            rec.mobile = True if (
+                    device_family and not (device_family == 'Spider')
+            ) else False
         except:
-            import logging
             logger = logging.getLogger('django.request')
-            logger.error('Cant parse user agent ' + request.META['HTTP_USER_AGENT'])
+            logger.error(
+                'Cant parse user agent ' + request.META['HTTP_USER_AGENT'])
         request.profiler = rec
         
     def save_rec(self, request, error=False):
@@ -97,8 +109,9 @@ class ProfilerMiddleware():
         rec.error = error
         rec.save()
         
-    def process_response(self, request, response):
+    def __call__(self, request):
         self.save_rec(request)
+        response = self.get_response(request)
         return response
     
     def process_exception(self, request, exception):

@@ -78,8 +78,7 @@ INSTALLED_APPS = (
     'tulius.counters',
 )
 
-MIDDLEWARE_CLASSES = (
-    'djfw.installer.middleware.MaintenanceMiddleware',
+MIDDLEWARE = (
     'raven.contrib.django.raven_compat.middleware.Sentry404CatchMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

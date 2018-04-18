@@ -52,7 +52,7 @@ def vk_success_auth(request):
     profile.token_expires = timezone.now() + datetime.timedelta(
         seconds=token_expires)
     profile.save()
-    if request.user.is_anonymous():
+    if request.user.is_anonymous:
         user = authenticate(vk_profile=profile, email=email)
         login(request, user)
         return HttpResponseRedirect('/')

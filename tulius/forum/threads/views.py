@@ -40,7 +40,7 @@ class Room(BaseThreadView):
             self.user, self.parent_thread, True)
         context['threads'] = self.core.get_subthreads(
             self.user, self.parent_thread, False)
-        if not self.user.is_anonymous():
+        if not self.user.is_anonymous:
             context['delete_post_form'] = PostDeleteForm()
         return context
 
@@ -144,7 +144,7 @@ class Thread(BaseThreadView):
         context.update(self.core.get_comments_pagination(
             self.request, self.parent_thread, page))
             
-        if not self.user.is_anonymous():
+        if not self.user.is_anonymous:
             context['delete_post_form'] = PostDeleteForm()
         return context
 

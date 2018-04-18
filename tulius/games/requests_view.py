@@ -24,7 +24,7 @@ def get_game(user, game_id, requested):
     except:
         raise Http404()
     game = get_object_or_404(Game, id=game_id)
-    if user.is_anonymous():
+    if user.is_anonymous:
         raise Http404()
     requests = RoleRequest.objects.filter(game=game,user=user)
     if requested != (requests.count() > 0):

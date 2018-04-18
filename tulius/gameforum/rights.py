@@ -76,7 +76,7 @@ class GameRightsPlugin(RightsPlugin):
             thread.admin = thread.variation.edit_right(user)
             thread.guest = False
             self.strict_roles(thread)
-            if not user.is_anonymous():
+            if not user.is_anonymous:
                 if (not thread.admin) and thread.game:
                     guests = GameGuest.objects.filter(
                         game=thread.game, user=user)
@@ -109,7 +109,7 @@ class GameRightsPlugin(RightsPlugin):
         special_read = False
         special_write = False
         special_moderate = False
-        if (not user.is_anonymous()) and (
+        if (not user.is_anonymous) and (
                 thread.room or (
                 thread.access_type > models.THREAD_ACCESS_TYPE_NOT_SET)):
             rights = models.GameThreadRight.objects.filter(
@@ -207,7 +207,7 @@ class GameRightsPlugin(RightsPlugin):
             return models.Thread.objects.filter(
                 parent=thread, access_type=models.THREAD_ACCESS_TYPE_NO_READ)
         else:
-            if user.is_anonymous():
+            if user.is_anonymous:
                 return []
             query = Q(
                 thread__parent=thread,

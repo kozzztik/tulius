@@ -48,7 +48,7 @@ def set_edit(games, user):
         game.edit = game.edit_right(user)
         if game.edit:
             game.text_hint = _("You are admin of this game")
-        if not user.is_anonymous():
+        if not user.is_anonymous:
             game.user_roles = Role.objects.filter(
                 variation=game.variation, user=user)
             for role in game.user_roles:
@@ -219,7 +219,7 @@ def role_text_read_right(role, user, game):
         return False
     if game.status == GAME_STATUS_COMPLETED_OPEN:
         return True
-    if user.is_anonymous():
+    if user.is_anonymous:
         return False
     if user.is_superuser:
         return True

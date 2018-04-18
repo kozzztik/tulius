@@ -1,8 +1,10 @@
-from django.shortcuts import get_object_or_404
-from django.http import Http404, HttpResponse
 import json
 
+from django.shortcuts import get_object_or_404
+from django.http import Http404, HttpResponse
+
 from .core import BasePluginView
+
 
 class Like(BasePluginView):
     """
@@ -11,7 +13,7 @@ class Like(BasePluginView):
     require_user = True
     
     def get(self, request):
-        if request.user.is_anonymous():
+        if request.user.is_anonymous:
             raise Http404()
         comment_id = request.GET['postid']
         value = request.GET['value'] == 'true'
@@ -24,9 +26,10 @@ class Like(BasePluginView):
 
         if not comment.parent.read_right(request.user):
             ret_json = {'success': False, 'value': value}
-            return HttpResponse( json.dumps( ret_json ) )
+            return HttpResponse(json.dumps(ret_json))
         
-        like_marks = models.CommentLike.objects.filter(user=request.user, comment=comment)
+        like_marks = models.CommentLike.objects.filter(
+            user=request.user, comment=comment)
         like_count = comment.likes
         if like_marks:
             for like in like_marks:
@@ -35,20 +38,28 @@ class Like(BasePluginView):
             value = False
         else:
             if len(like_marks) == 0:
-                like_mark = models.CommentLike(user=request.user, comment=comment)
+                like_mark = models.CommentLike(
+                    user=request.user, comment=comment)
                 like_mark.save()
             like_count += 1
             value = True
-        ret_json = {'success': True, 'value': value, 'like_count': like_count, 'comment_id': comment_id}
-        return HttpResponse( json.dumps( ret_json ) )
+        ret_json = {
+            'success': True,
+            'value': value,
+            'like_count': like_count,
+            'comment_id': comment_id}
+        return HttpResponse(json.dumps(ret_json))
+
 
 class BaseVoting(BasePluginView):
     template_name = 'voting'
     force_results = False
+
     def get_context_data(self, **kwargs):
         context = BasePluginView.get_context_data(self, **kwargs)
         context['voting'] = self.voting
-        self.core.prepare_voting_results(self.voting, self.request.user, self.force_results)
+        self.core.prepare_voting_results(
+            self.voting, self.request.user, self.force_results)
         return context
         
 
@@ -64,7 +75,8 @@ class Vote(BaseVoting):
         parent_comment = voting.comment
         if not parent_comment.parent.read_right(request.user):
             raise Http404()
-        votes = models.VotingVote.objects.filter(choice=choice, user=request.user)
+        votes = models.VotingVote.objects.filter(
+            choice=choice, user=request.user)
         if votes:
             if self.no_revote:
                 raise Http404()
@@ -74,7 +86,8 @@ class Vote(BaseVoting):
         vote.save()
         self.voting = choice.voting
         ret_json = {'success': True, 'html':  self.render()}
-        return HttpResponse( json.dumps( ret_json ) )
+        return HttpResponse(json.dumps(ret_json))
+
 
 class PreviewResults(BaseVoting):
     require_user = True
@@ -90,4 +103,4 @@ class PreviewResults(BaseVoting):
         if not parent_thread.read_right:
             raise Http404()
         ret_json = {'success': True, 'html':  self.render()}
-        return HttpResponse( json.dumps( ret_json ) )
+        return HttpResponse(json.dumps(ret_json))

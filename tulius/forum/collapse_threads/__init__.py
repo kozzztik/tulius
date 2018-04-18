@@ -9,7 +9,7 @@ class CollapsingThreadsPlugin(ForumPlugin):
     
     def thread_view(self, sender, **args):
         user = args['user']
-        if user.is_anonymous():
+        if user.is_anonymous:
             return
         ThreadCollapseStatus = self.models.ThreadCollapseStatus
         if sender:

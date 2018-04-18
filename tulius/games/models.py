@@ -112,7 +112,7 @@ class GameManager(models.Manager):
     def completed_games(self, user, check_read=False):
         if user.is_superuser:
             games = self.filter(status=GAME_STATUS_COMPLETED, deleted=False)
-        elif user.is_anonymous():
+        elif user.is_anonymous:
             games = []
         else:
             guested = GameGuest.objects.filter(
@@ -245,7 +245,7 @@ class Game(models.Model):
         return ''
         
     def edit_right(self, user):
-        if user.is_anonymous():
+        if user.is_anonymous:
             return False
         if user.is_superuser:
             return True
@@ -253,7 +253,7 @@ class Game(models.Model):
         return (users.count() > 0)
     
     def write_right(self, user):
-        if user.is_anonymous():
+        if user.is_anonymous:
             return False
         if user.is_superuser:
             return True
@@ -272,7 +272,7 @@ class Game(models.Model):
     def read_right(self, user):
         if self.status == GAME_STATUS_COMPLETED_OPEN:
             return True
-        if user.is_anonymous():
+        if user.is_anonymous:
             return False
         if user.is_superuser:
             return True
@@ -329,7 +329,7 @@ class Game(models.Model):
     def can_send_request(self, user):
         return (
             self.status == GAME_STATUS_OPEN_FOR_REGISTRATION) and (
-            not user.is_anonymous())
+            not user.is_anonymous)
     
     def sended_request(self, user):
         return RoleRequest.objects.filter(game=self, user=user).count() > 0

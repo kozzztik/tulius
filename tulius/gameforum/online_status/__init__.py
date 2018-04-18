@@ -10,7 +10,7 @@ class GameOnlineStatusPlugin(OnlineStatusPlugin):
     online_list_template = 'gameforum/snippets/online_roles.haml'
     
     def update_role_online_status(self, user, variation):
-        if variation.game_id and (not user.is_anonymous()):
+        if variation.game_id and (not user.is_anonymous):
             Role.objects.filter(
                 variation=variation, user=user).update(visit_time=now())
     
