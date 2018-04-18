@@ -90,7 +90,7 @@ class ChangeMaintainceView(AddMaintainceView):
     template_name = 'admin/change_form.html'
     form_class = ChangeMaintainceForm
     
-    def get_form(self, form_class):
+    def get_form(self, form_class=None):
         self.add_js_media = []
         worker = MaintainceWorker(self.obj)
         form = worker.get_form(self.request)

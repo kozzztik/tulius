@@ -4,14 +4,16 @@ The "engine room" of django mailer.
 Methods here actually handle the sending of queued messages.
 
 """
-from django_mailer import constants, models, settings
-from lockfile import FileLock, AlreadyLocked, LockTimeout
 from socket import error as SocketError
 import logging
 import smtplib
 import tempfile
 import time
 import os
+
+from django_mailer import constants, models, settings
+from .lockfile import FileLock, AlreadyLocked, LockTimeout
+
 
 if constants.EMAIL_BACKEND_SUPPORT:
     from django.core.mail import get_connection
@@ -65,7 +67,7 @@ def send_all(block_size=500, backend=None):
         # is the default if it's not provided) systems which use a LinkFileLock
         # so ensure that it is never a negative number.
         lock.acquire(settings.LOCK_WAIT_TIMEOUT or 0)
-        #lock.acquire(settings.LOCK_WAIT_TIMEOUT)
+        # lock.acquire(settings.LOCK_WAIT_TIMEOUT)
     except AlreadyLocked:
         logger.debug("Lock already in place. Exiting.")
         return
@@ -86,8 +88,8 @@ def send_all(block_size=500, backend=None):
         blacklist = models.Blacklist.objects.values_list('email', flat=True)
         connection.open()
         for message in _message_queue(block_size):
-            result = send_queued_message(message, smtp_connection=connection,
-                                  blacklist=blacklist)
+            result = send_queued_message(
+                message, smtp_connection=connection, blacklist=blacklist)
             if result == constants.RESULT_SENT:
                 sent += 1
             elif result == constants.RESULT_FAILED:
@@ -122,14 +124,15 @@ def send_loop(empty_queue_sleep=None):
     empty_queue_sleep = empty_queue_sleep or settings.EMPTY_QUEUE_SLEEP
     while True:
         while not models.QueuedMessage.objects.all():
-            logger.debug("Sleeping for %s seconds before checking queue "
-                          "again." % empty_queue_sleep)
+            logger.debug(
+                "Sleeping for %s seconds before checking queue again." %
+                empty_queue_sleep)
             time.sleep(empty_queue_sleep)
         send_all()
 
 
-def send_queued_message(queued_message, smtp_connection=None, blacklist=None,
-                 log=True):
+def send_queued_message(
+        queued_message, smtp_connection=None, blacklist=None, log=True):
     """
     Send a queued message, returning a response code as to the action taken.
 
@@ -164,28 +167,31 @@ def send_queued_message(queued_message, smtp_connection=None, blacklist=None,
 
     log_message = ''
     if blacklisted:
-        logger.info("Not sending to blacklisted email: %s" %
-                     message.to_address.encode("utf-8"))
+        logger.info(
+            "Not sending to blacklisted email: %s" %
+            message.to_address.encode("utf-8"))
         queued_message.delete()
         result = constants.RESULT_SKIPPED
     else:
         try:
-            logger.info("Sending message to %s: %s" %
-                         (message.to_address.encode("utf-8"),
-                          message.subject.encode("utf-8")))
+            logger.info(
+                "Sending message to %s: %s" % (
+                    message.to_address.encode("utf-8"),
+                    message.subject.encode("utf-8")))
             opened_connection = smtp_connection.open()
-            smtp_connection.connection.sendmail(message.from_address,
-                                                [message.to_address.encode("utf-8")],
-                                                message.encoded_message.encode("utf-8"))
+            smtp_connection.connection.sendmail(
+                message.from_address,
+                [message.to_address.encode("utf-8")],
+                message.encoded_message.encode("utf-8"))
             queued_message.delete()
             result = constants.RESULT_SENT
         except (SocketError, smtplib.SMTPSenderRefused,
                 smtplib.SMTPRecipientsRefused,
-                smtplib.SMTPAuthenticationError), err:
+                smtplib.SMTPAuthenticationError) as err:
             queued_message.defer()
-            logger.warning("Message to %s deferred due to failure: %s" %
-                            (message.to_address.encode("utf-8"), err))
-            log_message = unicode(err)
+            logger.warning("Message to %s deferred due to failure: %s" % (
+                message.to_address.encode("utf-8"), err))
+            log_message = str(err)
             result = constants.RESULT_FAILED
     if log:
         models.Log.objects.create(message=message, result=result,
@@ -217,9 +223,10 @@ def send_message(email_message, smtp_connection=None):
 
     try:
         opened_connection = smtp_connection.open()
-        smtp_connection.connection.sendmail(email_message.from_email,
-                    email_message.recipients(),
-                    email_message.message().as_string())
+        smtp_connection.connection.sendmail(
+            email_message.from_email,
+            email_message.recipients(),
+            email_message.message().as_string())
         result = constants.RESULT_SENT
     except (SocketError, smtplib.SMTPSenderRefused,
             smtplib.SMTPRecipientsRefused,

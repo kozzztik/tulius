@@ -98,7 +98,7 @@ class FileUpload(models.Model):
             image_path = os.path.join(
                 settings.STATIC_URL, 'tinymce/img/box_address.png')
         return f'<img src="{image_path}" style="max-height: 85px; ' \
-               f'max-width: 85px"/>'
+            'max-width: 85px"/>'
     
     def get_absolute_url(self):
         return self.body.url if self.body else None

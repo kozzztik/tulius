@@ -1,6 +1,8 @@
 from django.contrib.auth.backends import ModelBackend
 from django.core.files.base import ContentFile
-from tulius.models import User, USER_SEX_FEMALE, USER_SEX_MALE, USER_SEX_UNDEFINED
+from tulius.models import User, USER_SEX_FEMALE, USER_SEX_MALE, \
+    USER_SEX_UNDEFINED
+
 
 class VKBackend(ModelBackend):
     def check_name(self, name):
@@ -11,8 +13,11 @@ class VKBackend(ModelBackend):
             return True
         
     def get_valid_name(self, profile):
-        names = [profile.nickname, '%s_%s' % (profile.first_name,profile.last_name)]
-        names += ['%s_%s_%s' % (profile.first_name,profile.nickname,profile.last_name)]
+        names = [
+            profile.nickname, '%s_%s' % (profile.first_name,profile.last_name)]
+        names += [
+            '%s_%s_%s' % (
+                profile.first_name,profile.nickname,profile.last_name)]
         names += ['vk_' + str(profile.vk_id)]
         for name in names:
             new_name = name.replace(' ', '_')
@@ -31,12 +36,11 @@ class VKBackend(ModelBackend):
         import urllib
         data = urllib.urlopen(profile.photo)
         img = ContentFile(data.read())
-        user.avatar.save('vk_'+ str(profile.vk_id), img, False)
+        user.avatar.save('vk_' + str(profile.vk_id), img, False)
         user.save()
         return user
             
     def authenticate(self, vk_profile=None, email=None):
-        print 'try to auth'
         try:
             return User.objects.get(vk_profile_id=vk_profile.pk)
         except User.DoesNotExist:

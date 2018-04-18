@@ -448,7 +448,7 @@ class BaseGameFormsetView(RightsDetailMixin, MessageMixin, UpdateView):
     model = Game
     template_name = 'games/game_edit/winners.haml'
 
-    def get_form(self, form_class):
+    def get_form(self, form_class=None):
         return get_formset(
             Game, self.form_model, self.request.POST, self.form_class, extra=1,
             instance=self.object, params={'game': self.object})
