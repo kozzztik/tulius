@@ -79,13 +79,13 @@ class BasePluginView(TemplateView):
         return t.render(context)
 
     def dispatch(self, request, *args, **kwargs):
-        if self.require_user and (not request.user.is_authenticated()):
+        if self.require_user and (not request.user.is_authenticated):
             return redirect_to_login(request.build_absolute_uri())
         try:
             return super(BasePluginView, self).dispatch(
                 request, *args, **kwargs)
         except PermissionDenied:
-            if not request.user.is_authenticated():
+            if not request.user.is_authenticated:
                 return redirect_to_login(request.build_absolute_uri())
             else:
                 raise

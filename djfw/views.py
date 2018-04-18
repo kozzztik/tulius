@@ -50,20 +50,20 @@ class RightsDetailMixin(object):
     # return TRUE if rights is OK, False if user have no rights
     def check_rights(self, obj, user):
         if (self.login_required or self.superuser_required) and (
-                not user.is_authenticated()):
+                not user.is_authenticated):
             return False
         if self.superuser_required and (not user.is_superuser):
             return False
         return True
     
     def dispatch(self, request, *args, **kwargs):
-        if (self.login_required and (not request.user.is_authenticated())):
+        if (self.login_required and (not request.user.is_authenticated)):
             return redirect_to_login(request.build_absolute_uri())
         try:
             return super(RightsDetailMixin, self).dispatch(
                 request, *args, **kwargs)
         except PermissionDenied:
-            if not request.user.is_authenticated():
+            if not request.user.is_authenticated:
                 return redirect_to_login(request.build_absolute_uri())
             else:
                 raise
