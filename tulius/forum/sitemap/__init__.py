@@ -1,4 +1,6 @@
 from django.conf.urls import url
+from django.contrib.sitemaps.views import sitemap
+
 # TODO: fix this when module moved
 from tulius.forum.plugins import ForumPlugin, BasePluginView
 from django.contrib.sitemaps import Sitemap
@@ -56,7 +58,7 @@ class SitemapPlugin(ForumPlugin):
         return [
             url(
                 r'^sitemap\.xml$',
-                'django.contrib.sitemaps.views.sitemap',
+                sitemap,
                 {'sitemaps': self.sitemaps()},
                 name='sitemap')
         ]

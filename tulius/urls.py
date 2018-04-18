@@ -42,9 +42,10 @@ urlpatterns = [
     url(r'^games/', include('tulius.games.urls',  namespace='games')),
     url(
         r'^forums/',
-        include(apps.get_app_config('forum').site.urls)),
+        include((apps.get_app_config('forum').site.urls, 'forum'))),
     url(r'^stories/', include('tulius.stories.urls',  namespace='stories')),
-    url(r'^play/', include(apps.get_app_config('gameforum').site.urls)),
+    url(r'^play/',
+        include((apps.get_app_config('gameforum').site.urls, 'gameforum'))),
     
     url(r'^vk/', include('tulius.vk.urls',  namespace='vk')),
     url(r'^counters/', include('tulius.counters.urls',  namespace='counters')),
