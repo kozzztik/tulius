@@ -96,30 +96,44 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
-TEMPLATE_LOADERS = (
-    'hamlpy.template.loaders.HamlPyFilesystemLoader',
-    'hamlpy.template.loaders.HamlPyAppDirectoriesLoader',
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'OPTIONS': {
+            'loaders': [
+                'hamlpy.template.loaders.HamlPyFilesystemLoader',
+                'hamlpy.template.loaders.HamlPyAppDirectoriesLoader',
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+            ],
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.request',
+                'django.template.context_processors.static',
+                'ws4redis.context_processors.default',
+                'djfw.flatpages.context_processors.flatpages',
+                'tulius.login.context_processors.relogin',
+                'djfw.datablocks.context_processors.datablocks',
+            ],
+            'libraries': {
 
-if not DEBUG:
-    TEMPLATE_LOADERS = (
-        ('django.template.loaders.cached.Loader', TEMPLATE_LOADERS),)
+            }
+        }
+    },
+]
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.debug',
-    'django.core.context_processors.i18n',
-    'django.core.context_processors.media',
-    'django.core.context_processors.request',
-    'django.core.context_processors.static',
-    'django.contrib.messages.context_processors.messages',
-    'django.contrib.auth.context_processors.auth',
-    'ws4redis.context_processors.default',
-    'djfw.flatpages.context_processors.flatpages',
-    'tulius.login.context_processors.relogin',
-    'djfw.datablocks.context_processors.datablocks',
-)
+# TODO that must not work now
+# if not DEBUG:
+#     TEMPLATES += [
+#         {
+#             'BACKEND': 'django.template.loaders.cached.Loader'
+#         }
+#     ]
+
 
 AUTHENTICATION_BACKENDS = (
     'tulius.vk.backend.VKBackend',
