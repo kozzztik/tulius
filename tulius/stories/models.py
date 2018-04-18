@@ -87,7 +87,6 @@ class Story(models.Model):
     genres = models.ManyToManyField(
         Genre,
         blank=True,
-        null=True,
         verbose_name=_(u'genres'),
         related_name='stories',
     )
@@ -602,7 +601,7 @@ class StoryAdmin(models.Model):
         blank=False,
         null=False,
         verbose_name=_(u'user'),
-        related_name='admined stories',
+        related_name='admined_stories',
     )
     create_game = models.BooleanField(
         default=False, 

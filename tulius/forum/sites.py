@@ -95,7 +95,7 @@ class BaseForumSite(object):
     
     @property
     def urls(self):
-        return self.get_urls(), self.app_name, self.name
+        return self.get_urls(), self.app_name
 
 
 class ForumSite(BaseForumSite):

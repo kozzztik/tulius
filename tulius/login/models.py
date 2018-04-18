@@ -8,9 +8,8 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class RegistrationProfile(models.Model):
-    user = models.ForeignKey(
+    user = models.OneToOneField(
         settings.AUTH_USER_MODEL, models.PROTECT,
-        unique=True,
         verbose_name=_('user'))
     activation_key = models.CharField(_('activation key'), max_length=40)
     ACTIVATED = u"ALREADY_ACTIVATED"

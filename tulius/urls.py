@@ -42,10 +42,10 @@ urlpatterns = [
     url(r'^games/', include('tulius.games.urls',  namespace='games')),
     url(
         r'^forums/',
-        include((apps.get_app_config('forum').site.urls, 'forum'))),
+        include(apps.get_app_config('forum').site.urls)),
     url(r'^stories/', include('tulius.stories.urls',  namespace='stories')),
     url(r'^play/',
-        include((apps.get_app_config('gameforum').site.urls, 'gameforum'))),
+        include(apps.get_app_config('gameforum').site.urls)),
     
     url(r'^vk/', include('tulius.vk.urls',  namespace='vk')),
     url(r'^counters/', include('tulius.counters.urls',  namespace='counters')),
@@ -54,12 +54,14 @@ urlpatterns = [
 handler404 = 'tulius.views.error404'
 handler500 = 'tulius.views.error500'
 
-if settings.DEBUG:
-    urlpatterns += [
-        (r'^media/(?P<path>.*)$', 'django.views.static.serve',
-            {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
-        (r'^static/(?P<path>.*)$', 'django.contrib.staticfiles.views.serve')
-    ]
+# TODO: looks like it is not needed anymore
+# if settings.DEBUG:
+#    urlpatterns += [
+#        url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
+#            {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+#        url(r'^static/(?P<path>.*)$',
+# 'django.contrib.staticfiles.views.serve')
+#    ]
 
 
 def set_locale(sender, **kwargs):
