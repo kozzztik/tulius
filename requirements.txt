@@ -6,7 +6,7 @@ mysqlclient == 1.3.12
 # apparently best relational DB trees implementation
 django-mptt == 0.9.0
 
-django-hamlpy = 1.1.1
+django-hamlpy == 1.1.1
 
 python-memcached == 1.59
 django-memcache-status == 1.3
