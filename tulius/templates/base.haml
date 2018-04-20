@@ -31,7 +31,7 @@
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}photos/jquery-lightbox/js/lightbox.js'}
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}autocomplete/autocomplete-select.js'}
     %script{type: 'text/javascript', src: '{{ MEDIA_URL }}rcrumbs/jquery.rcrumbs.min.js'}
-    %script{type: 'text/javascript', src: '{{ STATIC_URL }}js/ws4redis.js'}
+    %script1{type: 'text/javascript', src: '{{ STATIC_URL }}js/ws4redis.js'}
     <script type='text/javascript'>
         var websocket_uri = '{{ WEBSOCKET_URI }}';
         {% if not request.user.is_anonymous %}

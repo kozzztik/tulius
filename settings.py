@@ -44,8 +44,9 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'django.contrib.sitemaps',
     'memcache_status',
-    'ws4redis',
-    'djaml',
+    # TODO: fix it
+    # 'ws4redis',
+    'hamlpy',
     'djfw',
     'djfw.datablocks',
     'djfw.logger',

@@ -118,7 +118,7 @@ class RepeatNode(template.Node):
 
     def render(self, context):
         block = self.macro_root.find(self.block_name)
-        if not block:
+        if not block or self.extra_context:
             # apparently we are not supposed to raise exceptions at rendering 
             # stage, but this is serious, and we cannot do it while parsing.
             # once again, it comes down to being able to support repeating of
@@ -129,12 +129,6 @@ class RepeatNode(template.Node):
                 "cannot repeat '%s': block or macro not found" %
                 self.block_name)
         else:
-            # resolve extra context variables
-            resolved_context = {}
-            for key, value in self.extra_context.items():
-                resolved_context[key] = value.resolve(context)
-            # render the block with the new context
-            context.update(resolved_context)
             if isinstance(block, MacroNode):
                 result = block.repeat(context)
             else:
@@ -144,41 +138,17 @@ class RepeatNode(template.Node):
 
 
 def do_repeat(parser, token):
-    # Stolen from django.templatetags.i18n.BlockTranslateParser
-    # Parses something like  "with x as y, i as j", and 
-    # returns it as a  context dict.
-    class RepeatTagParser(template.TokenParser):
-        def top(self):
-            extra_context = {}
-            # first tag is the blockname
-            try:
-                block_name = self.tag()
-            except TemplateSyntaxError: 
-                raise TemplateSyntaxError(
-                    "'%s' requires a block or macro name" % self.tagname)
-            # read param bindings
-            while self.more():
-                tag = self.tag()
-                if tag == 'with' or tag == 'and':
-                    value = self.value()
-                    if self.tag() != 'as':
-                        raise TemplateSyntaxError(
-                            "variable bindings in %s must be "
-                            "'with value as variable'" % self.tagname)
-                    extra_context[self.tag()] = parser.compile_filter(value)                
-                else:
-                    raise TemplateSyntaxError(
-                        "unknown subtag %s for '%s' found" %
-                        (tag, self.tagname))
-            return self.tagname, block_name, extra_context
-    
-    # parse arguments
-    (tag_name, block_name, extra_context) = \
-        RepeatTagParser(token.contents).top()
-    # return as a RepeatNode
+    try:
+        args = token.split_contents()
+        block_name, extra_context = args[1], args[2:]
+    except IndexError:
+        m = ("'%s' tag requires at least one argument (macro name)"
+             % token.contents.split()[0])
+        raise template.TemplateSyntaxError(m)
+        # return as a RepeatNode
     if not hasattr(parser, '_macro_root'):
         raise TemplateSyntaxError(
-            "'%s' requires macros to be enabled first" % tag_name)
+            "'%s' requires macros to be enabled first" % block_name)
     return RepeatNode(block_name, parser._macro_root, extra_context)
 
 

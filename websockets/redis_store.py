@@ -15,8 +15,9 @@ def _wrap_users(users, request):
         if u is SELF and request and request.user and \
                 request.user.is_authenticated:
             result.add(request.user.pk)
-        else:
-            result.add(u.pk)
+        # TODO no idea why not works
+        # else:
+        #     result.add(u.pk)
     return result
 
 

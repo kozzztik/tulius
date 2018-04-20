@@ -3,10 +3,10 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib.sitemaps import views as sitemaps_views
 from django.contrib import admin
+from django.conf.urls.static import static
 
-from tulius.views import HomeView, StatisticsView
 from djfw.flatpages.views import FlatpagesList
-from djfw.installer.signals import maintaince_started
+from tulius import views
 from .sitemap import sitemaps
 
 admin.autodiscover()
@@ -32,8 +32,8 @@ urlpatterns = [
     url(r'^profiler/', include('djfw.profiler.urls',  namespace='profiler')),
     url(r'^installer/', include('djfw.installer.urls', namespace='installer')),
     
-    url(r'^$', HomeView.as_view(), name='home'),
-    url(r'^statistics/$', StatisticsView.as_view(), name='stats'),
+    url(r'^$', views.HomeView.as_view(), name='home'),
+    url(r'^statistics/$', views.StatisticsView.as_view(), name='stats'),
 
     url(r'^accounts/', include('tulius.login.urls', namespace='auth')),
     url(r'^players/', include('tulius.players.urls', namespace='players')),
@@ -54,24 +54,6 @@ urlpatterns = [
 handler404 = 'tulius.views.error404'
 handler500 = 'tulius.views.error500'
 
-# TODO: looks like it is not needed anymore
-# if settings.DEBUG:
-#    urlpatterns += [
-#        url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
-#            {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
-#        url(r'^static/(?P<path>.*)$',
-# 'django.contrib.staticfiles.views.serve')
-#    ]
-
-
-def set_locale(sender, **kwargs):
-    import platform
-    is_windows = platform.system() == 'Windows'
-    if not is_windows:
-        import locale
-        locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
-
-
-maintaince_started.connect(set_locale)
-
-set_locale(None)
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

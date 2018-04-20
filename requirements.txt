@@ -6,17 +6,7 @@ mysqlclient == 1.3.12
 # apparently best relational DB trees implementation
 django-mptt == 0.9.0
 
-# hamlpy dependency
-pygments == 2.2.0
-
-# HAML translator python realization
-hamlpy == 0.82.2
-
-# makes hamlpy usage in django templates possible
-djaml == 1.1
-django-appconf == 1.0.2
-FeedParser == 5.2.1
-pyyaml == 3.12
+django-hamlpy = 1.1.1
 
 python-memcached == 1.59
 django-memcache-status == 1.3
