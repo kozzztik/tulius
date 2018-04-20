@@ -1,8 +1,9 @@
-from django.utils.translation import ugettext_lazy as _
-from django.conf.urls import patterns, url
+from django.conf.urls import url
+
 # TODO: fix this when module moved
 from tulius.forum.plugins import ForumPlugin, BasePluginView
 from .views import DoTrustmark
+
 
 class TrustmarksPlugin(ForumPlugin):
     
@@ -37,6 +38,9 @@ class TrustmarksPlugin(ForumPlugin):
         self.core['recalc_role_trust'] = self.recalc_role_trust
         
     def get_urls(self):
-        return patterns('',
-                        url(r'^do_trustmark/$', DoTrustmark.as_view(self), name='do_trustmark'),
-        )
+        return [
+            url(
+                r'^do_trustmark/$',
+                DoTrustmark.as_view(self),
+                name='do_trustmark'),
+        ]

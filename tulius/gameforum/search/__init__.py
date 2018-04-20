@@ -1,8 +1,10 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
+
 # TODO: fix this when module moved
 from tulius.forum.plugins import ForumPlugin
 from .views import SearchView, ExtendedSearchView
 from .forms import SearchForm
+
 
 class GameSearchPlugin(ForumPlugin):
     def search_url(self, thread):
@@ -20,7 +22,13 @@ class GameSearchPlugin(ForumPlugin):
         self.templates['search_form'] = 'gameforum/search_form.haml'
         
     def get_urls(self):
-        return patterns('',
-            url(r'^search/(?P<pk>\d+)/$', SearchView.as_view(plugin=self), name='search'),
-            url(r'^extended_search/(?P<pk>\d+)/$', ExtendedSearchView.as_view(plugin=self), name='extended_search'),
-        )
+        return [
+            url(
+                r'^search/(?P<pk>\d+)/$',
+                SearchView.as_view(plugin=self),
+                name='search'),
+            url(
+                r'^extended_search/(?P<pk>\d+)/$',
+                ExtendedSearchView.as_view(plugin=self),
+                name='extended_search'),
+        ]

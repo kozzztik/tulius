@@ -1,9 +1,10 @@
-from django.conf import settings
-from django.utils.importlib import import_module
-from django.core.exceptions import ImproperlyConfigured
+import importlib
+import logging
 import os
 import tarfile
-import logging
+
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
 logger = logging.getLogger('installer')
 
@@ -13,28 +14,33 @@ def subprocess(command, message_cmd=''):
     import subprocess
     is_windows = platform.system() == 'Windows'
     try:
-        proc = subprocess.Popen(command, shell=True, cwd=settings.BASE_DIR, stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
+        proc = subprocess.Popen(
+            command, shell=True, cwd=settings.BASE_DIR, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
         stdout_buf = []
         stderr_buf = []
         (stdout, stderr) = proc.communicate()
         if stdout is not None:
-            stdout_buf.append(stdout.decode('cp866' if is_windows else 'utf-8'))
+            stdout_buf.append(
+                stdout.decode('cp866' if is_windows else 'utf-8'))
         stdout = "\n".join(stdout_buf)
         if stderr is not None:
-            stderr_buf.append(stderr.decode('cp866' if is_windows else 'utf-8'))
+            stderr_buf.append(
+                stderr.decode('cp866' if is_windows else 'utf-8'))
         stderr = "\n".join(stderr_buf)
         if stdout is not None:
             stdout = stdout.rstrip()
         if proc.returncode != 0:
-            message = "Command failed: %s\n errcode: %s\n" % (message_cmd or command, proc.returncode)
+            message = "Command failed: %s\n errcode: %s\n" % (
+                message_cmd or command, proc.returncode)
             message += stderr or stdout or ''
             logger.error(message)
         else:
             logger.info(stdout)
         return proc.returncode
     except OSError as ose:
-        message = "Command failed with OSError. '%s':\n%s" % (message_cmd or command, ose)
+        message = "Command failed with OSError. '%s':\n%s" % (
+            message_cmd or command, ose)
         logger.error(message)
         raise
 
@@ -49,8 +55,10 @@ def backupmysql(category):
     
     if os.path.exists(filename):
         os.remove(filename) 
-    subprocess('mysqldump -u%s -p%s -h%s %s > %s' % (database['USER'], database['PASSWORD'], database['HOST'],
-                                                     database['NAME'], filename), 'Backup mysql')
+    subprocess(
+        'mysqldump -u%s -p%s -h%s %s > %s' % (
+            database['USER'], database['PASSWORD'], database['HOST'],
+            database['NAME'], filename), 'Backup mysql')
     logger.info('Mysql backup finished.')
     print('Mysql backup finished.')
     return [filename]
@@ -65,8 +73,8 @@ def add__to_backup(backup_file, file_path):
     log("Backuping " + file_path)
     arch_name = file_path.replace(settings.BASE_DIR, '')
     try:
-        file_path = unicode(file_path)
-        arch_name = unicode(arch_name)
+        file_path = str(file_path)
+        arch_name = str(arch_name)
     except:
         log("Failed unicode path " + file_path)
         raise
@@ -82,15 +90,14 @@ def do_backup(category_name):
     try:
         from django.core.management import call_command
         call_command('clearance')
-        try:
-            from djfw.installer.models import Backup, BackupCategory
-        except:
-            from installer.models import Backup, BackupCategory
+        from djfw.installer.models import Backup, BackupCategory
         categories = BackupCategory.objects.filter(name=category_name)
         if categories:
             category = categories[0]
         else:
-            category = BackupCategory(name=category_name, verbose_name=category_name, enabled=True, saved_backups=2)
+            category = BackupCategory(
+                name=category_name, verbose_name=category_name,
+                enabled=True, saved_backups=2)
             category.save()
         if not category.enabled:
             log("Category disabled.")
@@ -99,7 +106,8 @@ def do_backup(category_name):
         backups_dir = backup.backups_dir()
         media_root = settings.MEDIA_ROOT
         if backups_dir.count(media_root):
-            raise ImproperlyConfigured('Backup directory cant be in MEDIA directory.')
+            raise ImproperlyConfigured(
+                'Backup directory cant be in MEDIA directory.')
         if not os.path.exists(backups_dir):
             os.makedirs(backups_dir)
         backup.save()
@@ -109,7 +117,9 @@ def do_backup(category_name):
         try:
             backupfile = tarfile.open(path, 'w:gz', encoding='utf-8')
             import sys
-            log("Filesystem %s , system %s" % (sys.getfilesystemencoding(), sys.getdefaultencoding()))
+            log(
+                "Filesystem %s , system %s" % (
+                    sys.getfilesystemencoding(), sys.getdefaultencoding()))
         except:
             log("Failed to create tarfile.")
             raise
@@ -117,10 +127,14 @@ def do_backup(category_name):
         for app_name in settings.INSTALLED_APPS:
             try:
                 try:
-                    installers += [(app_name, import_module('.installer', app_name))]
+                    installers += [
+                        (
+                            app_name,
+                            importlib.import_module('.installer', app_name))]
                 except ImportError as exc:
                     msg = exc.args[0]
-                    if not msg.startswith('No module named') or 'installer' not in msg:
+                    if not msg.startswith(
+                            'No module named') or 'installer' not in msg:
                         raise
             except:
                 log("Failed to import application " + app_name)
@@ -156,6 +170,6 @@ def do_backup(category_name):
         category.clear_backups()
         log("Backups cleared. Finished.")
         return backup
-    except Exception, e:
-        logger.error(unicode(e))
+    except Exception as e:
+        logger.error(e)
         raise e

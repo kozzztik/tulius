@@ -1,36 +1,19 @@
-django == 1.6.3
-pitz
-django-grappelli == 2.4.12
-pillow
-MySQL-python
-# database migration
-south
-# simply better python shell
-ipython
-
-# for small pieces of AJAX
-simplejson
+django == 2.0.4
+pytz == 2018.4
+pillow == 5.1.0
+mysqlclient == 1.3.12
 
 # apparently best relational DB trees implementation
-django-mptt == 0.7.4
+django-mptt == 0.9.0
 
-# hamlpy dependency
-pygments
-# HAML translator python realization
-hamlpy
-# makes hamlpy usage in django templates possible
-djaml
-django-appconf
-BeautifulSoup
-FeedParser
-pyyaml
+django-hamlpy = 1.1.1
 
-python-memcached
-django-memcache-status
+python-memcached == 1.59
+django-memcache-status == 1.3
 # sentry
-raven
-gevent
-redis
-django-websocket-redis
-django-redis-cache
-requests
+raven == 6.6.0
+gevent == 1.2.2
+redis == 2.10.6
+django-websocket-redis == 0.5.1
+django-redis-cache == 1.7.1
+requests == 2.18.4

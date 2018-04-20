@@ -1,13 +1,17 @@
-from django.core.urlresolvers import reverse, NoReverseMatch  
-from django.forms import HiddenInput, TextInput  
-from django.utils import simplejson  
-from django.utils.safestring import mark_safe  
-      
+import json
+
+from django import urls
+from django.forms import HiddenInput, TextInput
+from django.utils.safestring import mark_safe
+
+
 class AutocompleteWidget(TextInput):  
         class Media:
             css = {'all': ('autocomplete/css/jquery-ui-1.8.21.custom.css',)}
-            js = ('autocomplete/jquery-1.7.2.min.js','autocomplete/jquery-ui-1.8.21.custom.min.js',
-                    'autocomplete/autocomplete-select.js')
+            js = (
+                'autocomplete/jquery-1.7.2.min.js',
+                'autocomplete/jquery-ui-1.8.21.custom.min.js',
+                'autocomplete/autocomplete-select.js')
         """ 
         Autocomplete widget to use with jquery-autocomplete plugin. 
      
@@ -15,13 +19,15 @@ class AutocompleteWidget(TextInput):
         you can relate some fields and it's values'll posted to autocomplete 
         view. 
      
-        Widget support all jquery-autocomplete options that dumped to JavaScript 
-        via django.utils.simplejson. 
+        Widget support all jquery-autocomplete options that dumped to 
+        JavaScript via django.utils.simplejson. 
      
         **Note** You must init one of ``choices`` or ``choices_url`` attribute. 
         Else widget raises TypeError when rendering. 
         """  
-        def __init__(self, model, token, attrs=None, options=None, related_fields=None):  
+        def __init__(
+                self, model, token, attrs=None, options=None,
+                related_fields=None):
             """ 
             Optional arguments: 
             ------------------- 
@@ -56,12 +62,13 @@ class AutocompleteWidget(TextInput):
                 self.extra = {}  
         
         def render(self, name, value=None, attrs=None):              
-            self.choices_url = reverse('autocomplete:autocomplete', args=[self.token])
+            self.choices_url = urls.reverse(
+                'autocomplete:autocomplete', args=[self.token])
             choices = ''  
             final_attrs = self.build_attrs(attrs)  
             try:  
-                choices = reverse(str(self.choices_url))  
-            except NoReverseMatch:  
+                choices = urls.reverse(str(self.choices_url))
+            except urls.NoReverseMatch:
                 choices = self.choices_url
             choices = u"""function(request, response){
                 $.ajax({
@@ -83,39 +90,48 @@ class AutocompleteWidget(TextInput):
                 });
             }""" % (choices,)
             self.options['source'] = choices
-            self.options['select'] = "function(event, ui) { $(this).autocomplete_select(event, ui); }"
-            self.options['change'] = "function(event, ui) { $(this).autocomplete_change(event, ui); }"
-            self.options['appendTo'] = '#' + name +  '_autocomplete'
-            html_code = HiddenInput().render(name, value=value, attrs={'id': attrs['id']})  
+            self.options['select'] = (
+                'function(event, ui)' 
+                ' { $(this).autocomplete_select(event, ui); }')
+            self.options['change'] = (
+                'function(event, ui) ' +
+                '{ $(this).autocomplete_change(event, ui); }')
+            self.options['appendTo'] = '#' + name + '_autocomplete'
+            html_code = HiddenInput().render(
+                name, value=value, attrs={'id': attrs['id']})
             if self.options or self.extra:  
                 if 'extraParams' in self.options:  
                     self.options['extraParams'].update(self.extra)  
                 else:  
                     self.options['extraParams'] = self.extra  
                     
-                #options = simplejson.dumps(self.options, indent=4, sort_keys=True)  
+                # options = simplejson.dumps(
+                #  self.options, indent=4, sort_keys=True)
                 options = ''
                 for k, v in self.options.iteritems():
                     if options:
                         options += ','
                     v = str(v)
-                    if (v[:8] <> 'function') and (v[:1] <> '{'):
+                    if (v[:8] != 'function') and (v[:1] != '{'):
                         v = '"%s"' % (v,)
                     options += "\n            %s: %s" % (k, v)
                 extra = []  
                 
                 for k, v in self.extra.items():  
-                    options = options.replace(simplejson.dumps(v), v)  
-                    extra.append(u"function %s() { return $('#id_%s').val(); }\n" % (v, k))  
+                    options = options.replace(json.dumps(v), v)
+                    extra.append(
+                        u"function %s() { return $('#id_%s').val(); }\n" % (
+                            v, k))
                     
                 extra = u''.join(extra)  
             else:  
                 extra, options = '', ''  
-            attrs['id'] = attrs['id'] +  '_autocomplete'
+            attrs['id'] = attrs['id'] + '_autocomplete'
             if value:
                 obj = self.model.objects.get(pk=value)
-                value = unicode(obj)
-            html_code += super(AutocompleteWidget, self).render(name +  '_autocomplete', value, attrs)  
+                value = str(obj)
+            html_code += super(AutocompleteWidget, self).render(
+                name + '_autocomplete', value, attrs)
             
             html_code += u""" 
     <script type="text/javascript">
@@ -127,4 +143,3 @@ class AutocompleteWidget(TextInput):
     """ % (extra, final_attrs['id'], options)  
       
             return mark_safe(html_code)
-            

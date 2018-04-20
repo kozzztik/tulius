@@ -1,11 +1,13 @@
-from django.contrib import admin
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.contrib import admin
 from .models import FileUpload
+
 
 class FileUploadForm(forms.ModelForm):
     class Meta:
         model = FileUpload
+        fields = '__all__'
+
 
 class FileUploadAdmin(admin.ModelAdmin):
     form = FileUploadForm
@@ -27,5 +29,6 @@ class FileUploadAdmin(admin.ModelAdmin):
     
     def has_add_permission(self, request):
         return False
-    
+
+
 admin.site.register(FileUpload, FileUploadAdmin)

@@ -1,6 +1,7 @@
-from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
 from django.db import models
+from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
+
 
 class Notification(models.Model):
     """
@@ -51,7 +52,8 @@ class Notification(models.Model):
     
     def __unicode__(self):
         return self.name or self.code_name
-    
+
+
 class UserNotification(models.Model):
     """
     User notification
@@ -61,7 +63,7 @@ class UserNotification(models.Model):
         verbose_name_plural = _('user notifications')
     
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        settings.AUTH_USER_MODEL, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'user'),
@@ -69,7 +71,7 @@ class UserNotification(models.Model):
     )
 
     notification = models.ForeignKey(
-        Notification,
+        Notification, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'notification'),
@@ -83,7 +85,8 @@ class UserNotification(models.Model):
     
     def __unicode__(self):
         return "%s - %s" % (self.user, self.name or self.code_name)
-    
+
+
 class IncomeMail(models.Model):
     sender = models.CharField(
         max_length=200,

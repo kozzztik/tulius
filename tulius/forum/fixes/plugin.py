@@ -1,7 +1,8 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 # TODO: fix this when module moved
 from tulius.forum.plugins import ForumPlugin, BasePluginView
 from .views import RebuildNums, FixLastPost, FixHtml
+
 
 class FixesPlugin(ForumPlugin):
     def init_core(self):
@@ -13,9 +14,21 @@ class FixesPlugin(ForumPlugin):
         return self.reverse('rebuild_nums', thread.id)
     
     def get_urls(self):
-        return patterns('',
-            url(r'^rebuild_nums/(?P<post_id>\d+)/$', RebuildNums.as_view(plugin=self), name='rebuild_nums'),
-            url(r'^rebuild_nums/$', RebuildNums.as_view(plugin=self), name='rebuild_nums'),
-            url(r'^fix_last_post/$', FixLastPost.as_view(plugin=self), name='fix_last_post'),
-            url(r'^fix_html/$', FixHtml.as_view(plugin=self), name='fix_html'),
-        )
+        return [
+            url(
+                r'^rebuild_nums/(?P<post_id>\d+)/$',
+                RebuildNums.as_view(plugin=self),
+                name='rebuild_nums'),
+            url(
+                r'^rebuild_nums/$',
+                RebuildNums.as_view(plugin=self),
+                name='rebuild_nums'),
+            url(
+                r'^fix_last_post/$',
+                FixLastPost.as_view(plugin=self),
+                name='fix_last_post'),
+            url(
+                r'^fix_html/$',
+                FixHtml.as_view(plugin=self),
+                name='fix_html'),
+        ]

@@ -1,24 +1,27 @@
+import json
+
+from django import forms
+from django import urls
 from django.template import RequestContext, loader
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.views.generic import FormView
 from django.http import HttpResponse, Http404
-import json
 from django.views.generic import DetailView
-from django import forms
 from django.shortcuts import get_object_or_404
-from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied
+
 
 class LoginRequiredMixin(object):
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
-        return super(LoginRequiredMixin, self).get(request, *args, **kwargs);
+        return super(LoginRequiredMixin, self).get(request, *args, **kwargs)
+
     @method_decorator(login_required)
-    
     def post(self, request, *args, **kwargs):
-        return super(LoginRequiredMixin, self).post(request, *args, **kwargs);
+        return super(LoginRequiredMixin, self).post(request, *args, **kwargs)
+
 
 class DecoratorChainingMixin(object):
     def dispatch(self, *args, **kwargs):
@@ -31,7 +34,8 @@ class DecoratorChainingMixin(object):
         for func in call_prepare_funcs:
             func(self, *args, **kwargs)
         return base(*args, **kwargs)
-    
+
+
 class RightsDetailMixin(object):
     login_required = False
     superuser_required = False
@@ -45,23 +49,26 @@ class RightsDetailMixin(object):
     
     # return TRUE if rights is OK, False if user have no rights
     def check_rights(self, obj, user):
-        if (self.login_required or self.superuser_required) and (not user.is_authenticated()):
+        if (self.login_required or self.superuser_required) and (
+                not user.is_authenticated):
             return False
         if self.superuser_required and (not user.is_superuser):
             return False
         return True
     
     def dispatch(self, request, *args, **kwargs):
-        if (self.login_required and (not request.user.is_authenticated())):
+        if (self.login_required and (not request.user.is_authenticated)):
             return redirect_to_login(request.build_absolute_uri())
         try:
-            return super(RightsDetailMixin, self).dispatch(request, *args, **kwargs)
+            return super(RightsDetailMixin, self).dispatch(
+                request, *args, **kwargs)
         except PermissionDenied:
-            if not request.user.is_authenticated():
+            if not request.user.is_authenticated:
                 return redirect_to_login(request.build_absolute_uri())
             else:
                 raise
-    
+
+
 class RenderMixin(object):
     def render(self, **kwargs):
         context_data = self.get_context_data(**kwargs)
@@ -69,19 +76,23 @@ class RenderMixin(object):
         template = self.get_template_names()
         if isinstance(template, (list, tuple)):
             t = loader.select_template(template)
-        elif isinstance(template, basestring):
+        elif isinstance(template, str):
             t = loader.get_template(template)
         return t.render(context)
-    
+
+
 class AjaxFormView(RenderMixin, FormView):
     template_name = 'snippets/ajax_form.haml'
     
     def form_valid(self, form):
-        return HttpResponse(json.dumps({'result': True, 'redirect': self.get_success_url()}))
+        return HttpResponse(
+            json.dumps({'result': True, 'redirect': self.get_success_url()}))
     
     def form_invalid(self, form):
-        return HttpResponse(json.dumps({'result': False, 'html': self.render(form=form)}))
-    
+        return HttpResponse(
+            json.dumps({'result': False, 'html': self.render(form=form)}))
+
+
 class AjaxModelFormView(AjaxFormView):
     def model_setup(self, model):
         pass
@@ -93,8 +104,10 @@ class AjaxModelFormView(AjaxFormView):
         self.model = form.save(commit=False)
         self.model_setup(self.model)
         self.model.save()
-        return HttpResponse(json.dumps({'result': True, 'redirect': self.get_success_url()}))
-    
+        return HttpResponse(
+            json.dumps({'result': True, 'redirect': self.get_success_url()}))
+
+
 class AjaxFormsetView(RenderMixin, DetailView):
     template_name = 'snippets/ajax_formset_table.haml'
     no_parent = False
@@ -115,7 +128,8 @@ class AjaxFormsetView(RenderMixin, DetailView):
     def __init__(self, obj=None, request=None, **kwargs):
         super(AjaxFormsetView, self).__init__(**kwargs)
         if self.model:
-            self.fk = forms.models._get_foreign_key(self.model, self.submodel, fk_name=self.fk_name)
+            self.fk = forms.models._get_foreign_key(
+                self.model, self.submodel, fk_name=self.fk_name)
         else:
             self.fk = None
         if (obj or self.no_parent) and request:
@@ -139,7 +153,9 @@ class AjaxFormsetView(RenderMixin, DetailView):
             self.items = self.submodel.objects.filter(**{self.fk.name: obj.pk})
         else:
             self.items = self.submodel.objects.all()
-        self.items = [item for item in self.items if self.get_read_right(obj, user, item)]
+        self.items = [
+            item for item in self.items
+            if self.get_read_right(obj, user, item)]
         for item in self.items:
             item.edit_right = self.get_edit_right(obj, user, item)
             item.html_id = self.id + '_item%s' % (item.id)
@@ -148,9 +164,10 @@ class AjaxFormsetView(RenderMixin, DetailView):
         
     def get_url(self, obj):
         if obj:
-            return reverse(self.url_name, kwargs={self.pk_url_kwarg: obj.pk})
+            return urls.reverse(
+                self.url_name, kwargs={self.pk_url_kwarg: obj.pk})
         else:
-            return reverse(self.url_name)
+            return urls.reverse(self.url_name)
             
     def get_edit_right(self, obj, user, item):
         return self.model_edit_right
@@ -162,9 +179,11 @@ class AjaxFormsetView(RenderMixin, DetailView):
         if self.form_class:
             return self.form_class
         exclude = self.form_exclude or []
-        if self.fk and not self.fk.name in exclude:
+        if self.fk and self.fk.name not in exclude:
             exclude += [self.fk.name]
-        return forms.models.modelform_factory(self.submodel, form=self.base_form, fields=self.form_fields, exclude=exclude)
+        return forms.models.modelform_factory(
+            self.submodel, form=self.base_form,
+            fields=self.form_fields, exclude=exclude)
     
     def get(self, request, *args, **kwargs):
         self.object = None if self.no_parent else self.get_object()
@@ -179,7 +198,8 @@ class AjaxFormsetView(RenderMixin, DetailView):
             raise Http404()
         form_class = self.get_form_class()
         initial = {self.fk.name: self.object} if self.fk else None
-        self.form = form_class(data=request.POST or None, initial=initial, prefix=self.id)
+        self.form = form_class(
+            data=request.POST or None, initial=initial, prefix=self.id)
         if 'item_id' in request.POST:
             item_id = request.POST['item_id']
             try:

@@ -1,11 +1,12 @@
-from django.core.management.base import NoArgsCommand
+import logging
+import sys
+
+from django.core.management.base import BaseCommand
 from django.db import connection
 from django_mailer import models, settings
 from django_mailer.engine import send_all
 from django_mailer.management.commands import create_handler
-from optparse import make_option
-import logging
-import sys
+
 try:
     from django.core.mail import get_connection
     EMAIL_BACKEND_SUPPORT = True
@@ -14,17 +15,25 @@ except ImportError:
     EMAIL_BACKEND_SUPPORT = False
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     help = 'Iterate the mail queue, attempting to send all mail.'
-    option_list = NoArgsCommand.option_list + (
-        make_option('-b', '--block-size', default=500, type='int',
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '-b, --block-size',
+            default=500,
+            type='int',
             help='The number of messages to iterate before checking the queue '
-                'again (in case new messages have been added while the queue '
-                'is being cleared).'),
-        make_option('-c', '--count', action='store_true', default=False,
+                 'again (in case new messages have been added while the queue '
+                 'is being cleared).'
+        )
+        parser.add_argument(
+            '-c, --count',
+            action='store_true',
+            default=False,
             help='Return the number of messages in the queue (without '
-                'actually sending any)'),
-    )
+                 'actually sending any)'
+        )
 
     def handle_noargs(self, verbosity, block_size, count, **options):
         # If this is just a count request the just calculate, report and exit.

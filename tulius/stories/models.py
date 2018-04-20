@@ -1,11 +1,13 @@
-from django.utils.translation import ugettext_lazy as _, pgettext
-from django.utils.timezone import now
-from django.db import models
-from djfw.common import CREATION_YEAR_CHOICES
-from tulius.forum.models import Thread
 from datetime import timedelta
+
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
+from django.utils.timezone import now
+
+from djfw.common import CREATION_YEAR_CHOICES
 from djfw.sortable.models import SortableModelMixin
 from tulius.models import User
+from tulius.forum.models import Thread
 
 
 class Genre(models.Model):
@@ -21,12 +23,13 @@ class Genre(models.Model):
         unique=False, 
         verbose_name=_('name')
     )
+
     def __unicode__(self):
         return self.name
     
     @models.permalink
     def get_absolute_url(self):
-        return ('stories:genre', (), { 'genre_id': self.id })
+        return 'stories:genre', (), {'genre_id': self.id}
     
     def stories_count(self):
         return self.stories.all().count()
@@ -34,13 +37,15 @@ class Genre(models.Model):
     def stories_list(self):
         val = ''
         for story in self.stories.all():
-            val += '<a href="%s">%s</a><br />' % (story.get_absolute_url(), story.name)
+            val += '<a href="%s">%s</a><br />' % (
+                story.get_absolute_url(), story.name)
         return val
     
     stories_count.short_description = _('stories')
     stories_list.short_description = _('stories')
     stories_list.allow_tags = True
-    
+
+
 class Story(models.Model):
     class Meta:
         verbose_name = _(u'story')
@@ -54,9 +59,9 @@ class Story(models.Model):
         verbose_name=_(u'name')
     )
     announcement = models.TextField(
-        default = '',
+        default='',
         blank=True,
-        verbose_name = _(u'announcement'),
+        verbose_name=_(u'announcement'),
     )
     announcement_preview = models.TextField(
         default='',
@@ -76,13 +81,12 @@ class Story(models.Model):
         
     )
     creation_year = models.PositiveIntegerField(
-        choices = CREATION_YEAR_CHOICES,
+        choices=CREATION_YEAR_CHOICES,
         verbose_name=_(u'creation year'),
     )
     genres = models.ManyToManyField(
         Genre,
         blank=True,
-        null=True,
         verbose_name=_(u'genres'),
         related_name='stories',
     )
@@ -108,34 +112,36 @@ class Story(models.Model):
         default=True, 
         verbose_name=_(u'hidden')
     )
+
     def __unicode__(self):
         return self.name
         
     @models.permalink
     def get_absolute_url(self):
-        return ('stories:story', (), { 'pk': self.id })
+        return 'stories:story', (), {'pk': self.id}
     
     @models.permalink
     def get_edit_url(self):
-        return ('stories:edit_story_main', (self.id,), {})
+        return 'stories:edit_story_main', (self.id,), {}
         
     def edit_right(self, user):
-        if user.is_anonymous():
+        if user.is_anonymous:
             return False
         if user.is_superuser:
             return True
-        return (StoryAdmin.objects.filter(user=user, story=self).count() > 0)
+        return StoryAdmin.objects.filter(user=user, story=self).count() > 0
     
     def create_right(self, user):
-        if user.is_anonymous():
+        if user.is_anonymous:
             return False
         if user.is_superuser:
             return True
-        return (self.admins.filter(user=user, create_game=True).count() > 0)
+        return self.admins.filter(user=user, create_game=True).count() > 0
 
     def get_variations(self):
         return Variation.objects.filter(story=self, game=None, deleted=False)
-    
+
+
 AVATAR_SAVE_SIZE = (200, 200)
 AVATAR_SIZES = (
         (40, 40),
@@ -145,13 +151,14 @@ AVATAR_SIZES = (
 AVATAR_PATH = 'stories/avatars'
 AVATAR_ALT_PATH = AVATAR_PATH + '-alt'
 
+
 class Avatar(models.Model):
     class Meta:
         verbose_name = _(u'avatar')
         verbose_name_plural = _(u'avatars')
 
     story = models.ForeignKey(
-        Story,
+        Story, models.PROTECT,
         blank=False,
         null=False,
         verbose_name=_(u'story'),
@@ -192,19 +199,20 @@ class Avatar(models.Model):
         
     @models.permalink
     def get_absolute_url(self):
-        return ('stories:avatar', (self.id,), {})
+        return 'stories:avatar', (self.id,), {}
     
     @models.permalink
     def get_delete_url(self):
-        return ('stories:delete_avatar', (self.id, ), {})
-        
+        return 'stories:delete_avatar', (self.id, ), {}
+
+
 class AvatarAlternative(models.Model):
     class Meta:
         verbose_name = _(u'avatar alternative')
         verbose_name_plural = _(u'avatars alternaties')
 
     avatar = models.ForeignKey(
-        Avatar,
+        Avatar, models.PROTECT,
         blank=False,
         null=False,
         verbose_name=_(u'avatar'),
@@ -234,7 +242,8 @@ class AvatarAlternative(models.Model):
             self.image.delete()
         except:
             pass
-    
+
+
 CHAR_SEX_UNDEFINED = 0
 CHAR_SEX_MALE = 1
 CHAR_SEX_FEMALE = 2
@@ -247,7 +256,8 @@ CHAR_SEX_CHOICES = (
     (CHAR_SEX_FEMALE, _('Female')),
     (CHAR_SEX_MIDDLE, _('Middle')),
     (CHAR_SEX_PLUR, _('Plural')),
-    )
+)
+
 
 class Character(models.Model):
     class Meta:
@@ -256,7 +266,7 @@ class Character(models.Model):
         ordering = ['order', 'id']
         
     story = models.ForeignKey(
-        Story,
+        Story, models.PROTECT,
         blank=False,
         null=False,
         verbose_name=_(u'story'),
@@ -288,7 +298,7 @@ class Character(models.Model):
         null=True,
     )
     avatar = models.ForeignKey(
-        Avatar,
+        Avatar, models.PROTECT,
         blank=True,
         null=True,
         verbose_name=_(u'avatar'),
@@ -298,16 +308,18 @@ class Character(models.Model):
         default=False, 
         verbose_name=_(u'show in character list')
     )
+
     def __unicode__(self):
         return self.name
         
     @models.permalink
     def get_absolute_url(self):
-        return ('stories:character', (self.id,), {})
+        return 'stories:character', (self.id,), {}
     
     @models.permalink
     def get_info_url(self):
-        return ('stories:character_info', (), { 'pk': self.id })
+        return 'stories:character_info', (), {'pk': self.id}
+
         
 class Variation(SortableModelMixin):
     class Meta:
@@ -316,7 +328,7 @@ class Variation(SortableModelMixin):
         ordering = ['order', 'id']
         
     story = models.ForeignKey(
-        Story,
+        Story, models.PROTECT,
         blank=False,
         null=False,
         verbose_name=_(u'story'),
@@ -335,7 +347,7 @@ class Variation(SortableModelMixin):
         null=True,
     )
     game = models.ForeignKey(
-        to = 'games.Game',
+        'games.Game', models.PROTECT,
         verbose_name=_(u'game'),
         related_name='story_variation',
         blank=True,
@@ -343,7 +355,7 @@ class Variation(SortableModelMixin):
     )
     
     thread = models.ForeignKey(
-        Thread,
+        Thread, models.PROTECT,
         verbose_name=_(u'new forum'),
         related_name='variations',
         blank=True,
@@ -384,13 +396,16 @@ class Variation(SortableModelMixin):
         self.comments_count = 0
         self.save()
         rolelinks = {}
-        for role in Role.objects.filter(variation__id=old_id).exclude(deleted=True): 
+        for role in Role.objects.filter(
+                variation__id=old_id).exclude(deleted=True):
             old_role = role.pk
             role.copy(self)
             rolelinks[old_role] = role
-        for material in AdditionalMaterial.objects.filter(variation__id=old_id): 
+        for material in AdditionalMaterial.objects.filter(
+                variation__id=old_id):
             material.copy(self)
-        for illustration in Illustration.objects.filter(variation__id=old_id): 
+        for illustration in Illustration.objects.filter(
+                variation__id=old_id):
             illustration.copy(self)
         return rolelinks
                 
@@ -404,7 +419,8 @@ class Variation(SortableModelMixin):
     
     def get_roles(self):
         return Role.objects.filter(variation=self).exclude(deleted=True)
-    
+
+
 class Role(SortableModelMixin):
     class Meta:
         verbose_name = _(u'role')
@@ -412,21 +428,21 @@ class Role(SortableModelMixin):
         ordering = ['order', 'id']
         
     variation = models.ForeignKey(
-        Variation,
+        Variation, models.PROTECT,
         blank=False,
         null=False,
         verbose_name=_(u'variation'),
         related_name='roles',
     )
     character = models.ForeignKey(
-        Character,
+        Character, models.PROTECT,
         blank=True,
         null=True,
         verbose_name=_(u'character'),
         related_name='roles',
     )
     avatar = models.ForeignKey(
-        Avatar,
+        Avatar, models.PROTECT,
         blank=True,
         null=True,
         verbose_name=_(u'avatar'),
@@ -467,7 +483,7 @@ class Role(SortableModelMixin):
         verbose_name=_(u'show trust marks')
     )
     user = models.ForeignKey(
-        User, 
+        User, models.PROTECT,
         blank=True,
         null=True,
         related_name='roles', 
@@ -488,7 +504,7 @@ class Role(SortableModelMixin):
     visit_time = models.DateTimeField(
         blank=True,
         null=True,
-        verbose_name= _('visit time'),
+        verbose_name=_('visit time'),
     )
     
     comments_count = models.PositiveIntegerField(
@@ -517,7 +533,7 @@ class Role(SortableModelMixin):
         return ('stories:role_text', (self.id,), {})
         
     def is_online(self):
-        return (self.visit_time > now() - timedelta(minutes=3))
+        return self.visit_time > now() - timedelta(minutes=3)
     
     def copy(self, new_variation):
         self.id = None
@@ -525,21 +541,22 @@ class Role(SortableModelMixin):
         self.comments_count = 0
         self.save()
         return True
-        
+
+
 class RoleDeleteMark(models.Model):
     class Meta:
         verbose_name = _(u'role delete mark')
         verbose_name_plural = _(u'roles delete marks')
         
     role = models.ForeignKey(
-        Role,
+        Role, models.PROTECT,
         blank=False,
         null=False,
         verbose_name=_(u'role'),
         related_name='delete_marks',
     )
     user = models.ForeignKey(
-        User,
+        User, models.PROTECT,
         blank=False,
         null=False,
         verbose_name=_(u'user'),
@@ -552,14 +569,16 @@ class RoleDeleteMark(models.Model):
     )
     
     delete_time = models.DateTimeField(
-        auto_now_add    = True,
-        verbose_name    = _('created at'),
+        auto_now_add=True,
+        verbose_name=_('created at'),
     )
     
     def __unicode__(self):
-        return _("%(role)s deleted by %(user)s at %(time)s") % {'role': unicode(self.role), 'user': unicode(self.user), 
-            'time': self.delete_time }
-    
+        return _("%(role)s deleted by %(user)s at %(time)s") % {
+            'role': str(self.role), 'user': str(self.user),
+            'time': self.delete_time}
+
+
 class StoryAdmin(models.Model):
     class Meta:
         verbose_name = _(u'story admin')
@@ -571,18 +590,18 @@ class StoryAdmin(models.Model):
         (True, _('Yes')),
     )
     story = models.ForeignKey(
-        Story,
+        Story, models.PROTECT,
         blank=False,
         null=False,
         verbose_name=_(u'story'),
         related_name='admins',
     )
-    user =  models.ForeignKey(
-        User,
+    user = models.ForeignKey(
+        User, models.PROTECT,
         blank=False,
         null=False,
         verbose_name=_(u'user'),
-        related_name='admined stories',
+        related_name='admined_stories',
     )
     create_game = models.BooleanField(
         default=False, 
@@ -590,15 +609,17 @@ class StoryAdmin(models.Model):
         choices=CREATE_CHOICES
         
     )
+
     def __unicode__(self):
         if self.user:
             if self.create_game:
-                return "%s (%s)" % (self.user, unicode(_("games admin")))
+                return "%s (%s)" % (self.user, str(_("games admin")))
             else:
-                return unicode(self.user)
+                return str(self.user)
         else:
             return None
-            
+
+
 class StoryAuthor(models.Model):
     class Meta:
         verbose_name = _(u'story author')
@@ -606,32 +627,34 @@ class StoryAuthor(models.Model):
         unique_together = ('story', 'user')
         
     story = models.ForeignKey(
-        Story,
+        Story, models.PROTECT,
         blank=False,
         null=False,
         verbose_name=_(u'story'),
         related_name='authors',
     )
-    user =  models.ForeignKey(
-        User,
+    user = models.ForeignKey(
+        User, models.PROTECT,
         blank=False,
         null=False,
         verbose_name=_(u'user'),
         related_name='authored_stories',
     )
+
     def __unicode__(self):
         if self.user:
-            return unicode(self.user)
+            return str(self.user)
         else:
             return None
-            
+
+
 class AdditionalMaterial(models.Model):
     class Meta:
         verbose_name = _(u'additional material')
         verbose_name_plural = _(u'additional materials')
 
     story = models.ForeignKey(
-        Story,
+        Story, models.PROTECT,
         blank=True,
         null=True,
         verbose_name=_(u'story'),
@@ -639,7 +662,7 @@ class AdditionalMaterial(models.Model):
     )
 
     variation = models.ForeignKey(
-        Variation,
+        Variation, models.PROTECT,
         blank=True,
         null=True,
         verbose_name=_(u'variation'),
@@ -707,12 +730,14 @@ class AdditionalMaterial(models.Model):
         self.variation = new_variation
         self.save()
         return True
-        
+
+
 ILLUSTRATION_PATH = 'stories/illustrations/'
-            
+
+
 class Illustration(models.Model):
     story = models.ForeignKey(
-        Story,
+        Story, models.PROTECT,
         blank=True,
         null=True,
         verbose_name=_(u'story'),
@@ -720,7 +745,7 @@ class Illustration(models.Model):
     )
 
     variation = models.ForeignKey(
-        Variation,
+        Variation, models.PROTECT,
         blank=True,
         null=True,
         verbose_name=_(u'variation'),
@@ -754,16 +779,16 @@ class Illustration(models.Model):
     @models.permalink
     def get_absolute_url(self):
         if self.variation and self.variation.game:
-            return ('games:edit_illustration', (self.id,), {})
+            return 'games:edit_illustration', (self.id,), {}
         else:
-            return ('stories:edit_illustration', (self.id,), {})
+            return 'stories:edit_illustration', (self.id,), {}
         
     @models.permalink 
     def delete_url(self):
         if self.variation and self.variation.game:
-            return ('games:illustration_delete', (self.id,), {})
+            return 'games:illustration_delete', (self.id,), {}
         else:
-            return ('stories:illustration_delete', (self.id,), {})
+            return 'stories:illustration_delete', (self.id,), {}
         
     def delete_data(self):
         try:
@@ -789,7 +814,7 @@ class Illustration(models.Model):
     def _copy_file(self, source_path, dest):
         if source_path:
             try:
-                source = file.open(source_path)
+                source = open(source_path)
                 try:
                     dest.save('%s.jpg' % (self.pk,), source)
                 finally:

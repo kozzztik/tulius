@@ -1,7 +1,11 @@
+import logging
+
 from django.utils.translation import ugettext_lazy as _
+
 
 bb_codes_list = {}
 bb_simple_codes_list = {'br': '<br/>'}
+
 
 def bbcode_to_html(data_str, codes_list=None, simple_codes_list=None):
     current = 0
@@ -14,13 +18,14 @@ def bbcode_to_html(data_str, codes_list=None, simple_codes_list=None):
     while current < len(data_str):
         if (data_str[current] == '['):
             tag_opened = current
-            if (len(data_str) > current + 1) and (data_str[current + 1] == '/'):
+            if (len(data_str) > current + 1) and (
+                    data_str[current + 1] == '/'):
                 state = 2
                 tagname_start = current + 2
             else:
                 state = 1
                 tagname_start = current + 1
-        elif (data_str[current] == ']') and (state <> 0):
+        elif (data_str[current] == ']') and (state != 0):
             tagname = data_str[tagname_start:current].strip()
             if tagname:
                 if (state == 1):
@@ -42,17 +47,20 @@ def bbcode_to_html(data_str, codes_list=None, simple_codes_list=None):
                                 data = tag
                             if (not (data is None)):
                                 old_len = current - tag_opened
-                                data_str = data_str[0:tag_opened] + data + data_str[(current + 1):len(data_str)]
+                                data_str = data_str[0:tag_opened] + data + \
+                                    data_str[(current + 1):len(data_str)]
                                 current = current + len(data) - old_len - 1
                         elif (tagname in codes_list):
                             tag = codes_list[tagname]
-                            tag_stack.append((tag, tagname, param, tag_opened, current + 1))
+                            tag_stack.append(
+                                (tag, tagname, param, tag_opened, current + 1))
                 elif (state == 2):
                     tagname = tagname.lower()
                     new_tag_stack = tag_stack[:]
                     tag = None
                     while len(new_tag_stack) > 0:
-                        (stack_tag, stack_tagname, stack_param, stack_tag_opened, stack_current) = \
+                        (stack_tag, stack_tagname, stack_param,
+                         stack_tag_opened, stack_current) = \
                             new_tag_stack.pop()
                         if stack_tagname == tagname:
                             tag = stack_tag
@@ -67,11 +75,13 @@ def bbcode_to_html(data_str, codes_list=None, simple_codes_list=None):
                             pass
                         if (not (data is None)):
                             old_len = current - stack_tag_opened
-                            data_str = data_str[0:stack_tag_opened] + data + data_str[(current + 1):len(data_str)]
+                            data_str = data_str[0:stack_tag_opened] + data + \
+                                data_str[(current + 1):len(data_str)]
                             current = current + len(data) - old_len - 1
                 state = 0
         current += 1    
     return data_str
+
 
 def register_bb_code(name):
     def wrapper(f):
@@ -79,8 +89,10 @@ def register_bb_code(name):
         return f
     return wrapper
 
+
 def bb_simple_nested(tagname, param, text):
     return '<%s>%s</%s>' % (tagname, text, tagname)
+
 
 bb_codes_list['i'] = bb_simple_nested
 bb_codes_list['b'] = bb_simple_nested
@@ -89,8 +101,10 @@ bb_codes_list['s'] = bb_simple_nested
 bb_codes_list['big'] = bb_simple_nested
 bb_codes_list['small'] = bb_simple_nested
 
-VALID_BB_COLORS = ['darkred', 'red', 'orange', 'brown', 'yellow', 'green', 'olive', 'cyan', 'blue', 'darkblue',
-                   'indigo', 'violet', 'white', 'black']
+VALID_BB_COLORS = [
+    'darkred', 'red', 'orange', 'brown', 'yellow', 'green', 'olive', 'cyan',
+    'blue', 'darkblue', 'indigo', 'violet', 'white', 'black']
+
 
 @register_bb_code('color')
 def bb_color(tagname, param, text):
@@ -101,12 +115,13 @@ def bb_color(tagname, param, text):
     if (not param_checked) and (len(param) == 7):
         param_checked = True
         for c in param[1:7]:
-            if not c in 'abcdef0123456789':
+            if c not in 'abcdef0123456789':
                 param_checked = False
                 break
     if not param_checked:
         raise Exception('Invalid color')
     return '<span style="color: %s;">%s</span>' % (param, text)
+
 
 @register_bb_code('url')
 def bb_url(tagname, param, text):
@@ -117,6 +132,7 @@ def bb_url(tagname, param, text):
         text = text.replace('"', '&quot;').replace('\n', '')
         return '<a href="%s">%s</a>' % (text, text)
 
+
 @register_bb_code('img')
 def bb_img(tagname, param, text):
     text = text.replace('"', '&quot;').replace('\n', '')
@@ -126,41 +142,48 @@ def bb_img(tagname, param, text):
     else:
         return '<img src="%s"/>' % (text)
 
+
 @register_bb_code('quote')
 def bb_quote(tagname, param, text):
     if param:
-        param += ' ' + unicode(_('said'))
+        param += ' ' + str(_('said'))
         return '<blockquote><small>%s</small>%s</blockquote>' % (param, text,)
     else:
         return '<blockquote>%s</blockquote>' % (text,)
+
 
 @register_bb_code('center')
 def bb_center(tagname, param, text):
     return '<div align="center">%s</div>' % (text,)
 
+
 @register_bb_code('code')
 def bb_code(tagname, param, text):
     return '<tt>%s</tt>' % (text,)
 
-VALID_BB_FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large', 'xx-large']
+
+VALID_BB_FONT_SIZES = [
+    'xx-small', 'x-small', 'small', 'medium', 'large', 'x-large', 'xx-large']
+
 
 @register_bb_code('size')
 def bb_size(tagname, param, text):
     param = param.strip()
-    if not param in VALID_BB_FONT_SIZES:
+    if param not in VALID_BB_FONT_SIZES:
         param = param.replace('px', '').strip()
         param = int(param)
         param = str(param) + 'px'
     return '<span style="font-size:%s;">%s</span>' % (param, text)
+
 
 def bb_datablock(tagname, param):
     try:
         from djfw.datablocks.models import DataBlock
         block = DataBlock.objects.languaged().filter(name=param)[0]
         return block.full_text
-    except Exception, e:
-        import logging
+    except Exception as e:
         logging.error(e)
         return ''
-    
+
+
 bb_simple_codes_list['datablock'] = bb_datablock

@@ -1,13 +1,15 @@
 from djfw.inlineformsets import get_formset
-from .forms import DeleteVotingForm, VoitingForm, VoitingChoiceForm, ManageForm
 # TODO: fix this when module moved
 from tulius.forum.plugins import ForumPlugin, BasePluginView
+from .forms import DeleteVotingForm, VoitingForm, VoitingChoiceForm, ManageForm
+
 
 class VotingCore(ForumPlugin):
     def prepare_voting_results(self, voting, view_user, force_results=False):
         models = self.site.core.models
-        if view_user and not view_user.is_anonymous():
-            votes = models.VotingVote.objects.filter(user=view_user, choice__voting=voting)
+        if view_user and not view_user.is_anonymous:
+            votes = models.VotingVote.objects.filter(
+                user=view_user, choice__voting=voting)
             voting.choice = votes[0].choice if votes else None
             if voting.choice and voting.show_results:
                 force_results = True        
@@ -15,10 +17,12 @@ class VotingCore(ForumPlugin):
             choices = models.VotingChoice.objects.filter(voting=voting)
             votes = 0
             for choice in choices:
-                choice.vote_count = models.VotingVote.objects.filter(choice=choice).count()
+                choice.vote_count = models.VotingVote.objects.filter(
+                    choice=choice).count()
                 votes += choice.vote_count
             for choice in choices:
-                choice.vote_persent = (choice.vote_count * 100 / votes) if votes else 0
+                choice.vote_persent = (
+                        choice.vote_count * 100 / votes) if votes else 0
                 choice.vote_length = choice.vote_persent / 2
                 if choice.vote_length < 1:
                     choice.vote_length = 1
@@ -27,11 +31,16 @@ class VotingCore(ForumPlugin):
     def preprocess_add_voting(self, request):
         models = self.site.core.models
         form = VoitingForm(data=request.POST or None)
-        formset = get_formset(models.Voting, models.VotingChoice, request.POST, VoitingChoiceForm, extra=2)
+        formset = get_formset(
+            models.Voting,
+            models.VotingChoice,
+            request.POST,
+            VoitingChoiceForm,
+            extra=2)
         valid = False
         if request.method == 'POST':
             valid = form.is_valid() and formset.is_valid()
-        return (valid, form, formset)
+        return valid, form, formset
     
     def process_add_voting(self, form, formset, comment, user):
         voting = form.save(commit=False)
@@ -61,17 +70,24 @@ class VotingCore(ForumPlugin):
         else:
             voting_delete = None
             voting_form = VoitingForm(data=request.POST or None)
-            voting_formset = get_formset(models.Voting, models.VotingChoice, request.POST, VoitingChoiceForm, extra=2)
+            voting_formset = get_formset(
+                models.Voting,
+                models.VotingChoice,
+                request.POST,
+                VoitingChoiceForm,
+                extra=2)
         valid = False
         if request.method == 'POST':
             if voting:
                 valid = voting_delete.is_valid()
                 if valid:
                     if not voting.closed:
-                        voting.do_close = voting_delete.cleaned_data['close_voting']
+                        voting.do_close = voting_delete.cleaned_data[
+                            'close_voting']
                     else:
                         voting.do_close = False
-                    voting.do_delete = voting_delete.cleaned_data['delete_voting']
+                    voting.do_delete = voting_delete.cleaned_data[
+                        'delete_voting']
                     
             else:
                 valid = voting_form.is_valid() and voting_formset.is_valid()
@@ -79,7 +95,7 @@ class VotingCore(ForumPlugin):
         else:
             if voting:
                 self.prepare_voting_results(voting, request.user, True)
-        return (valid, voting, voting_form, voting_formset, voting_delete)
+        return valid, voting, voting_form, voting_formset, voting_delete
     
     def process_edit_voting(self, voting, form, formset, comment, user):
         if voting:
@@ -115,12 +131,15 @@ class VotingCore(ForumPlugin):
         thread = kwargs['thread']
         voting = None
         if thread and thread.first_comment:
-            first_comment = self.models.Comment.objects.get(id=thread.first_comment_id)
-            (voting_valid, voting, voting_form, voting_formset, voting_delete) = self.preprocess_edit_voting(sender.request, 
-                                                                                                first_comment)
+            first_comment = self.models.Comment.objects.get(
+                id=thread.first_comment_id)
+            (voting_valid, voting, voting_form, voting_formset,
+             voting_delete) = self.preprocess_edit_voting(
+                sender.request, first_comment)
             context['voting_delete'] = voting_delete
         else:
-            (voting_valid, voting_form, voting_formset) = self.preprocess_add_voting(sender.request)
+            (voting_valid, voting_form, voting_formset) = \
+                self.preprocess_add_voting(sender.request)
         sender.voting = voting
         sender.voting_form = voting_form
         sender.voting_formset = voting_formset
@@ -134,18 +153,25 @@ class VotingCore(ForumPlugin):
         if sender.self_is_room or (not sender.request.POST):
             return
         if sender.comment and sender.comment.voting:
-            self.process_edit_voting(sender.voting, sender.voting_form, sender.voting_formset, sender.comment, sender.request.user)
+            self.process_edit_voting(
+                sender.voting,
+                sender.voting_form,
+                sender.voting_formset,
+                sender.comment,
+                sender.request.user)
     
     def comment_before_edit(self, sender, **kwargs):
         voting = None
         comment = kwargs['comment']
         context = kwargs['context']
         if comment:
-            (voting_valid, voting, voting_form, voting_formset, voting_delete) = self.preprocess_edit_voting(sender.request, 
-                                                                                                        comment)
+            (voting_valid, voting, voting_form, voting_formset,
+             voting_delete) = self.preprocess_edit_voting(
+                sender.request, comment)
             context['voting_delete'] = voting_delete
         else:
-            (voting_valid, voting_form, voting_formset) = self.preprocess_add_voting(sender.request)
+            (voting_valid, voting_form, voting_formset) = \
+                self.preprocess_add_voting(sender.request)
         context['voting_valid'] = voting_valid
         context['voting'] = voting
         context['voting_form'] = voting_form
@@ -159,7 +185,12 @@ class VotingCore(ForumPlugin):
             voting = context['voting']
             voting_form = context['voting_form']
             voting_formset = context['voting_formset']
-            self.process_edit_voting(voting, voting_form, voting_formset, sender.comment, sender.request.user)
+            self.process_edit_voting(
+                voting,
+                voting_form,
+                voting_formset,
+                sender.comment,
+                sender.request.user)
     
     def init_core(self):
         super(VotingCore, self).init_core()

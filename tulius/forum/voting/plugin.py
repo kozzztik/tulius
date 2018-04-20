@@ -1,7 +1,8 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from .views import Like, Vote, PreviewResults
 
 from .core import VotingCore
+
 
 class VotingPlugin(VotingCore):
     def comment_voting(self, comment):
@@ -22,12 +23,14 @@ class VotingPlugin(VotingCore):
         return self.reverse('preview_results')
     
     def is_liked(self, comment):
-        likes = self.models.CommentLike.objects.filter(comment=comment, user=comment.view_user)
+        likes = self.models.CommentLike.objects.filter(
+            comment=comment, user=comment.view_user)
         return True if likes else False
     
     def init_core(self):
         super(VotingPlugin, self).init_core()
-        self.templates['voting_closed_results'] = 'forum/voting/closed_results.haml'
+        self.templates['voting_closed_results'] = \
+            'forum/voting/closed_results.haml'
         self.templates['voting_results'] = 'forum/voting/voting_results.haml'
         self.templates['voting'] = 'forum/voting/voting.haml'
         self.templates['voting_tag'] = 'forum/voting/voting_tag.haml'
@@ -40,8 +43,10 @@ class VotingPlugin(VotingCore):
         self.urlizer['Thread_get_voting_url'] = self.vote_url
         
     def get_urls(self):
-        return patterns('',
+        return [
             url(r'^like/$', Like.as_view(plugin=self), name='like'),
             url(r'^vote/$', Vote.as_view(plugin=self), name='vote'),
-            url(r'^preview_results/$', PreviewResults.as_view(plugin=self), name='preview_results'),
-        )
+            url(
+                r'^preview_results/$', PreviewResults.as_view(plugin=self),
+                name='preview_results'),
+        ]

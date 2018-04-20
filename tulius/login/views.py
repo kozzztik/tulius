@@ -1,15 +1,18 @@
-from django.utils.translation import ugettext_lazy as _, ugettext as __
-from django.views.generic import TemplateView, View, FormView
-from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout, get_user_model
-from django.contrib import messages
-from django.contrib.sites.models import Site, RequestSite
-from django.http import Http404, HttpResponseRedirect
-from django.core.urlresolvers import reverse, reverse_lazy
-from .forms import LoginForm, ReLoginForm, RegistrationForm
-from models import RegistrationProfile
-import re
 import hashlib
 import random
+import re
+
+from django import urls
+from django.contrib import auth
+from django.contrib import messages
+from django.contrib.sites.models import Site
+from django.contrib.sites.requests import RequestSite
+from django.http import Http404, HttpResponseRedirect
+from django.utils.translation import ugettext_lazy as _
+from django.views.generic import TemplateView, View, FormView
+
+from .forms import LoginForm, ReLoginForm, RegistrationForm
+from .models import RegistrationProfile
 
 
 class Login(TemplateView):
@@ -20,11 +23,12 @@ class Login(TemplateView):
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-            user = authenticate(username=username, password=password)
+            user = auth.authenticate(username=username, password=password)
             if user:
                 if user.is_active:
-                    auth_login(request, user)
-                    messages.success(request, _('You have successfully logged in'))
+                    auth.login(request, user)
+                    messages.success(
+                        request, _('You have successfully logged in'))
                     if 'next' in request.GET and request.GET['next']:
                         return HttpResponseRedirect(request.GET['next'])
                     elif 'next' in request.POST and request.POST['next']:
@@ -43,7 +47,7 @@ class Login(TemplateView):
 
 class Logout(View):
     def get(self, request, *args, **kwargs):
-        auth_logout(request)
+        auth.logout(request)
         if 'next' in request.GET and request.GET['next']:
             return HttpResponseRedirect(request.GET['next'])
         elif 'next' in request.POST and request.POST['next']:
@@ -62,7 +66,7 @@ class ReLogin(View):
             user.backend = 'django.contrib.auth.backends.ModelBackend'
             next_url = form.cleaned_data['next_url']
             if user.is_active:
-                auth_login(request, user)
+                auth.login(request, user)
                 messages.success(request, _('You have successfully logged in'))
             else:
                 messages.error(request, _('This account is disabled'))
@@ -79,7 +83,7 @@ class ReLogin(View):
 class RegisterView(FormView):
     template_name = 'login/registration.haml'
     form_class = RegistrationForm
-    success_url = reverse_lazy('auth:registration_complete')
+    success_url = urls.reverse_lazy('auth:registration_complete')
 
     def get_context_data(self, **kwargs):
         kwargs['form_submit_title'] = _('Sign up')
@@ -87,20 +91,23 @@ class RegisterView(FormView):
 
     def form_valid(self, form):
         data = form.cleaned_data
-        username, email, password = data['username'], data['email'], data['password1']
+        username, email, password = \
+            data['username'], data['email'], data['password1']
         if Site._meta.installed:
             site = Site.objects.get_current()
         else:
             site = RequestSite(self.request)
-        new_user = get_user_model().objects.create_user(username, email, password)
+        new_user = auth.get_user_model().objects.create_user(
+            username, email, password)
         new_user.is_active = False
         new_user.save()
 
         salt = hashlib.sha1(str(random.random())).hexdigest()[:5]
-        if isinstance(username, unicode):
+        if isinstance(username, str):
             username = username.encode('utf-8')
         activation_key = hashlib.sha1(salt+username).hexdigest()
-        registration_profile = RegistrationProfile.objects.create(user=new_user, activation_key=activation_key)
+        registration_profile = RegistrationProfile.objects.create(
+            user=new_user, activation_key=activation_key)
         registration_profile.send_activation_email(site)
         return super(RegisterView, self).form_valid(form)
 
@@ -114,7 +121,8 @@ class ActivateView(TemplateView):
         profile = None
         if self.SHA1_RE.search(activation_key):
             try:
-                profile = RegistrationProfile.objects.get(activation_key=activation_key)
+                profile = RegistrationProfile.objects.get(
+                    activation_key=activation_key)
             except RegistrationProfile.DoesNotExist:
                 pass
             if profile and not profile.activation_key_expired():
@@ -124,7 +132,8 @@ class ActivateView(TemplateView):
                 profile.activation_key = RegistrationProfile.ACTIVATED
                 profile.save()
                 user.backend = 'django.contrib.auth.backends.ModelBackend'
-                auth_login(request, user)
+                auth.login(request, user)
                 messages.success(request, _('You have successfully logged in'))
-                return HttpResponseRedirect(reverse('auth:registration_activation_complete'))
+                return HttpResponseRedirect(
+                    urls.reverse('auth:registration_activation_complete'))
         return self.render_to_response(kwargs)

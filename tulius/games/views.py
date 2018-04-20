@@ -1,7 +1,8 @@
+from django import urls
+from django.apps import apps
 from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib import messages
 from django.http import Http404, HttpResponseRedirect
 from django.http import HttpResponse
@@ -14,12 +15,16 @@ from django.views.generic.edit import UpdateView
 
 from djfw.cataloging.core import CatalogPage
 from djfw.views import RightsDetailMixin
-from tulius.stories.models import Variation, AdditionalMaterial, StoryAuthor, Character
-from tulius.gameforum import site as gameforum_site
+from tulius.stories.models import Variation, AdditionalMaterial, StoryAuthor, \
+    Character
 from .forms import AddGameForm, GameInviteForm, GameChangeStoryForm
 from .catalog import games_catalog_page, index_catalog_page
 from .models import *
 import json
+
+
+gameforum_site = apps.get_app_config('gameforum').site
+
 
 class MessageMixin(object):
     error_message = _('there were some errors during form validation')
@@ -35,17 +40,20 @@ class MessageMixin(object):
         if self.error_message:
             messages.error(self.request, self.error_message)
         return super(MessageMixin, self).form_invalid(form)
-    
+
+
 def set_edit(games, user):
     for game in games:
         game.text_hint = ''
         game.edit = game.edit_right(user)
         if game.edit:
             game.text_hint = _("You are admin of this game")
-        if not user.is_anonymous():
-            game.user_roles = Role.objects.filter(variation=game.variation, user=user)
+        if not user.is_anonymous:
+            game.user_roles = Role.objects.filter(
+                variation=game.variation, user=user)
             for role in game.user_roles:
-                role.text_url = reverse('games:view_role', args=(role.pk,))
+                role.text_url = urls.reverse(
+                    'games:view_role', args=(role.pk,))
         if game.can_send_request(user):
             if game.sended_request(user):
                 if game.user_roles.count() == 0:
@@ -55,7 +63,9 @@ def set_edit(games, user):
             elif game.vacant_roles().count() > 0:
                 game.request = True
                 if not game.text_hint:
-                    game.text_hint = _("This game is open for registration, you can send request to play it")
+                    game.text_hint = _(
+                        "This game is open for registration, "
+                        "you can send request to play it")
             else:
                 game.full = True
                 if not game.text_hint:
@@ -63,31 +73,39 @@ def set_edit(games, user):
         if game.read_right(user):
             game.enter = (game.status >= GAME_STATUS_IN_PROGRESS)
             game.full = False
-            game.enter_url = reverse('gameforum:game', args=(game.pk,))
+            game.enter_url = urls.reverse('gameforum:game', args=(game.pk,))
             if not game.text_hint:
                 if game.write_right(user):
                     game.text_hint = _("You participate in this game")
                 else:
                     game.text_hint = _("You are a guest in this game")
     return games
-    
+
+
 class IndexView(TemplateView):
-    template_name='games/index.haml'
+    template_name = 'games/index.haml'
     
     def get_context_data(self, **kwargs):
         user = self.request.user
         context = {}
-        context['new_games'] = set_edit(Game.objects.new_games(user), user)
-        context['announced_games'] = set_edit(Game.objects.announced_games(user), user)
-        context['awaiting_start_games'] = set_edit(Game.objects.awaiting_start_games(user), user)
-        context['current_games'] = set_edit(Game.objects.current_games(user), user)
-        context['completed_games'] = set_edit(Game.objects.completed_games(user), user)
-        context['completed_open_games'] = set_edit(Game.objects.completed_open_games(user), user)
+        context['new_games'] = set_edit(
+            Game.objects.new_games(user), user)
+        context['announced_games'] = set_edit(
+            Game.objects.announced_games(user), user)
+        context['awaiting_start_games'] = set_edit(
+            Game.objects.awaiting_start_games(user), user)
+        context['current_games'] = set_edit(
+            Game.objects.current_games(user), user)
+        context['completed_games'] = set_edit(
+            Game.objects.completed_games(user), user)
+        context['completed_open_games'] = set_edit(
+            Game.objects.completed_open_games(user), user)
         context['catalog_page'] = games_catalog_page()    
         return context
-    
+
+
 class GamesListBase(TemplateView):
-    template_name='games/games_list.haml'
+    template_name = 'games/games_list.haml'
     page_name = ''
     proc_name = ''
     
@@ -97,37 +115,46 @@ class GamesListBase(TemplateView):
     def get_context_data(self, **kwargs):
         user = self.request.user
         context = {}
-        context['catalog_page'] = CatalogPage(name=self.page_name, parent=index_catalog_page, is_index=True)
+        context['catalog_page'] = CatalogPage(
+            name=self.page_name, parent=index_catalog_page, is_index=True)
         proc = getattr(Game.objects, self.proc_name)
         games = set_edit(proc(user), user)
         self.process_games(games)
         context['games'] = games
         return context
-    
+
+
 class AnnouncedGames(GamesListBase):
     page_name = _('Announced games')
     proc_name = 'new_games'
-    
+
+
 class RequestAcceptingGames(GamesListBase):
     page_name = _('Accepting requests')
     proc_name = 'announced_games'
+
 
 class AwaitingStartGames(GamesListBase):
     page_name = _('Awaiting start')
     proc_name = 'awaiting_start_games'
 
+
 class CurrentGames(GamesListBase):
     page_name = _('Current games')
     proc_name = 'current_games'
+
     def process_games(self, games):
         for game in games:
             thread = game.variation.thread
             thread.variation = game.variation
-            game.online_roles = gameforum_site.core.get_online_roles(None, thread, False)
-            
+            game.online_roles = gameforum_site.core.get_online_roles(
+                None, thread, False)
+
+
 class CompletedOpenedGames(GamesListBase):
     page_name = _('Opened completed')
     proc_name = 'completed_open_games'
+
 
 def copy_file(game, source, dest):
     if source.name:
@@ -138,13 +165,14 @@ def copy_file(game, source, dest):
             finally:
                 source.close()
         except:
-            True
+            pass
+
 
 class CreateGame(MessageMixin, SubCreateView):
     model = Game
     form_class = AddGameForm
     parent_model = Variation
-    template_name='games/add_game.haml'
+    template_name = 'games/add_game.haml'
     
     def form_valid(self, form):
         variation = self.parent_object
@@ -163,7 +191,8 @@ class CreateGame(MessageMixin, SubCreateView):
             game.variation.game = game
             game.variation.save()
             game.save()
-            game.variation.thread = gameforum_site.core.copy_game_forum(game.variation, rolelinks, self.request.user)
+            game.variation.thread = gameforum_site.core.copy_game_forum(
+                game.variation, rolelinks, self.request.user)
             copy_file(game, story.card_image, game.card_image)
             copy_file(game, story.top_banner, game.top_banner)
             copy_file(game, story.bottom_banner, game.bottom_banner)
@@ -174,19 +203,23 @@ class CreateGame(MessageMixin, SubCreateView):
         
     def get_context_data(self, **kwargs):
         context = super(CreateGame, self).get_context_data(**kwargs)
-        context['catalog_page'] = CatalogPage(name=_('create game'), parent=games_catalog_page())
-        context['form_submit_title'] =  _("add")
+        context['catalog_page'] = CatalogPage(
+            name=_('create game'), parent=games_catalog_page())
+        context['form_submit_title'] = _("add")
         return context
-        
+
+
 def get_game_page(game):
-    return CatalogPage(instance=game, parent=games_catalog_page(), is_index=True)
-    
+    return CatalogPage(
+        instance=game, parent=games_catalog_page(), is_index=True)
+
+
 def role_text_read_right(role, user, game):
     if not game:
         return False
     if game.status == GAME_STATUS_COMPLETED_OPEN:
         return True
-    if user.is_anonymous():
+    if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
@@ -194,33 +227,45 @@ def role_text_read_right(role, user, game):
         return True
     if role.user == user and game.status >= GAME_STATUS_REGISTRATION_COMPLETED:
         return True
-    return ((game.status in [GAME_STATUS_FINISHING, GAME_STATUS_COMPLETED]) and game.read_right(user))
-    
+    return (
+        game.status in [GAME_STATUS_FINISHING, GAME_STATUS_COMPLETED] and
+        game.read_right(user)
+    )
+
+
 class GameView(RightsDetailMixin, DetailView):
     template_name = 'games/game.haml'
     model = Game
     
     def check_rights(self, obj, user):
         if obj.read_right(user):
-            obj.enter_url = reverse('gameforum:game', args=(obj.pk,))
+            obj.enter_url = urls.reverse('gameforum:game', args=(obj.pk,))
         if obj.edit_right(user):
             obj.edit_url = obj.get_edit_url()
-        obj.send_request = obj.can_send_request(user) and not obj.sended_request(user)
+        obj.send_request = (
+            obj.can_send_request(user) and not
+            obj.sended_request(user))
         return obj.view_info_right(user)
     
     def get_context_data(self, **kwargs):
         game = self.object
         kwargs['catalog_page'] = get_game_page(game) 
-        roles = Role.objects.filter(variation=game.variation, show_in_character_list=True).exclude(deleted=True)
+        roles = Role.objects.filter(
+            variation=game.variation, show_in_character_list=True
+        ).exclude(deleted=True)
         for role in roles:
             if role_text_read_right(role, self.request.user, game):
-                role.text_url = reverse('games:view_role', args=(role.pk,))
+                role.text_url = urls.reverse(
+                    'games:view_role', args=(role.pk,))
         kwargs['roles'] = roles
-        kwargs['authors'] = StoryAuthor.objects.filter(story=game.variation.story)
+        kwargs['authors'] = StoryAuthor.objects.filter(
+            story=game.variation.story)
         kwargs['materials'] = AdditionalMaterial.objects.filter(
-            (Q(variation=game.variation) | Q(story=game.variation.story)) & Q(admins_only=False))
+            (Q(variation=game.variation) | Q(story=game.variation.story)) &
+            Q(admins_only=False))
         return super(GameView, self).get_context_data(**kwargs)
-    
+
+
 class GameRoleView(RightsDetailMixin, DetailView):
     template_name = 'games/game_role.haml'
     model = Role
@@ -230,20 +275,24 @@ class GameRoleView(RightsDetailMixin, DetailView):
         self.game = game
         self.game.edit = game.edit_right(user)
         if game.read_right(user):
-            game.enter_url = reverse('gameforum:game', args=(game.pk,))
+            game.enter_url = urls.reverse('gameforum:game', args=(game.pk,))
         return role_text_read_right(obj, user, game)
     
     def get_context_data(self, **kwargs):
         kwargs['game'] = self.game
         game_page = get_game_page(self.game) 
         kwargs['game_page'] = game_page
-        kwargs['catalog_page'] = CatalogPage(name=self.object.name, parent=game_page) 
+        kwargs['catalog_page'] = CatalogPage(
+            name=self.object.name, parent=game_page)
         return super(GameRoleView, self).get_context_data(**kwargs)
-    
+
+
 @login_required
-def invite_player(request, game_id, template_name='games/game_edit/invite_form.haml'):
+def invite_player(
+        request, game_id, template_name='games/game_edit/invite_form.haml'):
     success = 'error'
     error_text = ''
+    game = None
     try:
         game = Game.objects.get(id=game_id)
     except:
@@ -251,40 +300,51 @@ def invite_player(request, game_id, template_name='games/game_edit/invite_form.h
     if game and (not game.edit_right(request.user)):
         error_text = 'No rights on %s' % (game,)
     else:
-        inviteform = GameInviteForm(data=request.POST or None, variation=game.variation)
+        inviteform = GameInviteForm(
+            data=request.POST or None, variation=game.variation)
         if inviteform.is_valid():
             inv_user = inviteform.cleaned_data['user']
             inv_role = inviteform.cleaned_data['role']
             inv_message = inviteform.cleaned_data['message']
             if inv_role.variation.game == game:
-                invites = GameInvite.objects.filter(user=inv_user, role=inv_role, status=GAME_INVITE_STATUS_NEW)
+                invites = GameInvite.objects.filter(
+                    user=inv_user, role=inv_role,
+                    status=GAME_INVITE_STATUS_NEW)
                 if invites.count() == 0:
-                    invite = GameInvite(user=inv_user, role=inv_role, sender=request.user)
+                    invite = GameInvite(
+                        user=inv_user, role=inv_role, sender=request.user)
                     invite.save()
                 if inv_message:
                     inv_user.send_pm(request.user, inv_message)
                 success = 'success'
     t = get_template(template_name)
     response = t.render(Context(locals()))
-    return HttpResponse(json.dumps({'response': unicode(response), 'result': success, 'error_text': error_text}))
+    return HttpResponse(
+        json.dumps(
+            {'response': str(response), 'result': success,
+             'error_text': error_text}))
+
 
 @login_required
 def invite_accept(request, invite):
-    if invite.user <> request.user:
+    if invite.user != request.user:
         raise Http404()
     invite.status = GAME_INVITE_STATUS_ACCEPTED
-    GameInvite.objects.filter(role=invite.role).exclude(id=invite.id).update(status=GAME_INVITE_STATUS_OCCUPIED)
+    GameInvite.objects.filter(role=invite.role).exclude(
+        id=invite.id).update(status=GAME_INVITE_STATUS_OCCUPIED)
     invite.role.user = request.user
     invite.role.save()
     invite.save()
-    
+
+
 @login_required
 def invite_decline(request, invite):
-    if invite.user <> request.user:
+    if invite.user != request.user:
         raise Http404()
     invite.status = GAME_INVITE_STATUS_DECLINED
     invite.save()
-    
+
+
 class ChangeGameStoryView(RightsDetailMixin, UpdateView):
     template_name = 'games/change_story.haml'
     model = Game
@@ -310,12 +370,13 @@ class ChangeGameStoryView(RightsDetailMixin, UpdateView):
                     role.character = chars[0]
                     role.avatar = chars[0].avatar
                 role.save()
-        return HttpResponseRedirect(reverse('games:index'))
+        return HttpResponseRedirect(urls.reverse('games:index'))
+
 
 class DeleteGame(RightsDetailMixin, DeleteView):
     template_name = 'games/delete_game.haml'
     model = Game
-    success_url = reverse_lazy('games:index')
+    success_url = urls.reverse_lazy('games:index')
     
     def check_rights(self, obj, user):
         return user.is_superuser

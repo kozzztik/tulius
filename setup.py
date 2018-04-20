@@ -14,7 +14,7 @@ setup(
     license='https://github.com/kozzztik/tulius/blob/master/LICENSE',
     classifiers=[
         'License :: OSI Approved',
-        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.6',
         ],
 )
 

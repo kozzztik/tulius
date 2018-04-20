@@ -1,12 +1,15 @@
+import io
+from mimetypes import guess_type
+import os
+
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from django.conf import settings
+from PIL import Image
+
 from tulius.stories.models import AVATAR_SIZES, AVATAR_SAVE_SIZE
 from djfw.uploader import handle_upload
-from mimetypes import guess_type
-from PIL import Image
-import os
-import StringIO
+
 
 def save_upload(request, upload, filename, user):
     """
@@ -17,7 +20,7 @@ def save_upload(request, upload, filename, user):
     image = Image.open(upload)
     image.thumbnail(AVATAR_SAVE_SIZE, Image.ANTIALIAS)
     imageformat = getattr(settings, 'IMAGE_FORMAT', 'jpeg')
-    image_content = StringIO.StringIO()
+    image_content = io.StringIO()
     image.save(image_content, format=imageformat)
     image_file = ContentFile(image_content.getvalue())
     if user.avatar:
@@ -33,14 +36,17 @@ def save_upload(request, upload, filename, user):
         small_image.save(filepath, imageformat.upper())
     return {'url': 'http://' + request.META['HTTP_HOST'] + user.avatar.url}
 
+
 MAX_AVATAR_SIZE = 10 * 1024 * 1024
 
+
 def check_mime(request, filename):
-    mime=guess_type(filename, True)[0]
-    if mime[:5] <> 'image':
-        raise Exception( "Only image upload, not " +  mime)
+    mime = guess_type(filename, True)[0]
+    if mime[:5] != 'image':
+        raise Exception("Only image upload, not " + mime)
     if int(request.META['CONTENT_LENGTH']) > MAX_AVATAR_SIZE:
-        raise Exception( "File too big" )
+        raise Exception("File too big")
+
 
 @login_required
 def profile_upload_avatar(request):

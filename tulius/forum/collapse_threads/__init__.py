@@ -1,6 +1,7 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from tulius.forum.plugins import ForumPlugin
 from .views import CollapseThreads
+
 
 class CollapsingThreadsPlugin(ForumPlugin):
     def get_collapse_url(self, thread):
@@ -8,12 +9,13 @@ class CollapsingThreadsPlugin(ForumPlugin):
     
     def thread_view(self, sender, **args):
         user = args['user']
-        if user.is_anonymous():
+        if user.is_anonymous:
             return
         ThreadCollapseStatus = self.models.ThreadCollapseStatus
         if sender:
             try:
-                collapse_data = ThreadCollapseStatus.objects.get(thread=sender, user=user)
+                collapse_data = ThreadCollapseStatus.objects.get(
+                    thread=sender, user=user)
                 sender.collapse_rooms = collapse_data.collapse_rooms
                 sender.collapse_threads = collapse_data.collapse_threads
             except self.models.ThreadCollapseStatus.DoesNotExist:
@@ -22,7 +24,8 @@ class CollapsingThreadsPlugin(ForumPlugin):
         else:
             context = args['context']
             groups = context['groups']
-            collapses = ThreadCollapseStatus.objects.filter(thread__id__in=[thread.id for thread in groups], user=user)
+            collapses = ThreadCollapseStatus.objects.filter(
+                thread__id__in=[thread.id for thread in groups], user=user)
             for group in groups:
                 fc = None
                 for collapse in collapses:
@@ -38,6 +41,9 @@ class CollapsingThreadsPlugin(ForumPlugin):
         self.site.signals.thread_view.connect(self.thread_view)
         
     def get_urls(self):
-        return patterns('',
-            url(r'^collapse_thread/(?P<parent_id>\d+)/$', CollapseThreads.as_view(self), name='collapse_thread'),
-        )
+        return [
+            url(
+                r'^collapse_thread/(?P<parent_id>\d+)/$',
+                CollapseThreads.as_view(self),
+                name='collapse_thread'),
+        ]

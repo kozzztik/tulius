@@ -1,6 +1,7 @@
-from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
+
 
 class Smile(models.Model):
     class Meta:
@@ -27,14 +28,15 @@ class Smile(models.Model):
     def preview_image(self):
         if not self.image:
             return None
-        return '<img src="'+ str(self.image.url) +'"/>'
+        return '<img src="' + str(self.image.url) + '"/>'
     
     def __unicode__(self):
         return self.name
     
     preview_image.allow_tags = True
     preview_image.short_description = _('image')
-    
+
+
 class UploadedFile(models.Model):
     class Meta:
         verbose_name = _('uploaded file')
@@ -53,7 +55,8 @@ class UploadedFile(models.Model):
     )
     
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, 
+        settings.AUTH_USER_MODEL,
+        models.PROTECT,
         null=True,
         blank=True,
         related_name='wysibb_files', 
@@ -61,8 +64,8 @@ class UploadedFile(models.Model):
     )
     
     created_at = models.DateTimeField(
-        auto_now_add    = True,
-        verbose_name    = _('create time'),
+        auto_now_add=True,
+        verbose_name=_('create time'),
     )
     
     mime = models.CharField(
@@ -95,7 +98,8 @@ class UploadedFile(models.Model):
     file_size_formated.short_description = _('file size')
     filename_link.allow_tags = True
     filename_link.short_description = _('File')
-    
+
+
 class UploadedImage(models.Model):
     """
     Uploaded images
@@ -122,7 +126,8 @@ class UploadedImage(models.Model):
     )
     
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, 
+        settings.AUTH_USER_MODEL,
+        models.PROTECT,
         null=True,
         blank=True,
         related_name='wysibb_images', 
@@ -130,8 +135,8 @@ class UploadedImage(models.Model):
     )
     
     created_at = models.DateTimeField(
-        auto_now_add    = True,
-        verbose_name    = _('create time'),
+        auto_now_add=True,
+        verbose_name=_('create time'),
     )
     
     mime = models.CharField(
@@ -151,7 +156,9 @@ class UploadedImage(models.Model):
     def preview_image(self):
         if (not self.image) or (not self.thumb):
             return ""
-        return '<a href="%s"><img src="%s" style="max-height: 85px; max-width: 85px"/></a>' % (self.image.url, self.thumb.url)
+        return '<a href="%s"><img src="%s" style="max-height: ' \
+            '85px; max-width: 85px"/></a>' % (
+                self.image.url, self.thumb.url)
     
     def get_absolute_url(self):
         return self.body.url if self.body else None
@@ -164,4 +171,3 @@ class UploadedImage(models.Model):
     preview_image.short_description = _('image')
     file_size_formated.short_description = _('file size')
     preview_image.allow_tags = True
-    

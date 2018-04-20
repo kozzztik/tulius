@@ -11,10 +11,15 @@ def get_page(self):
     except (KeyError, ValueError, TypeError):
         return 1
 
-class PaginationMiddleware(object):
+
+class PaginationMiddleware:
     """
     Inserts a variable representing the current page onto the request object if
     it exists in either **GET** or **POST** portions of the request.
     """
-    def process_request(self, request):
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
         request.__class__.page = property(get_page)
+        return self.get_response(request)

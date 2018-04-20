@@ -1,10 +1,10 @@
+import os
+
 from django.db import models
-from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-import os
-from datetime import datetime
+from django.utils.translation import ugettext_lazy as _
+
 
 class BackupCategory(models.Model):
     """
@@ -59,7 +59,8 @@ class BackupCategory(models.Model):
     
     def __unicode__(self):
         return self.verbose_name
-    
+
+
 class Backup(models.Model):
     """
     Backup
@@ -69,15 +70,15 @@ class Backup(models.Model):
         verbose_name_plural = _('backups')
     
     category = models.ForeignKey(
-        BackupCategory, 
+        BackupCategory, models.PROTECT,
         null=False,
         blank=False,
         related_name='backups', 
         verbose_name=_('category')
     )
     create_time = models.DateTimeField(
-        auto_now_add    = True,
-        verbose_name    = _('create time'),
+        auto_now_add=True,
+        verbose_name=_('create time'),
     )
     size = models.PositiveIntegerField(
         blank=False,
@@ -85,6 +86,7 @@ class Backup(models.Model):
         default=0,
         verbose_name=_(u'size'),
     )
+
     def __unicode__(self):
         return "%s %s" % (self.category.name, self.create_time)
     
@@ -108,10 +110,11 @@ class Backup(models.Model):
     
     @models.permalink
     def get_absolute_url(self):
-        return ('installer:backup', (), { 'object_id': self.id })
+        return 'installer:backup', (), {'object_id': self.id}
     
     def url(self):
-        return '<a href="%s">%s</a>' % (self.get_absolute_url(), self.get_absolute_url())
+        return '<a href="%s">%s</a>' % (
+            self.get_absolute_url(), self.get_absolute_url())
     
     url.short_description = _(u'URL')
     url.allow_tags = True
@@ -120,12 +123,14 @@ class Backup(models.Model):
         if os.path.exists(self.path()):
             os.remove(self.path())
         super(Backup, self).delete(using=using)
-        
+
+
 def get_lock_file_name():
     lock_file_name = getattr(settings, 'INSTALLER_LOCK_FILE', None)
     if not lock_file_name:
         lock_file_name = settings.BASE_DIR + 'maintaince.lock'
     return lock_file_name
+
 
 class Revision(models.Model):
     class Meta:
@@ -157,7 +162,8 @@ class Revision(models.Model):
     
     def __unicode__(self):
         return "%s %s %s" % (self.number, self.author, self.comment)
-    
+
+
 class MaintenanceLog(models.Model):
     """
     UpdateLog
@@ -270,7 +276,8 @@ class MaintenanceLog(models.Model):
             f = open(file_name, 'w')
             f.write(str(self.id))
             f.close()
-            
+
+
 class MaintenanceLogMessage(models.Model):
     """
     UpdateLog
@@ -280,7 +287,7 @@ class MaintenanceLogMessage(models.Model):
         verbose_name_plural = _('Maintenance log messages')
 
     mainteince = models.ForeignKey(
-        MaintenanceLog, 
+        MaintenanceLog, models.PROTECT,
         null=False,
         blank=False,
         related_name='messages', 
@@ -296,15 +303,15 @@ class MaintenanceLogMessage(models.Model):
         verbose_name=_('text')
     )
 
+
 class MaintainceChangelist(models.Model):
     mainteince = models.ForeignKey(
-        MaintenanceLog, 
+        MaintenanceLog, models.PROTECT,
         null=False,
         blank=False,
     )
     revision = models.ForeignKey(
-        Revision, 
+        Revision, models.PROTECT,
         null=False,
         blank=False,
     )
-

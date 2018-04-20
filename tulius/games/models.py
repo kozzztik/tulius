@@ -1,11 +1,13 @@
-from django.utils.translation import ugettext_lazy as _
+from django.db import models
+from django.db import transaction
 from django.core.exceptions import ValidationError
 from django.db.models.query_utils import Q
-from django.db import transaction
-from django.db import models
-from .signals import game_status_changed
+from django.utils.translation import ugettext_lazy as _
+
 from tulius.stories.models import Role
 from tulius.models import User
+from .signals import game_status_changed
+
 
 class Skin(models.Model):
     class Meta:
@@ -22,7 +24,8 @@ class Skin(models.Model):
         blank=True,
         null=True,
     )
-    
+
+
 GAME_STATUS_NEW = 1
 GAME_STATUS_OPEN_FOR_REGISTRATION = 2
 GAME_STATUS_REGISTRATION_COMPLETED = 3
@@ -41,6 +44,7 @@ GAME_STATUS_CHOICES = (
     (GAME_STATUS_COMPLETED_OPEN, _(u'completed and open')),
 )
 
+
 class GameManager(models.Manager):
 
     def any_completed(self):
@@ -48,14 +52,13 @@ class GameManager(models.Manager):
             Q(status=GAME_STATUS_COMPLETED) |
             Q(status=GAME_STATUS_COMPLETED_OPEN)
         )
+
     def current(self):
-        return self.filter(
-            status = GAME_STATUS_IN_PROGRESS,
-        )
+        return self.filter(status=GAME_STATUS_IN_PROGRESS)
+
     def awaits_start(self):
-        return self.filter(
-            status = GAME_STATUS_REGISTRATION_COMPLETED,
-        )
+        return self.filter(status=GAME_STATUS_REGISTRATION_COMPLETED)
+
     def completed_by_player(self, player):
         games = self.any_completed().filter(characters__user=player)
         for game in games:
@@ -83,48 +86,63 @@ class GameManager(models.Manager):
         return [game for game in games if game.view_info_right(user)]
         
     def announced_games(self, user, announce=False):
-        games = self.filter(status=GAME_STATUS_OPEN_FOR_REGISTRATION, deleted=False)
+        games = self.filter(
+            status=GAME_STATUS_OPEN_FOR_REGISTRATION, deleted=False)
         if announce:
             games = games.filter(show_announcement=True)
         return [game for game in games if game.view_info_right(user)]
         
     def awaiting_start_games(self, user, check_read=False, announce=False):
-        games = self.filter(status=GAME_STATUS_REGISTRATION_COMPLETED, deleted=False)
+        games = self.filter(
+            status=GAME_STATUS_REGISTRATION_COMPLETED, deleted=False)
         if announce:
             games = games.filter(show_announcement=True)
-        return [game for game in games if game.view_info_right(user, check_read)]
+        return [
+            game for game in games if game.view_info_right(user, check_read)]
     
     def current_games(self, user, check_read=False, announce=False):
-        games = self.filter(Q(status=GAME_STATUS_IN_PROGRESS) | Q(status=GAME_STATUS_FINISHING)).filter(deleted=False)
+        games = self.filter(
+            Q(status=GAME_STATUS_IN_PROGRESS) |
+            Q(status=GAME_STATUS_FINISHING)).filter(deleted=False)
         if announce:
             games = games.filter(show_announcement=True)
-        return [game for game in games if game.view_info_right(user, check_read)]
+        return [
+            game for game in games if game.view_info_right(user, check_read)]
         
     def completed_games(self, user, check_read=False):
         if user.is_superuser:
             games = self.filter(status=GAME_STATUS_COMPLETED, deleted=False)
-        elif user.is_anonymous():
+        elif user.is_anonymous:
             games = []
         else:
-            guested = GameGuest.objects.filter(user=user, game__status=GAME_STATUS_COMPLETED, game__deleted=False).select_related('game')
+            guested = GameGuest.objects.filter(
+                user=user, game__status=GAME_STATUS_COMPLETED,
+                game__deleted=False).select_related('game')
             guested = [guest.game for guest in guested]
-            admined = GameAdmin.objects.filter(user=user, game__status=GAME_STATUS_COMPLETED, game__deleted=False).select_related('game')
+            admined = GameAdmin.objects.filter(
+                user=user, game__status=GAME_STATUS_COMPLETED,
+                game__deleted=False).select_related('game')
             admined = [admin.game for admin in admined]
-            played = Role.objects.filter(user=user, variation__game__status=GAME_STATUS_COMPLETED, variation__game__deleted=False).select_related('variation__game')
+            played = Role.objects.filter(
+                user=user, variation__game__status=GAME_STATUS_COMPLETED,
+                variation__game__deleted=False).select_related(
+                'variation__game')
             played = [role.variation.game for role in played]
             games = guested + admined + played
             # delete duplicates
             games_list = {}
             for game in games:
                 games_list[game.id] = game
-            games = games_list.values()
+            games = list(games_list.values())
             games.sort(key=lambda game: game.id, reverse=True)
         return games
         
     def completed_open_games(self, user):
-        games = self.filter(status=GAME_STATUS_COMPLETED_OPEN, deleted=False).order_by('-id')
+        games = self.filter(
+            status=GAME_STATUS_COMPLETED_OPEN, deleted=False).order_by('-id')
         return games
-        
+
+
 class Game(models.Model):
     """
     Game
@@ -136,7 +154,7 @@ class Game(models.Model):
     objects = GameManager()
     
     variation = models.ForeignKey(
-        'stories.Variation',
+        'stories.Variation', models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'variation'),
@@ -208,7 +226,7 @@ class Game(models.Model):
         verbose_name=_(u'show announcement'),
     )
     skin = models.ForeignKey(
-        Skin,
+        Skin, models.PROTECT,
         verbose_name=_(u'skin'),
         related_name='games',
         blank=True,
@@ -227,7 +245,7 @@ class Game(models.Model):
         return ''
         
     def edit_right(self, user):
-        if user.is_anonymous():
+        if user.is_anonymous:
             return False
         if user.is_superuser:
             return True
@@ -235,24 +253,26 @@ class Game(models.Model):
         return (users.count() > 0)
     
     def write_right(self, user):
-        if user.is_anonymous():
+        if user.is_anonymous:
             return False
         if user.is_superuser:
             return True
         if self.edit_right(user):
-            return True;
+            return True
         if self.status < GAME_STATUS_IN_PROGRESS:
             return False
         roles = Role.objects.filter(variation=self.variation, user=user)
         return (roles.count() > 0)
         
     def get_assigned_users(self):
-        return [role.user for role in Role.objects.filter(variation=self.variation) if role.user]
+        return [
+            role.user for role in Role.objects.filter(
+                variation=self.variation) if role.user]
         
     def read_right(self, user):
         if self.status == GAME_STATUS_COMPLETED_OPEN:
             return True
-        if user.is_anonymous():
+        if user.is_anonymous:
             return False
         if user.is_superuser:
             return True
@@ -273,19 +293,19 @@ class Game(models.Model):
     
     @models.permalink
     def get_absolute_url(self):
-        return ('games:game', (), {'pk': self.id })
+        return 'games:game', (), {'pk': self.id}
     
     @models.permalink
     def get_edit_url(self):
-        return ('games:edit_game_main', (), {'game_id': self.id })
+        return 'games:edit_game_main', (), {'game_id': self.id}
         
     @models.permalink
     def get_request_url(self):
-        return ('games:game_request', (), {'game_id': self.id })
+        return 'games:game_request', (), {'game_id': self.id}
         
     @models.permalink
     def get_cancel_request_url(self):
-        return ('games:cancel_game_request', (), {'game_id': self.id })
+        return 'games:cancel_game_request', (), {'game_id': self.id}
         
     def __unicode__(self):
         return u'%s - %d' % (self.name, self.serial_number)
@@ -296,14 +316,20 @@ class Game(models.Model):
             raise ValidationError(_('Specify game serial number'))
         if not self.variation_id:
             return
-        games = Game.objects.filter(variation__story=self.variation.story, serial_number=self.serial_number, deleted=False)
+        games = Game.objects.filter(
+            variation__story=self.variation.story,
+            serial_number=self.serial_number, deleted=False)
         if games:
             for game in games:
-                if game.id <> self.id:
-                    raise ValidationError(_('Game serial number must be unique in story. This number of game ') + unicode(game) + '.')
+                if game.id != self.id:
+                    raise ValidationError(
+                        _('Game serial number must be unique in story. This '
+                          'number of game ') + str(game) + '.')
     
     def can_send_request(self, user):
-        return (self.status == GAME_STATUS_OPEN_FOR_REGISTRATION) and (not user.is_anonymous())
+        return (
+            self.status == GAME_STATUS_OPEN_FOR_REGISTRATION) and (
+            not user.is_anonymous)
     
     def sended_request(self, user):
         return RoleRequest.objects.filter(game=self, user=user).count() > 0
@@ -324,9 +350,12 @@ class Game(models.Model):
                 
             super(Game, self).save(*args, **kwargs)
             if old_self:
-                if old_self.status <> self.status:
-                    game_status_changed.send(self, old_status=old_self.status, new_status=self.status)
-                    
+                if old_self.status != self.status:
+                    game_status_changed.send(
+                        self, old_status=old_self.status,
+                        new_status=self.status)
+
+
 class GameAdmin(models.Model):
     """
     Game admin
@@ -337,19 +366,20 @@ class GameAdmin(models.Model):
         unique_together = ('game', 'user')
         
     game = models.ForeignKey(
-        Game,
+        Game, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'game'),
         related_name='admins',
     )
     user = models.ForeignKey(
-        User,
+        User, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'user'),
         related_name='admined_games',
     )
+
 
 class GameGuest(models.Model):
     """
@@ -361,19 +391,20 @@ class GameGuest(models.Model):
         unique_together = ('game', 'user')
     
     game = models.ForeignKey(
-        Game,
+        Game, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'game'),
         related_name='guests',
     )
     user = models.ForeignKey(
-        User,
+        User, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'user'),
         related_name='guested_games',
     )
+
 
 class GameWinner(models.Model):
     """
@@ -382,17 +413,17 @@ class GameWinner(models.Model):
     class Meta:
         verbose_name = _('game winner')
         verbose_name_plural = _('game winners')
-        #unique_together = ('game', 'new_user') #not supported by old games
+        # unique_together = ('game', 'new_user') #not supported by old games
     
     game = models.ForeignKey(
-        Game,
+        Game, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'game'),
         related_name='winners',
     )
     user = models.ForeignKey(
-        User,
+        User, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'user'),
@@ -409,14 +440,14 @@ class RoleRequest(models.Model):
         verbose_name_plural = _('role requests')
     
     game = models.ForeignKey(
-        Game,
+        Game, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'game'),
         related_name='role_requests',
     )
     user = models.ForeignKey(
-        User,
+        User, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'user'),
@@ -429,7 +460,7 @@ class RoleRequest(models.Model):
     )
     
     def __unicode__(self):
-        return u'%s - %s' % (unicode(self.user), unicode(self.game))
+        return u'%s - %s' % (str(self.user), str(self.game))
         
 
 class RoleRequestSelection(models.Model):
@@ -442,7 +473,7 @@ class RoleRequestSelection(models.Model):
         unique_together = ('role_request', 'role')
         
     role_request = models.ForeignKey(
-        RoleRequest,
+        RoleRequest, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'role request'),
@@ -454,13 +485,14 @@ class RoleRequestSelection(models.Model):
     )
     
     role = models.ForeignKey(
-        'stories.Role',
+        'stories.Role', models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'role'),
         related_name='requests',
     )
-    
+
+
 class RequestQuestion(models.Model):
     """
     Game role request question
@@ -470,7 +502,7 @@ class RequestQuestion(models.Model):
         verbose_name_plural = _('request questions')
         
     game = models.ForeignKey(
-        Game,
+        Game, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'game'),
@@ -486,7 +518,8 @@ class RequestQuestion(models.Model):
         
     def __unicode__(self):
         return self.question
-        
+
+
 class RequestQuestionAnswer(models.Model):
     """
     Game role request question
@@ -496,14 +529,14 @@ class RequestQuestionAnswer(models.Model):
         verbose_name_plural = _('request question answers')
         
     role_request = models.ForeignKey(
-        RoleRequest,
+        RoleRequest, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'role request'),
         related_name='answers',
     )
     question = models.ForeignKey(
-        RequestQuestion,
+        RequestQuestion, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'answer'),
@@ -515,7 +548,8 @@ class RequestQuestionAnswer(models.Model):
         null=False,
         verbose_name=_(u'answer')
     )
-    
+
+
 GAME_INVITE_STATUS_NEW = 1
 GAME_INVITE_STATUS_ACCEPTED = 2
 GAME_INVITE_STATUS_DECLINED = 3
@@ -528,6 +562,7 @@ GAME_INVITE_STATUS_CHOICES = (
     (GAME_INVITE_STATUS_OCCUPIED, _(u'occupied invite')),
 )
 
+
 class GameInvite(models.Model):
     """
     Game role user invite
@@ -538,7 +573,7 @@ class GameInvite(models.Model):
         ordering = ['-id']
         
     role = models.ForeignKey(
-        'stories.Role',
+        'stories.Role', models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'role'),
@@ -546,14 +581,13 @@ class GameInvite(models.Model):
     )
     
     user = models.ForeignKey(
-        User,
+        User, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'user'),
         related_name='invites',
     )
 
-    
     status = models.SmallIntegerField(
         default=GAME_INVITE_STATUS_NEW,
         verbose_name=_(u'status'),
@@ -561,7 +595,7 @@ class GameInvite(models.Model):
     )
     
     sender = models.ForeignKey(
-        User,
+        User, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'sender'),
@@ -569,8 +603,8 @@ class GameInvite(models.Model):
     )
     
     create_time = models.DateTimeField(
-        auto_now_add    = True,
-        verbose_name    = _('created at'),
+        auto_now_add=True,
+        verbose_name=_('created at'),
     )
     
     def status_as_text(self):
