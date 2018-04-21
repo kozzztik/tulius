@@ -23,11 +23,12 @@ docker run -d -p $2:7000 --name=tulius_$1 --restart=unless-stopped \
 
 echo "Start docker container tulius_$1_ws on port $3"
 docker run -d -p $3:7000 --name=tulius_$1_ws --restart=unless-stopped \
-    tulius_$1 uwsgi --socket 0.0.0.0:7000 --protocol uwsgi \
+    tulius_$1 uwsgi --http 0.0.0.0:7000 \
                --max-requests 10000 \
                --threads 2 \
                --processes 1 \
                --master \
+               --gevent 100 \
                --http-websockets \
                --wsgi wsgi_websocket:application
 
