@@ -23,7 +23,7 @@ ADD tulius /opt/tulius
 WORKDIR /opt
 ADD . /opt/
 # update requirements
-RUN pip3 install -r requirements.txt
+RUN pip install -r requirements.txt
 RUN python manage.py compilemessages
 EXPOSE 7000
 CMD [ "uwsgi", "--socket", "0.0.0.0:7000", \
