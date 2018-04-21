@@ -1,5 +1,5 @@
 FROM python:2.7
-RUN apt-get update && apt-get install gettext -y
+RUN apt-get update && apt-get install gettext uwsgi uwsgi-plugin-python -y
 ENV PYTHONUNBUFFERED 1
 ## install requirements, so they can be cached by Docker
 RUN pip install django==1.6.3 pitz django-grappelli==2.4.12 pillow \
@@ -22,8 +22,6 @@ RUN pip install django==1.6.3 pitz django-grappelli==2.4.12 pillow \
 #RUN pip3 install django-websocket-redis == 0.5.1
 #RUN pip3 install django-redis-cache == 1.7.1
 #RUN pip3 install requests == 2.18.4
-# application server
-RUN pip install uwsgi
 
 ADD tulius /opt/tulius
 WORKDIR /opt
