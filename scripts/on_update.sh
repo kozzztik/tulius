@@ -2,6 +2,8 @@ echo "do on update"
 
 echo "Stop existing tulius_$1"
 docker stop tulius_$1
+docker rm tulius_$1
+
 
 echo "Build docker container tulius_$1"
 docker build -t tulius_$1 .
