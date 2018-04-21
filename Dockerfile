@@ -37,7 +37,7 @@ ADD manage.py /opt/tulius/manage.py
 ADD requirements.txt /opt/tulius/requirements.txt
 ADD wsgi.py /opt/tulius/wsgi.py
 ADD wsgi_websocket.py /opt/tulius/wsgi_websocket.py
-ADD settings-production.py /opt/tulius/settings-production.py
+ADD settings_production.py /opt/tulius/settings_production.py
 
 WORKDIR /opt/tulius
 

@@ -10,8 +10,8 @@ https://docs.djangoproject.com/en/1.6/howto/deployment/wsgi/
 import os
 from django.core.wsgi import get_wsgi_application
 
-if os.path.exists('settings-production.py'):
-    settings_file = 'settings-production'
+if os.path.exists('settings_production.py'):
+    settings_file = 'settings_production'
 else:
     settings_file = 'settings'
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", settings_file)
