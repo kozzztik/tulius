@@ -34,7 +34,6 @@ RUN python manage.py compilemessages
 EXPOSE 7000
 CMD [ "uwsgi", "--socket", "0.0.0.0:7000", \
                "--uid", "uwsgi", \
-               "--plugins", "python", \
                "--protocol", "uwsgi", \
                "--max-requests", "5000", \
                "--threads", "4", \
