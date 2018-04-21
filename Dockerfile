@@ -25,9 +25,20 @@ RUN pip install django==1.6.3 pitz django-grappelli==2.4.12 pillow \
 #RUN pip3 install django-redis-cache == 1.7.1
 #RUN pip3 install requests == 2.18.4
 
-ADD tulius /opt/tulius
-WORKDIR /opt
-ADD . /opt/
+RUN mkdir /opt/tulius
+WORKDIR /opt/tulius
+ADD tulius /opt/tulius/tulius
+ADD django_mailer /opt/tulius/django_mailer
+ADD djfw /opt/tulius/djfw
+ADD events /opt/tulius/events
+ADD pm /opt/tulius/pm
+ADD websockets /opt/tulius/websockets
+ADD manage.py /opt/tulius/manage.py
+ADD requirements.txt /opt/tulius/requirements.txt
+ADD wsgi.py /opt/tulius/wsgi.py
+ADD wsgi_websocket.py /opt/tulius/wsgi_websocket.py
+ADD settings-production.py /opt/tulius/settings-production.py
+
 # update requirements
 RUN pip install -r requirements.txt
 RUN python manage.py compilemessages
