@@ -1,6 +1,8 @@
 FROM python:2.7
-RUN apt-get update && apt-get install gettext uwsgi uwsgi-plugin-python -y
+RUN apt-get update && apt-get install gettext -y
 ENV PYTHONUNBUFFERED 1
+RUN pip install uwsgi
+
 ## install requirements, so they can be cached by Docker
 RUN pip install django==1.6.3 pitz django-grappelli==2.4.12 pillow \
     MySQL-python south ipython simplejson django-mptt==0.7.4 \
@@ -31,7 +33,6 @@ RUN pip install -r requirements.txt
 RUN python manage.py compilemessages
 EXPOSE 7000
 CMD [ "uwsgi", "--socket", "0.0.0.0:7000", \
-               "--uid", "uwsgi", \
                "--protocol", "uwsgi", \
                "--max-requests", "5000", \
                "--threads", "4", \
