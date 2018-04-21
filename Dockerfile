@@ -1,6 +1,8 @@
 FROM python:2.7
 EXPOSE 7000
-RUN apt-get update && apt-get install gettext -y
+RUN apt-get update && apt-get install gettext locales -y
+RUN locale-gen ru_RU.UTF-8
+RUN dpkg-reconfigure --frontend=noninteractive locales
 ENV PYTHONUNBUFFERED 1
 RUN pip install uwsgi
 
