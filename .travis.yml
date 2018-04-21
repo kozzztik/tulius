@@ -7,10 +7,14 @@ addons:
   ssh_known_hosts: tulius.com:33023
 deploy:
   - provider: script
-    script: bash scripts/deploy.sh test
+    script: bash scripts/deploy.sh 7001
     on:
       branch: dev
   - provider: script
-    script: bash scripts/deploy.sh prod
+    script: bash scripts/deploy.sh 7000
     on:
       branch: master
+  - provider: script
+    script: bash scripts/deploy.sh 7000
+    on:
+      branch: docker
