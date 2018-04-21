@@ -39,10 +39,11 @@ ADD wsgi.py /opt/tulius/wsgi.py
 ADD wsgi_websocket.py /opt/tulius/wsgi_websocket.py
 ADD settings-production.py /opt/tulius/settings-production.py
 
+WORKDIR /opt/tulius
+
 # update requirements
 RUN pip install -r requirements.txt
 
-WORKDIR /opt/tulius
 RUN python manage.py compilemessages
 CMD [ "uwsgi", "--socket", "0.0.0.0:7000", \
                "--protocol", "uwsgi", \

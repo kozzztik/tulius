@@ -4,7 +4,6 @@ echo "Stop existing tulius_$1"
 docker stop tulius_$1
 docker rm tulius_$1
 
-
 echo "Build docker container tulius_$1"
 docker build -t tulius_$1 .
 
@@ -15,7 +14,6 @@ docker run -v "$PWD/static":/opt/tulius/static \
 echo "Migrate"
 docker run tulius_$1 python manage.py syncdb
 docker run tulius_$1 python manage.py migrate
-
 
 echo "Start docker container tulius_$1 on port $2"
 docker run -d -p 7000:$2 --name=tulius_$1 --restart=unless-stopped \
