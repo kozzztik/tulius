@@ -38,5 +38,5 @@ CMD [ "uwsgi", "--socket", "0.0.0.0:7000", \
                "--max-requests", "5000", \
                "--threads", "4", \
                "--processes", "2", \
-               "--master", "true", \
+               "--master", \
                "--wsgi", "wsgi:application" ]
