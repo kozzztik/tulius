@@ -1,4 +1,5 @@
 FROM python:2.7
+EXPOSE 7000
 RUN apt-get update && apt-get install gettext -y
 ENV PYTHONUNBUFFERED 1
 RUN pip install uwsgi
@@ -26,7 +27,6 @@ RUN pip install django==1.6.3 pitz django-grappelli==2.4.12 pillow \
 #RUN pip3 install requests == 2.18.4
 
 RUN mkdir /opt/tulius
-WORKDIR /opt/tulius
 ADD tulius /opt/tulius/tulius
 ADD django_mailer /opt/tulius/django_mailer
 ADD djfw /opt/tulius/djfw
@@ -41,8 +41,9 @@ ADD settings-production.py /opt/tulius/settings-production.py
 
 # update requirements
 RUN pip install -r requirements.txt
+
+WORKDIR /opt/tulius
 RUN python manage.py compilemessages
-EXPOSE 7000
 CMD [ "uwsgi", "--socket", "0.0.0.0:7000", \
                "--protocol", "uwsgi", \
                "--max-requests", "5000", \
