@@ -3,7 +3,11 @@ import os
 import sys
 
 if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
+    if os.path.exists('settings_production.py'):
+        settings_file = 'settings_production'
+    else:
+        settings_file = 'settings'
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", settings_file)
 
     from django.core.management import execute_from_command_line
 
