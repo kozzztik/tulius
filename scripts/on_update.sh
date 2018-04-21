@@ -1,13 +1,18 @@
 echo "do on update"
-. env/bin/activate
-pip install -r requirements.txt
-python manage.py collectstatic --noinput
-python manage.py syncdb
-python manage.py migrate
-deactivate
 
 echo "Stop existing tulius_$1"
 docker stop tulius_$1
+
+echo "Collect static"
+docker run -v "$PWD/static:/opt/tulius/static \
+    tulius_$1 python manage.py collectstatic --noinput
+
+echo "Migrate"
+docker run -v "$PWD/static:/opt/tulius/static \
+    tulius_$1 python manage.py syncdb
+docker run -v "$PWD/static:/opt/tulius/static \
+    tulius_$1 python manage.py migrate
+
 
 echo "Build docker container tulius_$1"
 docker build -t tulius_$1 .

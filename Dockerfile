@@ -2,30 +2,11 @@ FROM python:2.7
 RUN apt-get update && apt-get install gettext -y
 ENV PYTHONUNBUFFERED 1
 ## install requirements, so they can be cached by Docker
-RUN pip install django == 1.6.3 && \
-    pip install pitz && \
-    pip install django-grappelli == 2.4.12 && \
-    pip install pillow && \
-    pip install MySQL-python && \
-    pip install south && \
-    pip install ipython && \
-    pip install simplejson && \
-    pip install django-mptt == 0.7.4 && \
-    pip install pygments && \
-    pip install hamlpy && \
-    pip install djaml && \
-    pip install django-appconf && \
-    pip install BeautifulSoup && \
-    pip install FeedParser && \
-    pip install pyyaml && \
-    pip install python-memcached && \
-    pip install django-memcache-status && \
-    pip install raven && \
-    pip install gevent && \
-    pip install redis && \
-    pip install django-websocket-redis && \
-    pip install django-redis-cache && \
-    pip install requests
+RUN pip install django==1.6.3 pitz django-grappelli==2.4.12 pillow \
+    MySQL-python south ipython simplejson django-mptt==0.7.4 \
+    pygments hamlpy djaml django-appconf BeautifulSoup FeedParser \
+    pyyaml python-memcached django-memcache-status raven gevent \
+    redis django-websocket-redis django-redis-cache requests
 #RUN pip3 install django == 2.0.4
 #RUN pip3 install pytz == 2018.4
 #RUN pip3 install pillow == 5.1.0
