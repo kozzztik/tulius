@@ -1,6 +1,5 @@
 echo "do on update"
 . env/bin/activate
-export DJANGO_SETTINGS_MODULE=settings-production
 pip install -r requirements.txt
 python manage.py collectstatic --noinput
 python manage.py syncdb
