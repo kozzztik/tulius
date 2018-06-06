@@ -1,0 +1,47 @@
+version: '3.5'
+services:
+  redis:
+    image: redis
+    restart: always
+    networks:
+      tuliusnet:
+        ipv4_address: 10.5.0.3
+    container_name: tulius_redis
+
+  mysql:
+    image: mysql/mysql-server:5.7.22
+    restart: always
+    networks:
+      tuliusnet:
+        ipv4_address: 10.5.0.2
+    volumes:
+      - type: bind
+        source: "../../data/mysql"
+        target: "/var/lib/mysql"
+      - ./mysql.cnf:/etc/my.cnf:ro
+    ports:
+      - "0.0.0.0:3307:3306"
+    container_name: tulius_mysql
+
+  nginx:
+    image: nginx
+    restart: always
+    networks:
+      tuliusnet:
+        ipv4_address: 10.5.0.4
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../../../master/data:/opt/master_data
+      - ../../../dev/data:/opt/dev_data
+    command: ['nginx', '-g', 'daemon off;']
+    container_name: tulius_nginx
+
+networks:
+  tuliusnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+    name: tuliusnet

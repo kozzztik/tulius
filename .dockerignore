@@ -3,3 +3,4 @@ media
 env
 sql-logfile.txt
 backup.log
+data

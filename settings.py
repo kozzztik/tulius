@@ -3,6 +3,14 @@ import os
 
 from django.utils.translation import ugettext_lazy as _
 
+branch = os.environ.get("TULIUS_BRANCH", '')
+if branch == 'master':
+    env = 'prod'
+elif branch == 'dev':
+    env = 'qa'
+else:
+    env = 'dev'
+
 BASE_DIR = os.path.dirname(__file__) + '/'
 PROJECT_NAME = 'tulius'
 
@@ -15,8 +23,8 @@ USE_L10N = True
 USE_TZ = True
 SITE_ID = 1
 
-DEBUG = True
-TEMPLATE_DEBUG = True
+DEBUG = (env != 'prod')
+TEMPLATE_DEBUG = DEBUG
 
 SECRET_KEY = '0q^^#b-w#ae@i%h$da%chx@3ldu52c5%6v)_fiaorkl+4#r%=1'
 
@@ -26,6 +34,7 @@ VK_APP_SECRET = 'm6GcbXexyppJ4cv1p94y'
 MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
 
+# TODO remove in 3.6
 LANGUAGES = (
     ('ru', _('Russian')),
 )
@@ -132,9 +141,7 @@ AUTHENTICATION_BACKENDS = (
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
-    'tulius.com',
-    'tulius.co-de.org',
-    ]
+]
 
 EMAIL_BACKEND = 'django_mailer.backend.DbBackend'
 
@@ -148,9 +155,9 @@ DEFAULT_THEME = 'classic'
 
 IMAGE_FORMAT = 'png'
 
-SITE_ROOT = BASE_DIR + 'tulius/'
-MEDIA_ROOT = BASE_DIR + 'media/'
-STATIC_ROOT = BASE_DIR + 'static/'
+SITE_ROOT = os.path.join(BASE_DIR, 'tulius') + '/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'data', 'media')
+STATIC_ROOT = os.path.join(BASE_DIR, 'data', 'static')
 LOCALE_PATHS = (SITE_ROOT + 'locale/',)
 INSTALLER_BACKUPS_DIR = BASE_DIR + 'backups/'
 
@@ -222,6 +229,7 @@ if DEBUG:
         'error', r"DateTimeField received a naive datetime",
         RuntimeWarning, r'django\.db\.models\.fields')
 
+# TODO remove with 3.6
 THEMING_ROOT = MEDIA_ROOT + 'uploads/themes/'
 THEMING_URL = MEDIA_URL + 'uploads/themes/'
 
@@ -239,26 +247,26 @@ MAIL_RECEIVERS = ['pm.mail.get_mail']
 
 
 WS4REDIS_CONNECTION = {
-    'host': '127.0.0.1',
+    'host': 'tulius_redis',
     'port': 6379,
     'db': 10,
     'password': '',
 }
 
 WS4REDIS_EXPIRE = 60
-WS4REDIS_PREFIX = 'ws'
+WS4REDIS_PREFIX = 'ws_{}'.format(env)
 WEBSOCKET_URL = '/ws/'
 WS4REDIS_SUBSCRIBER = 'websockets.subscriber.RedisSubscriber'
 WSGI_APPLICATION = 'ws4redis.django_runserver.application'
 WS4REDIS_HEARTBEAT = 'heartbeat'
 
-
+# Actual credentials are hold in settings_production.py file.
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'tulius',
-        'HOST': '127.0.0.1',
-        'USER': 'tulius',
+        'NAME': 'tulius_{}'.format(env),
+        'HOST': '127.0.0.1' if env == 'dev' else 'tulius_mysql',
+        'USER': 'tulius_{}'.format(env),
         'PASSWORD': 'tulius',
         'PORT': '',
         'CONN_MAX_AGE': 20,
@@ -274,3 +282,32 @@ DATABASES = {
 # }
 #
 # SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+
+if env == 'prod':
+    DEFAULT_FROM_EMAIL = 'tulius@tulius.com'
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': '127.0.0.1:11211',
+            'KEY_PREFIX': 'tulius',
+        }
+    }
+    SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+    ALLOWED_HOSTS += [
+        'tulius.com',
+        'tulius.co-de.org',
+]
+elif env == 'qa':
+    DEFAULT_FROM_EMAIL = 'tulius-test@tulius.com'
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': '127.0.0.1:11211',
+            'KEY_PREFIX': 'testtulius',
+        }
+    }
+    SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+    ALLOWED_HOSTS += [
+        'test.tulius.com',
+        'test.tulius.co-de.org',
+    ]

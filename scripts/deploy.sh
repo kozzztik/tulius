@@ -10,5 +10,5 @@ ssh -i /tmp/deploy_rsa travis@tulius.com -p 33023 "cd ~/$TRAVIS_BRANCH && git fe
 echo "Data updated"
 
 # Do after deploy staff
-ssh -i /tmp/deploy_rsa travis@tulius.com -p 33023 "cd ~/$TRAVIS_BRANCH && . scripts/on_update.sh $TRAVIS_BRANCH $1 $2"
+ssh -i /tmp/deploy_rsa travis@tulius.com -p 33023 "cd ~/$TRAVIS_BRANCH && . scripts/on_update.sh $TRAVIS_BRANCH"
 echo "Finished."

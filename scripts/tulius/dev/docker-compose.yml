@@ -1,0 +1,39 @@
+version: '3.5'
+services:
+  uwsgi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      tuliusnet:
+        ipv4_address: 10.5.0.20
+    restart: unless-stopped
+    environment:
+      TULIUS_BRANCH: dev
+
+  websockets:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      tuliusnet:
+        ipv4_address: 10.5.0.21
+    restart: unless-stopped
+    command: ["uwsgi", "--http", "0.0.0.0:7000",
+               "--max-requests", "10000",
+               "--threads", "2",
+               "--processes", "1",
+               "--master",
+               "--gevent", "100",
+               "--http-websockets",
+               "--wsgi", "wsgi_websocket:application"]
+    environment:
+      TULIUS_BRANCH: dev
+
+networks:
+  tuliusnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+    name: tuliusnet
