@@ -2,7 +2,7 @@ version: '3.5'
 services:
   uwsgi:
     build:
-      context: .
+      context: ../../..
       dockerfile: Dockerfile
     networks:
       tuliusnet:
@@ -13,7 +13,7 @@ services:
 
   websockets:
     build:
-      context: .
+      context: ../../..
       dockerfile: Dockerfile
     networks:
       tuliusnet:
