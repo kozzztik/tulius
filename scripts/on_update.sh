@@ -1,34 +1,34 @@
+#!/usr/bin/env bash
 echo "do on update"
 
-echo "Stop existing tulius_$1"
-docker stop tulius_$1
-docker rm tulius_$1
-docker stop tulius_$1_ws
-docker rm tulius_$1_ws
+TULIUS_BRANCH=$1
+ROOTDIR=$PWD
+
+echo "Stop existing compose"
+cd scripts/tulius/$1
+docker-compose down
+cd $ROOTDIR
 
 echo "Build docker container tulius_$1"
 docker build -t tulius_$1 .
 
 echo "Collect static"
-docker run -v "$PWD/static":/opt/tulius/static \
+docker run -v "$PWD/data/static":/opt/tulius/data/static \
+    -e TULIUS_BRANCH="$1" \
+    --net tuliusnet \
     tulius_$1 python manage.py collectstatic --noinput
 
 echo "Migrate"
-docker run tulius_$1 python manage.py migrate
+docker run \
+    -e TULIUS_BRANCH="$1" \
+    --net tuliusnet \
+    tulius_$1 python manage.py migrate
 
-echo "Start docker container tulius_$1 on port $2"
-docker run -d -p $2:7000 --name=tulius_$1 --restart=unless-stopped \
-    -v "$PWD/media":/opt/tulius/media tulius_$1
 
-echo "Start docker container tulius_$1_ws on port $3"
-docker run -d -p $3:7000 --name=tulius_$1_ws --restart=unless-stopped \
-    tulius_$1 uwsgi --http 0.0.0.0:7000 \
-               --max-requests 10000 \
-               --threads 2 \
-               --processes 1 \
-               --master \
-               --gevent 100 \
-               --http-websockets \
-               --wsgi wsgi_websocket:application
+echo "Run compose"
+
+cd scripts/tulius/$1
+docker-compose up -d --build --force-recreate
+cd $ROOTDIR
 
 echo "Done."
