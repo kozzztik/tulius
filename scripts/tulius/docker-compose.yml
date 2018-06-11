@@ -30,13 +30,59 @@ services:
       tuliusnet:
         ipv4_address: 10.5.0.4
     ports:
-      - "8080:80"
+      - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ../../../master/data:/opt/master_data
       - ../../../dev/data:/opt/dev_data
     command: ['nginx', '-g', 'daemon off;']
     container_name: tulius_nginx
+
+  mail:
+    build:
+      context: ./postfix
+    volumes:
+      - ../../data/mail:/var/mail
+    restart: always
+    networks:
+      tuliusnet:
+        ipv4_address: 10.5.0.5
+    container_name: tulius_mail
+
+  sentry_web:
+    build:
+      context: ./sentry
+    restart: always
+    networks:
+      tuliusnet:
+        ipv4_address: 10.5.0.6
+    volumes:
+      - ../../data/:/var/lib/sentry/files
+    container_name: tulius_sentry
+
+  sentry_worker:
+    build:
+      context: ./sentry
+    command: run worker
+    restart: always
+    networks:
+      tuliusnet:
+        ipv4_address: 10.5.0.7
+    volumes:
+      - ../../data/:/var/lib/sentry/files
+    container_name: tulius_sentry_worker
+
+  sentry_cron:
+    build:
+      context: ./sentry
+    command: run cron
+    restart: always
+    networks:
+      tuliusnet:
+        ipv4_address: 10.5.0.8
+    volumes:
+      - ../../data/:/var/lib/sentry/files
+    container_name: tulius_sentry_cron
 
 networks:
   tuliusnet:

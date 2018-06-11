@@ -143,7 +143,7 @@ ALLOWED_HOSTS = [
     'localhost',
 ]
 
-EMAIL_BACKEND = 'django_mailer.backend.DbBackend'
+# EMAIL_BACKEND = 'django_mailer.backend.DbBackend'
 
 INLINE_FORMSET_CLASS = 'table'
 ACCOUNT_ACTIVATION_DAYS = 2
@@ -233,7 +233,7 @@ if DEBUG:
 THEMING_ROOT = MEDIA_ROOT + 'uploads/themes/'
 THEMING_URL = MEDIA_URL + 'uploads/themes/'
 
-EMAIL_HOST = 'localhost'
+EMAIL_HOST = 'tulius_mail' if env == 'prod' else 'localhost'
 EMAIL_PORT = 25
 EMAIL_HOST_USER = '' 
 EMAIL_HOST_PASSWORD = ''
