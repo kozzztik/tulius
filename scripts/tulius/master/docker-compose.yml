@@ -10,6 +10,8 @@ services:
     restart: unless-stopped
     environment:
       TULIUS_BRANCH: master
+    volumes:
+      - ../../../data/media:/opt/tulius/data/media
 
   websockets:
     build:
@@ -29,6 +31,8 @@ services:
                "--wsgi", "wsgi_websocket:application"]
     environment:
       TULIUS_BRANCH: master
+    volumes:
+      - ../../../data/media:/opt/tulius/data/media
 
 networks:
   tuliusnet:
