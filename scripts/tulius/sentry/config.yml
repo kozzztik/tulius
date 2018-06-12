@@ -1,0 +1,24 @@
+system.admin-email: 'kozzztik@co-de.org'
+system.url-prefix: 'http://sentry.co-de.org'
+system.secret-key: 'ZHU2O7VW9UCznHwDgDyUEYvOKjjtVoKQW+ccNm9+d5rKVxxtzW6Qqg=='
+
+mail.backend: 'smtp'
+mail.host: 'tulius_mail'
+mail.port: 25
+mail.username: ''
+mail.password: ''
+mail.use-tls: false
+mail.from: 'sentry@co-de.org'
+mail.subject-prefix: '[Sentry] '
+mail.mailgun-api-key: ''
+
+redis.clusters:
+  default:  # cluster name; `default` replaces `SENTRY_REDIS_OPTIONS`
+    hosts:  # options are passed as keyword arguments to `rb.Cluster`
+      0:
+        host: tulius_redis
+        port: 6379
+
+filestore.backend: 'filesystem'
+filestore.options:
+  location: '/var/lib/sentry/files'

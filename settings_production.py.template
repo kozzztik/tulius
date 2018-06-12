@@ -1,0 +1,17 @@
+from settings import *
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'tulius_{}'.format(env),
+        'HOST': '127.0.0.1' if env == 'dev' else 'tulius_mysql',
+        'USER': 'tulius_{}'.format(env),
+        'PASSWORD': '< ADD DB PASSWORD HERE >',
+        'PORT': '',
+        'CONN_MAX_AGE': 20,
+    }
+}
+
+RAVEN_CONFIG = {
+    'dsn': '< ADD SENTRY DSN HERE>',
+}

@@ -90,3 +90,5 @@ ENV/
 
 #Pycharm
 .idea/
+
+settings_production.py
