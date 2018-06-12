@@ -30,6 +30,8 @@ SENTRY_USE_BIG_INTS = True
 # If you're expecting any kind of real traffic on Sentry, we highly recommend
 # configuring the CACHES and Redis settings
 
+SENTRY_DIGESTS = 'sentry.digests.backends.redis.RedisBackend'
+
 ###########
 # General #
 ###########
