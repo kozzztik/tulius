@@ -299,6 +299,8 @@ if env == 'prod':
 ]
 elif env == 'qa':
     DEFAULT_FROM_EMAIL = 'tulius-test@tulius.com'
+    EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',

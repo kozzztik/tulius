@@ -34,32 +34,9 @@ SENTRY_USE_BIG_INTS = True
 # General #
 ###########
 
-# The administrative email for this installation.
-# Note: This will be reported back to getsentry.com as the point of contact. See
-# the beacon documentation for more information. This **must** be a string.
-
-# SENTRY_ADMIN_EMAIL = 'your.name@example.com'
-SENTRY_ADMIN_EMAIL = 'kozzztik@co-de.org'
-
 # Instruct Sentry that this install intends to be run by a single organization
 # and thus various UI optimizations should be enabled.
 SENTRY_SINGLE_ORGANIZATION = True
-
-#########
-# Redis #
-#########
-
-# Generic Redis configuration used as defaults for various things including:
-# Buffers, Quotas, TSDB
-
-SENTRY_REDIS_OPTIONS = {
-    'hosts': {
-        0: {
-            'host': 'tulius_redis',
-            'port': 6379,
-        }
-    }
-}
 
 #########
 # Cache #
@@ -131,24 +108,9 @@ SENTRY_QUOTAS = 'sentry.quotas.redis.RedisQuota'
 
 SENTRY_TSDB = 'sentry.tsdb.redis.RedisTSDB'
 
-################
-# File storage #
-################
-
-# Any Django storage backend is compatible with Sentry. For more solutions see
-# the django-storages package: https://django-storages.readthedocs.org/en/latest/
-
-SENTRY_FILESTORE = 'django.core.files.storage.FileSystemStorage'
-SENTRY_FILESTORE_OPTIONS = {
-    'location': '/var/lib/sentry/files',
-}
-
 ##############
 # Web Server #
 ##############
-
-# You MUST configure the absolute URI root for Sentry:
-SENTRY_URL_PREFIX = 'http://sentry.co-de.org'  # No trailing slash!
 
 # If you're using a reverse proxy, you should enable the X-Forwarded-Proto
 # header and uncomment the following settings
@@ -161,34 +123,3 @@ SENTRY_WEB_OPTIONS = {
     # 'workers': 3,  # the number of gunicorn workers
     # 'secure_scheme_headers': {'X-FORWARDED-PROTO': 'https'},
 }
-
-###############
-# Mail Server #
-###############
-
-# For more information check Django's documentation:
-#  https://docs.djangoproject.com/en/1.3/topics/email/?from=olddocs#e-mail-backends
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
-EMAIL_HOST = 'tulius_mail'
-EMAIL_HOST_PASSWORD = ''
-EMAIL_HOST_USER = ''
-EMAIL_PORT = 25
-EMAIL_USE_TLS = False
-
-# The email address to send on behalf of
-SERVER_EMAIL = 'sentry@co-de.org'
-
-# If you're using mailgun for inbound mail, set your API key and configure a
-# route to forward to /api/hooks/mailgun/inbound/
-MAILGUN_API_KEY = ''
-
-########
-# etc. #
-########
-
-# If this file ever becomes compromised, it's important to regenerate your SECRET_KEY
-# Changing this value will result in all current sessions being invalidated
-SECRET_KEY = 'ZHU2O7VW9UCznHwDgDyUEYvOKjjtVoKQW+ccNm9+d5rKVxxtzW6Qqg=='
-
