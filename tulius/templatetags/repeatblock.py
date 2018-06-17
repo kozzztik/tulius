@@ -26,8 +26,8 @@ class MacroRoot(template.Node):
         Apart from that, the node doesn't do much, except rendering it's
         childs.
     """
-    def __init__(self, nodelist=[]):
-        self.nodelist = nodelist
+    def __init__(self, nodelist=None):
+        self.nodelist = nodelist or []
         
     def render(self, context):
         return self.nodelist.render(context)
@@ -129,6 +129,7 @@ class RepeatNode(template.Node):
                 "cannot repeat '%s': block or macro not found" %
                 self.block_name)
         else:
+            context.push(self.extra_context)
             if isinstance(block, MacroNode):
                 result = block.repeat(context)
             else:
