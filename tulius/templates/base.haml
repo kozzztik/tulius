@@ -3,34 +3,20 @@
 - load repeatblock
 - enablemacros
 
-- block jquery_styles
-    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}jquery/css/jquery-ui-1.10.3.custom.min.css'}
-
-- block bootstrap_styles
-    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}common/twitter_bootstrap/css/bootstrap.min.css'}
-    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}common/twitter_bootstrap/css/bootstrap-responsive.min.css'}
-    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}common/fortawesome/css/font-awesome.min.css'}
-    <!--[if IE 7]>
-    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}common/fortawesome/css/font-awesome-ie7.min.css'}
-    <![endif]-->
-
 - block sitewide_styles
-    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}photos/jquery-lightbox/css/lightbox.css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}common/jquery-lightbox/css/lightbox.css'}
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}tulius/css/tulius2015.css'}
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius.css'}
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/baselayout.css'}
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-main.css'}
-    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}rcrumbs/jquery.rcrumbs.min.css'}
-    
-- block bootstrap_scripts
-    %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/bootstrap/js/bootstrap.min.js'}
-    
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}common/rcrumbs/jquery.rcrumbs.min.css'}
+
 - block sitewide_scripts
-    %script{type: 'text/javascript', src: '{{ MEDIA_URL }}js/jquery.cookie.js'}
-    %script{type: 'text/javascript', src: '{{ MEDIA_URL }}js/jquery.history.js'}
-    %script{type: 'text/javascript', src: '{{ STATIC_URL }}photos/jquery-lightbox/js/lightbox.js'}
-    %script{type: 'text/javascript', src: '{{ STATIC_URL }}autocomplete/autocomplete-select.js'}
-    %script{type: 'text/javascript', src: '{{ MEDIA_URL }}rcrumbs/jquery.rcrumbs.min.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/js/jquery.cookie.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/js/jquery.history.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/jquery-lightbox/js/lightbox.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/js/autocomplete-select.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/rcrumbs/jquery.rcrumbs.min.js'}
     %script1{type: 'text/javascript', src: '{{ STATIC_URL }}js/ws4redis.js'}
     <script type='text/javascript'>
         var websocket_uri = '{{ WEBSOCKET_URI }}';
@@ -41,9 +27,8 @@
         {% endif %}
     </script>
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}tulius/js/menu.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/js/jquery.formset.js'}
 
-    - include "inlineformsets/init.html"
-    
     - block extra_scripts
     
 - block body
