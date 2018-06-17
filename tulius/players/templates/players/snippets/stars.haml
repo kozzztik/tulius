@@ -1,8 +1,8 @@
 %div.stars
     - for star in player.full_stars
         - if star == 'b'
-            %img{src: '/static/players/star_big.png'}
+            %img{src: '{{ STATIC_URL }}players/star_big.png'}
         - elif star == 's'
-            %img{src: '/static/players/star_win.gif'}
+            %img{src: '{{ STATIC_URL }}players/star_win.gif'}
         - elif star == 'e'
-            %img{src: '/static/players/star.gif'}
+            %img{src: '{{ STATIC_URL }}players/star.gif'}

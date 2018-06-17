@@ -4,7 +4,10 @@ def get_page(self):
     integer representing the current page.
     """
     try:
-        p = self.REQUEST['page']
+        if self.POST:
+            p = self.POST['page']
+        else:
+            p = self.GET['page']
         if p == 'last':
             return 'last'
         return int(p)
@@ -21,5 +24,5 @@ class PaginationMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        request.__class__.page = property(get_page)
+        request.page = get_page(request)
         return self.get_response(request)
