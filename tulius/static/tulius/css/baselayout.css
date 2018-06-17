@@ -48,7 +48,7 @@
 
 #content-center-game {
     margin-top: 40px;
-    background: url(../img/baselayout/bg2.gif);
+    background: url("../img/baselayout/bg2.gif");
     padding-left: 20px;
     padding-right: 20px;
     max-width: 940px;    

@@ -28,7 +28,7 @@ table.vertical-center td { vertical-align: middle; }
 .catalogindex li { 
     padding: 5px; 
     border: 1px solid rgb(205, 195, 183);
-    background: url("../jquery/css/images/ui-bg_glass_70_ede4d4_1x400.png") repeat-x scroll 50% 50%;
+    background: url("../../common/jquery/css/images/ui-bg_glass_70_ede4d4_1x400.png") repeat-x scroll 50% 50%;
     margin-bottom: 1px; 
     border-radius: 6px 0px 0px 6px;
     margin-right: -1px;
