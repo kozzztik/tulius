@@ -14,7 +14,6 @@ RUN pip install django==2.0.6 pytz==2018.4 pillow==5.1.0 \
 
 RUN mkdir /opt/tulius
 ADD tulius /opt/tulius/tulius
-ADD django_mailer /opt/tulius/django_mailer
 ADD djfw /opt/tulius/djfw
 ADD events /opt/tulius/events
 ADD pm /opt/tulius/pm

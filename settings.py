@@ -72,7 +72,6 @@ INSTALLED_APPS = (
     'djfw.photos',
     'djfw.sortable',
     'djfw.custom_views',
-    'django_mailer',
     'pm',
     'tulius',
     'tulius.login',
@@ -154,8 +153,6 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
 ]
-
-# EMAIL_BACKEND = 'django_mailer.backend.DbBackend'
 
 INLINE_FORMSET_CLASS = 'table'
 ACCOUNT_ACTIVATION_DAYS = 2
@@ -241,10 +238,6 @@ if DEBUG:
     warnings.filterwarnings(
         'error', r"DateTimeField received a naive datetime",
         RuntimeWarning, r'django\.db\.models\.fields')
-
-# TODO remove with 3.6
-THEMING_ROOT = MEDIA_ROOT + 'uploads/themes/'
-THEMING_URL = MEDIA_URL + 'uploads/themes/'
 
 EMAIL_HOST = 'tulius_mail' if env == 'prod' else 'localhost'
 EMAIL_PORT = 25
