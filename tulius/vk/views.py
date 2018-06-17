@@ -1,5 +1,5 @@
 import datetime
-import urllib
+import urllib.parse
 
 from django import urls
 from django.http.response import HttpResponseRedirect
@@ -17,14 +17,15 @@ def oauth_redd_url(request):
 
 
 def vk_auth_reddirect(request):
-    args = {}
-    args['client_id'] = settings.VK_APP_KEY
-    args['scope'] = '4194304'
-    args['redirect_uri'] = oauth_redd_url(request)
-    args['response_type'] = 'code'
-    args['v'] = '5.28'
-    args['state'] = ''
-    url = 'https://oauth.vk.com/authorize?' + urllib.urlencode(args)
+    args = {
+        'client_id': settings.VK_APP_KEY,
+        'scope': '4194304',
+        'redirect_uri': oauth_redd_url(request),
+        'response_type': 'code',
+        'v': '5.28',
+        'state': '',
+    }
+    url = 'https://oauth.vk.com/authorize?' + urllib.parse.urlencode(args)
     return HttpResponseRedirect(url)
 
 

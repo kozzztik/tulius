@@ -180,7 +180,7 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
             game__status__in=[
                 game_models.GAME_STATUS_COMPLETED,
                 game_models.GAME_STATUS_COMPLETED_OPEN]).count()
-        big_stars = games_played / 100
+        big_stars = int(games_played / 100)
         games_played -= big_stars * 100
         small_stars = 0
         for star in stars.stars_list:

@@ -1,6 +1,6 @@
 import json
 import logging
-import urllib
+import urllib.parse
 
 from django.conf import settings
 import requests
@@ -19,11 +19,11 @@ class VKConnector():
         url = self.base_url + method
         if kwargs or access_token:
             url += '?'
-        url += urllib.urlencode(kwargs)
+        url += urllib.parse.urlencode(kwargs)
         if kwargs and access_token:
             url += '&'
         if access_token:
-            url += urllib.urlencode({'access_token': access_token})
+            url += urllib.parse.urlencode({'access_token': access_token})
         response = requests.request(http_method, url)
         if response.status_code in [200, 201]:
             content = json.loads(response.text)
@@ -37,7 +37,7 @@ class VKConnector():
         args['client_secret'] = self.secret
         args['code'] = code
         args['redirect_uri'] = old_reddirect
-        url = 'https://oauth.vk.com/access_token?' + urllib.urlencode(args)
+        url = 'https://oauth.vk.com/access_token?' + urllib.parse.urlencode(args)
         response = requests.get(url)
         if response.status_code not in [200, 201]:
             raise Exception(response.text)
