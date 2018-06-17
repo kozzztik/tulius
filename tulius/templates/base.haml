@@ -1,4 +1,4 @@
-- extends 'html5_empty.haml'
+- extends 'html5_empty.html'
 - load i18n
 - load repeatblock
 - enablemacros
@@ -7,11 +7,11 @@
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}jquery/css/jquery-ui-1.10.3.custom.min.css'}
 
 - block bootstrap_styles
-    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}twitter_bootstrap/css/bootstrap.min.css'}
-    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}twitter_bootstrap/css/bootstrap-responsive.min.css'}
-    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}djfw/fortawesome/css/font-awesome.min.css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}common/twitter_bootstrap/css/bootstrap.min.css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}common/twitter_bootstrap/css/bootstrap-responsive.min.css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}common/fortawesome/css/font-awesome.min.css'}
     <!--[if IE 7]>
-    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}djfw/fortawesome/css/font-awesome-ie7.min.css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}common/fortawesome/css/font-awesome-ie7.min.css'}
     <![endif]-->
 
 - block sitewide_styles
@@ -23,7 +23,7 @@
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}rcrumbs/jquery.rcrumbs.min.css'}
     
 - block bootstrap_scripts
-    %script{type: 'text/javascript', src: '{{ STATIC_URL }}djfw/bootstrap/js/bootstrap.min.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/bootstrap/js/bootstrap.min.js'}
     
 - block sitewide_scripts
     %script{type: 'text/javascript', src: '{{ MEDIA_URL }}js/jquery.cookie.js'}
