@@ -16,7 +16,7 @@ from .models import RegistrationProfile
 
 
 class Login(TemplateView):
-    template_name = 'login/login.haml'
+    template_name = 'login/login.html'
 
     def get(self, request, *args, **kwargs):
         form = LoginForm(data=request.POST or None)
