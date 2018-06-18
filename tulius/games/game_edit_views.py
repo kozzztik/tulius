@@ -1,4 +1,3 @@
-from django import urls
 from django.views.generic import DetailView
 from django.views.generic.edit import UpdateView, BaseDeleteView
 from django.contrib.auth.decorators import login_required
@@ -17,7 +16,7 @@ from .game_edit_forms import *
 from .game_edit_catalog import *
 from djfw.uploader import handle_field_upload
 from djfw.inlineformsets import get_formset
-from djfw.autocomplete.decorators import autocomplete_result
+from tulius.core.autocomplete import autocomplete_result
 from .forms import GameInviteForm
 from djfw.sortable.views import DecoratorChainingMixin, SortableDetailViewMixin
 from djfw.custom_views import FormsetWidget, ActionableViewMixin

@@ -8,8 +8,6 @@ from .avatar_uploads import edit_story_avatar_upload, edit_story_avatar_reload
 app_name = 'tulius.stories'
 
 urlpatterns = [
-    url(r'^test/$', TestView.as_view(), name='test'),
-
     # Story catalog
     url(r'^$', IndexView.as_view(), name='index'),
     url(r'^story/(?P<pk>\d+)/$', StoryView.as_view(), name='story'),

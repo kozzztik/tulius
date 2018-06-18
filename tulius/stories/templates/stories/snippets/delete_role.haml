@@ -1,5 +1,5 @@
 - load i18n
-- load url from future
+
 %form#RoleDeleteModal.modal.hide.fade.in.well.form-horizontal{method: 'POST', action: '{% url "stories:delete_role" variation.id %}', }
     - csrf_token
     .modal-header

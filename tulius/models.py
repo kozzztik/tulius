@@ -7,6 +7,7 @@ from django.core import validators
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, pgettext
 
+from tulius.core.autocomplete.models import add_autocomplete_widget
 from tulius.vk.models import VK_Profile
 from pm.signals import private_message_created
 
@@ -229,6 +230,10 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
         else:
             s = pgettext('Someone', '%s said')
         return s % self.username
+
+
+User.autocomplete_widget = add_autocomplete_widget(
+    User, User.objects.all(), User.USERNAME_FIELD)
 
 
 def on_pm_create(sender, **kwargs):

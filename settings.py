@@ -63,7 +63,6 @@ INSTALLED_APPS = (
     'djfw.flatpages',
     'djfw.tinymce',
     'djfw.wysibb',
-    'djfw.autocomplete',
     'djfw.inlineformsets',
     'djfw.cataloging',
     'djfw.news',

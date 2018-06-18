@@ -17,7 +17,7 @@
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/jquery-lightbox/js/lightbox.js'}
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/js/autocomplete-select.js'}
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/rcrumbs/jquery.rcrumbs.min.js'}
-    %script1{type: 'text/javascript', src: '{{ STATIC_URL }}js/ws4redis.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}js/ws4redis.js'}
     <script type='text/javascript'>
         var websocket_uri = '{{ WEBSOCKET_URI }}';
         {% if not request.user.is_anonymous %}

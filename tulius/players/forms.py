@@ -1,6 +1,6 @@
 from django.utils.translation import ugettext_lazy as _
 from django import forms
-from pm.models import PrivateMessage
+
 from tulius.models import User
 
 
@@ -30,6 +30,7 @@ class PlayersFilterForm(forms.Form):
         required = False,
         queryset = User.objects.all(),
         label = _(u'Player'),
+        widget = User.autocomplete_widget
     )
 
     sort_type = forms.ChoiceField(

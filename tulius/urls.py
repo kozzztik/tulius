@@ -28,7 +28,7 @@ urlpatterns = [
     url(r'^flatpages/$', FlatpagesList.as_view(),  name='flatpages'),
     url(
         r'^autocomplete/',
-        include('djfw.autocomplete.urls', namespace='autocomplete')),
+        include('tulius.core.autocomplete.urls', namespace='autocomplete')),
     url(r'^profiler/', include('djfw.profiler.urls',  namespace='profiler')),
     url(r'^installer/', include('djfw.installer.urls', namespace='installer')),
     

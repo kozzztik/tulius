@@ -22,6 +22,7 @@ class GameInviteForm(forms.Form):
         required = True,
         queryset = User.objects.all(),
         label = _(u'User'),
+        widget=User.autocomplete_widget,
     )
     
     message = forms.CharField(

@@ -6,7 +6,6 @@ from django.http import Http404
 from django.contrib import messages
 from djfw.cataloging.core import CatalogPage
 from djfw.views import AjaxModelFormView, LoginRequiredMixin, RightsDetailMixin
-from .models import *
 from .forms import *
 from .materials_views import upload_illustration
 from .catalog import stories_catalog_page
@@ -17,17 +16,6 @@ def filter_by_author(stories, author):
         user__id=author).values('story').distinct()
     storylist = [author['story'] for author in storyauthor]
     return stories.filter(pk__in=storylist)
-
-
-class TestView(TemplateView):
-    template_name = 'stories/index.haml'
-
-    def get_context_data(self, **kwargs):
-        from djfw.autocomplete.widget import AutocompleteWidget
-        from tulius.models import User
-        w = AutocompleteWidget(User, 'grtgrtg')
-        t = User.objects.filter(id=31)
-        w.render('test_name', value=t, attrs={'id': 'dfdf'})
 
 
 class IndexView(TemplateView):

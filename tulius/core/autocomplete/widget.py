@@ -108,7 +108,7 @@ class AutocompleteWidget(TextInput):
                 # options = simplejson.dumps(
                 #  self.options, indent=4, sort_keys=True)
                 options = ''
-                for k, v in self.options.iteritems():
+                for k, v in self.options.items():
                     if options:
                         options += ','
                     v = str(v)

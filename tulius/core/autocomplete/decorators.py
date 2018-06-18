@@ -9,17 +9,14 @@ from django.http import Http404
 def autocomplete_result(func):
     @wraps(func)
     def inner(request, *args, **kwargs):
-        name = request.REQUEST.get('q', None)
+        name = request.GET.get('q', None)
         if not name:
             raise Http404()
-        limit = int(request.REQUEST.get('limit', 10))
+        limit = int(request.GET.get('limit', 10))
         if limit > 40:
             limit = 40
         args = (request, ) + args + (name, limit)
-        try:
-            items = func(*args, **kwargs)
-        except:
-            return HttpResponse('CACHE_MISS ' + str(sys.exc_info()))
+        items = func(*args, **kwargs)
         result = []
         for item in items:
             result.append((item.id, str(item)))
