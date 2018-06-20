@@ -1,10 +1,35 @@
+@font-face {
+  font-family: 'Philosopher';
+  font-style: italic;
+  font-weight: normal;
+  src: local('Philosopher Italic'), local('Philosopher-Italic'), url('philosopher_italic.woff') format('woff');
+}
+@font-face {
+  font-family: 'Philosopher';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Philosopher'), url('philosopher.woff') format('woff');
+}
+@font-face {
+  font-family: 'Philosopher';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Philosopher Bold'), local('Philosopher-Bold'), url('philosopher_bold.woff') format('woff');
+}
+@font-face {
+  font-family: 'Philosopher';
+  font-style: italic;
+  font-weight: bold;
+  src: local('Philosopher Bold Italic'), local('Philosopher-BoldItalic'), url('philosopher_bold_italic.woff') format('woff');
+}
+
 @media (min-width: 767px) {
     .body_main_area { margin-top: 60px; }
     
     body.home_page {
         font-family: 'Philosopher', sans-serif;
         background-color: black;
-        background-image: url(scena.png);
+        background-image: url("scena.png");
         background-repeat: no-repeat;
         background-position: -120px 150px;
         color: #999999; 
@@ -120,4 +145,4 @@
 
 .home_page ul.announcements > li {margin-bottom: 10px; } 
 
-.news_item {margin-bottom: 20px; } 
+.news_item {margin-bottom: 20px; }

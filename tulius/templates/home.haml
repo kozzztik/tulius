@@ -7,8 +7,7 @@
             - include 'home_link.haml'
 
 - block page_styles
-    %link{href: '/media/home/css.css', type: 'text/css', rel: 'stylesheet'}
-    %link{href: '/media/home/home.css', type: 'text/css', rel: 'stylesheet'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}tulius/home/home.css'}
 
 - block body_class
     home_page
@@ -27,7 +26,7 @@
                             %td
                                 %ul#links.nav.nav-pills.nav-stacked.span4
                                     %li
-                                        %a{href:'/games/'}
+                                        %a{href:'% url "games:index" %}'}
                                             {% trans "games" %}
                                     %li
                                         %a{href:'{% url "stories:index" %}'}
@@ -46,7 +45,7 @@
                 %td#right_blocks
                     #news.gameset
                         - if news
-                            %a{href:'/news'}
+                            %a{href:'{% url "news:index" %}'}
                                 %h2
                                     {% trans "News" %}
                                 %ul.announcements
