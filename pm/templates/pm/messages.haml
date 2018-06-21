@@ -1,11 +1,10 @@
 - extends 'base.haml'
 - load i18n
-- load url from future
 - load bbcodes
 
 
 - block extra_scripts
-    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-players.css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}tulius/css/tulius-players.css'}
 
 - block breadcrumbs
     %li

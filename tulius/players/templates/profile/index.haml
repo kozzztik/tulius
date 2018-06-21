@@ -1,11 +1,10 @@
 - extends 'base.haml'
 - load i18n
-- load url from future
 
 - block extra_scripts
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}ajaxuploader/js/fileuploader.js'}
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}ajaxuploader/css/fileuploader.css'}
-    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-players.css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}tulius/css/tulius-players.css'}
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-forum.css'}
     
 - block breadcrumbs

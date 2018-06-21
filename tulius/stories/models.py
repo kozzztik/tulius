@@ -24,7 +24,7 @@ class Genre(models.Model):
         verbose_name=_('name')
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
     
     @models.permalink
@@ -113,7 +113,7 @@ class Story(models.Model):
         verbose_name=_(u'hidden')
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
         
     @models.permalink
@@ -194,8 +194,8 @@ class Avatar(models.Model):
         Role.objects.filter(avatar=self).update(avatar=None)
         return super(Avatar, self).delete(using=using)
     
-    def __unicode__(self):
-        return u'%s' % (self.name,)
+    def __str__(self):
+        return '%s' % (self.name,)
         
     @models.permalink
     def get_absolute_url(self):
@@ -234,8 +234,8 @@ class AvatarAlternative(models.Model):
         verbose_name=_('file')
     )
     
-    def __unicode__(self):
-        return u'%s %sx%s' % (self.avatar.name, self.height, self.width)
+    def __str__(self):
+        return '%s %sx%s' % (self.avatar.name, self.height, self.width)
 
     def delete_data(self):
         try:
@@ -309,7 +309,7 @@ class Character(models.Model):
         verbose_name=_(u'show in character list')
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
         
     @models.permalink
@@ -374,7 +374,7 @@ class Variation(SortableModelMixin):
         verbose_name=_(u'deleted')
     )
         
-    def __unicode__(self):
+    def __str__(self):
         return self.name
         
     @models.permalink
@@ -521,7 +521,7 @@ class Role(SortableModelMixin):
         verbose_name=_(u'trust value'),
     )
     
-    def __unicode__(self):
+    def __str__(self):
         return self.name
         
     @models.permalink
@@ -573,7 +573,7 @@ class RoleDeleteMark(models.Model):
         verbose_name=_('created at'),
     )
     
-    def __unicode__(self):
+    def __str__(self):
         return _("%(role)s deleted by %(user)s at %(time)s") % {
             'role': str(self.role), 'user': str(self.user),
             'time': self.delete_time}
@@ -610,7 +610,7 @@ class StoryAdmin(models.Model):
         
     )
 
-    def __unicode__(self):
+    def __str__(self):
         if self.user:
             if self.create_game:
                 return "%s (%s)" % (self.user, str(_("games admin")))
@@ -641,7 +641,7 @@ class StoryAuthor(models.Model):
         related_name='authored_stories',
     )
 
-    def __unicode__(self):
+    def __str__(self):
         if self.user:
             return str(self.user)
         else:
@@ -685,7 +685,7 @@ class AdditionalMaterial(models.Model):
         verbose_name=_(u'Hide in materials')
     )
     
-    def __unicode__(self):
+    def __str__(self):
         return self.name
     
     @models.permalink
@@ -773,7 +773,7 @@ class Illustration(models.Model):
         verbose_name=_('thumb')
     )
     
-    def __unicode__(self):
+    def __str__(self):
         return self.name
     
     @models.permalink
@@ -820,7 +820,7 @@ class Illustration(models.Model):
                 finally:
                     source.close()
             except:
-                True
+                pass
                 
     def copy(self, new_variation):
         old_file = self.image.name

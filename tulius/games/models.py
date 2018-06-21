@@ -307,8 +307,8 @@ class Game(models.Model):
     def get_cancel_request_url(self):
         return 'games:cancel_game_request', (), {'game_id': self.id}
         
-    def __unicode__(self):
-        return u'%s - %d' % (self.name, self.serial_number)
+    def __str__(self):
+        return '%s - %d' % (self.name, self.serial_number)
         
     def clean(self):
         super(Game, self).clean()
@@ -459,8 +459,8 @@ class RoleRequest(models.Model):
         verbose_name=_(u'text')
     )
     
-    def __unicode__(self):
-        return u'%s - %s' % (str(self.user), str(self.game))
+    def __str__(self):
+        return '%s - %s' % (str(self.user), str(self.game))
         
 
 class RoleRequestSelection(models.Model):
@@ -516,7 +516,7 @@ class RequestQuestion(models.Model):
         verbose_name=_(u'question')
     )
         
-    def __unicode__(self):
+    def __str__(self):
         return self.question
 
 
