@@ -14,6 +14,7 @@ class ReLoginForm(forms.Form):
         required=True,
         queryset=get_user_model().objects.all(),
         label=_(u'User'),
+        widget=get_user_model().autocomplete_widget
     )
     next_url = forms.CharField(widget=forms.HiddenInput)
 

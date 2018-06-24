@@ -1765,6 +1765,7 @@ wbbdebug=true;
 					this.$body.focus();
 				}
 			}
+			this.sync();
 		},
 		clearLastRange: function() {
 			this.lastRange=false;
