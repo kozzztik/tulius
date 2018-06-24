@@ -56,7 +56,9 @@ class Logout(View):
             return HttpResponseRedirect('/')
 
 
-class ReLogin(View):
+class ReLogin(TemplateView):
+    template_name = 'login/relogin.html'
+
     def get(self, request, *args, **kwargs):
         if not request.user.is_superuser:
             raise Http404('Only for superuser')
@@ -64,17 +66,13 @@ class ReLogin(View):
         if form.is_valid():
             user = form.cleaned_data['login_by_user']
             user.backend = 'django.contrib.auth.backends.ModelBackend'
-            next_url = form.cleaned_data['next_url']
             if user.is_active:
                 auth.login(request, user)
                 messages.success(request, _('You have successfully logged in'))
             else:
                 messages.error(request, _('This account is disabled'))
-            if next_url:
-                HttpResponseRedirect(next_url)
-        else:
-            messages.success(request, _('Form invalid'))
-        return HttpResponseRedirect('/')
+            return HttpResponseRedirect('/')
+        return self.render_to_response({'form': form})
 
     def post(self, request, *args, **kwargs):
         return self.get(request, *args, **kwargs)

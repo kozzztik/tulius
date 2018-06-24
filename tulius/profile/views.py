@@ -7,7 +7,7 @@ from django.utils.decorators import method_decorator
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 
-from events.models import UserNotification, Notification
+from tulius.events.models import UserNotification, Notification
 from tulius.forum.models import CommentLike
 from tulius.stories.models import StoryAdmin, Role, Variation
 from tulius.games.views import invite_accept, invite_decline, set_edit

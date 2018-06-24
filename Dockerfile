@@ -15,8 +15,6 @@ RUN pip install django==2.0.6 pytz==2018.4 pillow==5.1.0 \
 RUN mkdir /opt/tulius
 ADD tulius /opt/tulius/tulius
 ADD djfw /opt/tulius/djfw
-ADD events /opt/tulius/events
-ADD pm /opt/tulius/pm
 ADD websockets /opt/tulius/websockets
 ADD manage.py /opt/tulius/manage.py
 ADD requirements.txt /opt/tulius/requirements.txt

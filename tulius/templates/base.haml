@@ -86,20 +86,6 @@
                                         {% trans "Confidential policy" %}
         - block modals
             - block login_modal
-                - if request.user.is_superuser
-                    %form#reloginModal.modal.hide.fade.in.well{method: 'POST', action: '{% url "auth:relogin" %}'}
-                        - csrf_token
-                        .modal-header
-                            %a.close{data-dismiss: "modal"}×
-                            %h3
-                                {% trans "Switch user" %}
-                        .modal-body
-                            - with field=relogin_form.login_by_user
-                                - include 'snippets/form_field.haml'
-                            = relogin_form.next_url
-                        .modal-footer
-                            %button.btn.btn-primary{type: 'submit'}
-                                {% trans "Switch" %}
                 %form#loginModal.modal.hide.fade.in.well{method: 'POST', action: '{% url "auth:login" %}'}
                     - csrf_token
                     .modal-header

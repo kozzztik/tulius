@@ -81,7 +81,7 @@ INSTALLED_APPS = (
     'tulius.stories',
     'tulius.gameforum',
     'djfw.installer',
-    'events',
+    'tulius.events',
     'tulius.vk',
     'tulius.counters',
 )
@@ -124,7 +124,6 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'ws4redis.context_processors.default',
                 'djfw.flatpages.context_processors.flatpages',
-                'tulius.login.context_processors.relogin',
                 'djfw.datablocks.context_processors.datablocks',
             ],
             'libraries': {
