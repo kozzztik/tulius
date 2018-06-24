@@ -18,15 +18,15 @@ urlpatterns = [
     url(
         r'^(?P<player_id>\d+)/played/$', PlayerUserProfileView.as_view(),
         name='player_played'),
-    # TODO: Not sure this pages still used.
     url(r'^profile/$', PlayerProfileView.as_view(), name='profile'),
     url(
         r'^profile/upload_avatar/$', profile_upload_avatar,
         name='profile_upload_avatar'),
-    url(
-        r'^profile/files/$', PlayerUploadedFilesView.as_view(),
-        name='profile_files'),
-    url(
-        r'^profile/played/$', PlayerPlayedView.as_view(),
-        name='profile_played'),
+    # TODO: Not sure this pages still used.
+    # url(
+    #     r'^profile/files/$', PlayerUploadedFilesView.as_view(),
+    #     name='profile_files'),
+    # url(
+    #     r'^profile/played/$', PlayerPlayedView.as_view(),
+    #     name='profile_played'),
 ]

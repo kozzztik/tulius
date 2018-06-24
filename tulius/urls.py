@@ -38,7 +38,7 @@ urlpatterns = [
     url(r'^accounts/', include('tulius.login.urls', namespace='auth')),
     url(r'^players/', include('tulius.players.urls', namespace='players')),
     url(r'^profile/', include('tulius.profile.urls', namespace='profile')),
-    url(r'^pm/', include('pm.urls', namespace='pm')),
+    url(r'^pm/', include('tulius.pm.urls', namespace='pm')),
     url(r'^games/', include('tulius.games.urls',  namespace='games')),
     url(
         r'^forums/',

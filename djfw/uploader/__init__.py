@@ -18,7 +18,7 @@ def handle_upload(request, func, *args, **kwargs):
                 filename = ""
         else:
             if len(request.FILES) == 1:
-                upload = request.FILES.values()[0]
+                upload = next(request.FILES.values())
             else:
                 raise Http404('Bad Upload')
             filename = upload.name

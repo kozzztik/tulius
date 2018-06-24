@@ -71,7 +71,7 @@ INSTALLED_APPS = (
     'djfw.photos',
     'djfw.sortable',
     'djfw.custom_views',
-    'pm',
+    'tulius.pm',
     'tulius',
     'tulius.login',
     'tulius.players',

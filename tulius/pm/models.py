@@ -1,10 +1,10 @@
 from django.db import models
 from django.db.models.query_utils import Q
 from django.utils.translation import ugettext_lazy as _
-from djfw.common.models import AbstractBaseModel
 
-from pm.signals import private_message_created
+from djfw.common.models import AbstractBaseModel
 from tulius.models import User
+from tulius.pm.signals import private_message_created
 
 
 class PrivateMessageManager(models.Manager):

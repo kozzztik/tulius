@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from .views import *
 
-app_name = 'pm'
+app_name = 'tulius.pm'
 
 urlpatterns = [
     url(

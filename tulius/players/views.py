@@ -18,7 +18,7 @@ from .models import stars
 from .forms import PlayersFilterForm, PLAYERS_SORT_STORIES_AUTHORED,\
     PLAYERS_SORT_GAMES_PLAYED_INC, PLAYERS_SORT_GAMES_PLAYED_DEC, \
     PLAYERS_SORT_REG_DATE, PLAYERS_SORT_ALPH, RankForm
-from pm.models import PrivateMessage
+from tulius.pm.models import PrivateMessage
 
 
 game_forum = apps.get_app_config('gameforum')

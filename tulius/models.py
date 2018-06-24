@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _, pgettext
 
 from tulius.core.autocomplete.models import add_autocomplete_widget
 from tulius.vk.models import VK_Profile
-from pm.signals import private_message_created
+from tulius.pm.signals import private_message_created
 
 
 USER_SEX_UNDEFINED = 0
@@ -207,12 +207,12 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
         return self.new_invites_cache
     
     def send_pm(self, sender, body):
-        from pm.models import PrivateMessage
+        from tulius.pm.models import PrivateMessage
         pm = PrivateMessage(sender=sender, receiver=self, body=body)
         pm.save()
         
     def update_not_readed(self):
-        from pm.models import PrivateMessage
+        from tulius.pm.models import PrivateMessage
         count = PrivateMessage.objects.filter(
             receiver=self, is_read=False, removed_by_receiver=False).count()
         self.not_readed_messages = count

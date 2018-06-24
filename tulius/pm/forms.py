@@ -1,5 +1,6 @@
 from django import forms
-from pm.models import *
+
+from tulius.pm.models import *
 
 
 class PrivateMessageForm(forms.ModelForm):

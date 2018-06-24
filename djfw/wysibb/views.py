@@ -1,4 +1,4 @@
-from io import StringIO
+from io import BytesIO
 from mimetypes import guess_type
 
 from django.conf import settings
@@ -46,14 +46,14 @@ def save_uploaded_image(request, upload, filename):
     uploaded_file.save()
     uploaded_file.image.save(str(uploaded_file.pk) + '_' + filename, upload)
     uploaded_file.save()
-    uploaded_file.image.open('b')
+    uploaded_file.image.open('rb')
     image = Image.open(uploaded_file.image)
     
     thumb_size = getattr(settings, 'WYSIBB_THUMB_SIZE', (100, 100))
     thumb_format = getattr(settings, 'WYSIBB_THUMB_FORMAT', 'png')
     image.thumbnail(thumb_size, Image.ANTIALIAS)
     
-    image_content = StringIO.StringIO()
+    image_content = BytesIO()
     image.save(image_content, format=thumb_format)
     image_file = ContentFile(image_content.getvalue())
     uploaded_file.thumb.save(
