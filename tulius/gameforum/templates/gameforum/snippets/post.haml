@@ -30,7 +30,7 @@
                 - if role.show_trust_marks
                     - if not block_trustmarks
                         .trustmark
-                            - if not role.user_id = user.id
+                            - if not role.user_id == user.id
                                 - if parent_thread.edit_marks
                                     .trustmark-links
                                         %a.do_trustmark{href: "javascript:do_trustmark({{ role.id }}, -3)"}
@@ -49,7 +49,7 @@
                             %span.trust_value{id: "trustmark-{{ role.id }}-allmark"}
                                 {{ role.trust_value }}%
                             %br
-                            - if not role.user_id = user.id
+                            - if not role.user_id == user.id
                                 - if not user.is_anonymous
                                     {% trans "My trust:" %}
                                     %span.trust_value{id: "trustmark-{{ role.id }}-mymark"}
