@@ -1,4 +1,4 @@
-from django.template import loader, RequestContext
+from django.template.response import TemplateResponse
 
 
 def get_pagination_context(request, page_num, pages_count, window=4):
@@ -89,9 +89,9 @@ def get_pagination_context(request, page_num, pages_count, window=4):
 
 def get_custom_pagination(
         request, context, template_name='forum/snippets/pagination.haml'):
-    c = RequestContext(request, context)
-    t = loader.get_template(template_name)
-    return t.render(c)
+    response = TemplateResponse(request, template_name, context=context)
+    response.render()
+    return response.content.decode()
 
 
 def get_pagination(

@@ -7,6 +7,7 @@ from .plugin import BasePluginView
 from .forms import CommentForm, CommentDeleteForm
 from .pagination import get_pagination, get_custom_pagination, get_pagination_context
 
+
 class BaseCommentView(BasePluginView):
     def get_context_data(self, **kwargs):
         context = super(BaseCommentView, self).get_context_data(**kwargs)

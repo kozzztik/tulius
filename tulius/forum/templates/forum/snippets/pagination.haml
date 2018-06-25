@@ -3,7 +3,7 @@
 - if is_paginated
     .pagination.pagination-centered
         %ul.pagination-btns
-            %li{class: "{% if page_num = 1 %}disabled{% endif %}"}
+            %li{class: "{% if page_num == 1 %}disabled{% endif %}"}
                 - if previous_page_num
                     <a onclick="javascript:set_page({{ previous_page_num }}, 0, {% if bottom %}true{% else %}false{% endif %})"
                         href="?page={{ previous_page_num }}">
@@ -29,7 +29,7 @@
                     %li.disabled
                         %a
                             \...
-            %li{class: "{% if pages_count = page_num %}disabled{% endif %}"}
+            %li{class: "{% if pages_count == page_num %}disabled{% endif %}"}
                 - if next_page
                     <a onclick="javascript:set_page({{ next_page }}, 0, {% if bottom %}true{% else %}false{% endif %})"
                         href="?page={{ next_page }}">

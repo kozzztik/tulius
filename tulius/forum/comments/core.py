@@ -145,7 +145,7 @@ class CommentsCore(ForumPlugin):
         return (success, error_text, redirect, text)
     
     def thread_pages_count(self, thread):
-        return ((thread.comments_count - 1) / self.COMMENTS_ON_PAGE + 1) or 1
+        return int((thread.comments_count - 1) / self.COMMENTS_ON_PAGE + 1) or 1
     
     def get_comments_pagination(self, request, thread, page):
         pages = thread.pages_count
@@ -160,7 +160,7 @@ class CommentsCore(ForumPlugin):
         thread = kwargs['thread']
         comments_count = self.models.Comment.objects.filter(
             parent=thread, deleted=False).count()
-        sender.page = (comments_count / self.COMMENTS_ON_PAGE) + 1
+        sender.page = int(comments_count / self.COMMENTS_ON_PAGE) + 1
         thread.comments_count += 1
 
     def before_delete_comment(self, sender, **kwargs):

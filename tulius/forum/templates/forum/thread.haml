@@ -37,13 +37,13 @@
 - block forum_content
 
     #toppagination.pagination_container
-        {{ pagination }}
+        {{ pagination|safe }}
     
     #comments_container
         - include forum_site.templates.comments
                 
     #bottompagination.pagination_container
-        {{ pagination_bottom }}
+        {{ pagination_bottom|safe }}
     
     - if not request.user.is_anonimous
         #refreshcomments

@@ -1,12 +1,12 @@
 from django import urls
 from django.utils.decorators import classonlymethod
 from django.views.generic import TemplateView
-from django.template import RequestContext, loader
+from django.template import loader
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.views import redirect_to_login
 
 
-class ForumPlugin(object):
+class ForumPlugin:
     site = None
     core = None
     templates = None
@@ -61,7 +61,7 @@ class BasePluginView(TemplateView):
     
     def render_to_response(self, context, **response_kwargs):
         return super(BasePluginView, self).render_to_response(
-            context, current_app=self.site.app_name, **response_kwargs)
+            context, **response_kwargs)
     
     def get_template_names(self):
         return [self.site.templates[self.template_name]]
@@ -69,14 +69,9 @@ class BasePluginView(TemplateView):
     def render(self, context_data=None, **kwargs):
         if context_data is None:
             context_data = self.get_context_data(**kwargs)
-        context = RequestContext(
-            self.request, context_data, current_app=self.site.app_name)
-        template = self.get_template_names()
-        if isinstance(template, (list, tuple)):
-            t = loader.select_template(template)
-        elif isinstance(template, str):
-            t = loader.get_template(template)
-        return t.render(context)
+        response = self.render_to_response(context_data)
+        response.render()
+        return response.content.decode()
 
     def dispatch(self, request, *args, **kwargs):
         if self.require_user and (not request.user.is_authenticated):

@@ -217,7 +217,7 @@ ul.comma-list > li:last-child:after { content: '.'; }
   height: 15px;
   line-height: 12px;
   vertical-align: text-top;
-  background-image: url("/media/forum/online.png");
+  background-image: url("../img/online.png");
   background-position: 12px 12px;
   background-repeat: no-repeat;
 }
@@ -308,7 +308,7 @@ body .quote {
     -moz-border-right-colors: none; 
     -moz-border-top-colors: none; 
     border-color: #8E7F60; 
-    background-image: url("../img/baselayout/quote.gif"); 
+    background-image: url("../img/quote.gif");
     border-style: solid; 
     border-width: 1px 1px 1px 3px; 
     margin-left: 30px; 
@@ -336,7 +336,7 @@ body .quote {
 
 #refreshcomments #refresh {
     display:block;
-    background: url('../forum/refresh.gif') no-repeat scroll left top transparent;
+    background: url('../img/refresh.gif') no-repeat scroll left top transparent;
     width: 32px;
     //margin: 2px;
     height: 32px;
@@ -346,7 +346,7 @@ body .quote {
 }
 
 #refreshcomments #refresh.loading {
-    background: url('../forum/refresh-loading.gif') no-repeat scroll left top transparent;
+    background: url('../img/refresh-loading.gif') no-repeat scroll left top transparent;
 }
 
 #refreshcomments #first_unreaded {
@@ -389,11 +389,11 @@ body .quote {
 #search_filter fieldset .controls .btn {margin-bottom: 5px;}
 
 .content.post-table.unreaded-post {
-    background-image: url("../img/baselayout/bg5.gif");
+    background-image: url("../../tulius/img/baselayout/bg5.gif");
 }
 
 .content.post-table {
-    background-image: url("../img/baselayout/bg3.gif");
+    background-image: url("../../tulius/img/baselayout/bg3.gif");
 } 
 
 .room_group_read_mark {
