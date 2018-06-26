@@ -1,6 +1,5 @@
 - extends 'base_cataloged_navig_game.haml'
 - load i18n
-- load url from future
 
 - block caption
     = variation.name
@@ -10,7 +9,7 @@
         {% trans "to roles" %}
 
 - block extra_scripts
-    %link{rel: 'stylesheet', href: '{{ MEDIA_URL }}css/tulius-stories.css', type: 'text/css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}stories/tulius-stories.css'}
     
 - block content
    %table

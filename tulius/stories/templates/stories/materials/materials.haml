@@ -1,6 +1,5 @@
 - extends 'base_cataloged_navig_game.haml'
 - load i18n
-- load url from future
 
 - block page_content
     %table.table
@@ -67,7 +66,7 @@
     - else
         %a.submit.btn.btn-primary{href: '{% url "stories:add_story_material" story.id %}'}
             {% trans "Add material" %}
-    %script{'type': 'text/javascript', 'src': '{{ MEDIA_URL }}stories/delete-material.js'}
+    %script{'type': 'text/javascript', 'src': '{{ STATIC_URL }}stories/delete-material.js'}
     #delete-material-popup.modal.hide.fade.in.well
         .modal-header
             %a.close{'data-dismiss': "modal"}×

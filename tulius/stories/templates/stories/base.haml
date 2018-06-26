@@ -1,6 +1,5 @@
 - extends 'base.haml'
 - load i18n
-- load url from future
 
 - block breadcrumbs
     %li
@@ -16,4 +15,4 @@
     {% trans "Story catalog" %}
     
 - block extra_scripts
-    %link{rel: 'stylesheet', href:'{{ MEDIA_URL }}css/tulius-stories.css', type: 'text/css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}stories/tulius-stories.css'}
