@@ -6,7 +6,7 @@
 #request-list-cell { padding: 5px; }
 
 .game-description h3 .content {
-    background: url("../games/anons-2.png") no-repeat;
+    _background: url("../img/anons-2.png") no-repeat;
     background-position: top right;
     margin-left: 70px;
 }
@@ -15,12 +15,12 @@
     margin-right: 100px;
     padding-top: 10px;
     color: black;
-    background: url("../games/anons-center.png") repeat-x;
+    _background: url("../img/anons-center.png") repeat-x;
     height: 54px;
 }
 
 .game-description h3 {
-    _background: url("../games/anons-1.png") no-repeat;
+    _background: url("../img/anons-1.png") no-repeat;
     background-position: top left;
     display: inline-block;
     margin-top: 10px;

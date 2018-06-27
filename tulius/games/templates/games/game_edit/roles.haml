@@ -2,8 +2,8 @@
 - load i18n
 
 - block extra_scripts
-    %script{'type': 'text/javascript', 'src': '{{ MEDIA_URL }}games/reqtooltips.js'}
-    %script{'type': 'text/javascript', 'src': '{{ MEDIA_URL }}games/invites.js'}
+    %script{'type': 'text/javascript', 'src': '{{ STATIC_URL }}games/js/reqtooltips.js'}
+    %script{'type': 'text/javascript', 'src': '{{ STATIC_URL }}games/js/invites.js'}
     
 - block page_scripts
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}sortable/sortable.js'}
