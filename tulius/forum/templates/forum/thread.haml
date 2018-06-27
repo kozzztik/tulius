@@ -2,12 +2,12 @@
 - load i18n
 
 - block page_scripts
-    %script{type: 'text/javascript', src: '{{ MEDIA_URL }}js/jquery.scrollintoview.min.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}forum/js/jquery.scrollintoview.min.js'}
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}forum/likes.js'}
-    %script{type: 'text/javascript', src: '{{ MEDIA_URL }}js/jquery.selection.js'}
-    %script{type: 'text/javascript', src: '{{ MEDIA_URL }}forum/fast-reply.js'}
-    %script{type: 'text/javascript', src: '{{ MEDIA_URL }}forum/preview.js'}
-    %script{type: 'text/javascript', src: '{{ MEDIA_URL }}forum/comments.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}forum/js/jquery.selection.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}forum/js/fast-reply.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}forum/js/preview.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}forum/js/comments.js'}
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}forum/likes.js'}
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}forum/voting.js'}
     - if not request.user.is_anonymous

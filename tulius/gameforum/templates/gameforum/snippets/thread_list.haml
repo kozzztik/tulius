@@ -7,7 +7,7 @@
                 &nbsp;
             %th 
                 {% trans "thread" %}
-            %th..miniphone-hidden{'width': '100'}
+            %th.miniphone-hidden{'width': '100'}
                 {% trans "author" %}
             %th.miniphone-hidden{'width': '80'}
                 {% trans "posts" %}
@@ -53,7 +53,7 @@
                             - for page in thread.pages
                                 %a{'href': '{{ page.url }}'}
                                     {{ page.page }}
-                %td..miniphone-hidden
+                %td.miniphone-hidden
                     - if thread.role.show_in_character_list
                         %a{'data-toggle': 'modal', 'href': '#role{{ thread.role.id }}'}
                             = thread.role

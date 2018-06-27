@@ -93,6 +93,7 @@ def get_formset_factory(parent_model, model, form=None, fk_name=None,
 
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,
+             'min_num': 1,
              'max_num': max_num,
              'params': params, 'absolute_max': absolute_max}
     if fk:
