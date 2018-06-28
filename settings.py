@@ -274,6 +274,7 @@ DATABASES = {
         'PASSWORD': 'tulius',
         'PORT': '',
         'CONN_MAX_AGE': 20,
+        'ATOMIC_REQUESTS': True,
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
         }

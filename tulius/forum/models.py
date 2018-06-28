@@ -1,7 +1,7 @@
 """
 Forum engine models for Tulius project
 """
-from django.db import models, transaction
+from django.db import models
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey, TreeManager
@@ -322,7 +322,7 @@ class Thread(MPTTModel, SitedModelMixin):
         return self.get_right(self._moderate_right_, user)
     
     def free_access_type(self):
-        return (self.access_type < THREAD_ACCESS_TYPE_NO_READ) 
+        return self.access_type < THREAD_ACCESS_TYPE_NO_READ
     
     def is_thread(self):
         return not self.room
@@ -341,14 +341,13 @@ class Thread(MPTTModel, SitedModelMixin):
         return comments['comments_sum']
         
     def save(self, *args, **kwargs):
-        with transaction.commit_on_success():
-            if not self.id:
-                self.site().signals.thread_on_create.send(self)
-            else:
-                old_thread = Thread.objects.select_for_update().get(id=self.id)
-                self.site().signals.thread_on_update.send(
-                    self, old_thread=old_thread)
-            super(Thread, self).save(*args, **kwargs)
+        if not self.id:
+            self.site().signals.thread_on_create.send(self)
+        else:
+            old_thread = Thread.objects.select_for_update().get(id=self.id)
+            self.site().signals.thread_on_update.send(
+                self, old_thread=old_thread)
+        super(Thread, self).save(*args, **kwargs)
 
 
 class ThreadAccessRight(models.Model):
@@ -520,50 +519,49 @@ class Comment(SitedModelMixin):
         if fast_save:
             super(Comment, self).save(*args, **kwargs)
             return
-        with transaction.commit_on_success():
-            was_none = self.id is None
-            thread = Thread.objects.select_for_update().get(id=self.parent_id)
-            delete_changed = False
-            # before safe work
-            if not was_none:
-                old_self = Comment.objects.select_for_update().get(id=self.id)
-                if old_self.deleted != self.deleted:
-                    delete_changed = True
-                    thread = Thread.objects.select_for_update().get(
-                        id=self.parent.id)
-                    if old_self.deleted:
-                        self.site().signals.before_add_comment.send(
-                            self, thread=thread, restore=True)
-                    else:
-                        self.site().signals.before_delete_comment.send(
-                            self, thread=thread)
-                    thread.save()
-                else:
-                    self.site().signals.before_save_comment.send(
-                        self, old_comment=old_self)
-            else:
-                if (not self.reply_id) and (
-                        self.parent.first_comment_id != self.id):
-                    self.reply_id = self.parent.first_comment_id
-                self.site().signals.before_add_comment.send(
-                    self, thread=thread, restore=False)
-            # real safe
-            super(Comment, self).save(*args, **kwargs)
-            # after save
-            if was_none:
-                if not thread.first_comment_id:
-                    thread.first_comment_id = self.id
-                thread.last_comment_id = self.id
-                thread.save()
-                self.site().signals.after_add_comment.send(
-                    self, thread=thread, restore=False)
-            elif delete_changed:
-                if self.deleted:
-                    self.site().signals.after_delete_comment.send(
-                        self, thread=thread)
-                else:
-                    self.site().signals.after_add_comment.send(
+        was_none = self.id is None
+        thread = Thread.objects.select_for_update().get(id=self.parent_id)
+        delete_changed = False
+        # before safe work
+        if not was_none:
+            old_self = Comment.objects.select_for_update().get(id=self.id)
+            if old_self.deleted != self.deleted:
+                delete_changed = True
+                thread = Thread.objects.select_for_update().get(
+                    id=self.parent.id)
+                if old_self.deleted:
+                    self.site().signals.before_add_comment.send(
                         self, thread=thread, restore=True)
+                else:
+                    self.site().signals.before_delete_comment.send(
+                        self, thread=thread)
+                thread.save()
+            else:
+                self.site().signals.before_save_comment.send(
+                    self, old_comment=old_self)
+        else:
+            if (not self.reply_id) and (
+                    self.parent.first_comment_id != self.id):
+                self.reply_id = self.parent.first_comment_id
+            self.site().signals.before_add_comment.send(
+                self, thread=thread, restore=False)
+        # real safe
+        super(Comment, self).save(*args, **kwargs)
+        # after save
+        if was_none:
+            if not thread.first_comment_id:
+                thread.first_comment_id = self.id
+            thread.last_comment_id = self.id
+            thread.save()
+            self.site().signals.after_add_comment.send(
+                self, thread=thread, restore=False)
+        elif delete_changed:
+            if self.deleted:
+                self.site().signals.after_delete_comment.send(
+                    self, thread=thread)
+            else:
+                self.site().signals.after_add_comment.send(
+                    self, thread=thread, restore=True)
 
 
 class ThreadReadMark(models.Model):
@@ -625,21 +623,19 @@ class CommentLike(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        with transaction.commit_on_success():
-            if self.id is None:
-                comment = Comment.objects.select_for_update().get(
-                    id=self.comment_id)
-                comment.likes += 1
-                comment.save() 
-            super(CommentLike, self).save(*args, **kwargs)
-            
-    def delete(self, using=None):
-        with transaction.commit_on_success():
+        if self.id is None:
             comment = Comment.objects.select_for_update().get(
                 id=self.comment_id)
-            comment.likes -= 1
-            comment.save() 
-            super(CommentLike, self).delete(using)
+            comment.likes += 1
+            comment.save()
+        super(CommentLike, self).save(*args, **kwargs)
+            
+    def delete(self, using=None, keep_parents=False):
+        comment = Comment.objects.select_for_update().get(
+            id=self.comment_id)
+        comment.likes -= 1
+        comment.save()
+        super(CommentLike, self).delete(using, keep_parents)
 
 
 class ThreadDeleteMark(models.Model):

@@ -101,13 +101,13 @@ class ThreadsCorePlugin(ForumPlugin):
         return rooms
     
     def paginate_thread(self, thread, base_url):
-        class ThreadPage():
+        class ThreadPage:
             page = 0
             page_link = ""
         
         childcount = self.site.models.Comment.objects.filter(
             parent=thread, deleted=False).count()
-        pages = (childcount - 1) / self.site.models.COMMENTS_ON_PAGE + 1
+        pages = int((childcount - 1) / self.site.models.COMMENTS_ON_PAGE) + 1
         if pages > 1:
             thread.pages = []
             for i in range(pages):

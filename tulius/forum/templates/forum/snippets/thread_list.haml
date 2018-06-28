@@ -21,20 +21,20 @@
                         - with unreaded=thread.unreaded
                             - if unreaded
                                 %a{href:'{{ unreaded.get_absolute_url }}'}
-                                    %img{src: '{{ MEDIA_URL }}forum/important_not_readed.gif'}
+                                    %img{src: '{{ STATIC_URL }}forum/img/important_not_readed.gif'}
                             - else
-                                %img{src: '{{ MEDIA_URL }}forum/important_readed.gif'}
+                                %img{src: '{{ STATIC_URL }}forum/img/important_readed.gif'}
                     - else
                         - if thread.closed
                             %a{href:'{{ thread.get_absolute_url }}'}
-                                %img{src: '{{ MEDIA_URL }}forum/closed.gif'}
+                                %img{src: '{{ STATIC_URL }}forum/img/closed.gif'}
                         - else
                             - with unreaded=thread.unreaded
                                 - if unreaded
                                     %a{href:'{{ unreaded.get_absolute_url }}'}
-                                        %img{src: '{{ MEDIA_URL }}forum/unreadedmark.gif'}
+                                        %img{src: '{{ STATIC_URL }}forum/img/unreadedmark.gif'}
                                 - else
-                                    %img{src: '{{ MEDIA_URL }}forum/readedmark.gif'}
+                                    %img{src: '{{ STATIC_URL }}forum/img/readedmark.gif'}
                 %td
                     .forum-post-description
                         %h4

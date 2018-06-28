@@ -2,12 +2,12 @@
 - load i18n
 
 - block additional_styles
-    %link{href: "{{ MEDIA_URL }}forum/select2/css/select2.min.css", rel: "stylesheet"}
+    %link{href: "{{ STATIC_URL }}forum/select2/css/select2.min.css", rel: "stylesheet"}
 
 - block additional_scripts
-    %script{src: "{{ MEDIA_URL }}forum/select2/js/select2.min.js"}
-    %script{src: "{{ MEDIA_URL }}forum/select2/js/i18n/ru.js"}
-    %script{src: "{{ MEDIA_URL }}forum/datepicker-ru.js"}
+    %script{src: "{{ STATIC_URL }}forum/select2/js/select2.min.js"}
+    %script{src: "{{ STATIC_URL }}forum/select2/js/i18n/ru.js"}
+    %script{src: "{{ STATIC_URL }}forum/js/datepicker-ru.js"}
     
 - block caption
     {% trans "Search" %}

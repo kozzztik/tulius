@@ -15,8 +15,8 @@
             var like_options = {
                 'wait_caption': '{% trans "Wait..." %}', 
                 'error_caption': '{% trans "Error" %}',
-                'like_image': '{{ MEDIA_URL }}forum/unlike.gif',
-                'dislike_image': '{{ MEDIA_URL }}forum/like.gif',
+                'like_image': '{{ STATIC_URL }}forum/img/unlike.gif',
+                'dislike_image': '{{ STATIC_URL }}forum/img/like.gif',
                 'url': '{{ forum_site.urlizer.like }}'
                 };
             var animation_speed = {{request.user.animation_speed}};
@@ -63,5 +63,5 @@
                                     - include forum_site.templates.fast_reply
                             #replyform_loading{style: 'display: none;'}
                                 #replyform_loading_container
-                                    %img{src: '{{ MEDIA_URL }}forum/img/loading.gif'}
+                                    %img{src: '{{ STATIC_URL }}forum/img/loading.gif'}
                                         {% trans "Loading..." %}

@@ -60,26 +60,26 @@
                     -block post_action_write
                         - if not block_reply
                             %a.hidden-phone.fast-reply-link.post-actions-button{href: 'javascript:fast_reply({{ comment.id }})'}
-                                %img{src: '{{ MEDIA_URL }}forum/replybutton.gif', height: '26', width: '127'}
+                                %img{src: '{{ STATIC_URL }}forum/img/replybutton.gif', height: '26', width: '127'}
                 - if comment.edit_right
                     - block post_action_edit
                         %a.hidden-phone.post-actions-button{href: '{{ comment.get_edit_url }}'}
-                                %img{src: '{{ MEDIA_URL }}forum/editbutton.gif', height: '26', width: '168'}
+                                %img{src: '{{ STATIC_URL }}forum/img/editbutton.gif', height: '26', width: '168'}
                     - block post_action_delete
                         - if parent_thread
                             %a.hidden-phone.post-actions-delete.post-actions-button{href: 'javascript:delete_comment({{ comment.id }})'}
-                                %img{'src': '{{ MEDIA_URL }}forum/delete_post.png'}
+                                %img{'src': '{{ STATIC_URL }}forum/img/delete_post.png'}
                 - if comment.is_thread
                     - block post_action_move
                         - if comment.parent.move_right
                             %a.hidden-phone.post-actions-button{href: '{{ comment.parent.get_move_url }}'}
-                                %img{'src': '{{ MEDIA_URL }}forum/move.gif'}
+                                %img{'src': '{{ STATIC_URL }}forum/img/move.gif'}
                 - if not request.user.is_anonymous
                     - block post_action_like
                       %a{'href': 'javascript:do_like({{ comment.id }})'}
                         %img.post-actions-button.likelink{id: 'likebtn{{ comment.id }}', height: '26', width: '26', 
                             value: '{{ comment.is_liked }}',
-                            src: '{{ MEDIA_URL }}forum/{% if comment.is_liked %}like.gif{% else %}unlike.gif{% endif %}'}
+                            src: '{{ STATIC_URL }}forum/img/{% if comment.is_liked %}like.gif{% else %}unlike.gif{% endif %}'}
                 - if comment.edit_time
                     .edited
                         - block edited
