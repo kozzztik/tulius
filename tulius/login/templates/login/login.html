@@ -36,7 +36,7 @@
 		<fieldset>
             {% csrf_token %}
             {% for field in form %}
-                {% include 'snippets/form_field.html' %}
+                {% include 'snippets/form_field.haml' %}
             {% endfor %}
 		<button class="btn btn-info" type="submit">
 			{% trans "Login" %}
