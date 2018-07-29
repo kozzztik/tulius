@@ -1,6 +1,7 @@
 from django.http import Http404, HttpResponseRedirect
 from .plugin import BasePluginView
 
+
 class MarkAsRead(BasePluginView):
     require_user = True
     
@@ -15,7 +16,7 @@ class MarkAsRead(BasePluginView):
             if thread.room:
                 self.mark_as_readed(thread, user)
             else:
-                thread.mark_as_readed
+                thread.mark_as_readed()  # TODO may not work
     
     def get(self, request, thread_id=None, **kwargs):
         if thread_id:
@@ -23,11 +24,13 @@ class MarkAsRead(BasePluginView):
                 thread_id = int(thread_id)
             except:
                 raise Http404()
-            parent_thread = self.core.get_parent_thread(request.user, thread_id)
+            parent_thread = self.core.get_parent_thread(
+                request.user, thread_id)
             self.mark_as_readed(parent_thread, request.user)
             return HttpResponseRedirect(parent_thread.get_absolute_url)
         else:
-            threads = self.core.models.Thread.objects.filter(parent=None, plugin_id=self.site.site_id)
+            threads = self.core.models.Thread.objects.filter(
+                parent=None, plugin_id=self.site.site_id)
             for thread in threads:
                 self.mark_as_readed(thread, request.user)
             return HttpResponseRedirect(self.site.urlizer.index())
