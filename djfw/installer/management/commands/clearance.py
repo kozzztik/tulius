@@ -1,24 +1,26 @@
-from __future__ import print_function
-
-from django.core.management.base import NoArgsCommand
-from django.conf import settings
+from importlib import import_module
 import logging
 
-class Command(NoArgsCommand):
+from django.core.management.base import BaseCommand
+from django.conf import settings
+
+
+class Command(BaseCommand):
     logger = logging.getLogger('installer')
     
     def handle_noargs(self, migrate_all=False, **options):
         self.logger.info('Start clearing...')
         print('Start clearing...')
         try:
-            from django.utils.importlib import import_module
             installers = []
             for app_name in settings.INSTALLED_APPS:
                 try:
-                    installers += [(app_name, import_module('.installer', app_name))]
+                    installers += [
+                        (app_name, import_module('.installer', app_name))]
                 except ImportError as exc:
                     msg = exc.args[0]
-                    if not msg.startswith('No module named') or 'installer' not in msg:
+                    if not msg.startswith(
+                            'No module named') or 'installer' not in msg:
                         raise
             if not installers:
                 self.logger.info('No modules to clear.')
@@ -29,10 +31,14 @@ class Command(NoArgsCommand):
                     self.logger.debug("Clearing %s" % installer[0])
                     print("Clearing %s..." % installer[0])
                     rec_cleared = clear_proc() or 0
-                    self.logger.debug("%s cleared. %s records deleted." % (installer[0], rec_cleared))
-                    print("%s cleared. %s records deleted." % (installer[0], rec_cleared))
+                    self.logger.debug(
+                        "%s cleared. %s records deleted." % (
+                            installer[0], rec_cleared))
+                    print("%s cleared. %s records deleted." % (
+                        installer[0], rec_cleared))
             if 'django.contrib.sessions' in settings.INSTALLED_APPS:
-                clear_sessions = getattr(settings, 'INSTALLER_CLEAR_SESSIONS', True)
+                clear_sessions = getattr(
+                    settings, 'INSTALLER_CLEAR_SESSIONS', True)
                 if clear_sessions:
                     self.logger.debug("Clearing sessions...")
                     print("Clearing sessions...")
