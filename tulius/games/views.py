@@ -26,7 +26,7 @@ import json
 gameforum_site = apps.get_app_config('gameforum').site
 
 
-class MessageMixin(object):
+class MessageMixin:
     error_message = _('there were some errors during form validation')
     success_message = ''
     

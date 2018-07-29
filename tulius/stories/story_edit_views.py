@@ -106,7 +106,7 @@ class StoryGraphics(StoryAdminMixin, DetailView):
         return handle_field_upload(request, field, '%s.jpg' % (story.pk,))
 
 
-class UsersFormsets(object):
+class UsersFormsets:
     def __init__(
             self, data=None, instance=None, initial=None, static=True,
             **kwargs):
@@ -209,7 +209,7 @@ class EditStoryCharacters(
     page_url = EDIT_STORY_PAGES_CHARACTERS
 
 
-class CharacterFormMixin(object):
+class CharacterFormMixin:
     parent_page_url = EDIT_STORY_PAGES_CHARACTERS
 
     def get_form_kwargs(self):

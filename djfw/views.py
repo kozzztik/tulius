@@ -13,7 +13,7 @@ from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 
 
-class LoginRequiredMixin(object):
+class LoginRequiredMixin:
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         return super(LoginRequiredMixin, self).get(request, *args, **kwargs)
@@ -23,7 +23,7 @@ class LoginRequiredMixin(object):
         return super(LoginRequiredMixin, self).post(request, *args, **kwargs)
 
 
-class DecoratorChainingMixin(object):
+class DecoratorChainingMixin:
     def dispatch(self, *args, **kwargs):
         decorators = getattr(self, 'decorators', [])
         call_prepare_funcs = getattr(self, 'call_prepare_funcs', [])
@@ -36,7 +36,7 @@ class DecoratorChainingMixin(object):
         return base(*args, **kwargs)
 
 
-class RightsDetailMixin(object):
+class RightsDetailMixin:
     login_required = False
     superuser_required = False
     
@@ -69,7 +69,7 @@ class RightsDetailMixin(object):
                 raise
 
 
-class RenderMixin(object):
+class RenderMixin:
     def render(self, **kwargs):
         context_data = self.get_context_data(**kwargs)
         context = RequestContext(self.request, context_data)

@@ -27,7 +27,7 @@ import yaml
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
-class UserAgentParser(object):
+class UserAgentParser:
     def __init__(self, pattern, family_replacement=None, v1_replacement=None):
         """Initialize UserAgentParser.
 
@@ -73,7 +73,7 @@ class UserAgentParser(object):
         return family, v1, v2, v3
 
 
-class OSParser(object):
+class OSParser:
     def __init__(self, pattern, os_replacement=None):
         """Initialize UserAgentParser.
 
@@ -114,7 +114,7 @@ class OSParser(object):
         return os, os_v1, os_v2, os_v3, os_v4
 
 
-class DeviceParser(object):
+class DeviceParser:
     def __init__(self, pattern, device_replacement=None):
         """Initialize UserAgentParser.
 
@@ -436,4 +436,3 @@ for _device_parser in regexes['device_parsers']:
         _device_replacement = _device_parser['device_replacement']
 
     DEVICE_PARSERS.append(DeviceParser(_regex, _device_replacement))
-

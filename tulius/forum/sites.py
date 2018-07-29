@@ -1,7 +1,7 @@
 from django.conf import settings
 
 
-class SitesManager():
+class SitesManager:
     sites = []
     
     def add_site(self, site):
@@ -19,7 +19,7 @@ class SitesManager():
 sites_manager = SitesManager()
 
 
-class SiteCore(object):
+class SiteCore:
     def __init__(self, site):
         self.content = {}
         self.site = site
@@ -38,7 +38,7 @@ class SiteCore(object):
         self.content[key] = value
 
 
-class BaseForumSite(object):
+class BaseForumSite:
     plugins = {}
     plugin_classes = ()
     core = None

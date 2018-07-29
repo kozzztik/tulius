@@ -37,7 +37,7 @@ class VarRightsMixin(RightsDetailMixin):
         return super(VarRightsMixin, self).get_context_data(**kwargs)
 
 
-class VarSubpageMixin(object):
+class VarSubpageMixin:
     page_url = None
     
     def get_context_data(self, **kwargs):
@@ -95,7 +95,7 @@ class VarMaterialsView(VarRightsMixin, VarSubpageMixin, DetailView):
         return super(VarMaterialsView, self).get_context_data(**kwargs)
 
 
-class RoleFormMixin(object):
+class RoleFormMixin:
     def get_form_kwargs(self):
         kwargs = super(RoleFormMixin, self).get_form_kwargs()
         kwargs['story'] = self.story

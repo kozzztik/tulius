@@ -69,7 +69,7 @@ def EditGameSubpage(game, url=EDIT_GAME_PAGES_TEXTS):
         urls.reverse(URL_PREFIX + url, args=(game.pk,)))
 
 
-class GameSubpage(object):
+class GameSubpage:
     page_url = None
     paging_class = EditGamePage
     

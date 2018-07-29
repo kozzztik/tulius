@@ -29,7 +29,7 @@ WEIGHT_SELECTOR_TEMPLATE_DB_COUNT = 6
 WEIGHT_SELECTOR_EXCEPTIONS = 7
 
 
-class LastTime(object):
+class LastTime:
     def __init__(
             self, offset_days=0, offset_month=0, round_day=False,
             round_month=False, round_week=False):
@@ -63,7 +63,7 @@ class LastTime(object):
         return value
 
 
-class TimePeriod(object):
+class TimePeriod:
     start = 0
     end = 0
     intervals = 0

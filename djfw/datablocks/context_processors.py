@@ -1,6 +1,7 @@
 from django.utils.safestring import mark_safe
 from .models import DataBlock
 
+
 def datablocks(request):
     objs = DataBlock.objects.languaged()
     datablocks = {}

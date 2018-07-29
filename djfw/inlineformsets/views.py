@@ -1,7 +1,8 @@
 from django.http import HttpResponseRedirect
 from .core import get_formset
 
-class DetailFormsetsMixin(object):
+
+class DetailFormsetsMixin:
     formsets = {}
 #    formsets = {'guestsformset': {'model': GameGuest, 'extra': 1, 'form': Form},
 #                'adminformset': {'model': GameAdmin, 'extra': 1},
@@ -16,7 +17,13 @@ class DetailFormsetsMixin(object):
             model = formset_def['model']
             extra = formset_def.get('extra', None)
             form = formset_def.get('form', None)
-            formset = get_formset(self.model, model, self.request.POST or None, form, extra=extra, instance=self.object)
+            formset = get_formset(
+                self.model,
+                model,
+                self.request.POST or None,
+                form,
+                extra=extra,
+                instance=self.object)
             self.formset_objs[formset_name] = formset
         return self.formset_objs
         
@@ -26,7 +33,7 @@ class DetailFormsetsMixin(object):
         return context
     
     def get_success_url(self):
-        return None
+        pass
     
     def formset_invalid(self):
         pass
@@ -49,4 +56,3 @@ class DetailFormsetsMixin(object):
             self.formset_invalid()
         context.update(self.formset_objs)
         return self.render_to_response(context)
-        

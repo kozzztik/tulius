@@ -5,7 +5,7 @@ from django.template import loader, Context
 from django.forms.models import fields_for_model, modelform_factory
 
 
-class SortableViewMixin(object):
+class SortableViewMixin:
     class Meta:
         static_js = ['sortable/sortable.js']
         
@@ -63,7 +63,7 @@ class SortableDetailViewMixin(SortableViewMixin):
                 })
 
 
-class DecoratorChainingMixin(object):
+class DecoratorChainingMixin:
     def dispatch(self, *args, **kwargs):
         decorators = getattr(self, 'decorators', [])
         base = super(DecoratorChainingMixin, self).dispatch
@@ -73,7 +73,7 @@ class DecoratorChainingMixin(object):
         return base(*args, **kwargs)
 
 
-class ActionableBase(object):
+class ActionableBase:
     class Meta:
         static_js = []
         static_css = []
@@ -387,7 +387,7 @@ class FormsetWidget(TemplatedWidget):
         return http.HttpResponse("{}")
     
     def get_formfield_callback(self):
-        return None
+        pass
     
     def get_formfield(self, obj, name, formfield):
         display = getattr(obj, 'get_' + name + '_display', None)

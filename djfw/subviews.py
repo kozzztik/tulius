@@ -6,7 +6,8 @@ from django.utils.translation import ugettext as _
 from django import forms
 from django.views.generic.edit import ModelFormMixin, ProcessFormView, SingleObjectTemplateResponseMixin
 
-class ParentObjectMixin(object):
+
+class ParentObjectMixin:
     """
     Provides the ability to retrieve a parent object for further manipulation.
     """

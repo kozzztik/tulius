@@ -1,6 +1,7 @@
 from threading import local
 import time
 
+
 class LocalCounter(local):
     def __init__(self):
         self.clear()
@@ -12,8 +13,10 @@ class LocalCounter(local):
         self.template_db_time = 0
         self.template_db_count = 0
         self.rendering_template = False
-    
+
+
 local_counter = LocalCounter()
+
 
 def templates_decorator(f):
     def wrapper(*args, **kwargs):
@@ -28,12 +31,14 @@ def templates_decorator(f):
         return result
     return wrapper
 
-class CursorWrapper(object):
+
+class CursorWrapper:
     def __init__(self, cursor, db):
         self.cursor = cursor
         self.db = db
         
-    WRAP_ERROR_ATTRS = frozenset(['fetchone', 'fetchmany', 'fetchall', 'nextset'])
+    WRAP_ERROR_ATTRS = frozenset(
+        ['fetchone', 'fetchmany', 'fetchall', 'nextset'])
     
     def execute(self, sql, params=None):
         self.db.validate_no_broken_transaction()
@@ -88,7 +93,8 @@ class CursorWrapper(object):
 
     def __iter__(self):
         return iter(self.cursor)
-    
+
+
 def cursor_exec_decorator(f):
     def wrapper(*args, **kwargs):
         starttime = int(time.clock() * 1000)
