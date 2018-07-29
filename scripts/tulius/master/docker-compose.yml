@@ -12,6 +12,11 @@ services:
       TULIUS_BRANCH: master
     volumes:
       - ../../../data/media:/opt/tulius/data/media
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "10"
 
   websockets:
     build:
@@ -33,6 +38,11 @@ services:
       TULIUS_BRANCH: master
     volumes:
       - ../../../data/media:/opt/tulius/data/media
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "2"
 
 networks:
   tuliusnet:
