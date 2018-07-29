@@ -49,8 +49,9 @@ class DetailFormsetsMixin:
         if valid:
             for formset in self.formset_objs.values():
                 formset.save()
+            # pylint: disable=assignment-from-no-return
             url = self.get_success_url()
-            if not url is None:
+            if url is not None:
                 return HttpResponseRedirect(url)
         else:
             self.formset_invalid()
