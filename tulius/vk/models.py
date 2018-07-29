@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class VK_Profile(models.Model):
     first_name = models.CharField(max_length=255, blank=False)
     last_name = models.CharField(max_length=255, blank=False)

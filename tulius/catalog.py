@@ -1,4 +1,5 @@
 from django.utils.translation import ugettext_lazy as _
-from djfw.cataloging.core import CatalogPage
+from djfw.cataloging import core
 
-index_catalog_page = CatalogPage(name=_('Tulius'), url='/')
+
+index_catalog_page = core.CatalogPage(name=_('Tulius'), url='/')

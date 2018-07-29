@@ -1,8 +1,11 @@
 from django.contrib import admin
-from .models import ProfilerMessage 
+
+from . import models
+
 
 class ProfilerMessageAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
-    
-admin.site.register(ProfilerMessage, ProfilerMessageAdmin)
+
+
+admin.site.register(models.ProfilerMessage, ProfilerMessageAdmin)

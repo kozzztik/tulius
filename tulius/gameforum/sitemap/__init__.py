@@ -1,18 +1,23 @@
-from tulius.forum.sitemap import SitemapPlugin, ForumSitemap
-from tulius.stories.models import Variation
-from tulius.games.models import GAME_STATUS_COMPLETED_OPEN
+from tulius.forum import sitemap
+from tulius.games import models as games_models
+from tulius.stories import models as stories_models
 
-class GameForumSitemap(ForumSitemap):
+
+class GameForumSitemap(sitemap.ForumSitemap):
     def get_root_threads(self):
         models = self.site.models
-        variations = Variation.objects.filter(game__status=GAME_STATUS_COMPLETED_OPEN)
-        thread_ids = [variation.thread_id for variation in variations if variation.thread_id]
+        variations = stories_models.Variation.objects.filter(
+            game__status=games_models.GAME_STATUS_COMPLETED_OPEN)
+        thread_ids = [
+            variation.thread_id
+            for variation in variations if variation.thread_id]
         threads = models.Thread.objects.filter(id__in=thread_ids)
         for thread in threads:
             thread.user_roles = []
             thread.admin = False
             thread.guest = True
         return threads
-        
-class GameSitemapPlugin(SitemapPlugin):
+
+
+class GameSitemapPlugin(sitemap.SitemapPlugin):
     sitemap_class = GameForumSitemap
