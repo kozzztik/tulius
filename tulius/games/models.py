@@ -239,9 +239,9 @@ class Game(models.Model):
     )
     
     def status_as_text(self):
-        for i in range(0, len(GAME_STATUS_CHOICES)):
-            if GAME_STATUS_CHOICES[i][0] == self.status:
-                return GAME_STATUS_CHOICES[i][1]
+        for i, choice in enumerate(GAME_STATUS_CHOICES):
+            if choice[0] == self.status:
+                return choice[1]
         return ''
         
     def edit_right(self, user):
@@ -608,7 +608,7 @@ class GameInvite(models.Model):
     )
     
     def status_as_text(self):
-        for i in range(0, len(GAME_INVITE_STATUS_CHOICES)):
-            if GAME_INVITE_STATUS_CHOICES[i][0] == self.status:
-                return GAME_INVITE_STATUS_CHOICES[i][1]
+        for i, choice in enumerate(GAME_INVITE_STATUS_CHOICES):
+            if choice[0] == self.status:
+                return choice[1]
         return ''

@@ -258,6 +258,7 @@ class FormWidget(TemplatedWidget):
     
     def __init__(self, *args, **kwargs):
         super(FormWidget, self).__init__(*args, **kwargs)
+        # pylint: disable=not-callable
         self.form = self.form_class(self.request.POST or None)
         
     def get_context_data(self):
@@ -269,6 +270,7 @@ class FormWidget(TemplatedWidget):
     def post(self, request, *args, **kwargs):
         if not self.get_post_right():
             raise PermissionDenied()
+        # pylint: disable=not-callable
         form = self.form_class(data=self.request.POST)
         if self.action:
             action = getattr(self.view, self.action)

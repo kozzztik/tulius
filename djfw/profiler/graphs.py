@@ -375,8 +375,7 @@ def collapsed_sum_graph(
                 create_time__gte=interval_start, create_time__lt=interval_end)
         value = [0 for w in weight_fields]
         for q in query:
-            for x in range(len(weight_fields)):
-                weight_field = weight_fields[x]
+            for x, weight_field in enumerate(weight_fields):
                 if callable(weight_field):
                     v = weight_field(q)
                 else:

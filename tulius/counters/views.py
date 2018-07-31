@@ -12,7 +12,7 @@ class CountersBase(TemplateView):
     template_name = 'counters/success.haml'
     
     def do_action(self):
-        raise NotImplemented()
+        raise NotImplementedError()
     
     def get_context_data(self, **kwargs):
         self.do_action()
