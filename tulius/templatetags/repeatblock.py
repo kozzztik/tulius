@@ -37,7 +37,6 @@ class MacroRoot(template.Node):
         if parent_nodelist is None:
             parent_nodelist = self.nodelist
         
-        from django.template.loader_tags import BlockNode
         for node in parent_nodelist:
             if isinstance(node, (MacroNode, BlockNode)):                
                 if node.name == block_name:
