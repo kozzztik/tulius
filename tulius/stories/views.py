@@ -19,7 +19,7 @@ def filter_by_author(stories, author):
 
 
 class IndexView(TemplateView):
-    template_name='stories/index.haml'
+    template_name = 'stories/index.haml'
 
     def get_context_data(self, **kwargs):
         stories_filter_form = StoryFilterForm(self.request.GET or None)

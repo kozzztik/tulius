@@ -1,8 +1,9 @@
-# -*- coding: utf-8 -*-
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
-from djfw.common.models import AbstractBaseModel
 from django.utils import translation
+
+from djfw.common.models import AbstractBaseModel
+
 
 class NewsItem(AbstractBaseModel):
     class Meta(AbstractBaseModel.Meta):
@@ -48,7 +49,7 @@ class NewsItem(AbstractBaseModel):
     
     @models.permalink
     def get_absolute_url(self):
-        return ('news:detail', (), { 'pk': self.id })
+        return 'news:detail', (), {'pk': self.id}
     
     def save(self, *args, **kwargs):
         if not self.language:

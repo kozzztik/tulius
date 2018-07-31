@@ -22,14 +22,14 @@ urlpatterns = [
         r'^sitemap-(?P<section>.+)\.xml$', sitemaps_views.sitemap,
         {'sitemaps': sitemaps}, name='sitemaps'),
     
-    url(r'^tinymce/', include('djfw.tinymce.urls',  namespace='tinymce')),
-    url(r'^wysibb/', include('djfw.wysibb.urls',  namespace='wysibb')),
-    url(r'^news/', include('djfw.news.urls',  namespace='news')),
-    url(r'^flatpages/$', FlatpagesList.as_view(),  name='flatpages'),
+    url(r'^tinymce/', include('djfw.tinymce.urls', namespace='tinymce')),
+    url(r'^wysibb/', include('djfw.wysibb.urls', namespace='wysibb')),
+    url(r'^news/', include('djfw.news.urls', namespace='news')),
+    url(r'^flatpages/$', FlatpagesList.as_view(), name='flatpages'),
     url(
         r'^autocomplete/',
         include('tulius.core.autocomplete.urls', namespace='autocomplete')),
-    url(r'^profiler/', include('djfw.profiler.urls',  namespace='profiler')),
+    url(r'^profiler/', include('djfw.profiler.urls', namespace='profiler')),
     url(r'^installer/', include('djfw.installer.urls', namespace='installer')),
     
     url(r'^$', views.HomeView.as_view(), name='home'),
@@ -39,16 +39,16 @@ urlpatterns = [
     url(r'^players/', include('tulius.players.urls', namespace='players')),
     url(r'^profile/', include('tulius.profile.urls', namespace='profile')),
     url(r'^pm/', include('tulius.pm.urls', namespace='pm')),
-    url(r'^games/', include('tulius.games.urls',  namespace='games')),
+    url(r'^games/', include('tulius.games.urls', namespace='games')),
     url(
         r'^forums/',
         include(apps.get_app_config('forum').site.urls)),
-    url(r'^stories/', include('tulius.stories.urls',  namespace='stories')),
+    url(r'^stories/', include('tulius.stories.urls', namespace='stories')),
     url(r'^play/',
         include(apps.get_app_config('gameforum').site.urls)),
     
-    url(r'^vk/', include('tulius.vk.urls',  namespace='vk')),
-    url(r'^counters/', include('tulius.counters.urls',  namespace='counters')),
+    url(r'^vk/', include('tulius.vk.urls', namespace='vk')),
+    url(r'^counters/', include('tulius.counters.urls', namespace='counters')),
 ]
 
 handler404 = 'tulius.views.error404'

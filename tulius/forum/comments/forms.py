@@ -22,7 +22,7 @@ class CommentForm(forms.Form):
     )
 
     def __init__(self, voting_enabled, *args, **kwargs):
-        super(CommentForm, self).__init__(*args,  **kwargs)
+        super(CommentForm, self).__init__(*args, **kwargs)
         if not voting_enabled:
             # not sure about tuple here
             self.fields['voting'].widget = (forms.widgets.HiddenInput(),)

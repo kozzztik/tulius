@@ -75,8 +75,8 @@ class TimePeriod:
 
 WEIGHT_SELECTION = (
     (WEIGHT_SELECTOR_CALLS, _(u'Calls'), None, _('Count')),
-    (WEIGHT_SELECTOR_EXEC_TIME,  _(u'Execution time'), 'exec_time', _('Time')),
-    (WEIGHT_SELECTOR_DB_TIME,  _(u'DB work time'), 'db_time', _('Time')),
+    (WEIGHT_SELECTOR_EXEC_TIME, _(u'Execution time'), 'exec_time', _('Time')),
+    (WEIGHT_SELECTOR_DB_TIME, _(u'DB work time'), 'db_time', _('Time')),
     (WEIGHT_SELECTOR_DB_COUNT,
      _(u'DB queries count'), 'db_count', _('Count')),
     (WEIGHT_SELECTOR_TEMPLATE_TIME,
@@ -85,7 +85,7 @@ WEIGHT_SELECTION = (
      _(u'Template DB work time'), 'template_db_time', _('Time')),
     (WEIGHT_SELECTOR_TEMPLATE_DB_COUNT,
      _(u'Template DB queries count'), 'template_db_count', _('Count')),
-    (WEIGHT_SELECTOR_EXCEPTIONS,  _(u'Exceptions count'), 'error', _('Count')),
+    (WEIGHT_SELECTOR_EXCEPTIONS, _(u'Exceptions count'), 'error', _('Count')),
 )
 
 TIME_SELECTION = (

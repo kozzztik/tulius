@@ -11,7 +11,7 @@ class AddGameForm(forms.ModelForm):
         model = Game
         exclude = (
             'variation', 'status', 'announcement', 'announcement_preview',
-            'introduction',  'requests_text', 'card_image', 'top_banner',
+            'introduction', 'requests_text', 'card_image', 'top_banner',
             'bottom_banner', 'show_announcement', 'skin', 'deleted')
 
 
@@ -21,14 +21,12 @@ class GameInviteForm(forms.Form):
         label=_(u'Role'),
         empty_label=None,
     )
-    
     user = forms.ModelChoiceField(
         required=True,
         queryset=User.objects.all(),
         label=_(u'User'),
         widget=User.autocomplete_widget,
     )
-    
     message = forms.CharField(
         required=False,
         label=_(u'Message'),

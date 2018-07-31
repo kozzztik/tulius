@@ -1,6 +1,8 @@
-from tulius.models import User
-from .models import PrivateMessage
 import logging
+
+from tulius.models import User
+from tulius.pm.models import PrivateMessage
+
 
 logger = logging.getLogger('django.request')
 
@@ -22,14 +24,15 @@ def get_mail(mail):
         else:
             receiver = User.objects.get(username=receiver, is_active=True)
     except User.DoesNotExist:
-        logger.warning('Email not received. Recipient %s not found' % (receiver,) )
+        logger.warning(
+            'Email not received. Recipient %s not found' % (receiver,))
         return True
     try:
         sender = User.objects.get(email=mail.sender_mail, is_active=True)
     except User.DoesNotExist:
-        logger.warning('Email not received. Sender %s not found' % (mail.sender_mail,) )
+        logger.warning(
+            'Email not received. Sender %s not found' % (mail.sender_mail,))
         return True
     
     body = mail.body.replace('\\n', '\n').strip(' \n').replace('\n', '\t\n')
-    PrivateMessage(sender=sender, receiver= receiver, body=body).save()
-    
+    PrivateMessage(sender=sender, receiver=receiver, body=body).save()

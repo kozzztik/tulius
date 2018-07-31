@@ -57,7 +57,7 @@ class LogMessage(models.Model):
     )
     
     def __unicode__(self):
-        return "%s : %s" % (self.get_level_display(),  self.body)
+        return "%s : %s" % (self.get_level_display(), self.body)
     
 
 class ExceptionMessage(models.Model):

@@ -32,7 +32,7 @@ class ThreadsPlugin(ThreadsCorePlugin):
     
     def thread_edit_url(self, thread):
         if thread.room:
-            return self.reverse('edit_room',  thread.id)
+            return self.reverse('edit_room', thread.id)
         else:
             return self.reverse('edit_thread', thread.id)
 

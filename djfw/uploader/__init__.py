@@ -50,7 +50,7 @@ def handle_download(file_obj, file_name, mime_type=''):
 
 
 def handle_download_file_path(file_path, file_name, mime_type=''):
-    file_obj = FileWrapper(open(file_path,"rb"))
+    file_obj = FileWrapper(open(file_path, "rb"))
     return handle_download(file_obj, file_name, mime_type)
     
 

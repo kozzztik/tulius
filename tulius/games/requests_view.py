@@ -26,7 +26,7 @@ def get_game(user, game_id, requested):
     game = get_object_or_404(Game, id=game_id)
     if user.is_anonymous:
         raise Http404()
-    requests = RoleRequest.objects.filter(game=game,user=user)
+    requests = RoleRequest.objects.filter(game=game, user=user)
     if requested != (requests.count() > 0):
         raise Http404()
     return game, CatalogPage(instance=game, parent=games_catalog_page())
@@ -99,7 +99,7 @@ def make_game_request(
                         role = selection.role
                         rolelist.append(role)
                     except:
-                        True
+                        pass
         else:
             all_valid = False
         if form.is_valid() and all_valid:

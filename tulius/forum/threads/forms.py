@@ -1,88 +1,91 @@
 from django.utils.translation import ugettext_lazy as _
 from django import forms
-    
+
+
 class PostDeleteForm(forms.Form):
     post = forms.IntegerField(
-        required = True,
-        label = _(u'post'),
+        required=True,
+        label=_(u'post'),
         widget=forms.HiddenInput,
     )
     
     message = forms.CharField(
-        required = False,
-        label = _(u'Delete message'),
-        widget=forms.TextInput(attrs={'class':'mceNoEditor'}),
+        required=False,
+        label=_(u'Delete message'),
+        widget=forms.TextInput(attrs={'class': 'mceNoEditor'}),
     )
-    
+
+
 class RoomForm(forms.Form):
     title = forms.CharField(
-        required = True,
-        label = _(u'Title'),
+        required=True,
+        label=_(u'Title'),
     )
     
     body = forms.CharField(
-        required = False,
-        label = _(u'Body'),
+        required=False,
+        label=_(u'Body'),
         widget=forms.widgets.Textarea(),
     )
     
     access_type = forms.ChoiceField(
-        required = False,
-        label = _(u'Access type'),
+        required=False,
+        label=_(u'Access type'),
     )
     
     def __init__(self, models, thread=None, *args, **kwargs):
         self.caption = _('edit room') if thread else _('add room')
-        self.base_fields['access_type'].choices = models.THREAD_ACCESS_TYPE_CHOICES
-        self.base_fields['access_type'].initial = models.THREAD_ACCESS_TYPE_NOT_SET
+        self.base_fields['access_type'].choices = \
+            models.THREAD_ACCESS_TYPE_CHOICES
+        self.base_fields['access_type'].initial = \
+            models.THREAD_ACCESS_TYPE_NOT_SET
         if thread:
-            initial = {}
-            initial['title'] = thread.title
-            initial['body'] = thread.body
-            initial['access_type'] = thread.access_type
+            initial = {
+                'title': thread.title,
+                'body': thread.body,
+                'access_type': thread.access_type,
+            }
             kwargs['initial'] = initial
         super(RoomForm, self).__init__(*args, **kwargs)
 
 
 class ThreadForm(forms.Form):
-    
     title = forms.CharField(
-        required = True,
-        label = _(u'Title'),
+        required=True,
+        label=_(u'Title'),
     )
-    
     body = forms.CharField(
-        required = True,
-        label = _(u'Body'),
+        required=True,
+        label=_(u'Body'),
         widget=forms.widgets.Textarea(),
     )
-    
     access_type = forms.ChoiceField(
-        required = False,
-        label = _(u'Access type'),
+        required=False,
+        label=_(u'Access type'),
     )
-    
     closed = forms.BooleanField(
-        required = False,
-        label = _(u'Closed'),
-        initial = False
+        required=False,
+        label=_(u'Closed'),
+        initial=False
     )
-    
     important = forms.BooleanField(
-        required = False,
-        label = _(u'Important'),
-        initial = False
+        required=False,
+        label=_(u'Important'),
+        initial=False
     )
     
     voting = forms.BooleanField(
-        required = False,
-        label = _(u'Voting'),
-        initial = False
+        required=False,
+        label=_(u'Voting'),
+        initial=False
     )
     
-    def __init__(self, models, thread, comment, voting, moderate, *args, **kwargs):
-        self.base_fields['access_type'].choices = models.THREAD_ACCESS_TYPE_CHOICES
-        self.base_fields['access_type'].initial = models.THREAD_ACCESS_TYPE_NOT_SET
+    def __init__(
+            self, models, thread, comment, voting, moderate, *args, **kwargs):
+        self.base_fields['access_type'].choices = \
+            models.THREAD_ACCESS_TYPE_CHOICES
+        self.base_fields['access_type'].initial = \
+            models.THREAD_ACCESS_TYPE_NOT_SET
         if not thread:
             self.caption = _('add thread')
             self.base_fields['title'].initial = ''
@@ -118,4 +121,3 @@ class ThreadForm(forms.Form):
             self.base_fields['important'].widget = forms.CheckboxInput()
             self.base_fields['important'].is_hidden = False    
         super(ThreadForm, self).__init__(*args, **kwargs)
-        

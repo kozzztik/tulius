@@ -14,10 +14,12 @@ class VKBackend(ModelBackend):
         
     def get_valid_name(self, profile):
         names = [
-            profile.nickname, '%s_%s' % (profile.first_name,profile.last_name)]
+            profile.nickname,
+            '%s_%s' % (profile.first_name, profile.last_name)
+        ]
         names += [
             '%s_%s_%s' % (
-                profile.first_name,profile.nickname,profile.last_name)]
+                profile.first_name, profile.nickname, profile.last_name)]
         names += ['vk_' + str(profile.vk_id)]
         for name in names:
             new_name = name.replace(' ', '_')

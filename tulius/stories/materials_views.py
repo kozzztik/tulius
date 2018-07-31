@@ -10,7 +10,7 @@ from PIL import Image
 
 from djfw.uploader import handle_upload, handle_download_file_path
 from djfw.common import generate_random_id
-from .models import Illustration
+from tulius.stories.models import Illustration
 
 
 MAX_ILLUSTRATION_SIZE = 20 * 1024 * 1024
@@ -75,11 +75,11 @@ def get_illustration_file(request, illustration_id, is_thumb):
     View to return uploaded files
     """
     try:
-        illustration_id=int(illustration_id)
+        illustration_id = int(illustration_id)
     except:
         raise Http404()
     illustration = get_object_or_404(Illustration, id=illustration_id)
-    if (illustration.admins_only) and (
+    if illustration.admins_only and (
             not illustration.edit_right(request.user)):
         raise Http404()
     if is_thumb:
