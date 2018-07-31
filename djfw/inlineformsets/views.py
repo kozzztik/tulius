@@ -12,7 +12,7 @@ class DetailFormsetsMixin:
     def get_formsets(self):
         if self.formset_objs:
             return self.formset_objs
-        for formset_name in self.formsets.keys():
+        for formset_name in self.formsets:
             formset_def = self.formsets[formset_name]
             model = formset_def['model']
             extra = formset_def.get('extra', None)
@@ -42,7 +42,7 @@ class DetailFormsetsMixin:
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
         valid = True
-        for formset_name in self.formset_objs.keys():
+        for formset_name in self.formset_objs:
             formset = self.formset_objs[formset_name]
             if not formset.is_valid():
                 valid = False

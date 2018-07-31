@@ -296,7 +296,7 @@ def collapsed_sunlignt_graph(
                     categories[category] += value_dict[category]
     data = []
     all_weight = 0
-    for category in categories.keys():
+    for category in categories:
         c = {'id': category, 'label': category}
         if mappings:
             if category in mappings:

@@ -42,6 +42,10 @@ class RightsPlugin(ForumPlugin):
         return special_read, special_write, special_moderate
     
     def is_superuser_equal(self, thread, user, parent_moderate):
+        # Not sure that
+        # user.is_superuser if not user.is_anonymous else parent_moderate
+        # more obvious
+        # pylint: disable=consider-using-ternary
         return (
             (not user.is_anonymous) and user.is_superuser) or parent_moderate
         
