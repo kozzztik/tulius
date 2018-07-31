@@ -1,10 +1,12 @@
+from datetime import timedelta
+
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
 from django.db import transaction
 from django.http import Http404
 from django.utils import timezone
-from datetime import timedelta
 import django.dispatch
+
 # TODO: fix this when module moved
 from tulius.forum.plugins import ForumPlugin, BasePluginView
 from .forms import CommentForm
@@ -32,7 +34,7 @@ class CommentsCore(ForumPlugin):
             raise Http404()
         if check_write and (not parent_thread.write_right(user)):
             raise Http404()
-        return (parent_thread, parent_comment)
+        return parent_thread, parent_comment
 
     def process_edit_comment(
             self, request, parent_thread, comment, reply, voting_enabled,
@@ -93,7 +95,7 @@ class CommentsCore(ForumPlugin):
                     messages.error(request, ERROR_VALIDATION)
             else:
                 messages.error(request, ERROR_VALIDATION)
-        return (form, comment)
+        return form, comment
     
     def get_comments_page(self, user, parent_thread, page_num):
         comments = self.site.core.models.Comment.objects.select_related('user')
@@ -142,7 +144,7 @@ class CommentsCore(ForumPlugin):
                     redirect = comment.parent.get_absolute_url
                 success = 'success'
                 text = _('Comment successfully deleted!')
-        return (success, error_text, redirect, text)
+        return success, error_text, redirect, text
     
     def thread_pages_count(self, thread):
         return int((thread.comments_count - 1) / self.COMMENTS_ON_PAGE + 1) or 1
@@ -165,7 +167,7 @@ class CommentsCore(ForumPlugin):
 
     def before_delete_comment(self, sender, **kwargs):
         thread = kwargs['thread']
-        if (sender.id == thread.first_comment):
+        if sender.id == thread.first_comment:
             thread.deleted = True
         else:
             thread.comments_count -= 1

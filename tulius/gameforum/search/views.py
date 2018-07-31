@@ -89,12 +89,12 @@ class SearchView(ExtendedSearchView):
         
         filter_roles = [
             role for role in filter_roles
-            if (role.variation_id == variation.id)]
+            if role.variation_id == variation.id]
         filter_roles = [
             role for role in filter_roles if role.show_in_character_list]
         filter_not_roles = [
             role for role in filter_not_roles
-            if (role.variation_id == variation.id)]
+            if role.variation_id == variation.id]
         filter_not_roles = [
             role for role in filter_not_roles if role.show_in_character_list]
         if filter_roles:

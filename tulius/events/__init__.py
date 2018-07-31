@@ -1,8 +1,10 @@
+import logging
+
 from django.template import loader, Context
 from django.conf import settings
 from django.core.mail import EmailMessage
+
 from tulius.games.signals import game_status_changed
-import logging
 
 logger = logging.getLogger('django.request')
 
@@ -34,7 +36,7 @@ def send_notifications(users, notification_id, varibles):
     user_notifications = UserNotification.objects.filter(
         notification=notification, enabled=False)
     excluded_users_ids = [item.user_id for item in user_notifications]
-    users = [user for user in users if (user.id not in excluded_users_ids)]
+    users = [user for user in users if user.id not in excluded_users_ids]
     context_varibles = {}
     for user in users:
         try:

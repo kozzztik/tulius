@@ -30,7 +30,7 @@ class Smiles(TemplateView):
         emotions_list = {}
         new_emotions = []
         for emotion in emotions:
-            if not (emotion.filename in emotions_list):
+            if emotion.filename not in emotions_list:
                 emotions_list[emotion.filename] = emotion
                 new_emotions += [emotion]
         emotions = []

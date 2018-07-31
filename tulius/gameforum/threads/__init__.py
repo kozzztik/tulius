@@ -48,7 +48,7 @@ class GameThreadsPlugin(ThreadsPlugin):
             else:
                 thread.roles_list = [
                     role for role in thread.all_roles
-                    if (role.user_id == user.id)]
+                    if role.user_id == user.id]
         else:
             thread.roles_list = []
         thread.character_list = [

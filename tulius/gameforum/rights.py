@@ -45,9 +45,9 @@ class GameRightsPlugin(RightsPlugin):
             for role in write_roles:
                 if role not in thread.strict_write:
                     thread.strict_write += [role]
-        if (thread.access_type == models.THREAD_ACCESS_TYPE_OPEN):
+        if thread.access_type == models.THREAD_ACCESS_TYPE_OPEN:
             thread.strict_write = thread.strict_read
-        if (thread.access_type >= models.THREAD_ACCESS_TYPE_NO_WRITE):
+        if thread.access_type >= models.THREAD_ACCESS_TYPE_NO_WRITE:
             for role in write_roles:
                 if role not in thread.strict_write:
                     thread.strict_write += [role]

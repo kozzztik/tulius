@@ -171,7 +171,7 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
         from tulius.players.models import stars
 
         self.full_stars_cache = getattr(self, 'full_stars_cache', None)
-        if not (self.full_stars_cache is None):
+        if self.full_stars_cache is not None:
             return self.full_stars_cache
         self.full_stars_cache = 0
         variation_ids = [role['variation'] for role in Role.objects.filter(

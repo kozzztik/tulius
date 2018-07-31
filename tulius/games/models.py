@@ -250,7 +250,7 @@ class Game(models.Model):
         if user.is_superuser:
             return True
         users = GameAdmin.objects.filter(game=self, user=user)
-        return (users.count() > 0)
+        return users.count() > 0
     
     def write_right(self, user):
         if user.is_anonymous:
@@ -262,7 +262,7 @@ class Game(models.Model):
         if self.status < GAME_STATUS_IN_PROGRESS:
             return False
         roles = Role.objects.filter(variation=self.variation, user=user)
-        return (roles.count() > 0)
+        return roles.count() > 0
         
     def get_assigned_users(self):
         return [
@@ -281,7 +281,7 @@ class Game(models.Model):
         users = GameGuest.objects.filter(game=self, user=user)
         if users.count() > 0:
             return True
-        return (len(users) > 0)
+        return len(users) > 0
         
     def view_info_right(self, user, force_check_read=False):
         if self.show_announcement and (not force_check_read):
@@ -289,7 +289,7 @@ class Game(models.Model):
         return self.read_right(user)
         
     def is_finishing(self):
-        return (self.status == GAME_STATUS_FINISHING)
+        return self.status == GAME_STATUS_FINISHING
     
     @models.permalink
     def get_absolute_url(self):

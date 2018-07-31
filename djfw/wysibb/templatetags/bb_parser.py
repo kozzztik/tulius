@@ -15,7 +15,7 @@ def bbcode_to_html(data_str, codes_list=None, simple_codes_list=None):
     if codes_list is None:
         codes_list = bb_codes_list
     while current < len(data_str):
-        if (data_str[current] == '['):
+        if data_str[current] == '[':
             tag_opened = current
             if (len(data_str) > current + 1) and (
                     data_str[current + 1] == '/'):
@@ -44,16 +44,16 @@ def bbcode_to_html(data_str, codes_list=None, simple_codes_list=None):
                                     pass
                             else:
                                 data = tag
-                            if (not (data is None)):
+                            if data is not None:
                                 old_len = current - tag_opened
                                 data_str = data_str[0:tag_opened] + data + \
                                     data_str[(current + 1):len(data_str)]
                                 current = current + len(data) - old_len - 1
-                        elif (tagname in codes_list):
+                        elif tagname in codes_list:
                             tag = codes_list[tagname]
                             tag_stack.append(
                                 (tag, tagname, param, tag_opened, current + 1))
-                elif (state == 2):
+                elif state == 2:
                     tagname = tagname.lower()
                     new_tag_stack = tag_stack[:]
                     tag = None
@@ -72,7 +72,7 @@ def bbcode_to_html(data_str, codes_list=None, simple_codes_list=None):
                             data = tag(stack_tagname, stack_param, text)
                         except:
                             pass
-                        if (not (data is None)):
+                        if not data is not None:
                             old_len = current - stack_tag_opened
                             data_str = data_str[0:stack_tag_opened] + data + \
                                 data_str[(current + 1):len(data_str)]

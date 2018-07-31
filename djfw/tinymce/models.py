@@ -84,7 +84,7 @@ class FileUpload(models.Model):
     )
     
     def is_image(self):
-        return (self.mime[0:5] == 'image')
+        return self.mime[0:5] == 'image'
     
     def __unicode__(self):
         return self.filename

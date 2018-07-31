@@ -45,7 +45,7 @@ class RequestAnswerForm(forms.models.ModelForm):
 
     def after_constuct(self, formset, params, i):
         questions = params['questions']
-        if not (i is None):
+        if i is not None:
             self.question_text = questions[i]
 
 

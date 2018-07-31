@@ -794,11 +794,11 @@ class Illustration(models.Model):
         try:
             self.image.delete()
         except:
-            True
+            pass
         try:
             self.thumb.delete()
         except:
-            True
+            pass
             
     def delete(self, *args, **kwargs):
         self.delete_data()

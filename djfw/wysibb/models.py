@@ -90,7 +90,7 @@ class UploadedFile(models.Model):
         return filesizeformat(self.file_size)
     
     def filename_link(self):
-        if (not self.body):
+        if not self.body:
             return self.filename
         return '<a href="%s">%s</a>' % (self.body.url, self.filename)
 
