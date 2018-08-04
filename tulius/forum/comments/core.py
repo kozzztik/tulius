@@ -68,8 +68,8 @@ class CommentsCore(ForumPlugin):
                              (now > comment.create_time +
                               timedelta(minutes=2))) or
                             (comment.edit_time and (
-                                    now > comment.edit_time +
-                                    timedelta(minutes=2)))):
+                                now > comment.edit_time +
+                                timedelta(minutes=2)))):
                         comment.edit_time = now    
                 else:
                     comment = self.site.models.Comment(parent=parent_thread)
@@ -81,7 +81,7 @@ class CommentsCore(ForumPlugin):
                     comment.voting = form.cleaned_data['voting']
                 comment.plugin_id = self.site_id
                 voting_valid = (not voting_enabled) or (
-                        voting_valid or (not comment.voting))
+                    voting_valid or (not comment.voting))
                 if voting_valid:
                     comment.save()
                     if adding:

@@ -23,7 +23,7 @@ class CollapseThreads(BaseThreadView):
                 thread=self.parent_thread, user=self.request.user)
         if 'threads' in self.request.POST:
             collapse_data.collapse_threads = (
-                    self.request.POST['threads'] == '1')
+                self.request.POST['threads'] == '1')
         if 'rooms' in self.request.POST:
             collapse_data.collapse_rooms = (self.request.POST['rooms'] == '1')
         collapse_data.save()

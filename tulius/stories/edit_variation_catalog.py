@@ -12,12 +12,12 @@ EDIT_VARIATION_PAGES_MATERIALS = 'edit_variation_materials'
 EDIT_VARIATION_FORUM = 'edit_variation_forum'
 
 EDIT_VARIATION_PAGES = (
-        (_('main'), EDIT_VARIATION_PAGES_MAIN),
-        (_('roles'), EDIT_VARIATION_PAGES_ROLES),
-        (_('illustrations'), EDIT_VARIATION_PAGES_ILLUSTRATIONS),
-        (_('materials'), EDIT_VARIATION_PAGES_MATERIALS),
-        (_('forum'), EDIT_VARIATION_FORUM),
-    )
+    (_('main'), EDIT_VARIATION_PAGES_MAIN),
+    (_('roles'), EDIT_VARIATION_PAGES_ROLES),
+    (_('illustrations'), EDIT_VARIATION_PAGES_ILLUSTRATIONS),
+    (_('materials'), EDIT_VARIATION_PAGES_MATERIALS),
+    (_('forum'), EDIT_VARIATION_FORUM),
+)
 
 
 class EditVariationPage(CatalogPage):

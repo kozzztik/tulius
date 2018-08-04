@@ -159,8 +159,8 @@ def sunlignt_graph(request, category_field, category_subfield=None):
         category['label'] = category_id
         category['id'] = category_id
         category['sublabel'] = (
-                "%s %s (%.1f%%)" % (
-                    str(_("Views:")), category_weight, category['percentage']))
+            "%s %s (%.1f%%)" % (
+                str(_("Views:")), category_weight, category['percentage']))
         if category_subfield:
             category_elems = []
             subquery = {}
@@ -191,8 +191,8 @@ def sunlignt_graph(request, category_field, category_subfield=None):
                     "%s (%s: %.1f%%, " % (
                         category_elem_weight, category_id,
                         category_elem['percentage'],) +\
-                    str(_("All:")) + " %.1f%%)" % (category_elem[
-                                                    'percentage_total'],)
+                    str(_("All:")) + " %.1f%%)" % (
+                        category_elem['percentage_total'],)
                 category_elems += [category_elem]
             category['data'] = category_elems
         data += [category]
@@ -334,8 +334,8 @@ def collapsed_sunlignt_graph(
         category_weight = category['weight']
         category['percentage'] = int(category_weight * 100.0 / all_weight)
         category['sublabel'] = (
-                "%s %s (%.1f%%)" % (
-                    str(_("Views:")), category_weight, category['percentage']))
+            "%s %s (%.1f%%)" % (
+                str(_("Views:")), category_weight, category['percentage']))
         if category_subfield:
             for subcategory in category['data']:
                 sub_weight = subcategory['weight']

@@ -111,7 +111,7 @@ class GameRightsPlugin(RightsPlugin):
         special_moderate = False
         if (not user.is_anonymous) and (
                 thread.room or (
-                thread.access_type > models.THREAD_ACCESS_TYPE_NOT_SET)):
+                    thread.access_type > models.THREAD_ACCESS_TYPE_NOT_SET)):
             rights = models.GameThreadRight.objects.filter(
                 thread=thread, role_id__in=thread.user_roles)
             for right in rights:

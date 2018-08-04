@@ -144,10 +144,10 @@ class Story(models.Model):
 
 AVATAR_SAVE_SIZE = (200, 200)
 AVATAR_SIZES = (
-        (40, 40),
-        (80, 80),
-        (200, 200)
-    )
+    (40, 40),
+    (80, 80),
+    (200, 200)
+)
 AVATAR_PATH = 'stories/avatars'
 AVATAR_ALT_PATH = AVATAR_PATH + '-alt'
 

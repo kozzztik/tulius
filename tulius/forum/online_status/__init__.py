@@ -20,7 +20,8 @@ class OnlineStatusPlugin(ForumPlugin):
         if do_update:
             self.update_online_status(user, thread)
         users = self.site.models.OnlineUser.objects.select_related(
-            'user').filter(
+            'user'
+        ).filter(
             visit_time__gte=now() - timedelta(minutes=3),
             thread__tree_id=thread.tree_id, thread__lft__gte=thread.lft,
             thread__rght__lte=thread.rght)
@@ -31,7 +32,8 @@ class OnlineStatusPlugin(ForumPlugin):
     
     def get_all_online_users(self):
         users = self.site.models.OnlineUser.objects.select_related(
-            'user').filter(
+            'user'
+        ).filter(
             visit_time__gte=now() - timedelta(minutes=3),
             thread__plugin_id=self.site_id)
         users_list = {}

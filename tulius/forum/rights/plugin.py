@@ -29,7 +29,8 @@ class RightsPlugin(ForumPlugin):
         special_moderate = False
         if (not user.is_anonymous) and (
                 thread.room or (
-                thread.access_type > self.models.THREAD_ACCESS_TYPE_NOT_SET)):
+                    thread.access_type >
+                    self.models.THREAD_ACCESS_TYPE_NOT_SET)):
             rights = self.models.ThreadAccessRight.objects.filter(
                 thread=thread, user=user)
             for right in rights:
@@ -61,11 +62,11 @@ class RightsPlugin(ForumPlugin):
     def get_rights(self, thread):
         user = thread.view_user
         author = (not user.is_anonymous) and (
-                (user.id == thread.user_id) or user.is_superuser)
+            (user.id == thread.user_id) or user.is_superuser)
         (parent_read, parent_write, parent_moderate) = \
             self.get_parent_rights(thread, user)
         thread.limited_read = (
-                thread.access_type == self.models.THREAD_ACCESS_TYPE_NO_READ)
+            thread.access_type == self.models.THREAD_ACCESS_TYPE_NO_READ)
         thread.limited_read_list = []
         if thread.limited_read:
             thread.limited_read_list = self.limited_read_list(thread)
@@ -82,8 +83,8 @@ class RightsPlugin(ForumPlugin):
         moderate_right = \
             parent_moderate or special_moderate or is_superuser_equal
         read_right = parent_read and (
-                (thread.access_type < self.models.THREAD_ACCESS_TYPE_NO_READ)
-                or special_read or moderate_right or author)
+            (thread.access_type < self.models.THREAD_ACCESS_TYPE_NO_READ)
+            or special_read or moderate_right or author)
         if thread.access_type == self.models.THREAD_ACCESS_TYPE_NOT_SET:
             write_right = parent_write
         else:
@@ -115,7 +116,8 @@ class RightsPlugin(ForumPlugin):
         user = thread.view_user
         if user.is_superuser:
             return self.models.Thread.objects.get_descendants(
-                thread).filter(
+                thread
+            ).filter(
                 access_type=self.models.THREAD_ACCESS_TYPE_NO_READ,
                 deleted=False)
         else:

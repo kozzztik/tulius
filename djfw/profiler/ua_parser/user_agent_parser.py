@@ -159,10 +159,10 @@ def Parse(user_agent_string, **jsParseBits):
     """
     jsParseBits = jsParseBits or {}
     return {
-      'user_agent': ParseUserAgent(user_agent_string, **jsParseBits),
-      'os': ParseOS(user_agent_string, **jsParseBits),
-      'device': ParseDevice(user_agent_string, **jsParseBits),
-      'string': user_agent_string
+        'user_agent': ParseUserAgent(user_agent_string, **jsParseBits),
+        'os': ParseOS(user_agent_string, **jsParseBits),
+        'device': ParseDevice(user_agent_string, **jsParseBits),
+        'string': user_agent_string
     }
 
 
@@ -191,9 +191,10 @@ def ParseUserAgent(user_agent_string, **jsParseBits):
     # Override for Chrome Frame IFF Chrome is enabled.
     if 'js_user_agent_string' in jsParseBits:
         js_user_agent_string = jsParseBits['js_user_agent_string']
-        if (js_user_agent_string and js_user_agent_string.find('Chrome/') > -1 and
-            user_agent_string.find('chromeframe') > -1):
-            jsOverride = {}
+        if (
+                js_user_agent_string and
+                js_user_agent_string.find('Chrome/') > -1 and
+                user_agent_string.find('chromeframe') > -1):
             jsOverride = ParseUserAgent(js_user_agent_string)
             family = 'Chrome Frame (%s %s)' % (family, v1)
             v1 = jsOverride['major']
@@ -245,7 +246,7 @@ def ParseDevice(user_agent_string):
             break
 
     return {
-      'family': device
+        'family': device
     }
 
 
@@ -307,7 +308,7 @@ def ParseWithJSOverrides(user_agent_string,
 
     # Override for Chrome Frame IFF Chrome is enabled.
     if (js_user_agent_string and js_user_agent_string.find('Chrome/') > -1 and
-        user_agent_string.find('chromeframe') > -1):
+            user_agent_string.find('chromeframe') > -1):
         family = 'Chrome Frame (%s %s)' % (family, v1)
         ua_dict = ParseUserAgent(js_user_agent_string)
         v1 = ua_dict['major']
@@ -363,11 +364,11 @@ def GetFilters(user_agent_string, js_user_agent_string=None,
     """
     filters = {}
     filterdict = {
-      'js_user_agent_string': js_user_agent_string,
-      'js_user_agent_family': js_user_agent_family,
-      'js_user_agent_v1': js_user_agent_v1,
-      'js_user_agent_v2': js_user_agent_v2,
-      'js_user_agent_v3': js_user_agent_v3
+        'js_user_agent_string': js_user_agent_string,
+        'js_user_agent_family': js_user_agent_family,
+        'js_user_agent_v1': js_user_agent_v1,
+        'js_user_agent_v2': js_user_agent_v2,
+        'js_user_agent_v3': js_user_agent_v3
     }
     for key, value in filterdict.items():
         if value is not None and value != '':

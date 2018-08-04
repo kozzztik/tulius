@@ -60,7 +60,7 @@ def _wrap_sessions(sessions, request):
 class RedisStore(OldRedisStore):
     def _get_message_channels(
             self, request=None, facility='{facility}', broadcast=False,
-            groups=[], users=[], sessions=[]):
+            groups=(), users=(), sessions=()):
         prefix = self.get_prefix()
         channels = []
         if broadcast is True:
@@ -72,9 +72,10 @@ class RedisStore(OldRedisStore):
         # handle group messaging
         if isinstance(groups, (list, tuple)):
             # message is delivered to all listed groups
-            channels.extend('{prefix}group:{0}:{facility}'.format(
-                g, prefix=prefix, facility=facility)
-                for g in _wrap_groups(groups, request))
+            channels.extend([
+                '{prefix}group:{0}:{facility}'.format(
+                    g, prefix=prefix, facility=facility)
+                for g in _wrap_groups(groups, request)])
         elif groups is True and request and request.user and \
                 request.user.is_authenticated:
             # message is delivered to all groups the currently logged in user
@@ -98,9 +99,10 @@ class RedisStore(OldRedisStore):
         # handle user messaging
         if isinstance(users, (list, tuple)):
             # message is delivered to all listed users
-            channels.extend('{prefix}user:{0}:{facility}'.format(
+            channels.extend([
+                '{prefix}user:{0}:{facility}'.format(
                     u, prefix=prefix, facility=facility)
-                for u in _wrap_users(users, request))
+                for u in _wrap_users(users, request)])
         elif users is True and request and request.user and \
                 request.user.is_authenticated:
             # message is delivered to browser instances of the currently

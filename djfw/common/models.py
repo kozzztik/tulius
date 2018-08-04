@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.db.models.signals import post_save
@@ -10,8 +9,8 @@ class DirtyFieldsMixin:
         post_save.connect(
             self._reset_state,
             sender=self.__class__,
-            dispatch_uid='%s-DirtyFieldsMixin-sweeper' %
-                         self.__class__.__name__
+            dispatch_uid='%s-DirtyFieldsMixin-sweeper' % (
+                self.__class__.__name__)
         )
         self._reset_state()
 

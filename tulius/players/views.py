@@ -32,8 +32,8 @@ except:
 def filter_by_games(players):
     return players.filter(
         roles__variation__game__status__in=[
-            GAME_STATUS_COMPLETED, GAME_STATUS_COMPLETED_OPEN]).annotate(
-        games=Count('roles__variation__game', distinct=True))
+            GAME_STATUS_COMPLETED, GAME_STATUS_COMPLETED_OPEN
+        ]).annotate(games=Count('roles__variation__game', distinct=True))
 
 
 def filter_by_stories(players):

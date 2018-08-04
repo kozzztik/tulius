@@ -22,7 +22,7 @@ class VotingCore(ForumPlugin):
                 votes += choice.vote_count
             for choice in choices:
                 choice.vote_persent = (
-                        choice.vote_count * 100 / votes) if votes else 0
+                    choice.vote_count * 100 / votes) if votes else 0
                 choice.vote_length = choice.vote_persent / 2
                 if choice.vote_length < 1:
                     choice.vote_length = 1
@@ -133,9 +133,10 @@ class VotingCore(ForumPlugin):
         if thread and thread.first_comment:
             first_comment = self.models.Comment.objects.get(
                 id=thread.first_comment_id)
-            (voting_valid, voting, voting_form, voting_formset,
-             voting_delete) = self.preprocess_edit_voting(
-                sender.request, first_comment)
+            (
+                voting_valid, voting, voting_form, voting_formset,
+                voting_delete
+            ) = self.preprocess_edit_voting(sender.request, first_comment)
             context['voting_delete'] = voting_delete
         else:
             (voting_valid, voting_form, voting_formset) = \
@@ -167,7 +168,7 @@ class VotingCore(ForumPlugin):
         if comment:
             (voting_valid, voting, voting_form, voting_formset,
              voting_delete) = self.preprocess_edit_voting(
-                sender.request, comment)
+                 sender.request, comment)
             context['voting_delete'] = voting_delete
         else:
             (voting_valid, voting_form, voting_formset) = \

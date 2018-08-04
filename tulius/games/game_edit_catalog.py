@@ -21,17 +21,17 @@ EDIT_GAME_PAGES_WINNERS = 'edit_game_winners'
 GAME_GRAPHICS = 'story_pics'
 
 EDIT_GAME_PAGES = (
-        (_('main'), EDIT_GAME_PAGES_MAIN),
-        (_('texts'), EDIT_GAME_PAGES_TEXTS),
-        (_('users'), EDIT_GAME_PAGES_USERS),
-        (_('graphics'), EDIT_GAME_PAGES_GRAPHICS),
-        (_('roles'), EDIT_GAME_PAGES_ROLES),
-        (_('illustrations'), EDIT_GAME_PAGES_ILLUSTRATIONS),
-        (_('materials'), EDIT_GAME_PAGES_MATERIALS),
-        (_('request form'), EDIT_GAME_PAGES_REQUEST_FORM),
-        (_('requests'), EDIT_GAME_PAGES_REQUESTS),
-        (_('forum'), EDIT_GAME_PAGES_FORUM),
-    )
+    (_('main'), EDIT_GAME_PAGES_MAIN),
+    (_('texts'), EDIT_GAME_PAGES_TEXTS),
+    (_('users'), EDIT_GAME_PAGES_USERS),
+    (_('graphics'), EDIT_GAME_PAGES_GRAPHICS),
+    (_('roles'), EDIT_GAME_PAGES_ROLES),
+    (_('illustrations'), EDIT_GAME_PAGES_ILLUSTRATIONS),
+    (_('materials'), EDIT_GAME_PAGES_MATERIALS),
+    (_('request form'), EDIT_GAME_PAGES_REQUEST_FORM),
+    (_('requests'), EDIT_GAME_PAGES_REQUESTS),
+    (_('forum'), EDIT_GAME_PAGES_FORUM),
+)
     
 URL_PREFIX = 'games:'
 

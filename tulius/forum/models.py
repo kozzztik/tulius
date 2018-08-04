@@ -336,7 +336,8 @@ class Thread(MPTTModel, SitedModelMixin):
     
     def room_comments_count(self):
         comments = Thread.objects.get_descendants(self).filter(
-            room=False, deleted=False).aggregate(
+            room=False, deleted=False
+        ).aggregate(
             comments_sum=models.Sum('comments_count'))
         return comments['comments_sum']
         

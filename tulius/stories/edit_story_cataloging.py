@@ -18,16 +18,16 @@ EDIT_STORY_PAGES_MATERIALS = 'edit_story_materials'
 STORY_GRAPHICS = 'story_pics'
 
 EDIT_STORY_PAGES = (
-        (_('main'), EDIT_STORY_PAGES_MAIN),
-        (_('texts'), EDIT_STORY_PAGES_TEXTS),
-        (_('users'), EDIT_STORY_PAGES_USERS),
-        (_('graphics'), EDIT_STORY_PAGES_GRAPHICS),
-        (_('characters'), EDIT_STORY_PAGES_CHARACTERS),
-        (_('avatars'), EDIT_STORY_PAGES_AVATARS),
-        (_('illustrations'), EDIT_STORY_PAGES_ILLUSTRATIONS),
-        (_('materials'), EDIT_STORY_PAGES_MATERIALS),
-        (_('variations'), EDIT_STORY_PAGES_VARIATIONS),
-    )
+    (_('main'), EDIT_STORY_PAGES_MAIN),
+    (_('texts'), EDIT_STORY_PAGES_TEXTS),
+    (_('users'), EDIT_STORY_PAGES_USERS),
+    (_('graphics'), EDIT_STORY_PAGES_GRAPHICS),
+    (_('characters'), EDIT_STORY_PAGES_CHARACTERS),
+    (_('avatars'), EDIT_STORY_PAGES_AVATARS),
+    (_('illustrations'), EDIT_STORY_PAGES_ILLUSTRATIONS),
+    (_('materials'), EDIT_STORY_PAGES_MATERIALS),
+    (_('variations'), EDIT_STORY_PAGES_VARIATIONS),
+)
 
 
 class EditStoryPage(CatalogPage):

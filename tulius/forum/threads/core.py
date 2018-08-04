@@ -279,7 +279,7 @@ class ThreadsCorePlugin(ForumPlugin):
                 if not thread.edit_right(user):
                     error_text = _(
                         'You have no rights to delete thread %(post_id)s.') % {
-                        'post_id': thread_id}
+                            'post_id': thread_id}
                 else:
                     thread.deleted = True
                     delete_mark = models.ThreadDeleteMark(

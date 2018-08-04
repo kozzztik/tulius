@@ -124,9 +124,10 @@ class GameManager(models.Manager):
                 game__deleted=False).select_related('game')
             admined = [admin.game for admin in admined]
             played = Role.objects.filter(
-                user=user, variation__game__status=GAME_STATUS_COMPLETED,
-                variation__game__deleted=False).select_related(
-                'variation__game')
+                user=user,
+                variation__game__status=GAME_STATUS_COMPLETED,
+                variation__game__deleted=False
+            ).select_related('variation__game')
             played = [role.variation.game for role in played]
             games = guested + admined + played
             # delete duplicates
@@ -329,7 +330,7 @@ class Game(models.Model):
     def can_send_request(self, user):
         return (
             self.status == GAME_STATUS_OPEN_FOR_REGISTRATION) and (
-            not user.is_anonymous)
+                not user.is_anonymous)
     
     def sended_request(self, user):
         return RoleRequest.objects.filter(game=self, user=user).count() > 0

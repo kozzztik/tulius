@@ -190,7 +190,7 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
             else:
                 break
         self.full_stars_cache = 'b' * big_stars + 's' * small_stars + 'e' * (
-                stars.stars_count - small_stars)
+            stars.stars_count - small_stars)
         return self.full_stars_cache
     
     def stories_author(self):

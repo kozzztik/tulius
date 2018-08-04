@@ -31,8 +31,7 @@ class StoryFilterForm(forms.Form):
             'filter_by_author'].queryset.filter(
                 pk__in=[
                     author['user'] for author in
-                    StoryAuthor.objects.values('user').distinct()]
-        )
+                    StoryAuthor.objects.values('user').distinct()])
         self.fields['filter_by_author'].widget = forms.Select()
         self.fields['filter_by_author'].widget.choices = [
             EMPTY_CHOICE] + self.author_choice(
@@ -41,8 +40,7 @@ class StoryFilterForm(forms.Form):
             'filter_by_genre'].queryset.filter(
                 pk__in=[
                     v['genres'] for v in Story.objects.values(
-                        'genres').distinct()]
-        )
+                        'genres').distinct()])
         self.fields['filter_by_creation_year'].choices = [EMPTY_CHOICE] + [
             (v['creation_year'], v['creation_year']) for v in
             Story.objects.order_by('-creation_year').values(

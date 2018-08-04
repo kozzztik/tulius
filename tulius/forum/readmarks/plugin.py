@@ -153,7 +153,8 @@ class ReadMarksPlugin(ForumPlugin):
                     if thread.first_comment_id:
                         if (
                                 (not sender.unreaded_id) or (
-                                thread.first_comment_id < sender.unreaded_id)):
+                                    thread.first_comment_id <
+                                    sender.unreaded_id)):
                             sender.unreaded_id = thread.first_comment_id
         if sender.unreaded_id:
             sender.unreaded = self.Comment.objects.select_related(
