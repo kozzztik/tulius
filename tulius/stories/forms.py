@@ -53,8 +53,8 @@ class StoryFilterForm(forms.Form):
             author_list.append((author.pk, author))
         return sorted(author_list, key=self.sorting_function)
 
-    def sorting_function(self, tuple):
-        authors = StoryAuthor.objects.filter(user=tuple[1])
+    def sorting_function(self, value):
+        authors = StoryAuthor.objects.filter(user=value[1])
         return authors.count() 
 
 
