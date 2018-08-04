@@ -255,11 +255,10 @@ def PrettyUserAgent(family, v1=None, v2=None, v3=None):
     if v3:
         if v3[0].isdigit():
             return '%s %s.%s.%s' % (family, v1, v2, v3)
-        else:
-            return '%s %s.%s%s' % (family, v1, v2, v3)
-    elif v2:
+        return '%s %s.%s%s' % (family, v1, v2, v3)
+    if v2:
         return '%s %s.%s' % (family, v1, v2)
-    elif v1:
+    if v1:
         return '%s %s' % (family, v1)
     return family
 
@@ -271,11 +270,10 @@ def PrettyOS(os, os_v1=None, os_v2=None, os_v3=None, os_v4=None):
     if os_v3:
         if os_v3[0].isdigit():
             return '%s %s.%s.%s' % (os, os_v1, os_v2, os_v3)
-        else:
-            return '%s %s.%s%s' % (os, os_v1, os_v2, os_v3)
-    elif os_v2:
+        return '%s %s.%s%s' % (os, os_v1, os_v2, os_v3)
+    if os_v2:
         return '%s %s.%s' % (os, os_v1, os_v2)
-    elif os_v1:
+    if os_v1:
         return '%s %s' % (os, os_v1)
     return os
 
@@ -323,11 +321,10 @@ def Pretty(family, v1=None, v2=None, v3=None):
     if v3:
         if v3[0].isdigit():
             return '%s %s.%s.%s' % (family, v1, v2, v3)
-        else:
-            return '%s %s.%s%s' % (family, v1, v2, v3)
-    elif v2:
+        return '%s %s.%s%s' % (family, v1, v2, v3)
+    if v2:
         return '%s %s.%s' % (family, v1, v2)
-    elif v1:
+    if v1:
         return '%s %s' % (family, v1)
     return family
 

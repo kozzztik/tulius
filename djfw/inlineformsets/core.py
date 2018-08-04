@@ -86,8 +86,7 @@ class SimpleFormset(forms.models.BaseModelFormSet):
         model = getattr(self, 'model', None)
         if model:
             return model._meta.object_name.lower() + '_form'
-        else:
-            return ''
+        return ''
                 
     
 def get_formset_factory(
@@ -147,9 +146,8 @@ def get_formset(
             params=params,
             static=static,
             queryset=queryset)
-    else:
-        return factory(
-            data or None,
-            params=params,
-            static=static,
-            queryset=queryset)
+    return factory(
+        data or None,
+        params=params,
+        static=static,
+        queryset=queryset)

@@ -31,12 +31,10 @@ class Login(TemplateView):
                         request, _('You have successfully logged in'))
                     if 'next' in request.GET and request.GET['next']:
                         return HttpResponseRedirect(request.GET['next'])
-                    elif 'next' in request.POST and request.POST['next']:
+                    if 'next' in request.POST and request.POST['next']:
                         return HttpResponseRedirect(request.POST['next'])
-                    else:
-                        return HttpResponseRedirect('/')
-                else:
-                    messages.error(request, _('This account is disabled'))
+                    return HttpResponseRedirect('/')
+                messages.error(request, _('This account is disabled'))
             else:
                 messages.error(request, _('Invalid login/password pair'))
         return self.render_to_response({'form': form})
@@ -50,10 +48,9 @@ class Logout(View):
         auth.logout(request)
         if 'next' in request.GET and request.GET['next']:
             return HttpResponseRedirect(request.GET['next'])
-        elif 'next' in request.POST and request.POST['next']:
+        if 'next' in request.POST and request.POST['next']:
             return HttpResponseRedirect(request.POST['next'])
-        else:
-            return HttpResponseRedirect('/')
+        return HttpResponseRedirect('/')
 
 
 class ReLogin(TemplateView):

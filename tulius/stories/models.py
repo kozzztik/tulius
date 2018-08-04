@@ -384,8 +384,7 @@ class Variation(SortableModelMixin):
     def edit_right(self, user):
         if self.game:
             return self.game.edit_right(user)
-        else:
-            return self.story.edit_right(user)
+        return self.story.edit_right(user)
         
     def create_right(self, user):
         return self.story.create_right(user)
@@ -614,10 +613,8 @@ class StoryAdmin(models.Model):
         if self.user:
             if self.create_game:
                 return "%s (%s)" % (self.user, str(_("games admin")))
-            else:
-                return str(self.user)
-        else:
-            return None
+            return str(self.user)
+        return None
 
 
 class StoryAuthor(models.Model):
@@ -644,8 +641,7 @@ class StoryAuthor(models.Model):
     def __str__(self):
         if self.user:
             return str(self.user)
-        else:
-            return None
+        return None
 
 
 class AdditionalMaterial(models.Model):
@@ -692,22 +688,19 @@ class AdditionalMaterial(models.Model):
     def get_absolute_url(self):
         if self.variation and self.variation.game:
             return ('games:edit_material', (self.id,), {})
-        else:
-            return ('stories:edit_material', (self.id,), {})
+        return ('stories:edit_material', (self.id,), {})
         
     @models.permalink
     def url(self):
         if self.variation and self.variation.game:
             return ('games:material', (self.id,), {})
-        else:
-            return ('stories:material', (self.id,), {})
+        return ('stories:material', (self.id,), {})
         
     @models.permalink 
     def delete_url(self):
         if self.variation and self.variation.game:
             return ('games:material_delete', (self.id,), {})
-        else:
-            return ('stories:material_delete', (self.id,), {})
+        return ('stories:material_delete', (self.id,), {})
         
     def edit_right(self, user):
         if self.story:
@@ -780,15 +773,13 @@ class Illustration(models.Model):
     def get_absolute_url(self):
         if self.variation and self.variation.game:
             return 'games:edit_illustration', (self.id,), {}
-        else:
-            return 'stories:edit_illustration', (self.id,), {}
+        return 'stories:edit_illustration', (self.id,), {}
         
     @models.permalink 
     def delete_url(self):
         if self.variation and self.variation.game:
             return 'games:illustration_delete', (self.id,), {}
-        else:
-            return 'stories:illustration_delete', (self.id,), {}
+        return 'stories:illustration_delete', (self.id,), {}
         
     def delete_data(self):
         try:

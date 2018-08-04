@@ -19,11 +19,10 @@ class SortableViewMixin:
         if self.sortable_queryset is None:
             if self.sortable_model:
                 return self.sortable_model._default_manager.all()
-            else:
-                raise ImproperlyConfigured(
-                    "%(cls)s is missing a sortable queryset. Define "
-                    "%(cls)s.sortable_model or %(cls)s.sortable_queryset." % {
-                        'cls': self.__class__.__name__})
+            raise ImproperlyConfigured(
+                "%(cls)s is missing a sortable queryset. Define "
+                "%(cls)s.sortable_model or %(cls)s.sortable_queryset." % {
+                    'cls': self.__class__.__name__})
         return self.queryset._clone()
     
     def post(self, request, *args, **kwargs):
@@ -52,15 +51,14 @@ class SortableDetailViewMixin(SortableViewMixin):
             fk = forms.models._get_foreign_key(
                 self.model, self.sortable_model, fk_name=self.sortable_fk)
             return queryset.filter(**{fk.name: self.object.pk})
-        elif self.sortable_fk:
+        if self.sortable_fk:
             return queryset.filter(**{self.sortable_fk: self.object.pk})
-        else:
-            raise ImproperlyConfigured(
-                "%(cls)s is missing a sortable foreign key. Define "
-                "%(cls)s.sortable_model and %(cls)s.model, or "
-                "%(cls)s.sortable_fk." % {
-                    'cls': self.__class__.__name__
-                })
+        raise ImproperlyConfigured(
+            "%(cls)s is missing a sortable foreign key. Define "
+            "%(cls)s.sortable_model and %(cls)s.model, or "
+            "%(cls)s.sortable_fk." % {
+                'cls': self.__class__.__name__
+            })
 
 
 class DecoratorChainingMixin:
@@ -87,8 +85,7 @@ class ActionableBase:
         method = kwargs.pop('method', action_name)
         if callable(method):
             return method(**kwargs)
-        else:
-            return getattr(self, method)(**kwargs)
+        return getattr(self, method)(**kwargs)
         
     def post(self, request, *args, **kwargs):
         if not self.get_post_right():
@@ -190,9 +187,8 @@ class ActionableViewMixin(ActionableBase):
         if widget_name:
             widget = self.widgets_list[widget_name]
             return widget.post(request, *args, **kwargs)
-        else:
-            return super(ActionableViewMixin, self).post(
-                request, *args, **kwargs)
+        return super(ActionableViewMixin, self).post(
+            request, *args, **kwargs)
         
     def __getitem__(self, key):
         return self.widgets_list[key]
@@ -280,11 +276,10 @@ class FormWidget(TemplatedWidget):
                 action = getattr(self.view, self.action)
                 return action(form)
             return self.valid_form(form)
-        else:
-            if self.invalid_action:
-                action = getattr(self.view, self.action)
-                return action(form)
-            return self.invalid_form(form)
+        if self.invalid_action:
+            action = getattr(self.view, self.action)
+            return action(form)
+        return self.invalid_form(form)
     
     def valid_form(self, form):
         if self.valid_template:
@@ -325,8 +320,7 @@ class FormsetWidget(TemplatedWidget):
     def get_editable(self):
         if callable(self.editable):
             return self.editable(self.view)
-        else:
-            return self.editable
+        return self.editable
             
     def get_parent_object(self):
         if hasattr(self, 'obj'):

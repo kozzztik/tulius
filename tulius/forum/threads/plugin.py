@@ -18,8 +18,7 @@ class ThreadsPlugin(ThreadsCorePlugin):
         if new_parent:
             return self.reverse(
                 'thread_move_confirm', thread.id, new_parent.id)
-        else:
-            return self.reverse('thread_move_confirm', thread.id)
+        return self.reverse('thread_move_confirm', thread.id)
         
     def index_url(self):
         return self.reverse('index')
@@ -33,8 +32,7 @@ class ThreadsPlugin(ThreadsCorePlugin):
     def thread_edit_url(self, thread):
         if thread.room:
             return self.reverse('edit_room', thread.id)
-        else:
-            return self.reverse('edit_thread', thread.id)
+        return self.reverse('edit_thread', thread.id)
 
     def get_add_room_url(self, thread):
         return self.reverse('add_room', thread.id)

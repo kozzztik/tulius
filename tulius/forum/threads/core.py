@@ -124,8 +124,7 @@ class ThreadsCorePlugin(ForumPlugin):
             threads = threads.filter(plugin_id=self.site_id)
         if is_room:
             return self.prepare_room_list(user, parent_thread, threads)
-        else:
-            threads = threads.order_by('-last_comment_id')
+        threads = threads.order_by('-last_comment_id')
             
         for thread in threads:
             thread.parent = parent_thread

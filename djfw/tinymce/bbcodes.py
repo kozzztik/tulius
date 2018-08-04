@@ -128,9 +128,8 @@ def bb_url(tagname, param, text):
     if param:
         param = param.replace('"', '&quot;').replace('\n', '')
         return '<a href="%s">%s</a>' % (param, text)
-    else:
-        text = text.replace('"', '&quot;').replace('\n', '')
-        return '<a href="%s">%s</a>' % (text, text)
+    text = text.replace('"', '&quot;').replace('\n', '')
+    return '<a href="%s">%s</a>' % (text, text)
 
 
 @register_bb_code('img')
@@ -139,8 +138,7 @@ def bb_img(tagname, param, text):
     if param:
         param = param.replace('"', '&quot;').replace('\n', '')
         return '<img src="%s" alt="%s" />' % (param, text)
-    else:
-        return '<img src="%s"/>' % (text)
+    return '<img src="%s"/>' % (text)
 
 
 @register_bb_code('quote')
@@ -148,8 +146,7 @@ def bb_quote(tagname, param, text):
     if param:
         param += ' ' + str(_('said'))
         return '<blockquote><small>%s</small>%s</blockquote>' % (param, text,)
-    else:
-        return '<blockquote>%s</blockquote>' % (text,)
+    return '<blockquote>%s</blockquote>' % (text,)
 
 
 @register_bb_code('center')

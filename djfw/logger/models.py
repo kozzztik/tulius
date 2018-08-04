@@ -126,8 +126,7 @@ class ExceptionMessage(models.Model):
         if self.user_id:
             return '<a href="%s">%s</a>' % (
                 self.user.get_absolute_url(), str(self.user), )
-        else:
-            return ""
+        return ""
     
     def path_link(self):
         return '<a href="%s">%s</a>' % (self.path, self.path,)

@@ -37,8 +37,7 @@ class CommentsPlugin(CommentsCore):
     def get_edit_url(self, comment):
         if comment.is_thread():
             return comment.parent.get_edit_url
-        else:
-            return self.reverse('edit_comment', comment.id)
+        return self.reverse('edit_comment', comment.id)
     
     def reply_str(self, comment):
         return comment.user.get_forum_reply_str()

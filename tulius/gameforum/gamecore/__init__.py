@@ -91,8 +91,7 @@ class GamePlugin(ForumPlugin):
         if role_id == '': 
             if admin:
                 return None
-            else:
-                raise Http404()
+            raise Http404()
         for role in roles:
             if int(role.id) == int(role_id):
                 return role

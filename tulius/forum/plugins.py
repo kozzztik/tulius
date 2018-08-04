@@ -82,5 +82,4 @@ class BasePluginView(TemplateView):
         except PermissionDenied:
             if not request.user.is_authenticated:
                 return redirect_to_login(request.build_absolute_uri())
-            else:
-                raise
+            raise

@@ -41,8 +41,7 @@ def logic_time(x):
     time = x.template_time + x.db_time 
     if time > x.exec_time:
         return time
-    else:
-        return x.exec_time - time
+    return x.exec_time - time
 
 
 class StatisticsView(TemplateView):

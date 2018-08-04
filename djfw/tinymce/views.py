@@ -75,5 +75,4 @@ class Upload_file(View):
     def post(self, request, *args, **kwargs):
         if request.user.is_staff:
             return handle_upload(request, save_upload)
-        else:
-            raise Http404()
+        raise Http404()

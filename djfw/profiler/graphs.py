@@ -22,8 +22,7 @@ def time_period_graph(request, *args, **kwargs):
             return query.annotate(
                 weight_count=Count(weight_field),
                 weight_sum=Sum(weight_field), weight_avg=Avg(weight_field))
-        else:
-            return query.annotate(weight_sum=Count('id'))
+        return query.annotate(weight_sum=Count('id'))
         
     delta = (endtime - starttime) / intervals
     data = []
@@ -100,8 +99,7 @@ def time_period_graph_sum(request, *args, **kwargs):
                 weight_count=Count(weight_field),
                 weight_sum=Sum(weight_field),
                 weight_avg=Avg(weight_field))
-        else:
-            return query.annotate(weight_sum=Count('id'))
+        return query.annotate(weight_sum=Count('id'))
         
     delta = (endtime - starttime) / intervals
     data = []

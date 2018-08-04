@@ -65,8 +65,7 @@ class RightsDetailMixin:
         except PermissionDenied:
             if not request.user.is_authenticated:
                 return redirect_to_login(request.build_absolute_uri())
-            else:
-                raise
+            raise
 
 
 class RenderMixin:
@@ -166,8 +165,7 @@ class AjaxFormsetView(RenderMixin, DetailView):
         if obj:
             return urls.reverse(
                 self.url_name, kwargs={self.pk_url_kwarg: obj.pk})
-        else:
-            return urls.reverse(self.url_name)
+        return urls.reverse(self.url_name)
             
     def get_edit_right(self, obj, user, item):
         return self.model_edit_right

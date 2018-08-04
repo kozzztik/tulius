@@ -57,8 +57,7 @@ def vk_success_auth(request):
         user = authenticate(vk_profile=profile, email=email)
         login(request, user)
         return HttpResponseRedirect('/')
-    else:
-        user = request.user
-        user.vk_profile = profile
-        user.save()
-        return HttpResponseRedirect(urls.reverse('players:profile'))
+    user = request.user
+    user.vk_profile = profile
+    user.save()
+    return HttpResponseRedirect(urls.reverse('players:profile'))

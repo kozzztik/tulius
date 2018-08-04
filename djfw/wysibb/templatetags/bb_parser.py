@@ -111,8 +111,7 @@ VALID_BB_COLORS = [
 def bb_list(tagname, param, text):
     if param:
         return '<ol>%s</ol>' % (text,)
-    else:
-        return '<ul>%s</ul>' % (text,)
+    return '<ul>%s</ul>' % (text,)
 
 
 @register_bb_code('*')
@@ -142,9 +141,8 @@ def bb_url(tagname, param, text):
     if param:
         param = param.replace('"', '&quot;').replace('\n', '')
         return '<a href="%s">%s</a>' % (param, text)
-    else:
-        text = text.replace('"', '&quot;').replace('\n', '')
-        return '<a href="%s">%s</a>' % (text, text)
+    text = text.replace('"', '&quot;').replace('\n', '')
+    return '<a href="%s">%s</a>' % (text, text)
 
 
 @register_bb_code('img')
@@ -153,8 +151,7 @@ def bb_img(tagname, param, text):
     if param:
         param = param.replace('"', '&quot;').replace('\n', '')
         return '<img src="%s" alt="%s" />' % (param, text)
-    else:
-        return '<img src="%s"/>' % (text)
+    return '<img src="%s"/>' % (text)
 
 
 @register_bb_code('quote')
@@ -162,8 +159,7 @@ def bb_quote(tagname, param, text):
     if param:
         param += ' ' + str(_('said'))
         return '<div class="quote"><small>%s</small>%s</div>' % (param, text,)
-    else:
-        return '<div class="quote">%s</div>' % (text,)
+    return '<div class="quote">%s</div>' % (text,)
 
 
 @register_bb_code('center')

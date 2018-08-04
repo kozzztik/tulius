@@ -28,9 +28,8 @@ class MarkAsRead(BasePluginView):
                 request.user, thread_id)
             self.mark_as_readed(parent_thread, request.user)
             return HttpResponseRedirect(parent_thread.get_absolute_url)
-        else:
-            threads = self.core.models.Thread.objects.filter(
-                parent=None, plugin_id=self.site.site_id)
-            for thread in threads:
-                self.mark_as_readed(thread, request.user)
-            return HttpResponseRedirect(self.site.urlizer.index())
+        threads = self.core.models.Thread.objects.filter(
+            parent=None, plugin_id=self.site.site_id)
+        for thread in threads:
+            self.mark_as_readed(thread, request.user)
+        return HttpResponseRedirect(self.site.urlizer.index())

@@ -14,12 +14,11 @@ class SortableViewMixin:
         if self.sortable_queryset is None:
             if self.sortable_model:
                 return self.sortable_model._default_manager.all()
-            else:
-                raise ImproperlyConfigured(
-                    "%(cls)s is missing a sortable queryset. Define "
-                    "%(cls)s.sortable_model or %(cls)s.sortable_queryset." % {
-                        'cls': self.__class__.__name__
-                    })
+            raise ImproperlyConfigured(
+                "%(cls)s is missing a sortable queryset. Define "
+                "%(cls)s.sortable_model or %(cls)s.sortable_queryset." % {
+                    'cls': self.__class__.__name__
+                })
         return self.queryset._clone()
     
     def post(self, request, *args, **kwargs):
@@ -48,15 +47,14 @@ class SortableDetailViewMixin(SortableViewMixin):
             fk = forms.models._get_foreign_key(
                 self.model, self.sortable_model, fk_name=self.sortable_fk)
             return queryset.filter(**{fk.name: self.object.pk})
-        elif self.sortable_fk:
+        if self.sortable_fk:
             return queryset.filter(**{self.sortable_fk: self.object.pk})
-        else:
-            raise ImproperlyConfigured(
-                "%(cls)s is missing a sortable foreign key. Define "
-                "%(cls)s.sortable_model and %(cls)s.model, or "
-                "%(cls)s.sortable_fk." % {
-                    'cls': self.__class__.__name__
-                })
+        raise ImproperlyConfigured(
+            "%(cls)s is missing a sortable foreign key. Define "
+            "%(cls)s.sortable_model and %(cls)s.model, or "
+            "%(cls)s.sortable_fk." % {
+                'cls': self.__class__.__name__
+            })
 
 
 class DecoratorChainingMixin:
@@ -77,8 +75,7 @@ class ActionableMixin:
         method = kwargs.pop('method', action_name)
         if callable(method):
             return method(**kwargs)
-        else:
-            return getattr(self, method)(**kwargs)
+        return getattr(self, method)(**kwargs)
         
     def post(self, request, *args, **kwargs):
         if self.action_param in request.POST:
@@ -96,8 +93,7 @@ class ActionableFormsMixin(ActionableMixin):
     def create_form(self, action_name, form, *args, **kwargs):
         if form:
             return form(*args, **kwargs)
-        else:
-            return None
+        return None
     
     def get_forms(self):
         forms_dict = {}
@@ -126,8 +122,6 @@ class ActionableFormsMixin(ActionableMixin):
             method = kwargs.pop('method', action_name)
             if callable(method):
                 return method(form, **kwargs)
-            else:
-                return getattr(self, method)(form, **kwargs)
-        else:
-            return super(ActionableFormsMixin, self).dispatch_action(
-                action_name, **kwargs)
+            return getattr(self, method)(form, **kwargs)
+        return super(ActionableFormsMixin, self).dispatch_action(
+            action_name, **kwargs)

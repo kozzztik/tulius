@@ -61,9 +61,8 @@ class PrivateTalkingManager(models.Manager):
         talkings = self.filter(sender=sender, receiver=receiver)
         if talkings.count() > 0:
             return talkings[0]
-        else:
-            talking = PrivateTalking(sender=sender, receiver=receiver)
-            return talking
+        talking = PrivateTalking(sender=sender, receiver=receiver)
+        return talking
         
     def update_talking(self, sender, receiver, post):
         talking = self.get_talking(sender, receiver)

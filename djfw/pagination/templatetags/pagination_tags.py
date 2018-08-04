@@ -36,12 +36,12 @@ def do_autopaginate(parser, token):
         del split[as_index:as_index + 2]
     if len(split) == 2:
         return AutoPaginateNode(split[1])
-    elif len(split) == 3:
+    if len(split) == 3:
         return AutoPaginateNode(
             split[1],
             paginate_by=split[2],
             context_var=context_var)
-    elif len(split) == 4:
+    if len(split) == 4:
         try:
             orphans = int(split[3])
         except ValueError:
@@ -52,10 +52,9 @@ def do_autopaginate(parser, token):
             paginate_by=split[2],
             orphans=orphans,
             context_var=context_var)
-    else:
-        raise template.TemplateSyntaxError(
-            '%r tag takes one required '
-            'argument and one optional argument' % split[0])
+    raise template.TemplateSyntaxError(
+        '%r tag takes one required '
+        'argument and one optional argument' % split[0])
 
 
 class AutoPaginateNode(template.Node):

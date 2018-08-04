@@ -181,18 +181,17 @@ class GameRightsPlugin(RightsPlugin):
             if thread and thread.user_roles:
                 threads = threads.exclude(data1__in=thread.user_roles)
             return threads
-        else:
-            rights = models.GameThreadRight.objects.filter(
-                role_id__in=thread.user_roles,
-                thread__tree_id=thread.tree_id,
-                thread__lft__gt=thread.lft,
-                thread__rght__lt=thread.rght,
-                access_level__gte=models.THREAD_ACCESS_READ,
-                thread__deleted=False)
-            if thread and thread.user_roles:
-                rights = rights.exclude(thread__data1__in=thread.user_roles)
-            rights = rights.select_related('thread')
-            return [right.thread for right in rights]
+        rights = models.GameThreadRight.objects.filter(
+            role_id__in=thread.user_roles,
+            thread__tree_id=thread.tree_id,
+            thread__lft__gt=thread.lft,
+            thread__rght__lt=thread.rght,
+            access_level__gte=models.THREAD_ACCESS_READ,
+            thread__deleted=False)
+        if thread and thread.user_roles:
+            rights = rights.exclude(thread__data1__in=thread.user_roles)
+        rights = rights.select_related('thread')
+        return [right.thread for right in rights]
     
     def get_free_childs(self, thread):
         query = Q(access_type__lt=models.THREAD_ACCESS_TYPE_NO_READ)
@@ -206,19 +205,18 @@ class GameRightsPlugin(RightsPlugin):
         if user.is_superuser or thread.admin or self.read_all(thread):
             return models.Thread.objects.filter(
                 parent=thread, access_type=models.THREAD_ACCESS_TYPE_NO_READ)
-        else:
-            if user.is_anonymous:
-                return []
-            query = Q(
-                thread__parent=thread,
-                thread__access_type=models.THREAD_ACCESS_TYPE_NO_READ,
-                access_level__gte=models.THREAD_ACCESS_READ,
-                role_id__in=thread.user_roles)
-            query = query & (Q(thread__deleted=False) | Q(
-                thread__data1__in=thread.user_roles))
-            rights = models.GameThreadRight.objects.filter(query)
-            rights = rights.select_related('thread')
-            return [right.thread for right in rights]
+        if user.is_anonymous:
+            return []
+        query = Q(
+            thread__parent=thread,
+            thread__access_type=models.THREAD_ACCESS_TYPE_NO_READ,
+            access_level__gte=models.THREAD_ACCESS_READ,
+            role_id__in=thread.user_roles)
+        query = query & (Q(thread__deleted=False) | Q(
+            thread__data1__in=thread.user_roles))
+        rights = models.GameThreadRight.objects.filter(query)
+        rights = rights.select_related('thread')
+        return [right.thread for right in rights]
         
     def get_moderators(self, thread):
         rights = models.GameThreadRight.objects.filter(

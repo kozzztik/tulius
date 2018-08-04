@@ -403,9 +403,8 @@ class DeleteIllustrationView(RightsDetailMixin, BaseDeleteView):
         if self.variation:
             return urls.reverse(
                 'stories:' + self.variation_url, args=(self.variation.pk,))
-        else:
-            return urls.reverse('stories:' + self.story_url, args=(
-                self.story.pk,))
+        return urls.reverse('stories:' + self.story_url, args=(
+            self.story.pk,))
 
 
 class DeleteMaterialView(DeleteIllustrationView):

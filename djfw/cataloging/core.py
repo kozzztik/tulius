@@ -39,16 +39,14 @@ class CatalogPage():
     def get_index(self):
         if self.is_index:
             return self
-        elif self.parent:
+        if self.parent:
             return self.parent.get_index()
-        else:
-            return None
+        return None
     
     def get_breadcrumbs(self):
         if self.parent:
             return self.parent.get_breadcrumbs() + [self]
-        else:
-            return [self]
+        return [self]
             
     def render_selected(self):
         return self.name
@@ -85,12 +83,10 @@ class CatalogPage():
             result = '<ul class="catalogindex"><li>%s</li></ul>' % (result,)
         if self.is_index or (not self.parent):
             return result
-        else:
-            return self.parent.catalog_index(self.name, result)
+        return self.parent.catalog_index(self.name, result)
             
     def catalog_caption(self):
         if self.is_index or (not self.parent):
             return self.get_caption()
-        else:
-            return "%s - %s" % (
-                self.parent.catalog_caption(), self.get_caption())
+        return "%s - %s" % (
+            self.parent.catalog_caption(), self.get_caption())

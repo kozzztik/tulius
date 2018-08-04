@@ -53,5 +53,4 @@ class VKBackend(ModelBackend):
                     user.vk_profile = vk_profile
                     user.save()
                     return user
-                else:
-                    return self.register_user(vk_profile, email)
+                return self.register_user(vk_profile, email)

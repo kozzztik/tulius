@@ -123,8 +123,7 @@ class SitedModelMixin(models.Model):
                 raise AttributeError()
         if callable(attr_value):
             return attr_value(self)
-        else:
-            return attr_value
+        return attr_value
     
     _site = None
     
@@ -161,27 +160,24 @@ class ThreadManager(TreeManager):
             return self.filter(
                 tree_id=parent.tree_id, lft__lt=parent.lft,
                 rght__gt=parent.rght)
-        else:
-            if not parent.parent_id:
-                return self.none()
-            return self.filter(
-                tree_id=parent.parent.tree_id,
-                lft__lte=parent.parent.lft, rght__gte=parent.parent.rght)
+        if not parent.parent_id:
+            return self.none()
+        return self.filter(
+            tree_id=parent.parent.tree_id,
+            lft__lte=parent.parent.lft, rght__gte=parent.parent.rght)
             
     def get_descendants(self, parent):
         if parent.get_descendant_count():
             return self.filter(
                 tree_id=parent.tree_id, lft__gt=parent.lft,
                 rght__lt=parent.rght, deleted=False)
-        else:
-            return self.none()
+        return self.none()
         
     def get_protected_descendants(self, parent):
         if parent.get_descendant_count():
             return self.get_descendants(parent).exclude(
                 access_type__lt=THREAD_ACCESS_TYPE_NO_READ)
-        else:
-            return self.none()
+        return self.none()
 
 
 class Thread(MPTTModel, SitedModelMixin):
@@ -510,8 +506,7 @@ class Comment(SitedModelMixin):
         marks = CommentDeleteMark.objects.filter(comment=self)
         if marks:
             return marks[0]
-        else:
-            return None
+        return None
     
     def is_thread(self):
         return self.id == self.parent.first_comment_id
@@ -812,8 +807,7 @@ class Voting(models.Model):
         if votes.count() > 0:
             vote = votes[0]
             return vote.choice
-        else:
-            return None
+        return None
 
 
 class VotingChoice(models.Model):

@@ -28,8 +28,7 @@ class VKConnector():
         if response.status_code in [200, 201]:
             content = json.loads(response.text)
             return content
-        else:
-            raise Exception(response.text)
+        raise Exception(response.text)
         
     def request_access_key(self, code, old_reddirect):
         args = {}

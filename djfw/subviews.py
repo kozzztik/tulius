@@ -66,13 +66,12 @@ class ParentObjectMixin:
         if self.parent_queryset is None:
             if self.parent_model:
                 return self.parent_model._default_manager.all()
-            else:
-                raise exceptions.ImproperlyConfigured(
-                    '%(cls)s is missing a queryset. Define '
-                    '%(cls)s.model, %(cls)s.queryset, or override '
-                    '%(cls)s.get_object().' % {
-                        'cls': self.__class__.__name__
-                    })
+            raise exceptions.ImproperlyConfigured(
+                '%(cls)s is missing a queryset. Define '
+                '%(cls)s.model, %(cls)s.queryset, or override '
+                '%(cls)s.get_object().' % {
+                    'cls': self.__class__.__name__
+                })
         return self.parent_queryset._clone()
 
     def get_parent_slug_field(self):
@@ -87,10 +86,9 @@ class ParentObjectMixin:
         """
         if self.parent_context_object_name:
             return self.parent_context_object_name
-        elif hasattr(obj, '_meta'):
+        if hasattr(obj, '_meta'):
             return smart_str(obj._meta.object_name.lower())
-        else:
-            return None
+        return None
 
     def get_context_data(self, **kwargs):
         context = kwargs

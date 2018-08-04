@@ -120,16 +120,15 @@ class RightsPlugin(ForumPlugin):
             ).filter(
                 access_type=self.models.THREAD_ACCESS_TYPE_NO_READ,
                 deleted=False)
-        else:
-            if user.is_anonymous:
-                return []
-            rights = self.models.ThreadAccessRight.objects.filter(
-                user=user, thread__tree_id=thread.tree_id,
-                thread__lft__gt=thread.lft, thread__rght__lt=thread.rght,
-                access_level__gte=self.models.THREAD_ACCESS_READ,
-                thread__deleted=False)
-            rights = rights.select_related('thread')
-            return [right.thread for right in rights]
+        if user.is_anonymous:
+            return []
+        rights = self.models.ThreadAccessRight.objects.filter(
+            user=user, thread__tree_id=thread.tree_id,
+            thread__lft__gt=thread.lft, thread__rght__lt=thread.rght,
+            access_level__gte=self.models.THREAD_ACCESS_READ,
+            thread__deleted=False)
+        rights = rights.select_related('thread')
+        return [right.thread for right in rights]
     
     def get_free_childs(self, thread):
         user = thread.view_user
@@ -163,36 +162,34 @@ class RightsPlugin(ForumPlugin):
             return self.models.Thread.objects.filter(
                 parent=thread,
                 access_type=self.models.THREAD_ACCESS_TYPE_NO_READ)
-        else:
-            if user.is_anonymous:
-                return []
-            query = Q(
-                thread__parent=thread,
-                thread__access_type=self.models.THREAD_ACCESS_TYPE_NO_READ,
-                access_level__gte=self.models.THREAD_ACCESS_READ, user=user)
-            query = query & (Q(thread__deleted=False) | Q(thread__user=user))
-            rights = self.models.ThreadAccessRight.objects.filter(query)
-            rights = rights.select_related('thread')
-            return [right.thread for right in rights]
+        if user.is_anonymous:
+            return []
+        query = Q(
+            thread__parent=thread,
+            thread__access_type=self.models.THREAD_ACCESS_TYPE_NO_READ,
+            access_level__gte=self.models.THREAD_ACCESS_READ, user=user)
+        query = query & (Q(thread__deleted=False) | Q(thread__user=user))
+        rights = self.models.ThreadAccessRight.objects.filter(query)
+        rights = rights.select_related('thread')
+        return [right.thread for right in rights]
 
     def get_readeable_protected_index(self, user, level):
         if user.is_superuser:
             return self.models.Thread.objects.filter(
                 access_type=self.models.THREAD_ACCESS_TYPE_NO_READ,
                 plugin_id=self.site_id, level=level, deleted=False)
-        else:
-            if user.is_anonymous:
-                return []
-            query = Q(
-                thread__level=level,
-                thread__access_type=self.models.THREAD_ACCESS_TYPE_NO_READ,
-                thread__plugin_id=self.site_id,
-                access_level__gte=self.models.THREAD_ACCESS_READ,
-                user=user, thread__deleted=False)
+        if user.is_anonymous:
+            return []
+        query = Q(
+            thread__level=level,
+            thread__access_type=self.models.THREAD_ACCESS_TYPE_NO_READ,
+            thread__plugin_id=self.site_id,
+            access_level__gte=self.models.THREAD_ACCESS_READ,
+            user=user, thread__deleted=False)
 #            query = query & (Q(thread__deleted=False) | Q(thread__user=user))
-            rights = self.models.ThreadAccessRight.objects.filter(query)
-            rights = rights.select_related('thread')
-            return [right.thread for right in rights]
+        rights = self.models.ThreadAccessRight.objects.filter(query)
+        rights = rights.select_related('thread')
+        return [right.thread for right in rights]
 
     def get_moderators(self, thread):
         rights = self.models.ThreadAccessRight.objects.filter(

@@ -28,8 +28,7 @@ class SiteCore:
     def __getattr__(self, attr):
         if attr in self.__dict__:
             return self.__dict__[attr]
-        else:
-            return self.content[attr]
+        return self.content[attr]
     
     def __getitem__(self, key):
         return self.content[key]
