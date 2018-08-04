@@ -59,10 +59,6 @@ class BasePluginView(TemplateView):
             raise PermissionDenied()
         return {'forum_site': self.site, 'core': self.core}
 
-    def render_to_response(self, context, **response_kwargs):
-        return super(BasePluginView, self).render_to_response(
-            context, **response_kwargs)
-
     def get_template_names(self):
         return [self.site.templates[self.template_name]]
 

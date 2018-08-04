@@ -93,18 +93,8 @@ def time_period_graph_sum(request, *args, **kwargs):
     intervals = request.profiler_period.intervals
     weight_field = request.profiler_period.weight_field
 
-    def annotate_stats(query):
-        if weight_field:
-            return query.annotate(
-                weight_count=Count(weight_field),
-                weight_sum=Sum(weight_field),
-                weight_avg=Avg(weight_field))
-        return query.annotate(weight_sum=Count('id'))
-
     delta = (endtime - starttime) / intervals
     data = []
-    period_query = ProfilerMessage.objects.filter(
-        create_time__lte=endtime, create_time__gte=starttime)
     for i in range(intervals):
         interval_start = starttime + (delta * i)
         interval_end = starttime + (delta * (i + 1))

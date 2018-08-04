@@ -30,7 +30,7 @@ class CatalogCaption(CatalogIndex):
 @register.tag(name="catalog_index")
 def do_catalog_index(parser, token):
     try:
-        tag_name, catalog_page = token.split_contents()
+        _, catalog_page = token.split_contents()
     except ValueError:
         msg = 'catalog_index tag requires a single argument'
         raise template.TemplateSyntaxError(msg)
@@ -40,7 +40,7 @@ def do_catalog_index(parser, token):
 @register.tag(name="catalog_caption")
 def do_catalog_caption(parser, token):
     try:
-        tag_name, catalog_page = token.split_contents()
+        _, catalog_page = token.split_contents()
     except ValueError:
         msg = 'catalog_caption tag requires a single argument'
         raise template.TemplateSyntaxError(msg)

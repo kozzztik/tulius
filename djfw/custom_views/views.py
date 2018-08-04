@@ -314,9 +314,6 @@ class FormsetWidget(TemplatedWidget):
     table_class = ''
     editable = True
 
-    def __init__(self, *args, **kwargs):
-        super(FormsetWidget, self).__init__(*args, **kwargs)
-
     def get_editable(self):
         if callable(self.editable):
             return self.editable(self.view)

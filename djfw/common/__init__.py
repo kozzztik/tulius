@@ -9,7 +9,7 @@ def_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890'
 
 def generate_random_id(id_length=50, characters=def_chars):
     result = ''
-    for y in range(id_length):
+    for _ in range(id_length):
         result += characters[random.randint(0, len(characters)-1)]
     return result
 

@@ -210,13 +210,13 @@ def add_variation_illustration(request, variation_id):
     """
     Edit story view - Add illustration view
     """
-    (story, variation) = get_variation(request.user, variation_id)
+    (_, variation) = get_variation(request.user, variation_id)
     return upload_illustration(request, None, variation, None)
 
 
 @login_required
 def edit_variation_forum(request, variation_id):
-    (story, variation) = get_variation(request.user, variation_id)
+    (_, variation) = get_variation(request.user, variation_id)
     return HttpResponseRedirect(
         urls.reverse('gameforum:variation', args=(variation.pk,)))
 

@@ -240,7 +240,7 @@ class Game(models.Model):
     )
 
     def status_as_text(self):
-        for i, choice in enumerate(GAME_STATUS_CHOICES):
+        for choice in GAME_STATUS_CHOICES:
             if choice[0] == self.status:
                 return choice[1]
         return ''
@@ -609,7 +609,7 @@ class GameInvite(models.Model):
     )
 
     def status_as_text(self):
-        for i, choice in enumerate(GAME_INVITE_STATUS_CHOICES):
+        for choice in GAME_INVITE_STATUS_CHOICES:
             if choice[0] == self.status:
                 return choice[1]
         return ''

@@ -38,7 +38,7 @@ class FormFields(template.Node):
 @register.tag(name="inline_form_fields")
 def do_form_field(parser, token):
     try:
-        tag_name, formname, formset, head = token.split_contents()
+        _, formname, formset, head = token.split_contents()
     except ValueError:
         msg = 'inline_form_fields tag requires a three arguments'
         raise template.TemplateSyntaxError(msg)

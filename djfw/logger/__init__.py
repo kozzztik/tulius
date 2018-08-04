@@ -19,6 +19,6 @@ class DBLogHandler(logging.Handler):
                 log_message.body = record.msg
             log_message.save()
         except:
-            (exc_type, exc_value, exc_traceback) = sys.exc_info()
+            (exc_type, exc_value, _) = sys.exc_info()
             logging.error(exc_type)
             logging.error(exc_value)

@@ -45,7 +45,7 @@ def save_illustration(
     else:
         name = illustration.image.name
         if name:
-            (name, ext) = os.path.splitext(illustration.image.name)
+            (name, _) = os.path.splitext(illustration.image.name)
         else:
             name = generate_random_id(30)
         illustration.delete_data()
