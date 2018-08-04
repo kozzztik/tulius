@@ -147,7 +147,8 @@ class ThreadsCorePlugin(ForumPlugin):
         return sorted(childs, key=lambda x: x.id)
 
     def process_edit_room(
-            self, request, parent_thread, thread, formset_params={}):
+            self, request, parent_thread, thread, formset_params=None):
+        formset_params = formset_params or {}
         models = self.site.models
         right_model = self.site.core.right_model
         right_form = self.site.core.right_form
@@ -186,7 +187,8 @@ class ThreadsCorePlugin(ForumPlugin):
 
     def process_edit_thread(
             self, request, parent_thread, thread, voting_enabled,
-            voting_valid, formset_params={}):
+            voting_valid, formset_params=None):
+        formset_params = formset_params or {}
         models = self.site.models
         right_model = self.site.core.right_model
         right_form = self.site.core.right_form

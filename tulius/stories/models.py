@@ -389,8 +389,7 @@ class Variation(SortableModelMixin):
         return self.story.create_right(user)
 
     def copy(self):
-        old_id = self.id
-        self.id = None
+        old_id, self.pk = self.pk, None
         self.comments_count = 0
         self.save()
         rolelinks = {}

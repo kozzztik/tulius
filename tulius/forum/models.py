@@ -536,7 +536,9 @@ class Comment(SitedModelMixin):
                 self.site().signals.before_save_comment.send(
                     self, old_comment=old_self)
         else:
-            if (not self.reply_id) and (
+            # trick to avoid pylint warning
+            reply_id = getattr(self, 'reply_id', None)
+            if (not reply_id) and (
                     self.parent.first_comment_id != self.id):
                 self.reply_id = self.parent.first_comment_id
             self.site().signals.before_add_comment.send(

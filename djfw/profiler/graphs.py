@@ -249,7 +249,7 @@ def collapsed_time_period_graph(start_day, days, weight_field, multi=1):
 
 
 def collapsed_sunlignt_graph(
-        start_day, days, weight_field, subfield=None, mappings={},
+        start_day, days, weight_field, subfield=None, mappings=None,
         strict_mappings=False):
     category_subfield = weight_field != 'devices'
     categories = {}

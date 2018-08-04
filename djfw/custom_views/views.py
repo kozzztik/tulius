@@ -329,7 +329,7 @@ class FormsetWidget(TemplatedWidget):
                 obj = method()
             else:
                 return self.model._default_manager.all()
-        self.obj = obj
+        setattr(self, 'obj', obj)
         if not self.fk:
             fk = forms.models._get_foreign_key(obj.__class__, self.model)
             self.fk = fk.name
