@@ -21,8 +21,8 @@ class CountersBase(TemplateView):
 
 class ForumNums(CountersBase):
     def do_action(self):
-        site = apps.get_app_config('forum').site
-        site.core.rebuild_tree(None)
+        forum_site = apps.get_app_config('forum').site
+        forum_site.core.rebuild_tree(None)
 
 
 class PMCounters(CountersBase):

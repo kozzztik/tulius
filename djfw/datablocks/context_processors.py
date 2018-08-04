@@ -1,10 +1,11 @@
 from django.utils.safestring import mark_safe
-from .models import DataBlock
+
+from djfw.datablocks import models
 
 
 def datablocks(request):
-    objs = DataBlock.objects.languaged()
-    datablocks = {}
+    objs = models.DataBlock.objects.languaged()
+    blocks = {}
     for datablock in objs:
         if datablock.urls:
             urls = datablock.urls.split()
@@ -16,8 +17,8 @@ def datablocks(request):
             urls = [url.strip() for url in urls]
             if request.path in urls:
                 continue
-        datablocks[datablock.name] = mark_safe(datablock.full_text)
+        blocks[datablock.name] = mark_safe(datablock.full_text)
     return {
-        'datablocks': datablocks,
+        'datablocks': blocks,
         'request': request
     }

@@ -67,9 +67,9 @@ def time_period_graph(request, *args, **kwargs):
         period_data = []
         for module in module_list:
             module_values = [0]
-            for i in values:
-                if module['module_name'] == i['module_name']:
-                    module_values = [i['weight_sum']]
+            for j in values:
+                if module['module_name'] == j['module_name']:
+                    module_values = [j['weight_sum']]
                     break
             period_data += module_values
 

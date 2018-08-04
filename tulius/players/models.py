@@ -23,10 +23,10 @@ class StarsCache:
     stars_list = []
 
     def flush_stars_cache(self):
-        stars = PlayerStar.objects.all()
-        self.stars_count = len(stars)
+        star_objs = PlayerStar.objects.all()
+        self.stars_count = len(star_objs)
         self.stars_list = []
-        for star in stars:
+        for star in star_objs:
             self.stars_list += [star.games]
 
 

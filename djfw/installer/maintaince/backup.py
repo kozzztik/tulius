@@ -1,6 +1,8 @@
 import importlib
 import logging
 import os
+import platform
+import subprocess
 import tarfile
 
 from django.conf import settings
@@ -9,9 +11,7 @@ from django.core.exceptions import ImproperlyConfigured
 logger = logging.getLogger('installer')
 
 
-def subprocess(command, message_cmd=''):
-    import platform
-    import subprocess
+def run_subprocess(command, message_cmd=''):
     is_windows = platform.system() == 'Windows'
     try:
         proc = subprocess.Popen(
@@ -55,7 +55,7 @@ def backupmysql(category):
 
     if os.path.exists(filename):
         os.remove(filename)
-    subprocess(
+    run_subprocess(
         'mysqldump -u%s -p%s -h%s %s > %s' % (
             database['USER'], database['PASSWORD'], database['HOST'],
             database['NAME'], filename), 'Backup mysql')

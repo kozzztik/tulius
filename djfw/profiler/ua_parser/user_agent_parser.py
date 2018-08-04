@@ -94,13 +94,13 @@ class OSParser:
         return match_spans
 
     def Parse(self, user_agent_string):
-        os, os_v1, os_v2, os_v3, os_v4 = None, None, None, None, None
+        os_name, os_v1, os_v2, os_v3, os_v4 = None, None, None, None, None
         match = self.user_agent_re.search(user_agent_string)
         if match:
             if self.os_replacement:
-                os = self.os_replacement
+                os_name = self.os_replacement
             else:
-                os = match.group(1)
+                os_name = match.group(1)
 
             if match.lastindex >= 2:
                 os_v1 = match.group(2)
@@ -111,7 +111,7 @@ class OSParser:
                         if match.lastindex >= 5:
                             os_v4 = match.group(5)
 
-        return os, os_v1, os_v2, os_v3, os_v4
+        return os_name, os_v1, os_v2, os_v3, os_v4
 
 
 class DeviceParser:
@@ -219,12 +219,12 @@ def ParseOS(user_agent_string, **jsParseBits):
       A dictionary containing parsed bits.
     """
     for osParser in OS_PARSERS:
-        os, os_v1, os_v2, os_v3, os_v4 = osParser.Parse(user_agent_string)
-        if os:
+        os_name, os_v1, os_v2, os_v3, os_v4 = osParser.Parse(user_agent_string)
+        if os_name:
             break
-    os = os or 'Other'
+    os_name = os_name or 'Other'
     return {
-        'family': os,
+        'family': os_name,
         'major': os_v1,
         'minor': os_v2,
         'patch': os_v3,
@@ -263,19 +263,19 @@ def PrettyUserAgent(family, v1=None, v2=None, v3=None):
     return family
 
 
-def PrettyOS(os, os_v1=None, os_v2=None, os_v3=None, os_v4=None):
+def PrettyOS(os_name, os_v1=None, os_v2=None, os_v3=None, os_v4=None):
     """Pretty os string."""
     if os_v4:
-        return '%s %s.%s.%s.%s' % (os, os_v1, os_v2, os_v3, os_v4)
+        return '%s %s.%s.%s.%s' % (os_name, os_v1, os_v2, os_v3, os_v4)
     if os_v3:
         if os_v3[0].isdigit():
-            return '%s %s.%s.%s' % (os, os_v1, os_v2, os_v3)
-        return '%s %s.%s%s' % (os, os_v1, os_v2, os_v3)
+            return '%s %s.%s.%s' % (os_name, os_v1, os_v2, os_v3)
+        return '%s %s.%s%s' % (os_name, os_v1, os_v2, os_v3)
     if os_v2:
-        return '%s %s.%s' % (os, os_v1, os_v2)
+        return '%s %s.%s' % (os_name, os_v1, os_v2)
     if os_v1:
-        return '%s %s' % (os, os_v1)
-    return os
+        return '%s %s' % (os_name, os_v1)
+    return os_name
 
 
 def ParseWithJSOverrides(user_agent_string,
