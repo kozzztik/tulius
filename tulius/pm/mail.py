@@ -36,3 +36,4 @@ def get_mail(mail):
 
     body = mail.body.replace('\\n', '\n').strip(' \n').replace('\n', '\t\n')
     PrivateMessage(sender=sender, receiver=receiver, body=body).save()
+    return True

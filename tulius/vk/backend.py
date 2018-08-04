@@ -25,6 +25,7 @@ class VKBackend(ModelBackend):
             new_name = name.replace(' ', '_')
             if new_name and self.check_name(new_name):
                 return new_name
+        raise ValueError()
 
     def register_user(self, profile, email):
         user = User(vk_profile=profile, email=email)

@@ -48,3 +48,4 @@ class VKConnector():
         data = self.request('users.get', access_token=access_token, **params)
         if data:
             return data['response'][0]
+        return None  # not sure

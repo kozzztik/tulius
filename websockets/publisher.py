@@ -57,3 +57,4 @@ class RedisPublisher(RedisStore):
             message = self._connection.get(channel)
             if message:
                 return message
+        return None  # not sure

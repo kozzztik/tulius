@@ -101,7 +101,7 @@ def do_backup(category_name):
             category.save()
         if not category.enabled:
             log("Category disabled.")
-            return
+            return None
         backup = Backup(category=category)
         backups_dir = backup.backups_dir()
         media_root = settings.MEDIA_ROOT
