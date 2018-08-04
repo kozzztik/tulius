@@ -168,7 +168,7 @@ def paginate(context, window=DEFAULT_WINDOW, hashtag=''):
         pages = []
         # If there's no overlap between the first set of pages and the current
         # set of pages, then there's a possible need for elusion.
-        if len(first.intersection(current)) == 0:
+        if not first.intersection(current):
             first_list = list(first)
             first_list.sort()
             second_list = list(current)
@@ -195,7 +195,7 @@ def paginate(context, window=DEFAULT_WINDOW, hashtag=''):
             pages.extend(unioned)
         # If there's no overlap between the current set of pages and the last
         # set of pages, then there's a possible need for elusion.
-        if len(current.intersection(last)) == 0:
+        if not current.intersection(last):
             second_list = list(last)
             second_list.sort()
             diff = second_list[0] - pages[-1]
@@ -230,7 +230,7 @@ def paginate(context, window=DEFAULT_WINDOW, hashtag=''):
             getvars = context['request'].GET.copy()
             if 'page' in getvars:
                 del getvars['page']
-            if len(getvars.keys()) > 0:
+            if getvars.keys():
                 to_return['getvars'] = "&%s" % getvars.urlencode()
             else:
                 to_return['getvars'] = ''

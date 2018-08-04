@@ -516,7 +516,7 @@ class Comment(SitedModelMixin):
     def is_thread(self):
         return self.id == self.parent.first_comment_id
     
-    def save(self, fast_save=False, *args, **kwargs):
+    def save(self, *args, fast_save=False, **kwargs):
         if fast_save:
             super(Comment, self).save(*args, **kwargs)
             return

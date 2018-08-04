@@ -58,7 +58,7 @@ def bbcode_to_html(data_str, codes_list=None, simple_codes_list=None):
                     tagname = tagname.lower()
                     new_tag_stack = tag_stack[:]
                     tag = None
-                    while len(new_tag_stack) > 0:
+                    while new_tag_stack:
                         (stack_tag, stack_tagname, stack_param,
                          stack_tag_opened, stack_current) = \
                             new_tag_stack.pop()

@@ -10,7 +10,7 @@ def handle_upload(request, func, *args, **kwargs):
     Uploading files via Ajax
     """
     if request.method == "POST":
-        if len(request.FILES) == 0:
+        if not request.FILES:
             upload = ContentFile(request.read())
             if 'qqfile' in request.GET:
                 filename = request.GET['qqfile']

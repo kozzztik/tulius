@@ -50,7 +50,7 @@ class CharacterForm(forms.ModelForm):
         model = models.Character
         exclude = ('story',)
 
-    def __init__(self, story=None, *args, **kwargs):
+    def __init__(self, *args, story=None, **kwargs):
         super(CharacterForm, self).__init__(*args, **kwargs)
         self.fields['avatar'].queryset = self.fields[
             'avatar'].queryset.filter(story=story)

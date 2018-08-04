@@ -37,7 +37,7 @@ class Like(BasePluginView):
             like_count -= 1
             value = False
         else:
-            if len(like_marks) == 0:
+            if not like_marks:
                 like_mark = models.CommentLike(
                     user=request.user, comment=comment)
                 like_mark.save()

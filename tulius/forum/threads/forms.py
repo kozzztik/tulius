@@ -33,7 +33,7 @@ class RoomForm(forms.Form):
         label=_(u'Access type'),
     )
     
-    def __init__(self, models, thread=None, *args, **kwargs):
+    def __init__(self, models, *args, thread=None, **kwargs):
         self.caption = _('edit room') if thread else _('add room')
         self.base_fields['access_type'].choices = \
             models.THREAD_ACCESS_TYPE_CHOICES
