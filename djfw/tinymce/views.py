@@ -12,7 +12,7 @@ from .models import Emotion, FileUpload
 
 class Smiles(TemplateView):
     template_name = 'tinymce/smiles/tiny_mce_smiles.haml'
-    
+
     def get_context_data(self, **kwargs):
         emotions = Emotion.objects.all()
         if not emotions:
@@ -41,7 +41,7 @@ class Smiles(TemplateView):
 
 class Uploaded_files(TemplateView):
     template_name = 'tinymce/plugins/file_upload.haml'
-    
+
     def get_context_data(self, **kwargs):
         if not self.request.user.is_anonymous:
             all_files = FileUpload.objects.filter(
@@ -66,8 +66,8 @@ def save_upload(request, upload, filename):
     uploaded_file.save()
     uploaded_file.body.save(str(uploaded_file.pk) + '_' + filename, upload)
     uploaded_file.save()
-    return {'url': uploaded_file.body.url, 
-            'filename': uploaded_file.filename, 
+    return {'url': uploaded_file.body.url,
+            'filename': uploaded_file.filename,
             'image': uploaded_file.is_image()}
 
 

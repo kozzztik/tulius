@@ -23,14 +23,13 @@ class GameRightForm(forms.models.ModelForm):
                 [person.id, person] for person in
                 parent_thread.limited_read_list]
             self.fields['role'].widget.choices = choices
-                
-        
+
+
 class RoleForm(forms.Form):
     # role = forms.Select(choices=())
     role = forms.ChoiceField(label=_('Character'), choices=())
 
     def __init__(self, admin, roles, *args, **kwargs):
-                
         super(RoleForm, self).__init__(*args, **kwargs)
         choices = []
         if admin:
@@ -42,9 +41,8 @@ class RoleForm(forms.Form):
 
 class EditorForm(forms.Form):
     editor = forms.ChoiceField(label=_('Editor'), choices=())
-    
+
     def __init__(self, admin, roles, *args, **kwargs):
-                
         super(EditorForm, self).__init__(*args, **kwargs)
         choices = []
         if admin:

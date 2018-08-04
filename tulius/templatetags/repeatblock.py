@@ -28,20 +28,19 @@ class MacroRoot(template.Node):
     """
     def __init__(self, nodelist=None):
         self.nodelist = nodelist or []
-        
+
     def render(self, context):
         return self.nodelist.render(context)
-        
-    def find(self, block_name, parent_nodelist=None):        
+
+    def find(self, block_name, parent_nodelist=None):
         # parent_nodelist is internally for recusion, start with root nodelist
         if parent_nodelist is None:
             parent_nodelist = self.nodelist
-        
         for node in parent_nodelist:
-            if isinstance(node, (MacroNode, BlockNode)):                
+            if isinstance(node, (MacroNode, BlockNode)):
                 if node.name == block_name:
                     return node
-            if hasattr(node, 'nodelist'):               
+            if hasattr(node, 'nodelist'):
                 result = self.find(block_name, node.nodelist)
                 if result:
                     return result
@@ -88,20 +87,20 @@ class MacroNode(BlockNode):
 
     def render(self, context):
         return ''
-        
+
     # the render that actually works
-    def repeat(self, context):        
+    def repeat(self, context):
         return super(MacroNode, self).render(context)
 
 
 def do_macro(parser, token):
     # let the block parse itself
     result = do_block(parser, token)
-    # "upgrade" the BlockNode to a MacroNode and return it. Yes, I was not 
+    # "upgrade" the BlockNode to a MacroNode and return it. Yes, I was not
     # completely comfortable with it either at first, but Google says it's ok.
     result.__class__ = MacroNode
     return result
-      
+
 
 class RepeatNode(template.Node):
     """
@@ -118,7 +117,7 @@ class RepeatNode(template.Node):
     def render(self, context):
         block = self.macro_root.find(self.block_name)
         if not block or self.extra_context:
-            # apparently we are not supposed to raise exceptions at rendering 
+            # apparently we are not supposed to raise exceptions at rendering
             # stage, but this is serious, and we cannot do it while parsing.
             # once again, it comes down to being able to support repeating of
             # standard blocks. If we would only support our own %macro% tags,

@@ -52,47 +52,47 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
 
     avatar = models.ImageField(
-        upload_to='avatars', 
-        blank=True, 
+        upload_to='avatars',
+        blank=True,
         null=True
     )
     rank = models.CharField(
-        max_length=255, 
-        default='', 
-        blank=True, 
-        null=True, 
+        max_length=255,
+        default='',
+        blank=True,
+        null=True,
         verbose_name=_('rank')
     )
     show_played_games = models.BooleanField(
-        default=True, 
+        default=True,
         verbose_name=_('show played games')
     )
     show_played_characters = models.BooleanField(
-        default=True, 
+        default=True,
         verbose_name=_('show played characters')
     )
     show_online_status = models.BooleanField(
-        default=True, 
+        default=True,
         verbose_name=_('show on-line status')
     )
     hide_trustmarks = models.BooleanField(
-        default=False, 
+        default=False,
         verbose_name=_('hide trustmarks')
     )
     signature = models.TextField(
-        max_length=400, 
+        max_length=400,
         default='',
         blank=True,
         verbose_name=_('signature')
     )
     compact_text = models.BooleanField(
-        default=False, 
+        default=False,
         verbose_name=_('compact text')
     )
     icq = models.CharField(
         default='',
         blank=True,
-        max_length=12, 
+        max_length=12,
         verbose_name=_('ICQ')
     )
     skype = models.CharField(
@@ -106,7 +106,7 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
         verbose_name=_(u'sex'),
         choices=USER_SEX_CHOICES,
     )
-    
+
     game_inline = models.SmallIntegerField(
         default=USER_GAME_INLINE_TIME,
         blank=False,
@@ -118,7 +118,7 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
         blank=False,
         verbose_name=_(u'Animation speed'),
     )
-    
+
     vk_profile = models.ForeignKey(
         VK_Profile,
         models.PROTECT,
@@ -147,11 +147,11 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
-    
+
     def __unicode__(self):
         v = self.username
         return u'%s' % (v, )
-    
+
     @models.permalink
     def get_absolute_url(self):
         return 'players:player_details', (), {'player_id': self.id}
@@ -192,25 +192,25 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
         self.full_stars_cache = 'b' * big_stars + 's' * small_stars + 'e' * (
             stars.stars_count - small_stars)
         return self.full_stars_cache
-    
+
     def stories_author(self):
-        from tulius.stories.models import StoryAuthor 
+        from tulius.stories.models import StoryAuthor
         return StoryAuthor.objects.filter(user=self).count()
-    
+
     new_invites_cache = None
-    
+
     def new_invites(self):
         from tulius.games.models import GAME_INVITE_STATUS_NEW, GameInvite
         if self.new_invites_cache is None:
             self.new_invites_cache = GameInvite.objects.filter(
                 user=self, status=GAME_INVITE_STATUS_NEW)
         return self.new_invites_cache
-    
+
     def send_pm(self, sender, body):
         from tulius.pm.models import PrivateMessage
         pm = PrivateMessage(sender=sender, receiver=self, body=body)
         pm.save()
-        
+
     def update_not_readed(self):
         from tulius.pm.models import PrivateMessage
         count = PrivateMessage.objects.filter(
@@ -221,7 +221,7 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
         if last:
             self.last_read_pm_id = last[0].pk
         self.save()
-        
+
     def get_forum_reply_str(self):
         if self.sex == USER_SEX_MALE:
             s = pgettext('He', '%s said')

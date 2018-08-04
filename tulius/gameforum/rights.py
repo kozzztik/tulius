@@ -61,7 +61,7 @@ class GameRightsPlugin(RightsPlugin):
             if thread.strict_write is not None:
                 if role not in thread.strict_write:
                     thread.strict_write += [role]
-    
+
     def get_parent_rights(self, thread, user):
         if not thread.parent_id:
             variations = models.Variation.objects.filter(thread=thread)
@@ -93,8 +93,8 @@ class GameRightsPlugin(RightsPlugin):
             if not thread.game:
                 return (False, False, False)
             parent_read = thread.game.read_right(user)
-            parent_write = thread.game.write_right(user) 
-            return (parent_read, parent_write, False)
+            parent_write = thread.game.write_right(user)
+            return parent_read, parent_write, False
         (parent_read, parent_write, parent_moderate) = super(
             GameRightsPlugin, self).get_parent_rights(thread, user)
         thread.variation = thread.parent.variation
@@ -104,7 +104,7 @@ class GameRightsPlugin(RightsPlugin):
         thread.user_roles = thread.parent.user_roles
         self.strict_roles(thread)
         return parent_read, parent_write, parent_moderate
-     
+
     def get_special_rights(self, thread, user):
         special_read = False
         special_write = False
@@ -122,11 +122,11 @@ class GameRightsPlugin(RightsPlugin):
                 if right.access_level & models.THREAD_ACCESS_MODERATE:
                     special_moderate = True
         return special_read, special_write, special_moderate
-    
+
     def is_superuser_equal(self, thread, user, parent_moderate):
         return super(GameRightsPlugin, self).is_superuser_equal(
             thread, user, parent_moderate) or thread.admin
-    
+
     def get_rights(self, thread):
         user = thread.view_user
         (read_right, view_right, write_right, edit_right, move_right,
@@ -152,7 +152,7 @@ class GameRightsPlugin(RightsPlugin):
         return (
             read_right, view_right, write_right, edit_right, move_right,
             moderate_right)
-    
+
     def limited_read_list(self, thread):
         persons = [
             right.role for right in
@@ -161,17 +161,17 @@ class GameRightsPlugin(RightsPlugin):
             parent_list = thread.parent.limited_read_list
             persons = [person for person in persons if person in parent_list]
         return persons
-    
+
     def get_free_descendants(self, thread):
         query = Q(access_type__lt=models.THREAD_ACCESS_TYPE_NO_READ)
         if thread and thread.user_roles:
             query = query | Q(data1__in=thread.user_roles)
         return models.Thread.objects.get_descendants(thread).filter(
             deleted=False).filter(query)
-    
+
     def read_all(self, thread):
         return thread.game and thread.game.status >= GAME_STATUS_FINISHING
-    
+
     def get_readeable_protected_descendants(self, thread):
         user = thread.view_user
         if user.is_superuser or thread.admin or thread.guest or self.read_all(
@@ -192,14 +192,14 @@ class GameRightsPlugin(RightsPlugin):
             rights = rights.exclude(thread__data1__in=thread.user_roles)
         rights = rights.select_related('thread')
         return [right.thread for right in rights]
-    
+
     def get_free_childs(self, thread):
         query = Q(access_type__lt=models.THREAD_ACCESS_TYPE_NO_READ)
         if thread and thread.user_roles:
             query = query | Q(data1__in=thread.user_roles)
         query = Q(parent=thread) & query
         return models.Thread.objects.filter(query)
-    
+
     def get_readeable_protected_childs(self, thread):
         user = thread.view_user
         if user.is_superuser or thread.admin or self.read_all(thread):
@@ -217,14 +217,14 @@ class GameRightsPlugin(RightsPlugin):
         rights = models.GameThreadRight.objects.filter(query)
         rights = rights.select_related('thread')
         return [right.thread for right in rights]
-        
+
     def get_moderators(self, thread):
         rights = models.GameThreadRight.objects.filter(
             thread_id=thread.id,
             access_level__gt=models.THREAD_ACCESS_MODERATE)
         rights = rights.select_related('role')
         return [right.role for right in rights]
-        
+
     def get_accessed_users(self, thread):
         rights = models.GameThreadRight.objects.filter(
             thread_id=thread.id).distinct()
@@ -235,7 +235,7 @@ class GameRightsPlugin(RightsPlugin):
         if thread.strict_read:
             roles = [role for role in roles if role in thread.strict_read]
         return roles
-    
+
     def init_core(self):
         super(GameRightsPlugin, self).init_core()
         self.core['right_model'] = models.GameThreadRight

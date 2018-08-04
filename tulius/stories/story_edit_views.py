@@ -32,16 +32,16 @@ class StoryAdminMixin(RightsDetailMixin):
     model = Story
     page_url = None
     success_message = _('story was successfully updated')
-    
+
     def check_rights(self, obj, user):
         return obj.edit_right(user)
-    
+
     def get_context_data(self, **kwargs):
         if self.page_url:
             kwargs['catalog_page'] = EditStorySubpage(
                 self.object, url=self.page_url)
         return super(StoryAdminMixin, self).get_context_data(**kwargs)
-    
+
     def get_success_url(self):
         return urls.reverse('stories:' + self.page_url, args=(self.object.pk,))
 
@@ -77,7 +77,7 @@ class StoryFile():
 class StoryGraphics(StoryAdminMixin, DetailView):
     template_name = 'stories/edit_story/graphics.haml'
     page_url = EDIT_STORY_PAGES_GRAPHICS
-    
+
     def get_context_data(self, **kwargs):
         kwargs['story_files'] = (
             StoryFile(
@@ -91,7 +91,7 @@ class StoryGraphics(StoryAdminMixin, DetailView):
                 self.object.bottom_banner),
         )
         return super(StoryGraphics, self).get_context_data(**kwargs)
-    
+
     def post(self, request, *args, **kwargs):
         story = self.get_object()
         field_name = request.GET['story_name']
@@ -118,12 +118,12 @@ class UsersFormsets:
             instance=instance, params={'static': static})
         self.static = static
         self.instance = instance
-        
+
     def is_valid(self):
         return (
             (not self.static) and self.authorformset.is_valid() and
             self.adminformset.is_valid())
-    
+
     def save(self):
         self.authorformset.save()
         self.adminformset.save()
@@ -133,10 +133,10 @@ class UsersFormsets:
 class StoryUsers(ActionableViewMixin, StoryAdminMixin, DetailView):
     template_name = 'stories/edit_story/users.haml'
     page_url = EDIT_STORY_PAGES_USERS
-    
+
     def get_editable(self):
         return self.request.user.is_superuser
-    
+
     widgets = {
         'authorformset': {
             'class': FormsetWidget, 'model': StoryAuthor,
@@ -158,10 +158,10 @@ class EditStoryVariations(
 
 class BaseStoryAddView(StoryAdminMixin, MessageMixin, SubCreateView):
     parent_model = Story
-        
+
     def check_parent_rights(self, obj, user):
         return self.check_rights(obj, user)
-    
+
     def get_context_data(self, **kwargs):
         kwargs['form_submit_title'] = _("add")
         kwargs['catalog_page'] = CatalogPage(
@@ -177,7 +177,7 @@ class AddVariationView(BaseStoryAddView):
     parent_page_url = EDIT_STORY_PAGES_VARIATIONS
     page_name = _('Add new variation')
     model = Variation
-    
+
     def form_valid(self, form):
         with transaction.commit_on_success():
             variation = form.save(commit=False)
@@ -236,7 +236,7 @@ class CharacterView(
     model = Character
     form_class = CharacterForm
     success_message = _('character was successfully updated')
-    
+
     def check_rights(self, obj, user):
         self.parent_object = obj.story
         return self.parent_object.edit_right(user)
@@ -258,7 +258,7 @@ class StoryAvatarsView(StoryAdminMixin, DetailView):
 class StoryIllustrationsView(StoryAdminMixin, DetailView):
     template_name = 'stories/materials/illustrations.haml'
     page_url = EDIT_STORY_PAGES_ILLUSTRATIONS
-    
+
     def get_context_data(self, **kwargs):
         kwargs['illustrations'] = Illustration.objects.filter(story=self.object)
         return super(StoryIllustrationsView, self).get_context_data(**kwargs)
@@ -267,7 +267,7 @@ class StoryIllustrationsView(StoryAdminMixin, DetailView):
 class StoryMaterialsView(StoryAdminMixin, DetailView):
     template_name = 'stories/materials/materials.haml'
     page_url = EDIT_STORY_PAGES_MATERIALS
-    
+
     def get_context_data(self, **kwargs):
         kwargs['materials'] = AdditionalMaterial.objects.filter(
             story=self.object)
@@ -276,14 +276,14 @@ class StoryMaterialsView(StoryAdminMixin, DetailView):
 
 class StoryDeleteAvatarView(RightsDetailMixin, BaseDeleteView):
     model = Avatar
-    
+
     def get(self, request, *args, **kwargs):
         return self.post(request, *args, **kwargs)
-    
+
     def check_rights(self, obj, user):
         self.story = obj.story
         return obj.story.edit_right(user)
-    
+
     def get_success_url(self):
         return urls.reverse(
             'stories:' + EDIT_STORY_PAGES_AVATARS, args=(self.story.pk,))
@@ -295,7 +295,7 @@ class EditAvatarView(RightsDetailMixin, MessageMixin, UpdateView):
     form_class = AvatarForm
     success_message = _('avatar was successfully updated')
     parent_page_url = EDIT_STORY_PAGES_AVATARS
-    
+
     def check_rights(self, obj, user):
         self.story = obj.story
         return obj.story.edit_right(user)
@@ -320,7 +320,7 @@ class EditIllustrationView(RightsDetailMixin, MessageMixin, UpdateView):
     story_page_url = EDIT_STORY_PAGES_ILLUSTRATIONS
     variation_page_url = EDIT_VARIATION_PAGES_ILLUSTRATIONS
     login_required = True
-    
+
     def check_rights(self, obj, user):
         self.story = obj.story
         self.variation = obj.variation
@@ -398,7 +398,7 @@ class DeleteIllustrationView(RightsDetailMixin, BaseDeleteView):
         self.story = obj.story
         self.variation = obj.variation
         return obj.edit_right(user)
-    
+
     def get_success_url(self):
         if self.variation:
             return urls.reverse(

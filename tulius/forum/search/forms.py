@@ -24,7 +24,7 @@ class ExtendedSearchForm(forms.Form):
     date_from = forms.CharField(label=_("from date"), required=False)
     date_to = forms.CharField(label=_("to date"), required=False)
     text = forms.CharField(label=_("text"), required=False)
-    
+
     def __init__(self, threads, *args, **kwargs):
         super(ExtendedSearchForm, self).__init__(*args, **kwargs)
         self.fields['thread'].choices = threads

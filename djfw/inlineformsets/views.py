@@ -8,7 +8,7 @@ class DetailFormsetsMixin:
 #                'adminformset': {'model': GameAdmin, 'extra': 1},
 #                }
     formset_objs = {}
-    
+
     def get_formsets(self):
         if self.formset_objs:
             return self.formset_objs
@@ -26,18 +26,18 @@ class DetailFormsetsMixin:
                 instance=self.object)
             self.formset_objs[formset_name] = formset
         return self.formset_objs
-        
+
     def get_context_data(self, **kwargs):
         context = super(DetailFormsetsMixin, self).get_context_data(**kwargs)
         context.update(self.get_formsets())
         return context
-    
+
     def get_success_url(self):
         pass
-    
+
     def formset_invalid(self):
         pass
-    
+
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)

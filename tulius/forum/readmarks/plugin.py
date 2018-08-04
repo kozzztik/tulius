@@ -7,10 +7,10 @@ from .views import MarkAsRead
 class ReadMarksPlugin(ForumPlugin):
     def mark_thread_url(self, thread):
         return self.reverse('mark_as_readed', thread.id)
-    
+
     def mark_all_url(self):
         return self.reverse('mark_as_readed')
-    
+
     def mark_as_readed(self, thread, read_mark=None, readed_id=None):
         models = self.site.core.models
         if not thread.last_comment:
@@ -38,13 +38,13 @@ class ReadMarksPlugin(ForumPlugin):
             read_mark.readed_comment_id = thread.last_comment_id
             read_mark.not_readed_comment = None
         read_mark.save()
-    
+
     def get_read_mark(self, thread):
         user = thread.view_user
         marks = self.models.ThreadReadMark.objects.filter(
             thread=thread, user=user)
         return marks[0] if marks else None
-    
+
     def comments_readed(self, sender, **kwargs):
         user = kwargs['user']
         comments = kwargs['comments']
@@ -58,7 +58,7 @@ class ReadMarksPlugin(ForumPlugin):
                         comment.unreaded = (comment.id > last_readed) and (
                             comment.user_id != user.id)
             self.mark_as_readed(sender, readmark)
-    
+
     def after_add_comment(self, sender, **kwargs):
         restore = kwargs['restore']
         if not restore:
@@ -82,7 +82,7 @@ class ReadMarksPlugin(ForumPlugin):
                 thread=thread, not_readed_comment=sender.id)
             new_not_readed = comments[0].id if comments else None
             read_marks.update(not_readed_comment=new_not_readed)
-                
+
     def threads_list_view(self, sender, **args):
         user = sender.view_user
         threads = args['threads']
@@ -120,7 +120,7 @@ class ReadMarksPlugin(ForumPlugin):
                 not thread.important)]
         del threads[:]
         threads += important_threads + unreaded_threads + readed_threads
-        
+
     def prepare_room_list(self, sender, **kwargs):
         threads = kwargs['threads']
         user = kwargs['user']
@@ -159,7 +159,7 @@ class ReadMarksPlugin(ForumPlugin):
         if sender.unreaded_id:
             sender.unreaded = self.Comment.objects.select_related(
                 'parent').get(id=sender.unreaded_id)
-    
+
     def read_comments_page(self, thread, user, comments):
         unreaded = []
         if not user.is_anonymous:
@@ -183,7 +183,7 @@ class ReadMarksPlugin(ForumPlugin):
                         unreaded += [(comment.id, comment.page)]
             self.mark_as_readed(thread, readmark, readed_id=unreaded_id)
         return unreaded
-    
+
     def view_comments_page(self, sender, **kwargs):
         if not sender.room:
             sender.unreaded_comments = self.read_comments_page(
@@ -193,7 +193,7 @@ class ReadMarksPlugin(ForumPlugin):
         json = kwargs['json']
         thread = kwargs['thread']
         json['unreaded'] = thread.unreaded_comments
-            
+
     def room_groups_marks(self, sender, **kwargs):
         unreaded = None
         for room in sender.rooms:
@@ -201,7 +201,7 @@ class ReadMarksPlugin(ForumPlugin):
                 if (not unreaded) or (room.unreaded_id < unreaded.id):
                     unreaded = room.unreaded
         sender.unreaded = unreaded
-    
+
     def init_core(self):
         self.Comment = self.models.Comment
         self.urlizer['Thread_mark_as_readed'] = self.mark_thread_url
@@ -219,10 +219,10 @@ class ReadMarksPlugin(ForumPlugin):
             self.view_comments_page_json)
         self.site.signals.thread_prepare_room_group.connect(
             self.room_groups_marks)
-    
+
     def post_init(self):
         self.site.signals.thread_prepare_room.connect(self.prepare_room_list)
-        
+
     def get_urls(self):
         return [
             url(

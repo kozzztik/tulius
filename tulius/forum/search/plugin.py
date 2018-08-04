@@ -13,7 +13,7 @@ class SearchPlugin(ForumPlugin):
 
     def extended_search_url(self, thread):
         return self.reverse('extended_search', thread.tree_id)
-        
+
     def init_core(self):
         self.core['search_form'] = SearchForm()
         self.urlizer['Thread_search_url'] = self.search_url
@@ -23,7 +23,7 @@ class SearchPlugin(ForumPlugin):
         self.templates['search_post'] = 'forum/snippets/searched_post.haml'
         self.templates['search'] = 'forum/search.haml'
         self.templates['search_form'] = 'forum/search_form.haml'
-        
+
     def get_urls(self):
         return [
             url(

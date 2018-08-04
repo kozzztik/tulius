@@ -16,7 +16,6 @@ ERROR_VALIDATION = _('there were some errors during form validation')
 
 
 class ThreadsCorePlugin(ForumPlugin):
-        
     def get_parent_thread(self, user, thread_id, is_room=None):
         try:
             thread_id = int(thread_id)
@@ -35,7 +34,7 @@ class ThreadsCorePlugin(ForumPlugin):
         if not parent_post.read_right(user):
             raise PermissionDenied()
         return parent_post
-    
+
     def room_descendants(self, user, room):
         if room.rght - room.lft <= 1:
             return [], []
@@ -82,7 +81,7 @@ class ThreadsCorePlugin(ForumPlugin):
             thread for thread in threads if
             (thread.parent_id == room.id) or (thread.parent_id in room_ids)]
         return new_room_list, threads
-    
+
     def prepare_room_list(self, user, parent_room, rooms):
         site = self.site
         for thread in rooms:
@@ -99,12 +98,12 @@ class ThreadsCorePlugin(ForumPlugin):
             self.thread_prepare_room_signal.send(
                 room, parent_thread=parent_room, threads=threads, user=user)
         return rooms
-    
+
     def paginate_thread(self, thread, base_url):
         class ThreadPage:
             page = 0
             page_link = ""
-        
+
         childcount = self.site.models.Comment.objects.filter(
             parent=thread, deleted=False).count()
         pages = int((childcount - 1) / self.site.models.COMMENTS_ON_PAGE) + 1
@@ -115,7 +114,7 @@ class ThreadsCorePlugin(ForumPlugin):
                 page.page = i + 1
                 page.url = "%s?page=%s" % (base_url, i + 1,)
                 thread.pages += [page]
-                
+
     def get_subthreads(self, user, parent_thread, is_room=False):
         models = self.site.models
         threads = models.Thread.objects.filter(
@@ -125,11 +124,11 @@ class ThreadsCorePlugin(ForumPlugin):
         if is_room:
             return self.prepare_room_list(user, parent_thread, threads)
         threads = threads.order_by('-last_comment_id')
-            
+
         for thread in threads:
             thread.parent = parent_thread
         threads = [thread for thread in threads if thread.view_right(user)]
-        
+
         for thread in threads:
             if thread.read_right(user):
                 self.paginate_thread(thread, thread.get_absolute_url)
@@ -138,7 +137,7 @@ class ThreadsCorePlugin(ForumPlugin):
         self.threads_list_signal.send(
             parent_thread, threads=threads, is_room=is_room)
         return threads
-    
+
     def get_index(self, user, level):
         core = self.site.core
         childs = [child for child in core.get_free_index(user, level)]
@@ -183,8 +182,8 @@ class ThreadsCorePlugin(ForumPlugin):
                             formset.save()
                     else:
                         thread = None
-        return (form, formset, thread)
-    
+        return form, formset, thread
+
     def process_edit_thread(
             self, request, parent_thread, thread, voting_enabled,
             voting_valid, formset_params={}):
@@ -203,7 +202,7 @@ class ThreadsCorePlugin(ForumPlugin):
         form = ThreadForm(
             models, thread, comment, voting_enabled, moderate,
             data=request.POST or None)
-        
+
         formset = get_formset(
             models.Thread, right_model, request.POST,
             base_form=right_form, extra=1, params=formset_params,
@@ -216,7 +215,7 @@ class ThreadsCorePlugin(ForumPlugin):
             if form_valid and ((not voting_enabled) or voting_valid):
                 access_type = int(form.cleaned_data['access_type'])
                 free_access = (access_type <= models.THREAD_ACCESS_TYPE_OPEN)
-                if free_access or formset.is_valid(): 
+                if free_access or formset.is_valid():
                     with transaction.commit_on_success():
                         if not thread:
                             thread = models.Thread(
@@ -257,8 +256,8 @@ class ThreadsCorePlugin(ForumPlugin):
                     thread = None
         else:
             thread = None
-        return (form, formset, thread, comment)
-    
+        return form, formset, thread, comment
+
     def delete_thread(self, user, thread_id, message):
         models = self.site.models
         success = 'error'
@@ -292,8 +291,8 @@ class ThreadsCorePlugin(ForumPlugin):
                 success = 'success'
                 text = _('Room successfully deleted!') if thread.room else _(
                     'Thread successfully deleted!')
-        return (success, error_text, redirect, text)
-    
+        return success, error_text, redirect, text
+
     def search_list(self, user, parent, **kwargs):
         queryset = self.models.Thread.objects.filter(
             plugin_id=self.site_id, deleted=False, parent=parent, **kwargs)
@@ -304,7 +303,7 @@ class ThreadsCorePlugin(ForumPlugin):
                 continue
             thread_list += [thread] + self.search_list(user, thread, **kwargs)
         return thread_list
-    
+
     def expand_move_list(self, queryset, thread, user):
         thread_list = []
         for room in queryset:
@@ -320,7 +319,7 @@ class ThreadsCorePlugin(ForumPlugin):
                     thread_list += self.expand_move_list(
                         subqueryset, thread, user)
         return thread_list
-    
+
     def move_list(self, thread, user):
         queryset = self.models.Thread.objects.filter(
             plugin_id=self.site_id, level=0, room=True, deleted=False)
@@ -328,7 +327,7 @@ class ThreadsCorePlugin(ForumPlugin):
         if user.is_superuser and thread.room:
             move_list = [None] + move_list
         return move_list
-    
+
     def move_thread(self, thread, user, new_parent):
         if not thread.edit_right(user):
             raise Http404("no rights")
@@ -360,7 +359,7 @@ class ThreadsCorePlugin(ForumPlugin):
             obj.save()
         self.thread_on_move.send(
             thread, user=user, old_parent=old_parent, old_tree_id=old_tree_id)
-        
+
     def repair_thread_counters(self, thread=None, only_stats=False):
         if not only_stats:
             if thread:
@@ -368,7 +367,7 @@ class ThreadsCorePlugin(ForumPlugin):
             else:
                 self.models.Thread.objects.rebuild()
         self._repair_thread_counters(thread)
-                
+
     def _repair_thread_counters(self, thread=None):
         threads = self.models.Thread.objects.filter(
             parent=thread, deleted=False)

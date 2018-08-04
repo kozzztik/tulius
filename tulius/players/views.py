@@ -43,7 +43,7 @@ def filter_by_stories(players):
 
 class PlayersListView(TemplateView):
     template_name = 'players/player_list.haml'
-    
+
     def get_context_data(self, **kwargs):
         GET = self.request.GET
         players_filter_form = PlayersFilterForm(GET or None)
@@ -77,14 +77,14 @@ class PlayerView(DetailView):
     queryset = User.objects.filter(is_active=True)
     pk_url_kwarg = 'player_id'
     context_object_name = 'player'
-    
+
     def post(self, *args, **kwargs):
         return self.get(*args, **kwargs)
 
 
 class PlayerDetailsView(PlayerView):
     template_name = 'players/index.haml'
-    
+
     def get_context_data(self, **kwargs):
         player = self.object
         user = self.request.user
@@ -94,7 +94,7 @@ class PlayerDetailsView(PlayerView):
             if played_roles.count() > 5:
                 played_roles = played_roles[:5]
             if played_games.count() > 5:
-                played_games = played_games[:5] 
+                played_games = played_games[:5]
         if user.is_superuser:
             rankform = RankForm(
                 data=self.request.POST or None, instance=player)
@@ -112,7 +112,7 @@ class PlayerDetailsView(PlayerView):
 
 class PlayerHistoryView(TemplateView):
     template_name = 'players/player_history.haml'
-    
+
     @method_decorator(login_required)
     def get(self, *args, **kwargs):
         return super(PlayerHistoryView, self).get(*args, **kwargs)
@@ -142,7 +142,7 @@ class Statistics:
         self.games_admin = GameAdmin.objects.filter(user=user).count()
         self.story_admin = StoryAdmin.objects.filter(user=user).count()
         self.story_author = StoryAuthor.objects.filter(user=user).count()
-        self.total_games = variations.count()   
+        self.total_games = variations.count()
 
 
 def get_played(request_user, player=None):
@@ -150,7 +150,7 @@ def get_played(request_user, player=None):
         user = player
     else:
         user = request_user
-    played_games = []    
+    played_games = []
     played_roles = Role.objects.filter(
         user=user,
         variation__game__status__in=[
@@ -176,18 +176,18 @@ class LoginTemplateView(TemplateView):
 
 class PlayerProfileView(LoginTemplateView):
     template_name = 'profile/index.haml'
-    
+
     @method_decorator(login_required)
     def post(self, *args, **kwargs):
         return self.get(*args, **kwargs)
-    
+
     def get_context_data(self, **kwargs):
         request = self.request
         stats = Statistics(request.user)
         if stats.total_games > 0:
             played_roles, played_games = get_played(request.user)
             if played_roles.count() > 5:
-                played_roles = played_roles[:5]    
+                played_roles = played_roles[:5]
         show_stories = (stats.story_admin > 0)
         show_games = (
             stats.total_games +
@@ -211,7 +211,7 @@ class PlayerProfileView(LoginTemplateView):
 
 class PlayerPlayedView(LoginTemplateView):
     template_name = 'profile/played.haml'
-    
+
     def get_context_data(self, **kwargs):
         played_roles, played_games = get_played(self.request.user)
         roles_on_page = 50
@@ -230,6 +230,6 @@ class PlayerUserProfileView(PlayerView):
 
 class PlayerUploadedFilesView(LoginTemplateView):
     template_name = 'profile/files.haml'
-    
+
     def get_context_data(self, **kwargs):
         return {'files': UploadedFile.objects.filter(user=self.request.user)}

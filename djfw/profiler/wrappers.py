@@ -5,7 +5,7 @@ import time
 class LocalCounter(threading.local):
     def __init__(self):
         self.clear()
-    
+
     def clear(self):
         self.exec_time = 0
         self.exec_count = 0
@@ -36,10 +36,10 @@ class CursorWrapper:
     def __init__(self, cursor, db):
         self.cursor = cursor
         self.db = db
-        
+
     WRAP_ERROR_ATTRS = frozenset(
         ['fetchone', 'fetchmany', 'fetchall', 'nextset'])
-    
+
     def execute(self, sql, params=None):
         self.db.validate_no_broken_transaction()
         self.db.set_dirty()
@@ -53,7 +53,7 @@ class CursorWrapper:
             end_time = int(time.clock() * 1000)
             local_counter.exec_count += 1
             local_counter.exec_time += end_time - starttime
-    
+
     def executemany(self, sql, param_list):
         self.db.validate_no_broken_transaction()
         self.db.set_dirty()
@@ -65,7 +65,7 @@ class CursorWrapper:
             end_time = int(time.clock() * 1000)
             local_counter.exec_count += 1
             local_counter.exec_time += end_time - starttime
-    
+
     def callproc(self, procname, params=None):
         self.db.validate_no_broken_transaction()
         self.db.set_dirty()
@@ -81,7 +81,7 @@ class CursorWrapper:
             local_counter.exec_count += 1
             local_counter.exec_time += end_time - starttime
 
-            
+
     def __getattr__(self, attr):
         cursor_attr = getattr(self.cursor, attr)
         if attr in CursorWrapper.WRAP_ERROR_ATTRS:

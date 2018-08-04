@@ -8,12 +8,12 @@ from tulius.forum.online_status import OnlineStatusPlugin
 
 class GameOnlineStatusPlugin(OnlineStatusPlugin):
     online_list_template = 'gameforum/snippets/online_roles.haml'
-    
+
     def update_role_online_status(self, user, variation):
         if variation.game_id and (not user.is_anonymous):
             Role.objects.filter(
                 variation=variation, user=user).update(visit_time=now())
-    
+
     def get_online_roles(self, user, thread, do_update=True):
         variation = thread.variation
         if do_update:
@@ -30,9 +30,9 @@ class GameOnlineStatusPlugin(OnlineStatusPlugin):
         context = kwargs['context']
         user = kwargs["user"]
         context['online_roles'] = self.get_online_roles(user, sender)
-            
+
     def comments_page(self, sender, **kwargs):
-        user = kwargs["user"] 
+        user = kwargs["user"]
         comments = kwargs["comments"]
         online_roles = self.get_online_roles(user, sender)
         role_ids = [role.id for role in online_roles]
@@ -43,7 +43,7 @@ class GameOnlineStatusPlugin(OnlineStatusPlugin):
         for comment in comments:
             role_id = comment.data1
             comment.online_here = role_id and (role_id in role_ids)
-            
+
     def init_core(self):
         super(GameOnlineStatusPlugin, self).init_core()
         self.core['update_role_online_status'] = self.update_role_online_status

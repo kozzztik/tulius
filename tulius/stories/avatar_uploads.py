@@ -49,7 +49,7 @@ def save_upload(request, upload, filename, story, avatar):
         image_file = ContentFile(image_content.getvalue())
         filepath = "%s-%sx%s.%s" % (avatar.pk, size[0], size[1], imageformat)
         alternative.image.save(filepath, image_file)
-        
+
 
 def check_mime(request):
     filename = request.GET['qqfile']

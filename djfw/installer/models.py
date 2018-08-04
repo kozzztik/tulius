@@ -13,7 +13,7 @@ class BackupCategory(models.Model):
     class Meta:
         verbose_name = _('backup category')
         verbose_name_plural = _('backup categories')
-    
+
     name = models.CharField(
         max_length=255,
         blank=True,
@@ -44,7 +44,7 @@ class BackupCategory(models.Model):
         null=True,
         verbose_name=_('description')
     )
-    
+
     def clear_backups(self):
         backups = Backup.objects.filter(category=self).order_by('-id')
         if self.saved_backups and (self.saved_backups < backups.count()):
@@ -56,7 +56,7 @@ class BackupCategory(models.Model):
                 backup.delete()
             return obj_count
         return 0
-    
+
     def __unicode__(self):
         return self.verbose_name
 
@@ -68,12 +68,12 @@ class Backup(models.Model):
     class Meta:
         verbose_name = _('backup')
         verbose_name_plural = _('backups')
-    
+
     category = models.ForeignKey(
         BackupCategory, models.PROTECT,
         null=False,
         blank=False,
-        related_name='backups', 
+        related_name='backups',
         verbose_name=_('category')
     )
     create_time = models.DateTimeField(
@@ -89,36 +89,36 @@ class Backup(models.Model):
 
     def __unicode__(self):
         return "%s %s" % (self.category.name, self.create_time)
-    
+
     def backups_dir(self):
         dir_path = getattr(settings, 'INSTALLER_BACKUPS_DIR', None)
         if not dir_path:
             raise ImproperlyConfigured('Backups directory not set.')
         return dir_path
-    
+
     def file_name(self):
         return "%s.tar.gz" % self.pk
-    
+
     def file_size(self):
         from django.template.defaultfilters import filesizeformat
         return filesizeformat(self.size)
-    
+
     file_size.short_description = _(u'size')
-    
+
     def path(self):
         return os.path.join(self.backups_dir(), self.file_name())
-    
+
     @models.permalink
     def get_absolute_url(self):
         return 'installer:backup', (), {'object_id': self.id}
-    
+
     def url(self):
         return '<a href="%s">%s</a>' % (
             self.get_absolute_url(), self.get_absolute_url())
-    
+
     url.short_description = _(u'URL')
     url.allow_tags = True
-    
+
     def delete(self, using=None):
         if os.path.exists(self.path()):
             os.remove(self.path())
@@ -159,7 +159,7 @@ class Revision(models.Model):
         auto_now_add=False,
         verbose_name=_('end time'),
     )
-    
+
     def __unicode__(self):
         return "%s %s %s" % (self.number, self.author, self.comment)
 
@@ -171,7 +171,7 @@ class MaintenanceLog(models.Model):
     class Meta:
         verbose_name = _('Maintenance')
         verbose_name_plural = _('Maintenance')
-    
+
     STATE_IN_PROGRESS = 0
     STATE_SUCCESS = 1
     STATE_ERROR = 2
@@ -180,7 +180,7 @@ class MaintenanceLog(models.Model):
         (STATE_SUCCESS, _('Success')),
         (STATE_ERROR, _('Error')),
     )
-    
+
     revision = models.CharField(
         max_length=255,
         blank=True,
@@ -229,7 +229,7 @@ class MaintenanceLog(models.Model):
         default='',
         verbose_name=_('comment')
     )
-    
+
     operations = models.TextField(
         max_length=255,
         blank=True,
@@ -253,10 +253,10 @@ class MaintenanceLog(models.Model):
         default='',
         verbose_name=_('Parameters')
     )
-    
+
     def __unicode__(self):
         return "%s" % (self.start_time,)
-    
+
     def save(self, *args, **kwargs):
         file_name = get_lock_file_name()
         was_none = not self.pk
@@ -290,7 +290,7 @@ class MaintenanceLogMessage(models.Model):
         MaintenanceLog, models.PROTECT,
         null=False,
         blank=False,
-        related_name='messages', 
+        related_name='messages',
     )
 
     start_time = models.DateTimeField(

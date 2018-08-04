@@ -92,7 +92,7 @@ class AutocompleteWidget(TextInput):
         }""" % (choices,)
         self.options['source'] = choices
         self.options['select'] = (
-            'function(event, ui)' 
+            'function(event, ui)'
             ' { $(this).autocomplete_select(event, ui); }')
         self.options['change'] = (
             'function(event, ui) ' +
@@ -134,7 +134,7 @@ class AutocompleteWidget(TextInput):
         html_code += super(AutocompleteWidget, self).render(
             name + '_autocomplete', value, attrs)
 
-        html_code += u""" 
+        html_code += u"""
 <script type="text/javascript">
     $(document).ready(function() {
         %s$("input[id$='%s_autocomplete']").autocomplete({%s

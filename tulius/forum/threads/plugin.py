@@ -7,10 +7,10 @@ class ThreadsPlugin(ThreadsCorePlugin):
     room_list_template = 'forum/snippets/room_list.haml'
     thread_list_template = 'forum/snippets/thread_list.haml'
     thread_edit_template = 'forum/add_post.haml'
-    
+
     def thread_url(self, thread):
         return self.reverse('room' if thread.room else 'thread', thread.id)
-    
+
     def thread_move(self, thread):
         return self.reverse('thread_move', thread.id)
 
@@ -19,16 +19,16 @@ class ThreadsPlugin(ThreadsCorePlugin):
             return self.reverse(
                 'thread_move_confirm', thread.id, new_parent.id)
         return self.reverse('thread_move_confirm', thread.id)
-        
+
     def index_url(self):
         return self.reverse('index')
-    
+
     def add_root_room_url(self):
         return self.reverse('add_room')
-    
+
     def delete_thread_url(self):
         return self.reverse('delete_thread')
-    
+
     def thread_edit_url(self, thread):
         if thread.room:
             return self.reverse('edit_room', thread.id)
@@ -42,7 +42,7 @@ class ThreadsPlugin(ThreadsCorePlugin):
 
     def get_comments_page_url(self, thread):
         return self.reverse('comments_page', thread.id)
-    
+
     def init_core(self):
         super(ThreadsPlugin, self).init_core()
         self.urlizer['thread'] = self.thread_url
@@ -71,7 +71,7 @@ class ThreadsPlugin(ThreadsCorePlugin):
             self.get_comments_page_url
         self.urlizer['Thread_get_delete_url'] = self.delete_thread_url
         self.urlizer['Thread_get_move_url'] = self.thread_move
-        
+
     def get_urls(self):
         return [
             url(r'^$', views.Index.as_view(self), name='index'),

@@ -78,7 +78,7 @@ class ProfilerMiddleware():
                 os_list = rec.os.split()
                 if len(os_list) == 2:
                     rec.os = os_list[0]
-                    rec.os_version = os_list[1] 
+                    rec.os_version = os_list[1]
             if os['minor']:
                 rec.os_version += '.' + os['minor']
             device = user_data['device']
@@ -92,7 +92,7 @@ class ProfilerMiddleware():
             logger.error(
                 'Cant parse user agent ' + request.META['HTTP_USER_AGENT'])
         request.profiler = rec
-        
+
     def save_rec(self, request, error=False):
         rec = getattr(request, 'profiler', None)
         if (not rec) or rec.pk:
@@ -108,11 +108,11 @@ class ProfilerMiddleware():
         rec.db_count = local_counter.exec_count
         rec.error = error
         rec.save()
-        
+
     def __call__(self, request):
         self.save_rec(request)
         response = self.get_response(request)
         return response
-    
+
     def process_exception(self, request, exception):
         self.save_rec(request, error=True)

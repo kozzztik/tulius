@@ -11,7 +11,7 @@ class VKBackend(ModelBackend):
             return False
         except User.DoesNotExist:
             return True
-        
+
     def get_valid_name(self, profile):
         names = [
             profile.nickname,
@@ -24,15 +24,15 @@ class VKBackend(ModelBackend):
         for name in names:
             new_name = name.replace(' ', '_')
             if new_name and self.check_name(new_name):
-                return new_name 
-        
+                return new_name
+
     def register_user(self, profile, email):
         user = User(vk_profile=profile, email=email)
         if profile.sex == 1:
             user.sex = USER_SEX_FEMALE
         elif profile.sex == 2:
             user.sex = USER_SEX_MALE
-        else: 
+        else:
             user.sex = USER_SEX_UNDEFINED
         user.username = self.get_valid_name(profile)
         import urllib
@@ -41,7 +41,7 @@ class VKBackend(ModelBackend):
         user.avatar.save('vk_' + str(profile.vk_id), img, False)
         user.save()
         return user
-            
+
     def authenticate(self, vk_profile=None, email=None):
         try:
             return User.objects.get(vk_profile_id=vk_profile.pk)

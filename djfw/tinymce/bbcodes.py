@@ -79,7 +79,7 @@ def bbcode_to_html(data_str, codes_list=None, simple_codes_list=None):
                                 data_str[(current + 1):len(data_str)]
                             current = current + len(data) - old_len - 1
                 state = 0
-        current += 1    
+        current += 1
     return data_str
 
 

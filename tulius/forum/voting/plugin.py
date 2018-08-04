@@ -12,21 +12,21 @@ class VotingPlugin(VotingCore):
         voting = votings[0]
         self.prepare_voting_results(voting, comment.view_user)
         return voting
-    
+
     def like_url(self):
         return self.reverse('like')
-    
+
     def vote_url(self):
         return self.reverse('vote')
-    
+
     def preview_url(self):
         return self.reverse('preview_results')
-    
+
     def is_liked(self, comment):
         likes = self.models.CommentLike.objects.filter(
             comment=comment, user=comment.view_user)
         return True if likes else False
-    
+
     def init_core(self):
         super(VotingPlugin, self).init_core()
         self.templates['voting_closed_results'] = \
@@ -41,7 +41,7 @@ class VotingPlugin(VotingCore):
         self.urlizer['like'] = self.like_url
         self.urlizer['voting_preview'] = self.preview_url
         self.urlizer['Thread_get_voting_url'] = self.vote_url
-        
+
     def get_urls(self):
         return [
             url(r'^like/$', Like.as_view(plugin=self), name='like'),

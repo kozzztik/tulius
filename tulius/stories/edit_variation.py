@@ -31,7 +31,7 @@ class VarRightsMixin(RightsDetailMixin):
     def check_rights(self, obj, user):
         self.story = obj.story
         return self.story.edit_right(user)
-    
+
     def get_context_data(self, **kwargs):
         kwargs['story'] = self.story
         return super(VarRightsMixin, self).get_context_data(**kwargs)
@@ -39,13 +39,13 @@ class VarRightsMixin(RightsDetailMixin):
 
 class VarSubpageMixin:
     page_url = None
-    
+
     def get_context_data(self, **kwargs):
         if self.page_url:
             kwargs['catalog_page'] = EditVariationSubpage(
                 self.object, url=self.page_url)
         return super(VarSubpageMixin, self).get_context_data(**kwargs)
-    
+
     def get_success_url(self):
         return urls.reverse('stories:' + self.page_url, args=(self.object.pk,))
 
@@ -55,7 +55,7 @@ class VarMainView(VarRightsMixin, VarSubpageMixin, MessageMixin, UpdateView):
     page_url = EDIT_VARIATION_PAGES_MAIN
     success_message = _('story was successfully updated')
     form_class = EditVariationMainForm
-    
+
     def get_context_data(self, **kwargs):
         self.object.create_game = self.object.create_right(self.request.user)
         return super(VarMainView, self).get_context_data(**kwargs)
@@ -78,7 +78,7 @@ class EditVariationRoles(
 class VarIllustrationsView(VarRightsMixin, VarSubpageMixin, DetailView):
     template_name = 'stories/materials/illustrations.haml'
     page_url = EDIT_VARIATION_PAGES_ILLUSTRATIONS
-    
+
     def get_context_data(self, **kwargs):
         kwargs['illustrations'] = Illustration.objects.filter(
             variation=self.object)
@@ -88,7 +88,7 @@ class VarIllustrationsView(VarRightsMixin, VarSubpageMixin, DetailView):
 class VarMaterialsView(VarRightsMixin, VarSubpageMixin, DetailView):
     template_name = 'stories/materials/materials.haml'
     page_url = EDIT_VARIATION_PAGES_MATERIALS
-    
+
     def get_context_data(self, **kwargs):
         kwargs['materials'] = AdditionalMaterial.objects.filter(
             variation=self.object)
@@ -109,10 +109,10 @@ class AddRole(
     model = Role
     form_class = RoleForm
     success_message = _('role was successfully added')
-    
+
     def check_parent_rights(self, obj, user):
         return self.check_rights(obj, user)
-    
+
     def get_context_data(self, **kwargs):
         kwargs['form_submit_title'] = _("add")
         kwargs['catalog_page'] = CatalogPage(
@@ -127,7 +127,7 @@ class AddVarMaterial(VarRightsMixin, MessageMixin, SubCreateView):
     parent_model = Variation
     model = AdditionalMaterial
     form_class = AdditionalMaterialForm
-    
+
     def check_parent_rights(self, obj, user):
         return self.check_rights(obj, user)
 
@@ -138,7 +138,7 @@ class AddVarMaterial(VarRightsMixin, MessageMixin, SubCreateView):
             parent=EditVariationSubpage(
                 self.parent_object, url=EDIT_VARIATION_PAGES_MATERIALS))
         return super(AddVarMaterial, self).get_context_data(**kwargs)
-    
+
     def get_success_url(self):
         return urls.reverse(
             'stories:' + EDIT_VARIATION_PAGES_MATERIALS,
@@ -160,11 +160,11 @@ class RoleRightsMixin(RightsDetailMixin):
 class BaseRoleEdit(RoleRightsMixin, MessageMixin, UpdateView):
     model = Role
     success_message = _('role was successfully updated')
-    
+
     def get_context_data(self, **kwargs):
         kwargs['catalog_page'] = self.get_role_page()
         return super(BaseRoleEdit, self).get_context_data(**kwargs)
-    
+
     def get_success_url(self):
         return urls.reverse(
             'stories:' + EDIT_VARIATION_PAGES_ROLES,
@@ -184,7 +184,7 @@ class EditRoleTextView(BaseRoleEdit):
 class RoleTextView(RoleRightsMixin, DetailView):
     template_name = 'stories/variation/role_view_text.haml'
     model = Role
-    
+
     def get_context_data(self, **kwargs):
         kwargs['story'] = self.story
         kwargs['variation'] = self.object.variation
@@ -214,7 +214,7 @@ def add_variation_illustration(request, variation_id):
     return upload_illustration(request, None, variation, None)
 
 
-@login_required    
+@login_required
 def edit_variation_forum(request, variation_id):
     (story, variation) = get_variation(request.user, variation_id)
     return HttpResponseRedirect(
@@ -247,7 +247,7 @@ def delete_role(request, variation_id):
                         thread for thread in threads
                         if not thread.check_deleted()]
                 else:
-                    threads = [] 
+                    threads = []
                 if threads:
                     error_text = _(
                         "Role cant be deleted - it has threads on game forum.")
@@ -280,7 +280,7 @@ def delete_role(request, variation_id):
 class DeleteVariation(VarRightsMixin, DeleteView):
     template_name = 'stories/edit_story/delete_variation.haml'
     model = Variation
-    
+
     def get_success_url(self):
         return urls.reverse(
             'stories:edit_story_variations',

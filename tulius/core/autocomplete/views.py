@@ -11,10 +11,10 @@ from tulius.core.autocomplete import models
 
 
 @decorators.autocomplete_result
-def autocomplete_user(request, name, limit):  
+def autocomplete_user(request, name, limit):
     users = get_user_model().objects.filter(username__istartswith=name)[:limit]
     return users
-    
+
 
 @decorators.autocomplete_result
 def get_autocomplete(request, name, limit, token):

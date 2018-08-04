@@ -8,7 +8,7 @@ class PostDeleteForm(forms.Form):
         label=_(u'post'),
         widget=forms.HiddenInput,
     )
-    
+
     message = forms.CharField(
         required=False,
         label=_(u'Delete message'),
@@ -21,18 +21,18 @@ class RoomForm(forms.Form):
         required=True,
         label=_(u'Title'),
     )
-    
+
     body = forms.CharField(
         required=False,
         label=_(u'Body'),
         widget=forms.widgets.Textarea(),
     )
-    
+
     access_type = forms.ChoiceField(
         required=False,
         label=_(u'Access type'),
     )
-    
+
     def __init__(self, models, *args, thread=None, **kwargs):
         self.caption = _('edit room') if thread else _('add room')
         self.base_fields['access_type'].choices = \
@@ -73,13 +73,13 @@ class ThreadForm(forms.Form):
         label=_(u'Important'),
         initial=False
     )
-    
+
     voting = forms.BooleanField(
         required=False,
         label=_(u'Voting'),
         initial=False
     )
-    
+
     def __init__(
             self, models, thread, comment, voting, moderate, *args, **kwargs):
         self.base_fields['access_type'].choices = \
@@ -107,17 +107,17 @@ class ThreadForm(forms.Form):
             self.base_fields['closed'].is_hidden = True
         else:
             self.base_fields['closed'].widget = forms.CheckboxInput()
-            self.base_fields['closed'].is_hidden = False    
+            self.base_fields['closed'].is_hidden = False
         if not voting:
-            self.base_fields['voting'].widget = forms.HiddenInput()            
+            self.base_fields['voting'].widget = forms.HiddenInput()
             self.base_fields['voting'].is_hidden = True
         else:
             self.base_fields['voting'].widget = forms.CheckboxInput()
-            self.base_fields['voting'].is_hidden = False    
+            self.base_fields['voting'].is_hidden = False
         if not moderate:
             self.base_fields['important'].widget = forms.HiddenInput()
             self.base_fields['important'].is_hidden = True
         else:
             self.base_fields['important'].widget = forms.CheckboxInput()
-            self.base_fields['important'].is_hidden = False    
+            self.base_fields['important'].is_hidden = False
         super(ThreadForm, self).__init__(*args, **kwargs)

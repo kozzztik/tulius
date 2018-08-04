@@ -36,7 +36,7 @@ def handle_field_upload(request, field, target_filename):
         if field.name != '':
             field.delete()
         field.save(target_filename, upload)
-        
+
     return handle_upload(request, save, field, target_filename)
 
 
@@ -52,7 +52,7 @@ def handle_download(file_obj, file_name, mime_type=''):
 def handle_download_file_path(file_path, file_name, mime_type=''):
     file_obj = FileWrapper(open(file_path, "rb"))
     return handle_download(file_obj, file_name, mime_type)
-    
+
 
 def handle_field_download(field, file_name, mime_type=''):
     field.open()

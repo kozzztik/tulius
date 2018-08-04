@@ -21,19 +21,19 @@ class UploadedFile(models.Model):
 
     user = models.ForeignKey(
         User, models.PROTECT,
-        null=False, 
-        blank=False, 
-        related_name='forum_files', 
+        null=False,
+        blank=False,
+        related_name='forum_files',
         verbose_name=_('user')
     )
     name = models.CharField(
-        max_length=500, 
-        unique=False, 
+        max_length=500,
+        unique=False,
         verbose_name=_('name')
     )
     mime = models.CharField(
-        max_length=500, 
-        unique=False, 
+        max_length=500,
+        unique=False,
         verbose_name=_('mime type')
     )
     body = models.FileField(
@@ -48,13 +48,13 @@ class UploadedFile(models.Model):
         auto_now_add=True,
         verbose_name=_('uploaded at'),
     )
-    
+
     def is_image(self):
         return self.mime[0:5] == 'image'
-    
+
     def filename(self):
         return self.name
-    
+
     def __unicode__(self):
         """
         Provides unicode string post representation
@@ -102,11 +102,11 @@ class SitedModelMixin(models.Model):
     class Meta:
         abstract = True
     plugin_id = models.PositiveIntegerField(
-        null=True, 
-        blank=True, 
+        null=True,
+        blank=True,
         verbose_name=_('plugin')
     )
-    
+
     def get_site_attr(self, attr):
         if attr in ['plugin', 'plugin_id', '_plugin_cache', '_site']:
             raise AttributeError()
@@ -124,9 +124,9 @@ class SitedModelMixin(models.Model):
         if callable(attr_value):
             return attr_value(self)
         return attr_value
-    
+
     _site = None
-    
+
     def site(self):
         if not self._site:
             from .sites import sites_manager
@@ -135,7 +135,7 @@ class SitedModelMixin(models.Model):
                 raise ImproperlyConfigured(
                     'Forum site id = %s is not configured' % self.plugin_id)
         return self._site
-    
+
     def __getattribute__(self, attr):
         try:
             return super(SitedModelMixin, self).__getattribute__(attr)
@@ -148,13 +148,13 @@ class ThreadManager(TreeManager):
         if parent and not parent.descendant_count():
             return []
         return self.filter(parent=parent, room=True)
-    
+
     def threads(self, parent):
         if parent and not parent.descendant_count():
             return []
         return self.filter(parent=parent, room=False).order_by(
             '-important', 'id')
-    
+
     def get_ancestors(self, parent):
         if parent.tree_id:
             return self.filter(
@@ -165,14 +165,14 @@ class ThreadManager(TreeManager):
         return self.filter(
             tree_id=parent.parent.tree_id,
             lft__lte=parent.parent.lft, rght__gte=parent.parent.rght)
-            
+
     def get_descendants(self, parent):
         if parent.get_descendant_count():
             return self.filter(
                 tree_id=parent.tree_id, lft__gt=parent.lft,
                 rght__lt=parent.rght, deleted=False)
         return self.none()
-        
+
     def get_protected_descendants(self, parent):
         if parent.get_descendant_count():
             return self.get_descendants(parent).exclude(
@@ -188,33 +188,33 @@ class Thread(MPTTModel, SitedModelMixin):
         verbose_name = _('thread')
         verbose_name_plural = _('threads')
         ordering = ['-important', 'id']
-        
+
     objects = ThreadManager()
-    
+
     title = models.CharField(
-        max_length=255, 
-        unique=False, 
+        max_length=255,
+        unique=False,
         verbose_name=_('title')
     )
     body = models.CharField(
-        max_length=255, 
-        unique=False, 
+        max_length=255,
+        unique=False,
         verbose_name=_('body')
     )
     parent = TreeForeignKey(
         'self', models.PROTECT,
-        null=True, 
-        blank=True, 
-        related_name='children', 
+        null=True,
+        blank=True,
+        related_name='children',
         verbose_name=_('parent thread')
     )
     room = models.BooleanField(
-        default=False, 
+        default=False,
         verbose_name=_(u'room')
     )
     user = models.ForeignKey(
         User, models.PROTECT,
-        related_name='forum_threads', 
+        related_name='forum_threads',
         verbose_name=_('author')
     )
     access_type = models.SmallIntegerField(
@@ -227,58 +227,58 @@ class Thread(MPTTModel, SitedModelMixin):
         verbose_name=_('created at'),
     )
     closed = models.BooleanField(
-        default=False, 
+        default=False,
         verbose_name=_(u'closed')
     )
     important = models.BooleanField(
-        default=False, 
+        default=False,
         verbose_name=_(u'important')
     )
     deleted = models.BooleanField(
-        default=False, 
+        default=False,
         verbose_name=_(u'deleted')
     )
     protected_threads = models.SmallIntegerField(
-        default=0, 
+        default=0,
         verbose_name=_(u'protected threads')
-    ) 
+    )
     first_comment_id = models.IntegerField(
-        null=True, 
-        blank=True, 
+        null=True,
+        blank=True,
         verbose_name=_(u'first comment')
     )
     last_comment_id = models.IntegerField(
-        null=True, 
-        blank=True, 
+        null=True,
+        blank=True,
         verbose_name=_(u'last comment')
     )
     comments_count = models.IntegerField(
-        null=False, 
-        blank=False, 
+        null=False,
+        blank=False,
         default=0,
         verbose_name=_(u'first comment')
     )
     data1 = models.IntegerField(
-        null=True, 
-        blank=True, 
+        null=True,
+        blank=True,
         verbose_name=_(u'public comments'),
     )
     data2 = models.IntegerField(
-        null=True, 
-        blank=True, 
+        null=True,
+        blank=True,
         verbose_name=_(u'protected comments'),
     )
 
     def __unicode__(self):
         return self.title[:40] if self.title else self.body[:40]
-        
+
     def check_deleted(self):
         if self.deleted:
             return True
         if self.parent:
             return self.parent.check_deleted()
         return False
-    
+
     view_user = None
     _rights_cached_ = False
     _read_right_ = 0
@@ -287,11 +287,11 @@ class Thread(MPTTModel, SitedModelMixin):
     _edit_right_ = 3
     _move_right_ = 4
     _moderate_right_ = 5
-    
+
     def update_rights(self):
         if self.view_user:
             self._rights_cached_ = self.get_rights
-            
+
     def get_right(self, right, user=None):
         if user:
             self.view_user = user
@@ -301,42 +301,42 @@ class Thread(MPTTModel, SitedModelMixin):
 
     def read_right(self, user=None):
         return self.get_right(self._read_right_, user)
-            
+
     def view_right(self, user=None):
         return self.get_right(self._view_right_, user)
-    
+
     def write_right(self, user=None):
         return self.get_right(self._write_right_, user)
-    
+
     def edit_right(self, user=None):
         return self.get_right(self._edit_right_, user)
-    
+
     def move_right(self, user=None):
         return self.get_right(self._move_right_, user)
 
     def moderate_right(self, user=None):
         return self.get_right(self._moderate_right_, user)
-    
+
     def free_access_type(self):
         return self.access_type < THREAD_ACCESS_TYPE_NO_READ
-    
+
     def is_thread(self):
         return not self.room
-        
+
     def get_delete_mark(self):
         marks = ThreadDeleteMark.objects.filter(thread_id=self.id)
         return marks[0] if marks else None
-        
+
     def descendant_count(self):
         return (self.rght - self.lft - 1) / 2
-    
+
     def room_comments_count(self):
         comments = Thread.objects.get_descendants(self).filter(
             room=False, deleted=False
         ).aggregate(
             comments_sum=models.Sum('comments_count'))
         return comments['comments_sum']
-        
+
     def save(self, *args, **kwargs):
         if not self.id:
             self.site().signals.thread_on_create.send(self)
@@ -355,19 +355,19 @@ class ThreadAccessRight(models.Model):
         verbose_name = _('thread access right')
         verbose_name_plural = _('threads access rights')
         unique_together = ('thread', 'user')
-        
+
     thread = models.ForeignKey(
         Thread, models.PROTECT,
-        null=False, 
-        blank=False, 
-        related_name='rights', 
+        null=False,
+        blank=False,
+        related_name='rights',
         verbose_name=_('thread')
     )
     user = models.ForeignKey(
         User, models.PROTECT,
-        null=False, 
-        blank=False, 
-        related_name='forum_theads_rights', 
+        null=False,
+        blank=False,
+        related_name='forum_theads_rights',
         verbose_name=_('user')
     )
     access_level = models.SmallIntegerField(
@@ -385,29 +385,29 @@ class ThreadCollapseStatus(models.Model):
         verbose_name = _('thread access right')
         verbose_name_plural = _('threads access rights')
         unique_together = ('thread', 'user')
-        
+
     thread = models.ForeignKey(
         Thread, models.PROTECT,
-        null=False, 
-        blank=False, 
+        null=False,
+        blank=False,
         verbose_name=_('thread')
     )
     user = models.ForeignKey(
         User, models.PROTECT,
-        null=False, 
-        blank=False, 
+        null=False,
+        blank=False,
         verbose_name=_('user')
     )
     collapse_threads = models.BooleanField(
         default=False,
-        null=False, 
-        blank=False, 
+        null=False,
+        blank=False,
     )
-    
+
     collapse_rooms = models.BooleanField(
         default=False,
-        null=False, 
-        blank=False, 
+        null=False,
+        blank=False,
     )
 
 
@@ -419,36 +419,36 @@ class Comment(SitedModelMixin):
         verbose_name = _('comment')
         verbose_name_plural = _('comments')
         ordering = ['id']
-        
+
     title = models.CharField(
-        max_length=255, 
-        unique=False, 
+        max_length=255,
+        unique=False,
         verbose_name=_('title')
     )
-    
+
     body = models.TextField(
         verbose_name=_('body')
     )
-    
+
     parent = TreeForeignKey(
         Thread, models.PROTECT,
-        null=False, 
-        blank=False, 
-        related_name='comments', 
+        null=False,
+        blank=False,
+        related_name='comments',
         verbose_name=_('thread')
     )
     user = models.ForeignKey(
         User, models.PROTECT,
-        null=False, 
-        blank=False, 
-        related_name='forum_comments', 
+        null=False,
+        blank=False,
+        related_name='forum_comments',
         verbose_name=_('author')
     )
     editor = models.ForeignKey(
         User, models.PROTECT,
         null=True,
-        blank=True, 
-        related_name='forum_comments_edited', 
+        blank=True,
+        related_name='forum_comments_edited',
         verbose_name=_('edited by')
     )
     create_time = models.DateTimeField(
@@ -456,61 +456,61 @@ class Comment(SitedModelMixin):
         verbose_name=_('created at'),
     )
     edit_time = models.DateTimeField(
-        null=True, 
+        null=True,
         blank=True,
         verbose_name=_('edited at'),
     )
     reply = models.ForeignKey(
         'self', models.PROTECT,
-        null=True, 
-        blank=True, 
-        related_name='answers', 
+        null=True,
+        blank=True,
+        related_name='answers',
         verbose_name=_('reply to')
     )
     voting = models.BooleanField(
-        default=False, 
-        blank=True, 
+        default=False,
+        blank=True,
         verbose_name=_(u'voting')
     )
     deleted = models.BooleanField(
-        default=False, 
+        default=False,
         verbose_name=_(u'deleted')
     )
     likes = models.IntegerField(
-        null=False, 
-        blank=False, 
+        null=False,
+        blank=False,
         default=0,
         verbose_name=_(u'likes'),
     )
     page = models.IntegerField(
-        null=False, 
-        blank=False, 
+        null=False,
+        blank=False,
         default=0,
         verbose_name=_(u'page'),
     )
     data1 = models.IntegerField(
-        null=True, 
-        blank=True, 
+        null=True,
+        blank=True,
     )
     data2 = models.IntegerField(
-        null=True, 
-        blank=True, 
+        null=True,
+        blank=True,
     )
 
     view_user = None
 
     def __unicode__(self):
         return self.title[:40] if self.title else self.body[:40]
-        
+
     def get_delete_mark(self):
         marks = CommentDeleteMark.objects.filter(comment=self)
         if marks:
             return marks[0]
         return None
-    
+
     def is_thread(self):
         return self.id == self.parent.first_comment_id
-    
+
     def save(self, *args, fast_save=False, **kwargs):
         if fast_save:
             super(Comment, self).save(*args, **kwargs)
@@ -567,33 +567,33 @@ class ThreadReadMark(models.Model):
     class Meta:
         verbose_name = _('thread read mark')
         verbose_name_plural = _('thread read marks')
-    
+
     thread = models.ForeignKey(
         Thread, models.PROTECT,
-        null=False, 
-        blank=False, 
-        related_name='read_marks', 
+        null=False,
+        blank=False,
+        related_name='read_marks',
         verbose_name=_('thread'),
     )
     user = models.ForeignKey(
         User, models.PROTECT,
-        null=False, 
-        blank=False, 
-        related_name='forum_readed_threads', 
+        null=False,
+        blank=False,
+        related_name='forum_readed_threads',
         verbose_name=_('user'),
     )
     readed_comment = models.ForeignKey(
         Comment, models.PROTECT,
-        null=False, 
-        blank=False, 
-        related_name='readed_users', 
+        null=False,
+        blank=False,
+        related_name='readed_users',
         verbose_name=_('readed comment'),
     )
     not_readed_comment = models.ForeignKey(
         Comment, models.PROTECT,
-        null=True, 
-        blank=True, 
-        related_name='not_readed_users', 
+        null=True,
+        blank=True,
+        related_name='not_readed_users',
         verbose_name=_('not readed comment'),
     )
 
@@ -605,16 +605,16 @@ class CommentLike(models.Model):
 
     user = models.ForeignKey(
         User, models.PROTECT,
-        null=False, 
-        blank=False, 
-        related_name='liked_comments', 
+        null=False,
+        blank=False,
+        related_name='liked_comments',
         verbose_name=_('user'),
     )
     comment = models.ForeignKey(
         Comment, models.PROTECT,
-        null=False, 
-        blank=False, 
-        related_name='liked', 
+        null=False,
+        blank=False,
+        related_name='liked',
         verbose_name=_('comment'),
     )
 
@@ -625,7 +625,7 @@ class CommentLike(models.Model):
             comment.likes += 1
             comment.save()
         super(CommentLike, self).save(*args, **kwargs)
-            
+
     def delete(self, using=None, keep_parents=False):
         comment = Comment.objects.select_for_update().get(
             id=self.comment_id)
@@ -638,7 +638,7 @@ class ThreadDeleteMark(models.Model):
     class Meta:
         verbose_name = _(u'thread delete mark')
         verbose_name_plural = _(u'threads delete marks')
-        
+
     thread = models.ForeignKey(
         Thread, models.PROTECT,
         blank=False,
@@ -658,17 +658,17 @@ class ThreadDeleteMark(models.Model):
         blank=True,
         null=True,
     )
-    
+
     deleted = models.BooleanField(
-        default=True, 
+        default=True,
         verbose_name=_(u'deleted')
     )
-    
+
     delete_time = models.DateTimeField(
         auto_now_add=True,
         verbose_name=_('deleted at'),
     )
-    
+
     def __unicode__(self):
         return _("%(post)s deleted by %(user)s at %(time)s") % \
                {'post': str(self.thread), 'user': str(self.user),
@@ -679,7 +679,7 @@ class CommentDeleteMark(models.Model):
     class Meta:
         verbose_name = _(u'comment delete mark')
         verbose_name_plural = _(u'comments delete marks')
-        
+
     comment = models.ForeignKey(
         Comment, models.PROTECT,
         blank=False,
@@ -700,14 +700,14 @@ class CommentDeleteMark(models.Model):
         null=True,
     )
     deleted = models.BooleanField(
-        default=True, 
+        default=True,
         verbose_name=_(u'deleted')
     )
     delete_time = models.DateTimeField(
         auto_now_add=True,
         verbose_name=_('deleted at'),
     )
-    
+
     def __unicode__(self):
         return _("%(post)s deleted by %(user)s at %(time)s") % {
             'post': str(self.comment), 'user': str(self.user),
@@ -718,7 +718,7 @@ class OnlineUser(models.Model):
     class Meta:
         verbose_name = _(u'online user')
         verbose_name_plural = _(u'online users')
-        
+
     user = models.ForeignKey(
         User, models.PROTECT,
         blank=False,
@@ -737,7 +737,7 @@ class OnlineUser(models.Model):
         verbose_name=_(u'thread'),
         related_name='visit_marks',
     )
-    
+
     def __unicode__(self):
         return str(self.user)
 
@@ -749,7 +749,7 @@ class Voting(models.Model):
     class Meta:
         verbose_name = _('voting')
         verbose_name_plural = _('votings')
-    
+
     user = models.ForeignKey(
         User, models.PROTECT,
         null=False,
@@ -759,13 +759,13 @@ class Voting(models.Model):
     )
     comment = models.ForeignKey(
         Comment, models.PROTECT,
-        null=False, 
-        blank=False, 
-        related_name='voting_list', 
+        null=False,
+        blank=False,
+        related_name='voting_list',
         verbose_name=_(u'comment'),
     )
     voting_name = models.CharField(
-        max_length=255, 
+        max_length=255,
         default='',
         blank=True,
         verbose_name=_('name')
@@ -795,13 +795,13 @@ class Voting(models.Model):
         blank=True,
         verbose_name=_(u'add preview results button'),
     )
-    
+
     def __unicode__(self):
         return self.voting_name
-    
+
     def votes_count(self):
         return VotingVote.objects.filter(choice__voting_id=self.id).count()
-    
+
     def user_choice(self, user):
         votes = VotingVote.objects.filter(user=user, choice__voting=self)
         if votes.count() > 0:
@@ -817,7 +817,7 @@ class VotingChoice(models.Model):
     class Meta:
         verbose_name = _('voting choice')
         verbose_name_plural = _('voting choices')
-    
+
     voting = models.ForeignKey(
         Voting, models.PROTECT,
         null=False,
@@ -826,7 +826,7 @@ class VotingChoice(models.Model):
         related_name='choices',
     )
     name = models.CharField(
-        max_length=255, 
+        max_length=255,
         default='',
         blank=True,
         verbose_name=_('name')
@@ -844,7 +844,7 @@ class VotingVote(models.Model):
         verbose_name = _('voting vote')
         verbose_name_plural = _('voting votes')
         unique_together = ('choice', 'user')
-        
+
     choice = models.ForeignKey(
         VotingChoice, models.PROTECT,
         null=False,
@@ -859,7 +859,7 @@ class VotingVote(models.Model):
         verbose_name=_(u'user'),
         related_name='voting_votes',
     )
-    
+
     def __unicode__(self):
         return "%s - %s(%s)" % (
             self.choice.voting.voting_name, self.choice.name, self.user)

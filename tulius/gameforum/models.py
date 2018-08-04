@@ -12,7 +12,7 @@ class GameThreadRight(models.Model):
         verbose_name = _('game thread right')
         verbose_name_plural = _('game thread rights')
         unique_together = ('thread', 'role')
-    
+
     thread = models.ForeignKey(
         Thread, models.PROTECT,
         null=False,
@@ -27,7 +27,7 @@ class GameThreadRight(models.Model):
         verbose_name=_(u'role'),
         related_name='accessed_threads',
     )
-    
+
     access_level = models.SmallIntegerField(
         default=0,
         verbose_name=_(u'access rights'),
@@ -43,7 +43,7 @@ class Trustmark(models.Model):
         verbose_name = _('trust mark')
         verbose_name_plural = _('trust marks')
         unique_together = ('variation', 'user', 'role')
-    
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, models.PROTECT,
         null=False,
@@ -51,7 +51,7 @@ class Trustmark(models.Model):
         verbose_name=_(u'user'),
         related_name='trust_marks',
     )
-    
+
     variation = models.ForeignKey(
         Variation, models.PROTECT,
         null=False,
@@ -67,7 +67,7 @@ class Trustmark(models.Model):
         verbose_name=_(u'role'),
         related_name='trust_marks',
     )
-    
+
     value = models.SmallIntegerField(
         null=False,
         blank=False,

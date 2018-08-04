@@ -16,7 +16,7 @@ class PlayerStarForm(forms.ModelForm):
 
 class PlayerStarAdmin(admin.ModelAdmin):
     form = PlayerStarForm
-    
+
     list_display = (
         'id',
         'games',

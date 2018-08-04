@@ -6,15 +6,14 @@ from .views import DoTrustmark
 
 
 class TrustmarksPlugin(ForumPlugin):
-    
     max_val = 3
-    
+
     def trustmarks_url(self):
         return self.reverse('do_trustmark')
 
     def mark_to_percents(self, mark_value):
         return int(50 + (mark_value * 50 / self.max_val))
-    
+
     def recalc_role_trust(self, role):
         trustmarks = self.site.gamemodels.Trustmark.objects.filter(role=role)
         markcount = len(trustmarks)
@@ -36,7 +35,7 @@ class TrustmarksPlugin(ForumPlugin):
         self.urlizer['trustmarks'] = self.trustmarks_url
         self.core['mark_to_percents'] = self.mark_to_percents
         self.core['recalc_role_trust'] = self.recalc_role_trust
-        
+
     def get_urls(self):
         return [
             url(

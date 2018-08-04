@@ -7,9 +7,11 @@ from .bb_parser import bbcode_to_html
 
 register = template.Library()
 
-bad_tags = [re.compile(r'\<span(.*?)\>'), re.compile(r'\</span(.*?)\>'), 
-            re.compile(r'\<div(.*?)\>'), re.compile(r'\</div(.*?)\>'), 
-            re.compile(r'\<font(.*?)\>'), re.compile(r'\</font(.*?)\>')]
+bad_tags = [
+    re.compile(r'\<span(.*?)\>'), re.compile(r'\</span(.*?)\>'),
+    re.compile(r'\<div(.*?)\>'), re.compile(r'\</div(.*?)\>'),
+    re.compile(r'\<font(.*?)\>'), re.compile(r'\</font(.*?)\>')
+]
 
 smiles = Smile.objects.all()
 

@@ -45,13 +45,13 @@ class UploadedImageAdmin(admin.ModelAdmin):
         'created_at',
         'file_size_formated',
     )
-    
+
     list_display_links = (
     )
-    
+
     list_editable = (
     )
-    
+
     def has_add_permission(self, request):
         return False
 
@@ -75,10 +75,10 @@ class UploadedFileAdmin(admin.ModelAdmin):
         'mime',
         'file_size_formated',
     )
-    
+
     list_display_links = (
     )
-    
+
     list_editable = (
     )
 

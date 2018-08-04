@@ -4,7 +4,7 @@ from .plugin import BasePluginView
 
 class MarkAsRead(BasePluginView):
     require_user = True
-    
+
     def mark_as_readed(self, parent_thread, user):
         threads = parent_thread.get_children()
         if not parent_thread:
@@ -17,7 +17,7 @@ class MarkAsRead(BasePluginView):
                 self.mark_as_readed(thread, user)
             else:
                 thread.mark_as_readed()  # TODO may not work
-    
+
     def get(self, request, thread_id=None, **kwargs):
         if thread_id:
             try:

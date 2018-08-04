@@ -27,11 +27,11 @@ class BaseCommentView(BasePluginView):
         context['parent_thread'] = self.parent_thread
         return context
 
-    
+
 class EditComment(BaseCommentView):
     template_name = 'add_comment'
     require_user = True
-    
+
     def get_context_data(self, **kwargs):
         context = super(EditComment, self).get_context_data(**kwargs)
         if self.comment:
@@ -61,7 +61,7 @@ class EditComment(BaseCommentView):
             context=context,
             adding=(self.comment_id is None))
         return context
-    
+
     def post(self, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         if self.comment:
@@ -76,7 +76,7 @@ class FastReply(BaseCommentView):
     template_name = 'fast_reply'
     require_user = True
     error_message = None
-    
+
     def get_context_data(self, **kwargs):
         context = super(FastReply, self).get_context_data(**kwargs)
         context['parent_comment'] = self.comment
@@ -88,7 +88,7 @@ class FastReply(BaseCommentView):
         context['form'] = self.form
         self.site.signals.comment_before_fastreply.send(self, context=context)
         return context
-    
+
     def post(self, request, *args, **kwargs):
         html = self.render(**kwargs)
         comment = None
@@ -115,7 +115,7 @@ class FastReply(BaseCommentView):
 
 class CommentsPage(BasePluginView):
     template_name = 'comments'
-    
+
     def get_context_data(self, **kwargs):
         context = super(CommentsPage, self).get_context_data(**kwargs)
         self.parent_thread = self.core.get_parent_thread(
@@ -128,7 +128,6 @@ class CommentsPage(BasePluginView):
             self.page_num = int(self.page_num)
         except:
             raise Http404()
-        
         self.comments = self.core.get_comments_page(
             self.request.user, self.parent_thread, self.page_num)
         context['comments'] = self.comments
@@ -164,7 +163,7 @@ class CommentRedirrect(BaseCommentView):
 class Preview(BasePluginView):
     template_name = 'comment_preview'
     require_user = True
-    
+
     def get_context_data(self, **kwargs):
         context = super(Preview, self).get_context_data(**kwargs)
         context['body'] = self.request.POST[
@@ -173,7 +172,7 @@ class Preview(BasePluginView):
             'title'] if 'title' in self.request.POST else ''
         context['create_time'] = now()
         return context
-    
+
     def post(self, request, *args, **kwargs):
         return self.get(request, *args, **kwargs)
 

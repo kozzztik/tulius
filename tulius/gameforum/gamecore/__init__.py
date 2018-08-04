@@ -10,13 +10,13 @@ from .forms import EditorForm, RoleForm
 
 
 class GamePlugin(ForumPlugin):
-    
+
     def game_url(self, game):
         return self.reverse('game', game.id)
 
     def variation_url(self, variation):
         return self.reverse('variation', variation.id)
-    
+
     def copy_game_post(self, thread, new_parent, variation, rolelinks):
         models = self.site.models
         gamemodels = self.site.gamemodels
@@ -45,7 +45,7 @@ class GamePlugin(ForumPlugin):
             right.save()
         for subpost in subthreads:
             self.copy_game_post(subpost, thread, variation, rolelinks)
-        
+
         if not old_thread.room:
             first_comment = None
             subcomments = models.Comment.objects.filter(
@@ -61,9 +61,9 @@ class GamePlugin(ForumPlugin):
                     new_comment.data1 = rolelinks[comment.data1].id
                 new_comment.save()
                 if not first_comment:
-                    first_comment = new_comment.id 
+                    first_comment = new_comment.id
         return thread
-        
+
     def create_gameforum(self, user, variation):
         models = self.site.models
         if variation.game:
@@ -76,7 +76,7 @@ class GamePlugin(ForumPlugin):
             room=True, plugin_id=self.site_id)
         thread.save()
         return thread
-        
+
     def copy_game_forum(self, variation, rolelinks, user):
         if not variation.thread:
             variation.thread = self.create_gameforum(user, variation)
@@ -86,9 +86,9 @@ class GamePlugin(ForumPlugin):
         thread.title = variation.game.name
         thread.save()
         return thread
-    
+
     def get_role(self, role_id, roles, admin):
-        if role_id == '': 
+        if role_id == '':
             if admin:
                 return None
             raise Http404()
@@ -96,7 +96,7 @@ class GamePlugin(ForumPlugin):
             if int(role.id) == int(role_id):
                 return role
         raise Http404()
-        
+
     def process_role(
             self, request, parent_thread, init_role_id, new=False, user=None):
         if not user:
@@ -139,7 +139,7 @@ class GamePlugin(ForumPlugin):
                 for tmp_role in roles:
                     if tmp_role.user_id == user.id:
                         init_role = tmp_role
-                        break 
+                        break
         if (len(roles) > 1) or admin:
             if init_role:
                 init_role = init_role.pk
@@ -154,7 +154,7 @@ class GamePlugin(ForumPlugin):
                 role_id = cd['role']
                 role = self.get_role(role_id, roles, admin)
         return form, role
-    
+
     def process_editor(self, request, parent_thread, comment):
         variation = parent_thread.variation
         admin = parent_thread.admin
@@ -195,7 +195,7 @@ class GamePlugin(ForumPlugin):
                 None, sender, None, True, user=sender.view_user)
             context['roleform'] = roleform
             context['role'] = role
-        
+
     def thread_before_edit(self, sender, **kwargs):
         if sender.self_is_room:
             return
@@ -226,7 +226,7 @@ class GamePlugin(ForumPlugin):
             if editor:
                 comment.data2 = editor.id
             comment.save()
-    
+
     def comment_before_fast_reply(self, sender, **kwargs):
         context = kwargs['context']
         (roleform, role) = self.process_role(
@@ -234,7 +234,7 @@ class GamePlugin(ForumPlugin):
         context['roleform'] = roleform
         context['role'] = role
         sender.role = role
-        
+
     def comment_after_fast_reply(self, sender, **kwargs):
         comment = sender.comment
         role = sender.role
@@ -242,11 +242,11 @@ class GamePlugin(ForumPlugin):
             if role:
                 comment.data1 = role.id
             comment.save()
-    
+
     def comment_before_edit(self, sender, **kwargs):
         comment = kwargs['comment']
         sender.init_role_id = comment.data1 if comment else None
-    
+
     def comment_after_edit(self, sender, **kwargs):
         context = kwargs['context']
         adding = kwargs['adding']
@@ -268,7 +268,7 @@ class GamePlugin(ForumPlugin):
             if editor:
                 comment.data2 = editor.id
             comment.save()
-    
+
     def fix_games(self):
         games = Game.objects.all()
         for game in games:
@@ -286,7 +286,7 @@ class GamePlugin(ForumPlugin):
             variation.comments_count = self.models.Comment.objects.filter(
                 parent__tree_id=tree_id, deleted=False).count()
             variation.save()
-            
+
     def init_core(self):
         super(GamePlugin, self).init_core()
         self.urlizer['game'] = self.game_url
@@ -304,7 +304,7 @@ class GamePlugin(ForumPlugin):
             self.comment_after_fast_reply)
         self.site.signals.comment_before_edit.connect(self.comment_before_edit)
         self.site.signals.comment_after_edit.connect(self.comment_after_edit)
-        
+
     def get_urls(self):
         return [
             url(

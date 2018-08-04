@@ -25,7 +25,7 @@ class EditVariationPage(CatalogPage):
         return [
             EditVariationSubpage(self.instance, name, url, self)
             for (name, url) in EDIT_VARIATION_PAGES]
-        
+
     def __init__(self, variation):
         self.parent = EditStoryPage(variation.story)
         self.name = str(variation)

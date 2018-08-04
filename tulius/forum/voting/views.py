@@ -11,7 +11,7 @@ class Like(BasePluginView):
     Mark post as liked
     """
     require_user = True
-    
+
     def get(self, request):
         if request.user.is_anonymous:
             raise Http404()
@@ -27,7 +27,7 @@ class Like(BasePluginView):
         if not comment.parent.read_right(request.user):
             ret_json = {'success': False, 'value': value}
             return HttpResponse(json.dumps(ret_json))
-        
+
         like_marks = models.CommentLike.objects.filter(
             user=request.user, comment=comment)
         like_count = comment.likes
@@ -61,12 +61,12 @@ class BaseVoting(BasePluginView):
         self.core.prepare_voting_results(
             self.voting, self.request.user, self.force_results)
         return context
-        
+
 
 class Vote(BaseVoting):
     require_user = True
     no_revote = False
-    
+
     def get(self, request):
         models = self.core.models
         choice_id = int(request.GET['choice_id'])
@@ -92,7 +92,7 @@ class Vote(BaseVoting):
 class PreviewResults(BaseVoting):
     require_user = True
     force_results = True
-    
+
     def get(self, request):
         models = self.core.models
         voting_id = int(request.GET['voting_id'])

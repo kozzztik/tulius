@@ -10,15 +10,15 @@ class PlayerStar(models.Model):
         verbose_name = _('player star')
         verbose_name_plural = _('player stars')
         ordering = ['games']
-        
+
     games = models.SmallIntegerField(
-        blank=False, 
-        null=False, 
+        blank=False,
+        null=False,
         verbose_name=_('Games won')
     )
 
 
-class StarsCache():    
+class StarsCache:
     stars_count = 0
     stars_list = []
 

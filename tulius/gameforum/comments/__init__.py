@@ -8,7 +8,7 @@ class GameCommentsPlugin(CommentsPlugin):
     comment_template = 'gameforum/snippets/post.haml'
     fast_reply_template = 'gameforum/snippets/fast_reply.haml'
     edit_comment_template = 'gameforum/add_post.haml'
-    
+
     def reply_str(self, comment):
         sex = comment.role.sex if comment.role else None
         name = comment.role.name if comment.role else _('Leader')
@@ -23,20 +23,20 @@ class GameCommentsPlugin(CommentsPlugin):
         else:
             s = pgettext('Someone', '%s said')
         return s % name
-    
+
     def update_role_comments_count(self, role_id, count):
         if role_id:
             role = Role.objects.get(id=role_id)
             role.comments_count += count
-            role.save() 
-            
+            role.save()
+
     def after_add_comment(self, sender, **kwargs):
         thread = kwargs['thread']
         variation = Variation.objects.get(thread__tree_id=thread.tree_id)
         variation.comments_count += 1
         variation.save()
-        self.update_role_comments_count(sender.data1, 1) 
-        
+        self.update_role_comments_count(sender.data1, 1)
+
     def before_delete_comment(self, sender, **kwargs):
         super(GameCommentsPlugin, self).before_delete_comment(sender, **kwargs)
         thread = kwargs['thread']

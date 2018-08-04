@@ -6,7 +6,7 @@ from .views import CollapseThreads
 class CollapsingThreadsPlugin(ForumPlugin):
     def get_collapse_url(self, thread):
         return self.reverse('collapse_thread', thread.id)
-    
+
     def thread_view(self, sender, **args):
         user = args['user']
         if user.is_anonymous:
@@ -34,12 +34,12 @@ class CollapsingThreadsPlugin(ForumPlugin):
                         break
                 group.collapse_rooms = fc.collapse_rooms if fc else False
                 group.collapse_threads = fc.collapse_threads if fc else False
-                
+
     def init_core(self):
         super(CollapsingThreadsPlugin, self).init_core()
         self.urlizer['Thread_get_collapse_url'] = self.get_collapse_url
         self.site.signals.thread_view.connect(self.thread_view)
-        
+
     def get_urls(self):
         return [
             url(

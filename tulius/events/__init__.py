@@ -23,7 +23,6 @@ def send_notifications(users, notification_id, varibles):
     if (not notification.body_template) or (not notification.header_template):
         return
     try:
-        
         header_template = loader.get_template_from_string(
             reencode(notification.header_template))
         body_template = loader.get_template_from_string(

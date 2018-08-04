@@ -32,7 +32,7 @@ EDIT_GAME_PAGES = (
     (_('requests'), EDIT_GAME_PAGES_REQUESTS),
     (_('forum'), EDIT_GAME_PAGES_FORUM),
 )
-    
+
 URL_PREFIX = 'games:'
 
 
@@ -51,10 +51,10 @@ class EditGamePage(CatalogPage):
                     url=urlize(EDIT_GAME_PAGES_WINNERS),
                     parent=self)]
         return subpages
-    
+
     def get_caption(self):
         return str(self.instance)
-        
+
     def __init__(self, game):
         self.parent = games_catalog_page()
         self.name = "%s %s" % (str(_('edit')), game)
@@ -72,7 +72,7 @@ def EditGameSubpage(game, url=EDIT_GAME_PAGES_TEXTS):
 class GameSubpage:
     page_url = None
     paging_class = EditGamePage
-    
+
     def get_context_data(self, **kwargs):
         context = super(GameSubpage, self).get_context_data(**kwargs)
         gamepage = self.paging_class(self.object)

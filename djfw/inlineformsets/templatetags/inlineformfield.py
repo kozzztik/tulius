@@ -9,7 +9,7 @@ class FormFields(template.Node):
         self.form_name = form_name
         self.head = head
         self.formset_name = formset
-        
+
     def _check_field(self, field, formset):
         if formset.static and (field.name == 'DELETE'):
             return False
@@ -19,12 +19,12 @@ class FormFields(template.Node):
         if field.is_hidden or (field.name == fk):
             return False
         return True
-        
+
     def render(self, context):
         form = context[self.form_name]
         formset = context[self.formset_name]
         fields = [field for field in form if self._check_field(field, formset)]
-        
+
         if self.head == '1':
             template_name = 'inlineheader.html'
         else:

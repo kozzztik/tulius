@@ -32,7 +32,7 @@ class DataBlockManager(models.Manager):
         value = [data[4] for data in filtered_list]
         cache.set(CACHE_PREFIX + lang, value)
         return value
-    
+
     def languaged(self):
         return self.filter(pk__in=self.languaged_ids())
 
@@ -42,46 +42,46 @@ class DataBlock(models.Model):
         verbose_name = _(u'data block')
         verbose_name_plural = _(u'data blocks')
         ordering = ['name']
-        
+
     objects = DataBlockManager()
-    
+
     name = models.CharField(
-        max_length=100, 
-        blank=False, 
-        null=False, 
+        max_length=100,
+        blank=False,
+        null=False,
         verbose_name=_(u'name')
     )
     full_text = models.TextField(
-        default='', 
-        blank=True, 
-        null=True, 
+        default='',
+        blank=True,
+        null=True,
         verbose_name=_(u'text')
     )
-    
+
     urls = models.TextField(
-        default='', 
-        blank=True, 
-        null=True, 
+        default='',
+        blank=True,
+        null=True,
         verbose_name=_(u'URLs')
     )
-    
+
     exclude_urls = models.TextField(
-        default='', 
-        blank=True, 
-        null=True, 
+        default='',
+        blank=True,
+        null=True,
         verbose_name=_(u'exclude URLs')
     )
     language = models.CharField(
-        verbose_name=_('language'), 
-        max_length=10, 
-        null=True, 
+        verbose_name=_('language'),
+        max_length=10,
+        null=True,
         blank=True,
         editable=False
     )
 
     def __unicode__(self):
         return self.name
-    
+
     def save(self, *args, **kwargs):
         lang = translation.get_language()
         drop_cache = False

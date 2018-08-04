@@ -35,10 +35,10 @@ class LastTime:
             round_month=False, round_week=False):
         self.offset_days = offset_days
         self.offset_month = offset_month
-        self.round_day = round_day 
+        self.round_day = round_day
         self.round_month = round_month
         self.round_week = round_week
-        
+
     def month_offset(self, value, offset):
         target_month = value.year * 12 + value.month + offset
         target_year = (target_month - 1) // 12
@@ -133,7 +133,7 @@ class TimePeriodView(TemplateView):
             period_obj.end = period_obj.end()
         period_obj.intervals = period[4]
         request.profiler_period = period_obj
-        
+
     def get(self, request, *args, **kwargs):
         self.update_request(request)
         return super(TimePeriodView, self).get(request, *args, **kwargs)
@@ -141,7 +141,7 @@ class TimePeriodView(TemplateView):
 
 class SetTimePeriod(TimePeriodView):
     template_name = 'profiler/time_selector.html'
-    
+
     def get_context_data(self, **kwargs):
         period_choices = [(period[0], period[1]) for period in TIME_SELECTION]
         weight_choices = [
@@ -152,7 +152,7 @@ class SetTimePeriod(TimePeriodView):
                 'period': self.request.profiler_period.num,
                 'weight': self.request.profiler_period.weight_num})
         return {'form': self.form}
-    
+
     def post(self, request, *args, **kwargs):
         self.update_request(request)
         self.get_context_data(**kwargs)

@@ -9,10 +9,10 @@ class FixesPlugin(ForumPlugin):
         super(FixesPlugin, self).init_core()
         self.templates['fixes'] = 'forum/fixes/success.haml'
         self.urlizer['Thread_get_fix_counters_url'] = self.get_fix_counters_url
-    
+
     def get_fix_counters_url(self, thread):
         return self.reverse('rebuild_nums', thread.id)
-    
+
     def get_urls(self):
         return [
             url(

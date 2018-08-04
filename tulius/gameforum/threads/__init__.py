@@ -11,7 +11,7 @@ class GameThreadsPlugin(ThreadsPlugin):
     room_list_template = 'gameforum/snippets/room_list.haml'
     thread_list_template = 'gameforum/snippets/thread_list.haml'
     thread_edit_template = 'gameforum/add_post.haml'
-    
+
     def get_parent_thread(self, user, thread_id, is_room=None):
         thread = super(GameThreadsPlugin, self).get_parent_thread(
             user, thread_id, is_room)
@@ -38,7 +38,7 @@ class GameThreadsPlugin(ThreadsPlugin):
                             mark.value)
                         break
         if thread.game:
-            if thread.game.edit_right(user): 
+            if thread.game.edit_right(user):
                 thread.roles_list = [
                     role for role in thread.all_roles if not role.deleted]
             elif thread.game.status >= 5:
@@ -67,7 +67,7 @@ class GameThreadsPlugin(ThreadsPlugin):
             rolize_list[role.id] = role
         thread.rolize_list = rolize_list
         return thread
-    
+
     def rolize(self, posts, variation, roles_list):
         for post in posts:
             if post.data1:
@@ -81,7 +81,7 @@ class GameThreadsPlugin(ThreadsPlugin):
             else:
                 post.edit_role = None
         return posts
-    
+
     def rolize_lastest(self, posts, variation, roles_list):
         for post in posts:
             if post.last_comment and post.last_comment.data1:
@@ -89,7 +89,7 @@ class GameThreadsPlugin(ThreadsPlugin):
                     post.last_comment.data1] if (
                         post.last_comment.data1 in roles_list) else None
         return posts
-    
+
     def get_subthreads(self, user, parent_thread, is_room=False):
         threads = super(GameThreadsPlugin, self).get_subthreads(
             user, parent_thread, is_room)
@@ -98,14 +98,14 @@ class GameThreadsPlugin(ThreadsPlugin):
         threads = self.rolize_lastest(
             threads, parent_thread.variation, parent_thread.rolize_list)
         return threads
-    
+
     def rolize_comments(self, sender, **kwargs):
         comments = kwargs["comments"]
-        comments = self.rolize(comments, sender.variation, sender.rolize_list)
-    
+        self.rolize(comments, sender.variation, sender.rolize_list)
+
     def post_init(self):
         self.site.signals.read_comments.connect(self.rolize_comments)
-        
+
     def move_list(self, thread, user):
         queryset = self.models.Thread.objects.filter(
             plugin_id=self.site_id, level=0, tree_id=thread.tree_id)

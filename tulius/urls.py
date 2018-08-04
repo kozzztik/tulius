@@ -21,7 +21,7 @@ urlpatterns = [
     url(
         r'^sitemap-(?P<section>.+)\.xml$', sitemaps_views.sitemap,
         {'sitemaps': sitemaps}, name='sitemaps'),
-    
+
     url(r'^tinymce/', include('djfw.tinymce.urls', namespace='tinymce')),
     url(r'^wysibb/', include('djfw.wysibb.urls', namespace='wysibb')),
     url(r'^news/', include('djfw.news.urls', namespace='news')),
@@ -31,7 +31,7 @@ urlpatterns = [
         include('tulius.core.autocomplete.urls', namespace='autocomplete')),
     url(r'^profiler/', include('djfw.profiler.urls', namespace='profiler')),
     url(r'^installer/', include('djfw.installer.urls', namespace='installer')),
-    
+
     url(r'^$', views.HomeView.as_view(), name='home'),
     url(r'^statistics/$', views.StatisticsView.as_view(), name='stats'),
 
@@ -46,7 +46,7 @@ urlpatterns = [
     url(r'^stories/', include('tulius.stories.urls', namespace='stories')),
     url(r'^play/',
         include(apps.get_app_config('gameforum').site.urls)),
-    
+
     url(r'^vk/', include('tulius.vk.urls', namespace='vk')),
     url(r'^counters/', include('tulius.counters.urls', namespace='counters')),
 ]

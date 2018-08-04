@@ -17,6 +17,6 @@ class FlatPage(AbstractBaseModel):
 
     def __str__(self):
         return '%s -- %s' % (self.url, self.title)
-        
+
     def get_absolute_url(self):
         return self.url

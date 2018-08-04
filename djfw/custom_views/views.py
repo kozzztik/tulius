@@ -8,7 +8,7 @@ from django.forms.models import fields_for_model, modelform_factory
 class SortableViewMixin:
     class Meta:
         static_js = ['sortable/sortable.js']
-        
+
     sortable_model = None
     sortable_key = None
     sortable_field = 'order'
@@ -24,7 +24,7 @@ class SortableViewMixin:
                 "%(cls)s.sortable_model or %(cls)s.sortable_queryset." % {
                     'cls': self.__class__.__name__})
         return self.queryset._clone()
-    
+
     def post(self, request, *args, **kwargs):
         if self.login_required and self.request.user.is_anonymous:
             raise PermissionDenied('Login required')
@@ -43,7 +43,7 @@ class SortableViewMixin:
 
 class SortableDetailViewMixin(SortableViewMixin):
     sortable_fk = None
-    
+
     def get_sortable_queryset(self):
         self.object = self.get_object()
         queryset = super(SortableDetailViewMixin, self).get_sortable_queryset()
@@ -77,16 +77,16 @@ class ActionableBase:
         static_css = []
         media_js = []
         media_css = []
-        
+
     action_param = 'action'
 #    actions = {'my_action': {'method': 'my_proc'}}
-    
+
     def dispatch_action(self, action_name, **kwargs):
         method = kwargs.pop('method', action_name)
         if callable(method):
             return method(**kwargs)
         return getattr(self, method)(**kwargs)
-        
+
     def post(self, request, *args, **kwargs):
         if not self.get_post_right():
             raise PermissionDenied()
@@ -152,15 +152,15 @@ class ActionableViewMixin(ActionableBase):
             widgets_list[widget_name] = widget_class(
                 self, widget_name, **widget_data)
         self.widgets_list = widgets_list
-        
+
     def get_context_data(self, **kwargs):
         context = super(ActionableViewMixin, self).get_context_data(**kwargs)
         context['view'] = self
         return context
-        
+
     def get_css_list(self):
         return self._meta.css
-    
+
     def get_js_list(self):
         return self._meta.js
 
@@ -178,7 +178,7 @@ class ActionableViewMixin(ActionableBase):
         if not self.get_read_right():
             raise PermissionDenied()
         return super(ActionableViewMixin, self).get(request, *args, **kwargs)
-    
+
     def post(self, request, *args, **kwargs):
         if self.widgets_param in request.POST:
             widget_name = request.POST[self.widgets_param]
@@ -189,10 +189,10 @@ class ActionableViewMixin(ActionableBase):
             return widget.post(request, *args, **kwargs)
         return super(ActionableViewMixin, self).post(
             request, *args, **kwargs)
-        
+
     def __getitem__(self, key):
         return self.widgets_list[key]
-    
+
     def __iter__(self):
         for name in self.widgets_list:
             yield self[name]
@@ -201,7 +201,7 @@ class ActionableViewMixin(ActionableBase):
 class WidgetBase(ActionableBase):
     view = None
     name = ''
-    
+
     def __init__(self, view, name, **kwargs):
         self.view = view
         self.name = name
@@ -223,14 +223,14 @@ class WidgetBase(ActionableBase):
 class TemplatedWidget(WidgetBase):
     template_name = ''
     widget_context_name = ''
-    
+
     def get_context_data(self):
         context_name = self.widget_context_name or 'widget'
         return {context_name: self}
-    
+
     def get_template_name(self):
         return self.template_name
-    
+
     def __unicode__(self):
         if not self.get_read_right():
             return ''
@@ -251,18 +251,18 @@ class FormWidget(TemplatedWidget):
     css_class = ''
     template_name = 'custom_views/form.html'
     button_name = 'Send'
-    
+
     def __init__(self, *args, **kwargs):
         super(FormWidget, self).__init__(*args, **kwargs)
         # pylint: disable=not-callable
         self.form = self.form_class(self.request.POST or None)
-        
+
     def get_context_data(self):
         context = super(FormWidget, self).get_context_data()
         context_name = self.context_name or 'form'
         context[context_name] = self.form
         return context
-    
+
     def post(self, request, *args, **kwargs):
         if not self.get_post_right():
             raise PermissionDenied()
@@ -280,7 +280,7 @@ class FormWidget(TemplatedWidget):
             action = getattr(self.view, self.action)
             return action(form)
         return self.invalid_form(form)
-    
+
     def valid_form(self, form):
         if self.valid_template:
             c = Context(self.get_context_data())
@@ -289,14 +289,14 @@ class FormWidget(TemplatedWidget):
         else:
             template = self.__unicode__()
         return http.HttpResponse(template)
-     
+
     def invalid_form(self, form):
         return http.HTTPResponse(self.__unicode__())
 
 
 class TwitterFormWidget(FormWidget):
     template_name = 'custom_views/twitter_form.html'
-    
+
 
 class FormsetWidget(TemplatedWidget):
     template_name = 'custom_views/formset.html'
@@ -313,15 +313,15 @@ class FormsetWidget(TemplatedWidget):
     prefix = ''
     table_class = ''
     editable = True
-    
+
     def __init__(self, *args, **kwargs):
         super(FormsetWidget, self).__init__(*args, **kwargs)
-        
+
     def get_editable(self):
         if callable(self.editable):
             return self.editable(self.view)
         return self.editable
-            
+
     def get_parent_object(self):
         if hasattr(self, 'obj'):
             return self.obj
@@ -337,7 +337,7 @@ class FormsetWidget(TemplatedWidget):
             fk = forms.models._get_foreign_key(obj.__class__, self.model)
             self.fk = fk.name
         return self.obj
-    
+
     def get_queryset(self):
         if self.queryset:
             return self.queryset
@@ -348,7 +348,7 @@ class FormsetWidget(TemplatedWidget):
             self.exclude_fields = exclude + [self.fk]
         self.queryset = self.model._default_manager.filter(**{self.fk: obj})
         return self.queryset
-        
+
     def get_context_data(self):
         context = super(FormsetWidget, self).get_context_data()
         self.formset = self.prepare_formset()
@@ -357,7 +357,7 @@ class FormsetWidget(TemplatedWidget):
             self.form = self.get_formclass()(
                 initial=self.form_initials, prefix=self.name)
         return context
-    
+
     def add_item(self):
         if not self.get_editable():
             raise PermissionDenied()
@@ -374,23 +374,23 @@ class FormsetWidget(TemplatedWidget):
         else:
             self.form = form
         return http.HttpResponse(str(self))
-    
+
     def delete_item(self):
         if not self.get_editable():
             raise PermissionDenied()
         pk = self.view.request.POST['id']
         self.get_queryset().filter(pk=pk).delete()
         return http.HttpResponse("{}")
-    
+
     def get_formfield_callback(self):
         pass
-    
+
     def get_formfield(self, obj, name, formfield):
         display = getattr(obj, 'get_' + name + '_display', None)
         if display:
             return str(display())
         return str(getattr(obj, name, ''))
-    
+
     def prepare_formset(self):
         formset = []
         queryset = self.get_queryset()
@@ -417,7 +417,7 @@ class FormsetWidget(TemplatedWidget):
                     break
         formset = {'fields': formset_fields, 'model': model, 'forms': formset}
         return formset
-    
+
     def get_formclass(self):
         if not self.form_class:
             model = self.get_queryset().model

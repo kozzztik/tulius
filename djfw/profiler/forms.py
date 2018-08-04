@@ -9,7 +9,7 @@ class TimeSelectorForm(forms.Form):
         choices=[],
         label=_(u'weight'),
     )
-    
+
     period = forms.ChoiceField(
         required=False,
         choices=[],

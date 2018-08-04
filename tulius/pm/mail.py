@@ -33,6 +33,6 @@ def get_mail(mail):
         logger.warning(
             'Email not received. Sender %s not found' % (mail.sender_mail,))
         return True
-    
+
     body = mail.body.replace('\\n', '\n').strip(' \n').replace('\n', '\t\n')
     PrivateMessage(sender=sender, receiver=receiver, body=body).save()

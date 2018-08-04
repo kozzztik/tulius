@@ -12,7 +12,7 @@ class VotingCore(ForumPlugin):
                 user=view_user, choice__voting=voting)
             voting.choice = votes[0].choice if votes else None
             if voting.choice and voting.show_results:
-                force_results = True        
+                force_results = True
         if voting.closed or force_results:
             choices = models.VotingChoice.objects.filter(voting=voting)
             votes = 0
@@ -41,7 +41,7 @@ class VotingCore(ForumPlugin):
         if request.method == 'POST':
             valid = form.is_valid() and formset.is_valid()
         return valid, form, formset
-    
+
     def process_add_voting(self, form, formset, comment, user):
         voting = form.save(commit=False)
         voting.comment = comment
@@ -52,7 +52,7 @@ class VotingCore(ForumPlugin):
             voting_choice.voting = voting
             voting_choice.save()
         return voting
-    
+
     def preprocess_edit_voting(self, request, comment):
         models = self.site.core.models
         votings = models.Voting.objects.filter(comment=comment)
@@ -88,15 +88,13 @@ class VotingCore(ForumPlugin):
                         voting.do_close = False
                     voting.do_delete = voting_delete.cleaned_data[
                         'delete_voting']
-                    
             else:
                 valid = voting_form.is_valid() and voting_formset.is_valid()
-                
         else:
             if voting:
                 self.prepare_voting_results(voting, request.user, True)
         return valid, voting, voting_form, voting_formset, voting_delete
-    
+
     def process_edit_voting(self, voting, form, formset, comment, user):
         if voting:
             if voting.do_delete:
@@ -107,7 +105,7 @@ class VotingCore(ForumPlugin):
                     voting.save()
         else:
             self.process_add_voting(form, formset, comment, user)
-            
+
     def delete_voting(self, voting):
         models = self.site.core.models
         voting_choices = models.VotingChoice.objects.filter(voting=voting)
@@ -116,13 +114,13 @@ class VotingCore(ForumPlugin):
             voices.delete()
         voting_choices.delete()
         voting.delete()
-        
+
     def delete_votings(self, category, comment):
         models = self.site.core.models
         votings = models.Voting.objects.filter(comment=comment)
         for voting in votings:
             self.delete_voting(voting)
-    
+
     def thread_before_edit(self, sender, **kwargs):
         context = kwargs['context']
         context['show_voting'] = not sender.self_is_room
@@ -160,7 +158,7 @@ class VotingCore(ForumPlugin):
                 sender.voting_formset,
                 sender.comment,
                 sender.request.user)
-    
+
     def comment_before_edit(self, sender, **kwargs):
         voting = None
         comment = kwargs['comment']
@@ -179,7 +177,7 @@ class VotingCore(ForumPlugin):
         context['voting_formset'] = voting_formset
         if not voting_valid:
             sender.edit_is_valid = False
-            
+
     def comment_after_edit(self, sender, **kwargs):
         if sender.request.POST and sender.comment and sender.comment.voting:
             context = kwargs['context']
@@ -192,7 +190,7 @@ class VotingCore(ForumPlugin):
                 voting_formset,
                 sender.comment,
                 sender.request.user)
-    
+
     def init_core(self):
         super(VotingCore, self).init_core()
         self.core['preprocess_add_voting'] = self.preprocess_add_voting

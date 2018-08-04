@@ -38,7 +38,7 @@ def error500(request, template_name='500.haml'):
 
 
 def logic_time(x):
-    time = x.template_time + x.db_time 
+    time = x.template_time + x.db_time
     if time > x.exec_time:
         return time
     return x.exec_time - time
@@ -57,9 +57,9 @@ class StatisticsView(TemplateView):
         day = datetime.date.today()
         day_start = datetime.datetime(
             day.year, day.month, day.day, tzinfo=get_current_timezone())
-        
+
         graph = None
-        
+
         if self.request.GET:
             if ('graph_type' in self.request.GET) and \
                     self.request.GET['graph_type']:
@@ -74,8 +74,8 @@ class StatisticsView(TemplateView):
                     self.request.GET['sunlight_type']:
                 sunlight_type = int(self.request.GET['sunlight_type'])
             if ('period' in self.request.GET) and self.request.GET['period']:
-                days = int(self.request.GET['period'])  
-                
+                days = int(self.request.GET['period'])
+
         day_start = day_start - datetime.timedelta(days=days)
         if graph_type == GRAPH_TYPE_LINEAR:
             if linear_type == LINEAR_CALLS:

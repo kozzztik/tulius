@@ -32,7 +32,7 @@ class UserAdmin(DefUserAdmin):
     )
     list_display = ('username', 'email', 'is_active',)
     search_fields = ('username', 'email')
-    
+
     form = UserChangeForm
     add_form = UserCreationForm
 

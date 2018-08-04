@@ -35,10 +35,10 @@ class EditStoryPage(CatalogPage):
         return [
             EditStorySubpage(self.instance, name, url, self)
             for (name, url) in EDIT_STORY_PAGES]
-    
+
     def get_caption(self):
         return str(self.instance)
-        
+
     def __init__(self, story):
         self.parent = stories_catalog_page()
         self.name = "%s %s" % (str(_('edit')), story)

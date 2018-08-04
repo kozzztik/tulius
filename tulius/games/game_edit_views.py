@@ -32,7 +32,7 @@ class GameAdminViewMixin(DecoratorChainingMixin):
     decorators = [login_required]
     page_url = None
     paging_class = EditGamePage
-    
+
     def get_object(self, *args, **kwargs):
         game = super(GameAdminViewMixin, self).get_object(*args, **kwargs)
         self.variation = game.variation
@@ -42,7 +42,7 @@ class GameAdminViewMixin(DecoratorChainingMixin):
         self.catalog_page = gamepage.get_subpage(
             urls.reverse(URL_PREFIX + self.page_url, args=(game.pk,)))
         return game
-            
+
     def get_context_data(self, **kwargs):
         context = super(GameAdminViewMixin, self).get_context_data(**kwargs)
         context['catalog_page'] = self.catalog_page
@@ -57,7 +57,7 @@ class GameEditFormView(GameAdminViewMixin, UpdateView):
     def get_success_url(self):
         messages.success(self.request, _('game was successfully updated'))
         return self.object.get_edit_url()
-    
+
     def form_invalid(self, form):
         messages.error(
             self.request, _('there were some errors during form validation'))
@@ -116,7 +116,7 @@ class GameAdminGraphics(GameAdminView):
         context['game_files'] = [
             GraphicFile(self.object, name) for name in GRAPHIC_FIELDS]
         return context
-    
+
     def post(self, request, *args, **kwargs):
         obj = self.get_object()
         field_name = request.GET['field_name']
@@ -138,7 +138,7 @@ class GameEditRoles(GameAdminView, SortableDetailViewMixin):
         game = self.get_object()
         return Role.objects.filter(
             variation_id=game.variation_id).exclude(deleted=True)
-    
+
     def get_context_data(self, **kwargs):
         context = super(GameEditRoles, self).get_context_data(**kwargs)
         roles = self.get_sortable_queryset()
@@ -161,7 +161,7 @@ class EditRoleMixin(RightsDetailMixin):
 
     def get_form_kwargs(self):
         kwargs = super(EditRoleMixin, self).get_form_kwargs()
-        if self.form_class == RoleForm: 
+        if self.form_class == RoleForm:
             if self.object:
                 kwargs['story'] = self.object.variation.story
             else:
@@ -193,13 +193,13 @@ class AddRoleView(EditRoleMixin, MessageMixin, SubCreateView):
     parent_obj_foreign_key = 'dummy'
     catalog_page_name = _('Add role')
     success_message = _('role was successfully added')
-    
+
     def get_parent_object(self, queryset=None):
         obj = super(AddRoleView, self).get_parent_object()
         if not obj.edit_right(self.request.user):
             raise Http404()
         return obj
-    
+
     def form_valid(self, form):
         role = form.save(commit=False)
         role.variation = self.parent_object.variation
@@ -265,14 +265,14 @@ class EditRoleAssignView(RightsDetailMixin, DetailView):
 
 class BaseGameDetailView(RightsDetailMixin, DetailView):
     model = Game
-    
+
     def check_rights(self, obj, user):
         return obj.edit_right(user)
 
 
 class GameEditIllustrationsView(BaseGameDetailView):
     template_name = 'stories/materials/illustrations.haml'
-    
+
     def get_context_data(self, **kwargs):
         kwargs['catalog_page'] = EditGameSubpage(
             self.object, url=EDIT_GAME_PAGES_ILLUSTRATIONS)
@@ -287,7 +287,7 @@ class GameEditIllustrationsView(BaseGameDetailView):
 
 class GameEditMaterialsView(BaseGameDetailView):
     template_name = 'stories/materials/materials.haml'
-    
+
     def get_context_data(self, **kwargs):
         kwargs['catalog_page'] = EditGameSubpage(
             self.object, url=EDIT_GAME_PAGES_MATERIALS)
@@ -302,7 +302,7 @@ class GameEditMaterialsView(BaseGameDetailView):
 class BaseDeleteMaterialView(RightsDetailMixin, BaseDeleteView):
     def get(self, request, *args, **kwargs):
         return self.post(request, *args, **kwargs)
-    
+
     def check_rights(self, obj, user):
         self.variation = obj.variation
         if (not self.variation) or (not self.variation.game):
@@ -312,7 +312,7 @@ class BaseDeleteMaterialView(RightsDetailMixin, BaseDeleteView):
 
 class DeleteIllustration(BaseDeleteMaterialView):
     model = Illustration
-    
+
     def get_success_url(self):
         return urls.reverse(
             'games:' + EDIT_GAME_PAGES_ILLUSTRATIONS,
@@ -321,7 +321,7 @@ class DeleteIllustration(BaseDeleteMaterialView):
 
 class DeleteMaterial(BaseDeleteMaterialView):
     model = AdditionalMaterial
-    
+
     def get_success_url(self):
         return urls.reverse(
             'games:' + EDIT_GAME_PAGES_MATERIALS,
@@ -331,13 +331,13 @@ class DeleteMaterial(BaseDeleteMaterialView):
 class BaseEditMaterialView(RightsDetailMixin, MessageMixin, UpdateView):
     login_required = True
     parent_page_url = EDIT_GAME_PAGES_MATERIALS
-    
+
     def check_rights(self, obj, user):
         self.variation = obj.variation
         if (not self.variation) or (not self.variation.game):
             return False
         return obj.edit_right(user)
-    
+
     def get_context_data(self, **kwargs):
         kwargs['catalog_page'] = CatalogPage(
             name=self.object,
@@ -348,7 +348,7 @@ class BaseEditMaterialView(RightsDetailMixin, MessageMixin, UpdateView):
         kwargs['materials'] = AdditionalMaterial.objects.filter(
             variation=self.variation)
         return super(BaseEditMaterialView, self).get_context_data(**kwargs)
-    
+
     def get_success_url(self):
         return urls.reverse(
             'games:' + self.parent_page_url, args=(self.variation.game.pk,))
@@ -373,7 +373,7 @@ class MaterialView(RightsDetailMixin, DetailView):
     template_name = 'stories/material.haml'
     model = AdditionalMaterial
     context_object_name = 'material'
-    
+
     def check_rights(self, obj, user):
         self.variation = obj.variation
         if (not self.variation) or (not self.variation.game):
@@ -381,7 +381,7 @@ class MaterialView(RightsDetailMixin, DetailView):
         if obj.admins_only and (not obj.edit_right(user)):
             raise Http404()
         return True
-    
+
     def get_context_data(self, **kwargs):
         parent = CatalogPage(
             instance=self.variation.game,
@@ -457,7 +457,7 @@ class BaseGameFormsetView(RightsDetailMixin, MessageMixin, UpdateView):
         kwargs['catalog_page'] = EditGameSubpage(
             self.object, url=self.catalog_url)
         return super(BaseGameFormsetView, self).get_context_data(**kwargs)
-    
+
     def form_valid(self, form):
         form.save()
         return HttpResponseRedirect(

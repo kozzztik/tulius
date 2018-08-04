@@ -11,7 +11,6 @@ THREAD_HAVE_PR_THREADS = 2
 
 
 class RightsPlugin(ForumPlugin):
-    
     def get_parent_rights(self, thread, user):
         no_parent_read = True
         no_parent_write = True
@@ -21,8 +20,8 @@ class RightsPlugin(ForumPlugin):
             thread.parent_id) else no_parent_write
         parent_moderate = thread.parent.moderate_right(user) if (
             thread.parent_id) else user.is_superuser
-        return (parent_read, parent_write, parent_moderate)
-        
+        return parent_read, parent_write, parent_moderate
+
     def get_special_rights(self, thread, user):
         special_read = False
         special_write = False
@@ -41,7 +40,7 @@ class RightsPlugin(ForumPlugin):
                 if right.access_level & self.models.THREAD_ACCESS_MODERATE:
                     special_moderate = True
         return special_read, special_write, special_moderate
-    
+
     def is_superuser_equal(self, thread, user, parent_moderate):
         # Not sure that
         # user.is_superuser if not user.is_anonymous else parent_moderate
@@ -49,7 +48,7 @@ class RightsPlugin(ForumPlugin):
         # pylint: disable=consider-using-ternary
         return (
             (not user.is_anonymous) and user.is_superuser) or parent_moderate
-        
+
     def limited_read_list(self, thread):
         persons = [
             right.user for right in
@@ -58,7 +57,7 @@ class RightsPlugin(ForumPlugin):
             parent_list = thread.parent.limited_read_list
             persons = [person for person in persons if person in parent_list]
         return persons
-    
+
     def get_rights(self, thread):
         user = thread.view_user
         author = (not user.is_anonymous) and (
@@ -104,14 +103,14 @@ class RightsPlugin(ForumPlugin):
         return (
             read_right, view_right, write_right, edit_right, move_right,
             moderate_right)
-    
+
     def get_free_descendants(self, thread):
         query = Q(access_type__lt=self.models.THREAD_ACCESS_TYPE_NO_READ)
         if thread and thread.view_user and (
                 not thread.view_user.is_anonymous):
             query = query | Q(user=thread.view_user)
         return self.models.Thread.objects.get_descendants(thread).filter(query)
-    
+
     def get_readeable_protected_descendants(self, thread):
         user = thread.view_user
         if user.is_superuser:
@@ -129,7 +128,7 @@ class RightsPlugin(ForumPlugin):
             thread__deleted=False)
         rights = rights.select_related('thread')
         return [right.thread for right in rights]
-    
+
     def get_free_childs(self, thread):
         user = thread.view_user
         threads = self.models.Thread.objects.filter(
@@ -142,7 +141,7 @@ class RightsPlugin(ForumPlugin):
                 access_type__lt=self.models.THREAD_ACCESS_TYPE_NO_READ
             ) | Q(user=user))
         return threads.filter(query)
-    
+
     def get_free_index(self, user, level):
         threads = self.models.Thread.objects.filter(
             access_type__lt=self.models.THREAD_ACCESS_TYPE_NO_READ)
@@ -197,17 +196,17 @@ class RightsPlugin(ForumPlugin):
             access_level__gt=self.models.THREAD_ACCESS_MODERATE)
         rights = rights.select_related('user')
         return [right.user for right in rights]
-    
+
     def get_accessed_users(self, thread):
         rights = self.models.ThreadAccessRight.objects.filter(
             thread_id=thread.id).select_related('user').distinct()
         return [right.user for right in rights]
-    
+
     def comment_edit_right(self, comment):
         return (
             (comment.user == comment.view_user) or
             comment.parent.moderate_right(comment.view_user))
-    
+
     def thread_on_create(self, sender, **kwargs):
         ancestors = self.models.Thread.objects.get_ancestors(sender)
         if (not sender.free_access_type()) and (sender.parent_id):
@@ -229,14 +228,14 @@ class RightsPlugin(ForumPlugin):
                 ).update(
                     protected_threads=THREAD_HAVE_PR_THREADS +
                     THREAD_HAVE_PR_ROOMS)
-                
+
     def thread_on_update(self, sender, **kwargs):
         old_self = kwargs['old_thread']
         if sender.free_access_type() != old_self.free_access_type():
             for thread in self.models.Thread.objects.get_ancestors(sender):
                 self.thread_repair_counters(thread)
                 thread.save()
-                
+
     def thread_repair_counters(self, sender, **kwargs):
         pr_rooms = self.models.Thread.objects.get_protected_descendants(
             sender).filter(room=True)
@@ -247,7 +246,7 @@ class RightsPlugin(ForumPlugin):
             sender.protected_threads += THREAD_HAVE_PR_ROOMS
         if pr_threads:
             sender.protected_threads += THREAD_HAVE_PR_THREADS
-        
+
     def prepare_room_list(self, sender, **kwargs):
         sender.moderators = sender.get_moderators
         if sender.access_type == self.models.THREAD_ACCESS_TYPE_NO_READ:
@@ -259,7 +258,7 @@ class RightsPlugin(ForumPlugin):
         self.core['get_free_index'] = self.get_free_index
         self.core['get_readeable_protected_index'] = \
             self.get_readeable_protected_index
-        
+
         self.core['Thread_get_free_descendants'] = self.get_free_descendants
         self.core['Thread_get_moderators'] = self.get_moderators
         self.core['Thread_get_readeable_protected_descendants'] = \
@@ -273,7 +272,7 @@ class RightsPlugin(ForumPlugin):
         self.core['Thread_get_rights'] = self.get_rights
         self.core['right_model'] = self.site.models.ThreadAccessRight
         self.core['right_form'] = ThreadAccessRightForm
-        
+
     def post_init(self):
         super(RightsPlugin, self).post_init()
         self.site.signals.thread_on_create.connect(self.thread_on_create)

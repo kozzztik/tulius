@@ -21,9 +21,9 @@ class PrivateMessage(AbstractBaseModel):
         verbose_name = _('private message')
         verbose_name_plural = _('private messages')
         ordering = ['-created_at']
-    
+
     objects = PrivateMessageManager()
-    
+
     sender = models.ForeignKey(
         User, models.PROTECT,
         verbose_name=_('sender'),
@@ -63,7 +63,7 @@ class PrivateTalkingManager(models.Manager):
             return talkings[0]
         talking = PrivateTalking(sender=sender, receiver=receiver)
         return talking
-        
+
     def update_talking(self, sender, receiver, post):
         talking = self.get_talking(sender, receiver)
         talking.last = post
@@ -75,7 +75,7 @@ class PrivateTalking(models.Model):
         verbose_name = _('private talking')
         verbose_name_plural = _('private talkings')
         ordering = ['last']
-    
+
     objects = PrivateTalkingManager()
 
     sender = models.ForeignKey(

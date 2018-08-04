@@ -8,11 +8,10 @@ from tulius.forum.threads.views import BaseThreadView
 class CollapseThreads(BaseThreadView):
     parent_is_room = True
     view_mode = False
-    
+
     def get_context_data(self, **kwargs):
         if self.request.user.is_anonymous:
             raise Http404()
-        
         super(CollapseThreads, self).get_context_data(**kwargs)
         ThreadCollapseStatus = self.site.core.models.ThreadCollapseStatus
         try:
@@ -27,7 +26,7 @@ class CollapseThreads(BaseThreadView):
         if 'rooms' in self.request.POST:
             collapse_data.collapse_rooms = (self.request.POST['rooms'] == '1')
         collapse_data.save()
-        
+
     def post(self, request, **kwargs):
         self.get_context_data(**kwargs)
         return HttpResponse(json.dumps({'result': True}))

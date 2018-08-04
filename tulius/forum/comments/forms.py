@@ -10,7 +10,7 @@ class CommentForm(forms.Form):
         required=False,
         label=_(u'Title'),
     )
-    
+
     body = forms.CharField(
         required=False,
         label=_(u'Body'),
@@ -34,7 +34,7 @@ class CommentDeleteForm(forms.Form):
         label=_(u'post'),
         widget=forms.HiddenInput,
     )
-    
+
     message = forms.CharField(
         required=False,
         label=_(u'Delete message'),

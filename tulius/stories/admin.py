@@ -12,7 +12,7 @@ class GenreForm(forms.ModelForm):
 
 class GenreAdmin(admin.ModelAdmin):
     form = GenreForm
-    
+
     list_display = (
         'id',
         'name',

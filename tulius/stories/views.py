@@ -57,7 +57,7 @@ class AddStory(LoginRequiredMixin, AjaxModelFormView):
 
     def get_success_url(self):
         return self.model.get_edit_url()
-    
+
     def model_setup(self, model):
         model.hidden = True
         messages.success(self.request, _('story was successfully added'))
@@ -114,12 +114,12 @@ def edit_illustration_reload(request, illustration_id):
 class MaterialView(RightsDetailMixin, DetailView):
     template_name = 'stories/material.haml'
     model = AdditionalMaterial
-    
+
     def check_rights(self, obj, user):
         if obj.admins_only and (not obj.edit_right(user)):
             return False
         return obj.read_right(user)
-    
+
     def get_context_data(self, **kwargs):
         kwargs['catalog_page'] = CatalogPage(
             instance=self.object, parent=get_story_page(self.object.story))

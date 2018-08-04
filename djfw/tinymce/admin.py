@@ -26,7 +26,7 @@ class FileUploadAdmin(admin.ModelAdmin):
     list_editable = (
         'filename',
     )
-    
+
     def has_add_permission(self, request):
         return False
 

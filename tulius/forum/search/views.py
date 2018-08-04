@@ -25,7 +25,7 @@ def get_datetime(text):
 
 class ExtendedSearchView(BasePluginView):
     template_name = 'search_form'
-    
+
     def get_context_data(self, **kwargs):
         context = super(ExtendedSearchView, self).get_context_data(**kwargs)
         pk = self.kwargs.get('pk')
@@ -49,7 +49,7 @@ class ExtendedSearchView(BasePluginView):
 
 class SearchView(ExtendedSearchView):
     template_name = 'search'
-    
+
     def get_context_data(self, **kwargs):
         context = super(SearchView, self).get_context_data(**kwargs)
         form = self.form
@@ -69,7 +69,7 @@ class SearchView(ExtendedSearchView):
         filter_date_from = data.get('date_from', [])
         filter_date_to = data.get('date_to', [])
         filter_text = data.get('text', [])
-        
+
         if filter_thread:
             thread = self.site.models.Thread.objects.get(pk=filter_thread)
             if thread.read_right(self.request.user):
@@ -79,13 +79,13 @@ class SearchView(ExtendedSearchView):
                     conditions += [_(u'In thread: ') + thread.title]
                 comments = comments.filter(
                     parent__lft__gte=thread.lft, parent__rght__lte=thread.rght)
-        
+
         if filter_users:
             conditions += [
                 _(u'From users: ') + ', '.join(
                     [user.username for user in filter_users])]
             comments = comments.filter(user__in=filter_users)
-            
+
         if filter_not_users:
             conditions += [
                 _(u'Not from users: ') + ', '.join(

@@ -7,7 +7,7 @@ _('installer')
 
 class BackupAdmin(admin.ModelAdmin):
     list_filter = ['category']
-    
+
     list_display = (
         'id',
         'category',
@@ -29,7 +29,6 @@ admin.site.register(Backup, BackupAdmin)
 
 
 class BackupCategoryAdmin(admin.ModelAdmin):
-    
     list_display = (
         'name',
         'verbose_name',

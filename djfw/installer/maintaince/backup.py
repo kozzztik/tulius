@@ -52,9 +52,9 @@ def backupmysql(category):
     logger.info('Backup mysql...')
     print('Backup mysql...')
     filename = os.path.join(settings.BASE_DIR, 'mysql.sql')
-    
+
     if os.path.exists(filename):
-        os.remove(filename) 
+        os.remove(filename)
     subprocess(
         'mysqldump -u%s -p%s -h%s %s > %s' % (
             database['USER'], database['PASSWORD'], database['HOST'],

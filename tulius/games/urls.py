@@ -95,7 +95,6 @@ urlpatterns = [
         r'^edit_game/(?P<game_id>\d+)/players/$',
         game_edit_players,
         name='game_edit_players'),
-        
     url(
         r'^edit_game/(?P<pk>\d+)/add_role/$',
         AddRoleView.as_view(),

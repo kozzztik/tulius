@@ -14,7 +14,7 @@ class VKConnector():
         self.key = settings.VK_APP_KEY
         self.secret = settings.VK_APP_SECRET
         self.base_url = 'https://api.vk.com/method/'
-        
+
     def request(self, method, http_method="GET", access_token=None, **kwargs):
         url = self.base_url + method
         if kwargs or access_token:
@@ -29,7 +29,7 @@ class VKConnector():
             content = json.loads(response.text)
             return content
         raise Exception(response.text)
-        
+
     def request_access_key(self, code, old_reddirect):
         args = {}
         args['client_id'] = self.key
@@ -42,7 +42,7 @@ class VKConnector():
             raise Exception(response.text)
         else:
             return json.loads(response.text)
-            
+
     def user_get(self, pk, fields, access_token):
         params = {'user_id': pk, 'fields': ','.join(fields), 'v': '5.28'}
         data = self.request('users.get', access_token=access_token, **params)

@@ -20,7 +20,7 @@ class SortableViewMixin:
                     'cls': self.__class__.__name__
                 })
         return self.queryset._clone()
-    
+
     def post(self, request, *args, **kwargs):
         if self.login_required and self.request.user.is_anonymous:
             raise PermissionDenied('Login required')
@@ -39,7 +39,7 @@ class SortableViewMixin:
 
 class SortableDetailViewMixin(SortableViewMixin):
     sortable_fk = None
-    
+
     def get_sortable_queryset(self):
         self.object = self.get_object()
         queryset = super(SortableDetailViewMixin, self).get_sortable_queryset()
@@ -70,13 +70,13 @@ class DecoratorChainingMixin:
 class ActionableMixin:
     action_param = 'action'
 #    actions = {'my_action': {'method': 'my_proc'}}
-    
+
     def dispatch_action(self, action_name, **kwargs):
         method = kwargs.pop('method', action_name)
         if callable(method):
             return method(**kwargs)
         return getattr(self, method)(**kwargs)
-        
+
     def post(self, request, *args, **kwargs):
         if self.action_param in request.POST:
             action_name = request.POST[self.action_param]
@@ -94,7 +94,7 @@ class ActionableFormsMixin(ActionableMixin):
         if form:
             return form(*args, **kwargs)
         return None
-    
+
     def get_forms(self):
         forms_dict = {}
         for action_name in self.actions.keys():
@@ -104,7 +104,7 @@ class ActionableFormsMixin(ActionableMixin):
                 context_name = action.pop('context_name', action_name + '_form')
                 forms_dict[context_name] = self.create_form(action_name, form)
         return forms_dict
-    
+
     def get_context_data(self, **kwargs):
         context = super(ActionableMixin, self).get_context_data(**kwargs)
         context.update(self.get_forms())

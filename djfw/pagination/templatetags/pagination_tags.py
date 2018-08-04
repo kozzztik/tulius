@@ -60,16 +60,16 @@ def do_autopaginate(parser, token):
 class AutoPaginateNode(template.Node):
     """
     Emits the required objects to allow for Digg-style pagination.
-    
+
     First, it looks in the current context for the variable specified, and
     using that object, it emits a simple ``Paginator`` and the current page
     object into the context names ``paginator`` and ``page_obj``, respectively.
-    
+
     It will then replace the variable specified with only the objects for the
     current page.
-    
+
     .. note::
-        
+
         It is recommended to use *{% paginate %}* after using the autopaginate
         tag.  If you choose not to use *{% paginate %}*, make sure to display
         the list of available pages, or else the application may seem to be
@@ -96,7 +96,7 @@ class AutoPaginateNode(template.Node):
         paginator = Paginator(value, paginate_by, self.orphans)
         try:
             if context['request'].page == 'last':
-                page_number = paginator.num_pages 
+                page_number = paginator.num_pages
             else:
                 page_number = context['request'].page
             page_obj = paginator.page(page_number)
@@ -123,20 +123,20 @@ def paginate(context, window=DEFAULT_WINDOW, hashtag=''):
     Digg-like display of the available pages, given the current page.  If there
     are too many pages to be displayed before and after the current page, then
     elipses will be used to indicate the undisplayed gap between page numbers.
-    
+
     Requires one argument, ``context``, which should be a dictionary-like data
     structure and must contain the following keys:
-    
+
     ``paginator``
         A ``Paginator`` or ``QuerySetPaginator`` object.
-    
+
     ``page_obj``
-        This should be the result of calling the page method on the 
+        This should be the result of calling the page method on the
         aforementioned ``Paginator`` or ``QuerySetPaginator`` object, given
         the current page.
-    
+
     This same ``context`` dictionary-like data structure may also include:
-    
+
     ``getvars``
         A dictionary of all of the **GET** parameters in the current request.
         This is useful to maintain certain types of state, even when requesting
@@ -199,7 +199,7 @@ def paginate(context, window=DEFAULT_WINDOW, hashtag=''):
             second_list.sort()
             diff = second_list[0] - pages[-1]
             # If there is a gap of two, between the last page of the current
-            # set and the first page of the last set, then we're missing a 
+            # set and the first page of the last set, then we're missing a
             # page.
             if diff == 2:
                 pages.append(second_list[0] - 1)

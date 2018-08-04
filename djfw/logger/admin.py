@@ -7,7 +7,7 @@ _('logger')
 
 class LogMessageAdmin(admin.ModelAdmin):
     list_filter = ['level']
-    
+
     list_display = (
         'create_time',
         'level',
@@ -40,7 +40,7 @@ class ExceptionMessageAdmin(admin.ModelAdmin):
     )
     list_editable = (
     )
-    
+
     def has_add_permission(self, request):
         return False
 

@@ -17,15 +17,15 @@ from .trans import transliterate
 def save_uploaded_file(request, upload, filename):
     filename = transliterate(filename)
     uploaded_file = UploadedFile(
-        user=request.user, 
-        filename=filename, 
-        file_size=len(upload), 
+        user=request.user,
+        filename=filename,
+        file_size=len(upload),
         mime=(guess_type(filename, True)[0] or '')
     )
     uploaded_file.save()
     uploaded_file.body.save(str(uploaded_file.pk) + '_' + filename, upload)
     uploaded_file.save()
-    return {'url': uploaded_file.body.url, 
+    return {'url': uploaded_file.body.url,
             'filename': uploaded_file.filename}
 
 
@@ -37,22 +37,22 @@ def upload_file(request):
 def save_uploaded_image(request, upload, filename):
     filename = transliterate(filename)
     uploaded_file = UploadedImage(
-        user=request.user, 
-        filename=filename, 
-        file_size=len(upload), 
+        user=request.user,
+        filename=filename,
+        file_size=len(upload),
         mime=(guess_type(filename, True)[0] or '')
     )
-    
+
     uploaded_file.save()
     uploaded_file.image.save(str(uploaded_file.pk) + '_' + filename, upload)
     uploaded_file.save()
     uploaded_file.image.open('rb')
     image = Image.open(uploaded_file.image)
-    
+
     thumb_size = getattr(settings, 'WYSIBB_THUMB_SIZE', (100, 100))
     thumb_format = getattr(settings, 'WYSIBB_THUMB_FORMAT', 'png')
     image.thumbnail(thumb_size, Image.ANTIALIAS)
-    
+
     image_content = BytesIO()
     image.save(image_content, format=thumb_format)
     image_file = ContentFile(image_content.getvalue())

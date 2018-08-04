@@ -39,14 +39,14 @@ class DecoratorChainingMixin:
 class RightsDetailMixin:
     login_required = False
     superuser_required = False
-    
+
     def get_object(self):
         obj = super(RightsDetailMixin, self).get_object()
         user = getattr(self.request, 'user')
         if not self.check_rights(obj, user):
             raise PermissionDenied()
         return obj
-    
+
     # return TRUE if rights is OK, False if user have no rights
     def check_rights(self, obj, user):
         if (self.login_required or self.superuser_required) and (
@@ -55,7 +55,7 @@ class RightsDetailMixin:
         if self.superuser_required and (not user.is_superuser):
             return False
         return True
-    
+
     def dispatch(self, request, *args, **kwargs):
         if (self.login_required and (not request.user.is_authenticated)):
             return redirect_to_login(request.build_absolute_uri())
@@ -82,11 +82,11 @@ class RenderMixin:
 
 class AjaxFormView(RenderMixin, FormView):
     template_name = 'snippets/ajax_form.haml'
-    
+
     def form_valid(self, form):
         return HttpResponse(
             json.dumps({'result': True, 'redirect': self.get_success_url()}))
-    
+
     def form_invalid(self, form):
         return HttpResponse(
             json.dumps({'result': False, 'html': self.render(form=form)}))
@@ -95,10 +95,10 @@ class AjaxFormView(RenderMixin, FormView):
 class AjaxModelFormView(AjaxFormView):
     def model_setup(self, model):
         pass
-    
+
     def get_success_url(self):
         return self.model.get_absolute_url()
-    
+
     def form_valid(self, form):
         self.model = form.save(commit=False)
         self.model_setup(self.model)
@@ -120,10 +120,10 @@ class AjaxFormsetView(RenderMixin, DetailView):
     base_form = forms.ModelForm
     url_name = None
     html_id = None
-    
+
     def get_html_id(self):
         return self.html_id or self.submodel.__name__ + '_formset'
-    
+
     def __init__(self, obj=None, request=None, **kwargs):
         super(AjaxFormsetView, self).__init__(**kwargs)
         if self.model:
@@ -146,7 +146,7 @@ class AjaxFormsetView(RenderMixin, DetailView):
             raise Http404()
         if not no_items:
             self.prepare_items(obj, user)
-            
+
     def prepare_items(self, obj, user):
         if (not self.no_parent) and self.fk:
             self.items = self.submodel.objects.filter(**{self.fk.name: obj.pk})
@@ -160,19 +160,19 @@ class AjaxFormsetView(RenderMixin, DetailView):
             item.html_id = self.id + '_item%s' % (item.id)
         if self.edit_right:
             self.form = self.get_form_class()(prefix=self.id)
-        
+
     def get_url(self, obj):
         if obj:
             return urls.reverse(
                 self.url_name, kwargs={self.pk_url_kwarg: obj.pk})
         return urls.reverse(self.url_name)
-            
+
     def get_edit_right(self, obj, user, item):
         return self.model_edit_right
-    
+
     def get_read_right(self, obj, user, item):
         return self.model_read_right
-    
+
     def get_form_class(self):
         if self.form_class:
             return self.form_class
@@ -182,13 +182,13 @@ class AjaxFormsetView(RenderMixin, DetailView):
         return forms.models.modelform_factory(
             self.submodel, form=self.base_form,
             fields=self.form_fields, exclude=exclude)
-    
+
     def get(self, request, *args, **kwargs):
         self.object = None if self.no_parent else self.get_object()
         self.prepare(self.object, request.user)
         context = self.get_context_data(view=self)
         return self.render_to_response(context)
-    
+
     def post(self, request, *args, **kwargs):
         self.object = None if self.no_parent else self.get_object()
         self.prepare(self.object, request.user, no_items=True)
@@ -220,6 +220,6 @@ class AjaxFormsetView(RenderMixin, DetailView):
         self.prepare_items(self.object, request.user)
         context = self.get_context_data(view=self)
         return self.render_to_response(context)
-    
+
     def __unicode__(self):
         return self.render(view=self)

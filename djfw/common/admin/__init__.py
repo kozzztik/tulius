@@ -31,7 +31,7 @@ class CustomModelAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
 
 
-class StatusAdmin(CustomModelAdmin):    
+class StatusAdmin(CustomModelAdmin):
 
     list_display = (
         'id',

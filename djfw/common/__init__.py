@@ -96,7 +96,7 @@ def do_gauss_analyze(query, field_name, intervals):
         subquery = {field_name + '__gte': interval_start}
         if i == intervals - 1:
             subquery[field_name + '__lte'] = interval_end
-        else: 
+        else:
             subquery[field_name + '__lt'] = interval_end
         data += [
             (

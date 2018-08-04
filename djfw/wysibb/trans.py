@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
- 
 import re
 
 
 def transliterate(string):
- 
+
     capital_letters = {
         'А': 'A',
         'Б': 'B',
@@ -33,7 +31,7 @@ def transliterate(string):
         'Ь': '',
         'Э': 'E',
     }
- 
+
     capital_letters_transliterated_to_multiple_letters = {
         'Ж': 'Zh',
         'Ц': 'Ts',
@@ -79,18 +77,18 @@ def transliterate(string):
         'ю': 'yu',
         'я': 'ya',
     }
- 
+
     for cyrillic_string, latin_string in \
             capital_letters_transliterated_to_multiple_letters.items():
         string = re.sub(
             r"%s([а-я])" % cyrillic_string, r'%s\1' % latin_string, string)
- 
+
     for dictionary in (capital_letters, lower_case_letters):
         for cyrillic_string, latin_string in dictionary.items():
             string = string.replace(cyrillic_string, latin_string)
- 
+
     for cyrillic_string, latin_string in \
             capital_letters_transliterated_to_multiple_letters.items():
         string = string.replace(cyrillic_string, latin_string.upper())
- 
+
     return string

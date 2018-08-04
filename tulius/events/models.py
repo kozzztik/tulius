@@ -11,7 +11,7 @@ class Notification(models.Model):
         verbose_name = _('notification')
         verbose_name_plural = _('notifications')
         ordering = ['order']
-        
+
     code_name = models.CharField(
         max_length=40,
         default='',
@@ -49,7 +49,7 @@ class Notification(models.Model):
         blank=True,
         verbose_name=_(u'body template')
     )
-    
+
     def __str__(self):
         return self.name or self.code_name
 
@@ -61,7 +61,7 @@ class UserNotification(models.Model):
     class Meta:
         verbose_name = _('user notification')
         verbose_name_plural = _('user notifications')
-    
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, models.PROTECT,
         null=False,
@@ -77,12 +77,12 @@ class UserNotification(models.Model):
         verbose_name=_(u'notification'),
         related_name='users',
     )
-    
+
     enabled = models.BooleanField(
-        default=True, 
+        default=True,
         verbose_name=_(u'enabled')
     )
-    
+
     def __str__(self):
         return "%s - %s" % (self.user, self.name or self.code_name)
 

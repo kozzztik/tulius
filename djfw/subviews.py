@@ -17,10 +17,10 @@ class ParentObjectMixin:
     parent_slug_url_kwarg = 'slug'
     parent_pk_url_kwarg = 'pk'
     parent_obj_foreign_key = None
-    
+
     def check_parent_rights(self, obj, user):
         return True
-    
+
     def get_parent_object(self, queryset=None):
         if queryset is None:
             queryset = self.get_parent_queryset()
@@ -46,7 +46,7 @@ class ParentObjectMixin:
                 {'verbose_name': queryset.model._meta.verbose_name})
         if not self.check_parent_rights(parent_obj, self.request.user):
             raise exceptions.PermissionDenied()
-        
+
         if not self.parent_obj_foreign_key:
             obj = getattr(self, 'object')
             if obj:
@@ -115,7 +115,7 @@ class BaseParentCreateView(
         self.object = None
         self.parent_object = self.get_parent_object()
         return super(BaseParentCreateView, self).post(request, *args, **kwargs)
-    
+
     def form_valid(self, form):
         self.object = form.save(commit=False)
         if not self.parent_obj_foreign_key:

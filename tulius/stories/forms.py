@@ -46,7 +46,7 @@ class StoryFilterForm(forms.Form):
             Story.objects.order_by('-creation_year').values(
                 'creation_year').distinct()
         ]
-        
+
     def author_choice(self, authors):
         author_list = []
         for author in authors:
@@ -55,7 +55,7 @@ class StoryFilterForm(forms.Form):
 
     def sorting_function(self, value):
         authors = StoryAuthor.objects.filter(user=value[1])
-        return authors.count() 
+        return authors.count()
 
 
 class AddStoryForm(forms.ModelForm):

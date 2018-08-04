@@ -6,7 +6,6 @@ class RoleForm(forms.Form):
     role = forms.ChoiceField(label=_('Character'), choices=())
 
     def __init__(self, admin, roles, *args, **kwargs):
-                
         super(RoleForm, self).__init__(*args, **kwargs)
         choices = []
         if admin:
@@ -18,9 +17,8 @@ class RoleForm(forms.Form):
 
 class EditorForm(forms.Form):
     editor = forms.ChoiceField(label=_('Editor'), choices=())
-    
+
     def __init__(self, admin, roles, *args, **kwargs):
-                
         super(EditorForm, self).__init__(*args, **kwargs)
         choices = []
         if admin:

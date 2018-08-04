@@ -18,17 +18,17 @@ class InlineFormset(forms.models.BaseInlineFormSet):
         self.dinamic = not static
         super(InlineFormset, self).__init__(
             data, None, instance, None, None, queryset, **kwargs)
-                 
+
     def _after_form_constuct(self, form, i):
         proc = getattr(form, 'after_constuct', None)
         if proc and callable(proc):
             proc(self, self.params, i)
-        
+
     def _construct_form(self, i, **kwargs):
         form = super(InlineFormset, self)._construct_form(i, **kwargs)
         self._after_form_constuct(form, i)
         return form
-        
+
     def __unicode__(self):
         if self.instance:
             pk = self.instance.pk
@@ -59,17 +59,17 @@ class SimpleFormset(forms.models.BaseModelFormSet):
         self.dinamic = not static
         super(SimpleFormset, self).__init__(
             data=data, queryset=queryset, **kwargs)
-                 
+
     def _after_form_constuct(self, form, i):
         proc = getattr(form, 'after_constuct', None)
         if proc and callable(proc):
             proc(self, self.params, i)
-            
+
     def _construct_form(self, i, **kwargs):
         form = super(SimpleFormset, self)._construct_form(i, **kwargs)
         self._after_form_constuct(form, i)
         return form
-        
+
     def __str__(self):
         form = self.form()
         self._after_form_constuct(form, None)
@@ -87,8 +87,8 @@ class SimpleFormset(forms.models.BaseModelFormSet):
         if model:
             return model._meta.object_name.lower() + '_form'
         return ''
-                
-    
+
+
 def get_formset_factory(
         parent_model, model, form=None, fk_name=None, fields=None,
         exclude=None, extra=3, can_order=False, can_delete=True, max_num=None,

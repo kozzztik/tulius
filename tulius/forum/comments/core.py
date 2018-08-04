@@ -17,7 +17,7 @@ ERROR_VALIDATION = _('there were some errors during form validation')
 
 class CommentsCore(ForumPlugin):
     COMMENTS_ON_PAGE = 25
-    
+
     def get_parent_comment(self, user, comment_id, check_write):
         try:
             comment_id = int(comment_id)
@@ -49,7 +49,7 @@ class CommentsCore(ForumPlugin):
             initial['voting'] = comment.voting
         else:
             initial['title'] = "Re: " + parent_thread.title
-            
+
         form = CommentForm(
             voting_enabled, initial=initial, data=request.POST or None)
         if comment:
@@ -70,7 +70,7 @@ class CommentsCore(ForumPlugin):
                             (comment.edit_time and (
                                 now > comment.edit_time +
                                 timedelta(minutes=2)))):
-                        comment.edit_time = now    
+                        comment.edit_time = now
                 else:
                     comment = self.site.models.Comment(parent=parent_thread)
                     comment.user = request.user
@@ -96,7 +96,7 @@ class CommentsCore(ForumPlugin):
             else:
                 messages.error(request, ERROR_VALIDATION)
         return form, comment
-    
+
     def get_comments_page(self, user, parent_thread, page_num):
         comments = self.site.core.models.Comment.objects.select_related('user')
         comments = comments.filter(
@@ -145,10 +145,10 @@ class CommentsCore(ForumPlugin):
                 success = 'success'
                 text = _('Comment successfully deleted!')
         return success, error_text, redirect, text
-    
+
     def thread_pages_count(self, thread):
         return int((thread.comments_count - 1) / self.COMMENTS_ON_PAGE + 1) or 1
-    
+
     def get_comments_pagination(self, request, thread, page):
         pages = thread.pages_count
         pagination_context = get_pagination_context(request, page, pages,)
@@ -157,7 +157,7 @@ class CommentsCore(ForumPlugin):
         pagination_bottom = get_custom_pagination(request, pagination_context)
         reply_form = CommentForm(True) if thread.write_right() else None
         return locals()
-    
+
     def before_add_comment(self, sender, **kwargs):
         thread = kwargs['thread']
         comments_count = self.models.Comment.objects.filter(
@@ -196,14 +196,14 @@ class CommentsCore(ForumPlugin):
             comments = comments.values('id')
             comments = [comment['id'] for comment in comments]
             model.objects.filter(id__in=comments).update(page=(x + 1))
-            
+
     def after_add_comment(self, sender, **kwargs):
         if kwargs['restore']:
             self.thread_update_comments_pages(kwargs['thread'])
-    
+
     def after_delete_comment(self, sender, **kwargs):
         self.thread_update_comments_pages(kwargs['thread'])
-    
+
     def repair_thread_counters(self, sender, **args):
         if sender.room:
             return
@@ -255,7 +255,7 @@ class CommentsCore(ForumPlugin):
                 thread.save()
         thread.last_comment_cache = comment
         return comment
-    
+
     def prepare_room_list(self, sender, **kwargs):
         threads = kwargs['threads']
         sender.comments_count = 0
@@ -265,7 +265,7 @@ class CommentsCore(ForumPlugin):
             if (not sender.last_comment_id) or (
                     sender.last_comment_id < thread.last_comment_id):
                 sender.last_comment_id = thread.last_comment_id
-    
+
     def thread_view(self, sender, **kwargs):
         if sender:
             context = kwargs['context']
@@ -274,7 +274,7 @@ class CommentsCore(ForumPlugin):
             page_num = request.GET['page'] if 'page' in request.GET else 1
             context['comments'] = self.get_comments_page(
                 user, sender, int(page_num))
-        
+
     def init_core(self):
         self.Comment = self.models.Comment
         self.read_comments_signal = django.dispatch.Signal(
@@ -324,7 +324,7 @@ class CommentsCore(ForumPlugin):
         self.before_delete_comment_signal.connect(self.before_delete_comment)
         self.after_add_comment_signal.connect(self.after_add_comment)
         self.after_delete_comment_signal.connect(self.after_delete_comment)
-        
+
     def post_init(self):
         self.site.signals.thread_repair_counters.connect(
             self.repair_thread_counters)

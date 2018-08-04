@@ -46,13 +46,13 @@ class RoleDeleteForm(forms.Form):
         label=_(u'Role'),
         empty_label=None,
     )
-    
+
     message = forms.CharField(
         required=False,
         label=_(u'Delete message'),
         widget=forms.Textarea,
     )
-    
+
     def __init__(self, variation, *args, **kwargs):
         super(RoleDeleteForm, self).__init__(*args, **kwargs)
         self.fields['role'].queryset = self.fields[

@@ -24,7 +24,7 @@ def get_datetime(text):
 class ExtendedSearchView(BasePluginView, DetailView):
     template_name = 'search_form'
     model = Variation
-    
+
     def get_context_data(self, **kwargs):
         context = super(ExtendedSearchView, self).get_context_data(**kwargs)
         variation = self.get_object()
@@ -54,7 +54,7 @@ class ExtendedSearchView(BasePluginView, DetailView):
 
 class SearchView(ExtendedSearchView):
     template_name = 'search'
-    
+
     def get_context_data(self, **kwargs):
         context = super(SearchView, self).get_context_data(**kwargs)
         variation = self.object
@@ -76,7 +76,7 @@ class SearchView(ExtendedSearchView):
         filter_date_from = data.get('date_from', [])
         filter_date_to = data.get('date_to', [])
         filter_text = data.get('text', [])
-        
+
         if filter_thread:
             thread = self.site.models.Thread.objects.get(pk=filter_thread)
             if thread.read_right(self.request.user):
@@ -86,7 +86,7 @@ class SearchView(ExtendedSearchView):
                     conditions += [_(u'In thread: ') + thread.title]
                 comments = comments.filter(
                     parent__lft__gte=thread.lft, parent__rght__lte=thread.rght)
-        
+
         filter_roles = [
             role for role in filter_roles
             if role.variation_id == variation.id]
@@ -102,7 +102,7 @@ class SearchView(ExtendedSearchView):
                 [role.name for role in filter_roles])]
             comments = comments.filter(
                 data1__in=[role.id for role in filter_roles])
-            
+
         if filter_not_roles:
             conditions += [
                 _(u'Not from characters: ') + ', '.join(

@@ -29,13 +29,13 @@ gameforum_site = apps.get_app_config('gameforum').site
 class MessageMixin:
     error_message = _('there were some errors during form validation')
     success_message = ''
-    
+
     def form_valid(self, form):
         response = super(MessageMixin, self).form_valid(form)
         if self.success_message:
             messages.success(self.request, self.success_message)
         return response
-    
+
     def form_invalid(self, form):
         if self.error_message:
             messages.error(self.request, self.error_message)
@@ -84,7 +84,7 @@ def set_edit(games, user):
 
 class IndexView(TemplateView):
     template_name = 'games/index.haml'
-    
+
     def get_context_data(self, **kwargs):
         user = self.request.user
         context = {}
@@ -100,7 +100,7 @@ class IndexView(TemplateView):
             Game.objects.completed_games(user), user)
         context['completed_open_games'] = set_edit(
             Game.objects.completed_open_games(user), user)
-        context['catalog_page'] = games_catalog_page()    
+        context['catalog_page'] = games_catalog_page()
         return context
 
 
@@ -108,10 +108,10 @@ class GamesListBase(TemplateView):
     template_name = 'games/games_list.haml'
     page_name = ''
     proc_name = ''
-    
+
     def process_games(self, games):
         pass
-    
+
     def get_context_data(self, **kwargs):
         user = self.request.user
         context = {}
@@ -173,7 +173,7 @@ class CreateGame(MessageMixin, SubCreateView):
     form_class = AddGameForm
     parent_model = Variation
     template_name = 'games/add_game.haml'
-    
+
     def form_valid(self, form):
         variation = self.parent_object
         if not variation.create_right(self.request.user):
@@ -200,7 +200,7 @@ class CreateGame(MessageMixin, SubCreateView):
             admin.save()
         messages.success(self.request, _('game was successfully created'))
         return HttpResponseRedirect(game.get_edit_url())
-        
+
     def get_context_data(self, **kwargs):
         context = super(CreateGame, self).get_context_data(**kwargs)
         context['catalog_page'] = CatalogPage(
@@ -236,7 +236,7 @@ def role_text_read_right(role, user, game):
 class GameView(RightsDetailMixin, DetailView):
     template_name = 'games/game.haml'
     model = Game
-    
+
     def check_rights(self, obj, user):
         if obj.read_right(user):
             obj.enter_url = urls.reverse('gameforum:game', args=(obj.pk,))
@@ -246,10 +246,10 @@ class GameView(RightsDetailMixin, DetailView):
             obj.can_send_request(user) and not
             obj.sended_request(user))
         return obj.view_info_right(user)
-    
+
     def get_context_data(self, **kwargs):
         game = self.object
-        kwargs['catalog_page'] = get_game_page(game) 
+        kwargs['catalog_page'] = get_game_page(game)
         roles = Role.objects.filter(
             variation=game.variation, show_in_character_list=True
         ).exclude(deleted=True)
@@ -269,7 +269,7 @@ class GameView(RightsDetailMixin, DetailView):
 class GameRoleView(RightsDetailMixin, DetailView):
     template_name = 'games/game_role.haml'
     model = Role
-    
+
     def check_rights(self, obj, user):
         game = obj.variation.game
         self.game = game
@@ -277,10 +277,10 @@ class GameRoleView(RightsDetailMixin, DetailView):
         if game.read_right(user):
             game.enter_url = urls.reverse('gameforum:game', args=(game.pk,))
         return role_text_read_right(obj, user, game)
-    
+
     def get_context_data(self, **kwargs):
         kwargs['game'] = self.game
-        game_page = get_game_page(self.game) 
+        game_page = get_game_page(self.game)
         kwargs['game_page'] = game_page
         kwargs['catalog_page'] = CatalogPage(
             name=self.object.name, parent=game_page)
@@ -350,11 +350,11 @@ class ChangeGameStoryView(RightsDetailMixin, UpdateView):
     model = Game
     form_class = GameChangeStoryForm
     superuser_required = True
-    
+
     def get_form_kwargs(self):
-        return {'initial': {'story': self.object.variation.story}, 
+        return {'initial': {'story': self.object.variation.story},
                 'data': self.request.POST or None}
-    
+
     def form_valid(self, form):
         story = form.cleaned_data['story']
         with transaction.commit_on_success():
@@ -377,6 +377,6 @@ class DeleteGame(RightsDetailMixin, DeleteView):
     template_name = 'games/delete_game.haml'
     model = Game
     success_url = urls.reverse_lazy('games:index')
-    
+
     def check_rights(self, obj, user):
         return user.is_superuser

@@ -23,7 +23,7 @@ def time_period_graph(request, *args, **kwargs):
                 weight_count=Count(weight_field),
                 weight_sum=Sum(weight_field), weight_avg=Avg(weight_field))
         return query.annotate(weight_sum=Count('id'))
-        
+
     delta = (endtime - starttime) / intervals
     data = []
     period_query = ProfilerMessage.objects.filter(
@@ -55,7 +55,7 @@ def time_period_graph(request, *args, **kwargs):
         subquery = {'create_time__gte': interval_start}
         if i == intervals - 1:
             subquery['create_time__lte'] = interval_end
-        else: 
+        else:
             subquery['create_time__lt'] = interval_end
         period_query = ProfilerMessage.objects.filter(**subquery)
         values = period_query.order_by(
@@ -72,7 +72,7 @@ def time_period_graph(request, *args, **kwargs):
                     module_values = [i['weight_sum']]
                     break
             period_data += module_values
-                
+
         if settings.USE_TZ:
             data += [[make_naive(interval_end, utc), period_data]]
         else:
@@ -100,7 +100,7 @@ def time_period_graph_sum(request, *args, **kwargs):
                 weight_sum=Sum(weight_field),
                 weight_avg=Avg(weight_field))
         return query.annotate(weight_sum=Count('id'))
-        
+
     delta = (endtime - starttime) / intervals
     data = []
     period_query = ProfilerMessage.objects.filter(
@@ -111,7 +111,7 @@ def time_period_graph_sum(request, *args, **kwargs):
         subquery = {'create_time__gte': interval_start}
         if i == intervals - 1:
             subquery['create_time__lte'] = interval_end
-        else: 
+        else:
             subquery['create_time__lt'] = interval_end
         period_query = ProfilerMessage.objects.filter(**subquery)
         if weight_field:
@@ -147,7 +147,7 @@ def sunlignt_graph(request, category_field, category_subfield=None):
     for category_obj in categories:
         all_weight += category_obj['weight']
     for category_obj in categories:
-        category = {} 
+        category = {}
         category_weight = category_obj['weight']
         if not category_weight:
             continue
@@ -226,7 +226,7 @@ def distribution_graph(
         subquery = {weight_field + '__gte': interval_start}
         if i == intervals - 1:
             subquery[weight_field + '__lte'] = interval_end
-        else: 
+        else:
             subquery[weight_field + '__lt'] = interval_end
         value = ProfilerMessage.objects.filter(**subquery).count()
         x = (interval_end + interval_start) / 2
@@ -243,7 +243,7 @@ def collapsed_time_period_graph(start_day, days, weight_field, multi=1):
     if days <= PARTING_DAYS:
         delta = delta / COLLAPSE_INTERVALS
     data = []
-    
+
     for i in range(intervals):
         interval_start = start_day + (delta * i)
         interval_end = start_day + (delta * (i + 1))
@@ -311,7 +311,7 @@ def collapsed_sunlignt_graph(
                 if subfield:
                     elem['label'] = subcategory
                 else:
-                    elem['label'] = category + " " + (subcategory or "") 
+                    elem['label'] = category + " " + (subcategory or "")
                 if mappings and category in mappings:
                     if subcategory in mappings[category]['items']:
                         elem['label'] = mappings[category]['items'][
@@ -363,7 +363,7 @@ def collapsed_sum_graph(
     if days <= PARTING_DAYS:
         delta = delta / COLLAPSE_INTERVALS
     data = []
-    
+
     for i in range(intervals):
         interval_start = start_day + (delta * i)
         interval_end = start_day + (delta * (i + 1))

@@ -12,7 +12,7 @@ class BaseThreadView(BasePluginView):
     template_name = None
     parent_is_room = False
     view_mode = True
-    
+
     def get_context_data(self, **kwargs):
         self.get_parent_thread(**kwargs)
         context = super(BaseThreadView, self).get_context_data(**kwargs)
@@ -22,7 +22,7 @@ class BaseThreadView(BasePluginView):
                 self.parent_thread, context=context,
                 user=self.request.user, request=self.request)
         return context
-    
+
     def get_parent_thread(self, **kwargs):
         parent_id = kwargs['parent_id'] if 'parent_id' in kwargs else None
         self.user = self.request.user
@@ -33,7 +33,7 @@ class BaseThreadView(BasePluginView):
 class Room(BaseThreadView):
     template_name = 'room'
     parent_is_room = True
-    
+
     def get_context_data(self, **kwargs):
         context = super(Room, self).get_context_data(**kwargs)
         context['rooms'] = self.core.get_subthreads(
@@ -47,7 +47,7 @@ class Room(BaseThreadView):
 
 class Index(BaseThreadView):
     template_name = 'index'
-    
+
     def get_context_data(self, **kwargs):
         context = super(Index, self).get_context_data(**kwargs)
         all_rooms = [thread for thread in self.core.get_index(self.user, 1)]
@@ -74,7 +74,7 @@ class EditView(BaseThreadView):
     self_is_room = True
     require_user = True
     view_mode = False
-    
+
     def get_context_data(self, **kwargs):
         context = super(EditView, self).get_context_data(**kwargs)
         parent_thread = self.parent_thread
@@ -94,7 +94,7 @@ class EditView(BaseThreadView):
                     raise Http404()
             else:
                 if self.self_is_room:
-                    if not parent_thread.moderate_right():  
+                    if not parent_thread.moderate_right():
                         raise Http404()
                 else:
                     if not parent_thread.write_right():
@@ -108,7 +108,7 @@ class EditView(BaseThreadView):
         if self.self_is_room:
             (form, formset, thread) = self.core.process_edit_room(
                 self.request, parent_thread, thread)
-        else:            
+        else:
             (form, formset, thread, comment) = self.core.process_edit_thread(
                 self.request, parent_thread, thread, True, self.edit_is_valid)
             context['comment'] = comment
@@ -125,7 +125,7 @@ class EditView(BaseThreadView):
         self.site.signals.thread_after_edit.send(
             self, thread=thread, context=context)
         return context
-    
+
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         if self.thread:
@@ -136,14 +136,14 @@ class EditView(BaseThreadView):
 class Thread(BaseThreadView):
     template_name = 'thread'
     parent_is_room = False
-    
+
     def get_context_data(self, **kwargs):
         context = super(Thread, self).get_context_data(**kwargs)
         page = int(self.request.GET['page']) if \
             'page' in self.request.GET else 1
         context.update(self.core.get_comments_pagination(
             self.request, self.parent_thread, page))
-            
+
         if not self.user.is_anonymous:
             context['delete_post_form'] = PostDeleteForm()
         return context
@@ -174,7 +174,7 @@ class DeleteThread(BasePluginView):
 class MoveThreadSelect(BaseThreadView):
     template_name = 'thread_move_select'
     parent_is_room = None
-    
+
     def get_context_data(self, **kwargs):
         context = super(MoveThreadSelect, self).get_context_data(**kwargs)
         threads = self.core.thread_move_list(self.parent_thread, self.user)
@@ -192,7 +192,7 @@ class MoveThreadSelect(BaseThreadView):
 class MoveThreadConfirm(BaseThreadView):
     template_name = 'thread_move_confirm'
     parent_is_room = None
-    
+
     def get_context_data(self, **kwargs):
         context = super(MoveThreadConfirm, self).get_context_data(**kwargs)
         thread_id = self.kwargs['thread_id'] if \
@@ -202,7 +202,7 @@ class MoveThreadConfirm(BaseThreadView):
         self.thread = thread
         context['thread'] = thread
         return context
-    
+
     def post(self, request, **kwargs):
         self.get_context_data(**kwargs)
         self.core.move_thread(self.parent_thread, request.user, self.thread)

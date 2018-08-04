@@ -8,7 +8,7 @@ from . import plugin
 
 class RebuildNums(plugin.BasePluginView):
     template_name = 'fixes'
-    
+
     def get_context_data(self, post_id=None, **kwargs):
         thread = self.core.models.Thread
         if not self.request.user.is_superuser:
@@ -23,7 +23,7 @@ class RebuildNums(plugin.BasePluginView):
 
 class FixLastPost(plugin.BasePluginView):
     template_name = 'fixes'
-    
+
     def get_context_data(self, **kwargs):
         if not self.request.user.is_superuser:
             raise http.Http404
@@ -40,7 +40,7 @@ class FixLastPost(plugin.BasePluginView):
 
 class FixHtml(plugin.BasePluginView):
     template_name = 'fixes'
-    
+
     def get_context_data(self, **kwargs):
         fix_expr = [
             (r'<p (.*?)>', r''),
@@ -51,13 +51,11 @@ class FixHtml(plugin.BasePluginView):
 
         def do_fix_comment(comment):
             value = comment.body
-    
             for expr in fix_expr:
                 p = re.compile(expr[0], re.DOTALL)
                 value = p.sub(expr[1], value)
-            
             comment.body = value
-            
+
         def scan_threads(parent_thread):
             threads = models.Thread.objects.filter(
                 parent=parent_thread).order_by('id')

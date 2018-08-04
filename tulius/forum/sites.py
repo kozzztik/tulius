@@ -3,17 +3,17 @@ from django.conf import settings
 
 class SitesManager:
     sites = []
-    
+
     def add_site(self, site):
         obj = self.get_site(site.site_id)
         if not obj:
             self.sites += [site]
-    
+
     def get_site(self, site_id):
         for site in self.sites:
             if site.site_id == site_id:
                 return site
-        return None 
+        return None
 
 
 sites_manager = SitesManager()
@@ -24,12 +24,12 @@ class SiteCore:
         self.content = {}
         self.site = site
         self.name = site.name
-        
+
     def __getattr__(self, attr):
         if attr in self.__dict__:
             return self.__dict__[attr]
         return self.content[attr]
-    
+
     def __getitem__(self, key):
         return self.content[key]
 
@@ -44,7 +44,7 @@ class BaseForumSite:
     templates = None
     urlizer = None
     signals = None
-    
+
     def __init__(
             self, name='forum', app_name='forum', site_id=None, plugins=()):
         self.app_name = app_name
@@ -59,18 +59,18 @@ class BaseForumSite:
         self.models = self.core.models
         self.init_plugins()
         sites_manager.add_site(self)
-    
+
     def init_core(self):
         from . import models
         self.core.models = models
 
     def get_own_urls(self):
         return []
-    
+
     def check_dependencies(self):
         for plugin in self.plugins.values():
             plugin.check_dependencies(self.plugins)
-            
+
     def init_plugins(self):
         self.plugins = {}
         for plugin_class in self.plugin_classes:
@@ -89,9 +89,8 @@ class BaseForumSite:
         urlpatterns = self.get_own_urls()
         for plugin in self.plugins.values():
             urlpatterns += plugin.get_urls()
-
         return urlpatterns
-    
+
     @property
     def urls(self):
         return self.get_urls(), self.app_name
