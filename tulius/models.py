@@ -37,7 +37,7 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
                     '@/./+/-/_ characters'),
         validators=[
             validators.RegexValidator(
-                re.compile('^[\w.@+-]+$', re.U),
+                re.compile(r'^[\w.@+-]+$', re.U),
                 _('Enter a valid username.'), 'invalid')
         ])
     email = models.EmailField(_('email address'), blank=True)

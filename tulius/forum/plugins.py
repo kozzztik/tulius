@@ -50,9 +50,9 @@ class BasePluginView(TemplateView):
         self.core = self.site.core
 
     @classonlymethod
-    def as_view(self, plugin, **initkwargs):
+    def as_view(cls, plugin, **initkwargs):
         initkwargs['plugin'] = plugin
-        return super(BasePluginView, self).as_view(**initkwargs)
+        return super(BasePluginView, cls).as_view(**initkwargs)
     
     def get_context_data(self, **kwargs):
         if self.require_user and self.request.user.is_anonymous:

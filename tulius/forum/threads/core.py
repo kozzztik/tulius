@@ -373,11 +373,11 @@ class ThreadsCorePlugin(ForumPlugin):
     def _repair_thread_counters(self, thread=None):
         threads = self.models.Thread.objects.filter(
             parent=thread, deleted=False)
-        for thread in threads:
-            if thread.room:
-                self._repair_thread_counters(thread)
-            self.thread_repair_counters.send(thread)
-            thread.save()
+        for t in threads:
+            if t.room:
+                self._repair_thread_counters(t)
+            self.thread_repair_counters.send(t)
+            t.save()
 
     def init_core(self):
         self.thread_view_signal = django.dispatch.Signal(

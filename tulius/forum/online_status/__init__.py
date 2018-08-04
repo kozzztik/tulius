@@ -25,9 +25,7 @@ class OnlineStatusPlugin(ForumPlugin):
             visit_time__gte=now() - timedelta(minutes=3),
             thread__tree_id=thread.tree_id, thread__lft__gte=thread.lft,
             thread__rght__lte=thread.rght)
-        users_list = {}
-        for user in users:
-            users_list[user.user.id] = user.user
+        users_list = {u.user.id: u.user for u in users}
         return users_list.values()
     
     def get_all_online_users(self):

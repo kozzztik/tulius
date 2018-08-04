@@ -47,8 +47,8 @@ class VotingCore(ForumPlugin):
         voting.comment = comment
         voting.user = user
         voting.save()
-        for form in formset:
-            voting_choice = form.save(commit=False)
+        for f in formset:
+            voting_choice = f.save(commit=False)
             voting_choice.voting = voting
             voting_choice.save()
         return voting
