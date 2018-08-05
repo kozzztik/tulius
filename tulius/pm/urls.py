@@ -1,15 +1,17 @@
-from django.conf.urls import url
-from .views import *
+from django.conf import urls
+
+from tulius.pm import views
+
 
 app_name = 'tulius.pm'
 
 urlpatterns = [
-    url(
+    urls.url(
         r'^messages/$',
-        PlayerMessagesView.as_view(),
+        views.PlayerMessagesView.as_view(),
         name='messages'),
-    url(
+    urls.url(
         r'^user/(?P<pk>\d+)/$',
-        PlayerSendMessageView.as_view(),
+        views.PlayerSendMessageView.as_view(),
         name='to_user'),
 ]

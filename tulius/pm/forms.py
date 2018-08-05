@@ -1,12 +1,12 @@
 from django import forms
 
-from tulius.pm.models import *
+from tulius.pm import models
 
 
 class PrivateMessageForm(forms.ModelForm):
 
     class Meta:
-        model = PrivateMessage
+        model = models.PrivateMessage
         fields = ('body',)
 
     def __init__(self, sender, receiver, *args, **kwargs):

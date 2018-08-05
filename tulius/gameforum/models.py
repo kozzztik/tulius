@@ -1,7 +1,9 @@
 from django.conf import settings
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from tulius.forum.models import *
-from tulius.stories.models import Variation, Role
+
+from tulius.forum import models as forum
+from tulius.stories import models as stories
 
 
 class GameThreadRight(models.Model):
@@ -14,14 +16,14 @@ class GameThreadRight(models.Model):
         unique_together = ('thread', 'role')
 
     thread = models.ForeignKey(
-        Thread, models.PROTECT,
+        forum.Thread, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'thread'),
         related_name='access_roles',
     )
     role = models.ForeignKey(
-        Role, models.PROTECT,
+        stories.Role, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'role'),
@@ -31,7 +33,7 @@ class GameThreadRight(models.Model):
     access_level = models.SmallIntegerField(
         default=0,
         verbose_name=_(u'access rights'),
-        choices=THREAD_ACCESS_CHOICES,
+        choices=forum.THREAD_ACCESS_CHOICES,
     )
 
 
@@ -53,7 +55,7 @@ class Trustmark(models.Model):
     )
 
     variation = models.ForeignKey(
-        Variation, models.PROTECT,
+        stories.Variation, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'variation'),
@@ -61,7 +63,7 @@ class Trustmark(models.Model):
     )
 
     role = models.ForeignKey(
-        Role, models.PROTECT,
+        stories.Role, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'role'),

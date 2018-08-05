@@ -1,30 +1,33 @@
-from django.views.generic import DetailView, TemplateView
-from django.contrib.auth.decorators import login_required
-from django.utils.translation import ugettext_lazy as _
-from django.shortcuts import get_object_or_404
-from django.http import Http404
+from django import http
+from django import shortcuts
 from django.contrib import messages
-from djfw.cataloging.core import CatalogPage
-from djfw.views import AjaxModelFormView, LoginRequiredMixin, RightsDetailMixin
-from .forms import *
-from .materials_views import upload_illustration
-from .catalog import stories_catalog_page
+from django.views import generic
+from django.contrib.auth import decorators
+from django.utils.translation import ugettext_lazy as _
+
+from djfw import views as djfw_views
+from djfw.cataloging import core as cataloging
+
+from tulius.stories import catalog
+from tulius.stories import forms
+from tulius.stories import materials_views
+from tulius.stories import models
 
 
 def filter_by_author(stories, author):
-    storyauthor = StoryAuthor.objects.filter(
+    storyauthor = models.StoryAuthor.objects.filter(
         user__id=author).values('story').distinct()
     storylist = [author['story'] for author in storyauthor]
     return stories.filter(pk__in=storylist)
 
 
-class IndexView(TemplateView):
+class IndexView(generic.TemplateView):
     template_name = 'stories/index.haml'
 
     def get_context_data(self, **kwargs):
-        stories_filter_form = StoryFilterForm(self.request.GET or None)
-        stories = Story.objects.order_by('-creation_year')
-        catalog_page = stories_catalog_page()
+        stories_filter_form = forms.StoryFilterForm(self.request.GET or None)
+        stories = models.Story.objects.order_by('-creation_year')
+        catalog_page = catalog.stories_catalog_page()
         total_stories_count = stories.count()
         if self.request.GET:
             if ('filter_by_genre' in self.request.GET) and self.request.GET[
@@ -45,15 +48,15 @@ class IndexView(TemplateView):
         filtered_stories_count = len(stories)
         filtered = self.request.GET and (filtered_stories_count
                                          != total_stories_count)
-        add_form = AddStoryForm()
+        add_form = forms.AddStoryForm()
         for story in stories:
             story.editable = story.edit_right(self.request.user)
             story.authors.all()
         return locals()
 
 
-class AddStory(LoginRequiredMixin, AjaxModelFormView):
-    form_class = AddStoryForm
+class AddStory(djfw_views.LoginRequiredMixin, djfw_views.AjaxModelFormView):
+    form_class = forms.AddStoryForm
 
     def get_success_url(self):
         return self.model.get_edit_url()
@@ -64,56 +67,57 @@ class AddStory(LoginRequiredMixin, AjaxModelFormView):
 
 
 def get_story_page(story):
-    return CatalogPage(
-        instance=story, parent=stories_catalog_page(), is_index=True)
+    return cataloging.CatalogPage(
+        instance=story, parent=catalog.stories_catalog_page(), is_index=True)
 
 
-class StoryView(DetailView):
+class StoryView(generic.DetailView):
     template_name = 'stories/story.haml'
-    model = Story
+    model = models.Story
 
     def get_context_data(self, **kwargs):
         story = self.object
         if story.edit_right(self.request.user):
             story.edit_url = story.get_edit_url()
-        characters = Character.objects.filter(
+        characters = models.Character.objects.filter(
             story=story, show_in_character_list=True)
-        authors = StoryAuthor.objects.filter(story=story)
-        materials = AdditionalMaterial.objects.filter(
+        authors = models.StoryAuthor.objects.filter(story=story)
+        materials = models.AdditionalMaterial.objects.filter(
             story=story, admins_only=False)
         return {
             'story': story, 'characters': characters,
             'materials': materials, 'authors': authors}
 
 
-class CharacterInfoView(DetailView):
+class CharacterInfoView(generic.DetailView):
     template_name = 'stories/role_info.haml'
-    model = Character
+    model = models.Character
 
     def get_context_data(self, **kwargs):
         character = self.object
         story = character.story
         if (not story) or (not character.show_in_character_list):
-            raise Http404()
+            raise http.Http404()
         return locals()
 
 
-@login_required
+@decorators.login_required
 def edit_illustration_reload(request, illustration_id):
     try:
         illustration_id = int(illustration_id)
     except:
-        raise Http404()
-    illustration = get_object_or_404(Illustration, id=illustration_id)
+        raise http.Http404()
+    illustration = shortcuts.get_object_or_404(
+        models.Illustration, id=illustration_id)
     if not illustration.edit_right(request.user):
-        raise Http404()
-    return upload_illustration(
+        raise http.Http404()
+    return materials_views.upload_illustration(
         request, illustration.story, illustration.variation, illustration)
 
 
-class MaterialView(RightsDetailMixin, DetailView):
+class MaterialView(djfw_views.RightsDetailMixin, generic.DetailView):
     template_name = 'stories/material.haml'
-    model = AdditionalMaterial
+    model = models.AdditionalMaterial
 
     def check_rights(self, obj, user):
         if obj.admins_only and (not obj.edit_right(user)):
@@ -121,6 +125,6 @@ class MaterialView(RightsDetailMixin, DetailView):
         return obj.read_right(user)
 
     def get_context_data(self, **kwargs):
-        kwargs['catalog_page'] = CatalogPage(
+        kwargs['catalog_page'] = cataloging.CatalogPage(
             instance=self.object, parent=get_story_page(self.object.story))
         return super(MaterialView, self).get_context_data(**kwargs)

@@ -1,7 +1,8 @@
 from django import forms
 from django import urls
 from django.utils.translation import ugettext_lazy as _, _string_concat
-from .models import *
+
+from tulius.stories import models
 
 
 EMPTY_CHOICE = ('', '---------')
@@ -11,17 +12,17 @@ class StoryFilterForm(forms.Form):
 
     filter_by_author = forms.ModelChoiceField(
         required=False,
-        queryset=User.objects.all(),
+        queryset=models.User.objects.all(),
         label=_(u'Author'),
     )
     filter_by_genre = forms.ModelChoiceField(
         required=False,
-        queryset=Genre.objects.all(),
+        queryset=models.Genre.objects.all(),
         label=_(u'Genre'),
     )
     filter_by_creation_year = forms.ChoiceField(
         required=False,
-        choices=(EMPTY_CHOICE) + CREATION_YEAR_CHOICES,
+        choices=EMPTY_CHOICE + models.CREATION_YEAR_CHOICES,
         label=_(u'Creation year'),
     )
 
@@ -31,7 +32,7 @@ class StoryFilterForm(forms.Form):
             'filter_by_author'].queryset.filter(
                 pk__in=[
                     author['user'] for author in
-                    StoryAuthor.objects.values('user').distinct()])
+                    models.StoryAuthor.objects.values('user').distinct()])
         self.fields['filter_by_author'].widget = forms.Select()
         self.fields['filter_by_author'].widget.choices = [
             EMPTY_CHOICE] + self.author_choice(
@@ -39,11 +40,11 @@ class StoryFilterForm(forms.Form):
         self.fields['filter_by_genre'].queryset = self.fields[
             'filter_by_genre'].queryset.filter(
                 pk__in=[
-                    v['genres'] for v in Story.objects.values(
+                    v['genres'] for v in models.Story.objects.values(
                         'genres').distinct()])
         self.fields['filter_by_creation_year'].choices = [EMPTY_CHOICE] + [
             (v['creation_year'], v['creation_year']) for v in
-            Story.objects.order_by('-creation_year').values(
+            models.Story.objects.order_by('-creation_year').values(
                 'creation_year').distinct()
         ]
 
@@ -54,7 +55,7 @@ class StoryFilterForm(forms.Form):
         return sorted(author_list, key=self.sorting_function)
 
     def sorting_function(self, value):
-        authors = StoryAuthor.objects.filter(user=value[1])
+        authors = models.StoryAuthor.objects.filter(user=value[1])
         return authors.count()
 
 
@@ -65,5 +66,5 @@ class AddStoryForm(forms.ModelForm):
         '<i class="icon-plus"></i> ', _('Add story'))
 
     class Meta:
-        model = Story
+        model = models.Story
         fields = ('name', 'short_comment', 'creation_year', )

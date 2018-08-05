@@ -1,5 +1,5 @@
 
-class CatalogPage():
+class CatalogPage:
     """
         Class for page in Catalog tree
     """

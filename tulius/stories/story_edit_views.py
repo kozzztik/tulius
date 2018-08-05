@@ -1,5 +1,6 @@
 from django import shortcuts
 from django import http
+from django import urls
 from django.apps import apps
 from django.contrib import messages
 from django.views import generic
@@ -13,21 +14,17 @@ from djfw import uploader
 from djfw import views as djfw_views
 from djfw.sortable import views as sortable_views
 
-from tulius.games.views import MessageMixin
-from .models import Story, Variation, Character, Avatar, Role, \
-    AdditionalMaterial, Illustration, StoryAdmin, StoryAuthor
-from .story_edit_forms import CharacterForm, EditStoryMainForm, \
-    EditStoryTextsForm, StoryAuthorForm,\
-    StoryAdminForm, VariationForm, AvatarForm
-from .materials_forms import AdditionalMaterialForm, IllustrationForm
-from .edit_story_cataloging import *
-from .edit_variation_catalog import EDIT_VARIATION_PAGES_MATERIALS, \
-    EDIT_VARIATION_PAGES_ILLUSTRATIONS, EditVariationSubpage
-from .materials_views import upload_illustration
+from tulius.games import views as games_views
+from tulius.stories import edit_story_cataloging as story_catalog
+from tulius.stories import edit_variation_catalog as variation_catalog
+from tulius.stories import materials_forms
+from tulius.stories import materials_views
+from tulius.stories import models
+from tulius.stories import story_edit_forms
 
 
 class StoryAdminMixin(djfw_views.RightsDetailMixin):
-    model = Story
+    model = models.Story
     page_url = None
     success_message = _('story was successfully updated')
 
@@ -36,7 +33,7 @@ class StoryAdminMixin(djfw_views.RightsDetailMixin):
 
     def get_context_data(self, **kwargs):
         if self.page_url:
-            kwargs['catalog_page'] = EditStorySubpage(
+            kwargs['catalog_page'] = story_catalog.EditStorySubpage(
                 self.object, url=self.page_url)
         return super(StoryAdminMixin, self).get_context_data(**kwargs)
 
@@ -44,16 +41,18 @@ class StoryAdminMixin(djfw_views.RightsDetailMixin):
         return urls.reverse('stories:' + self.page_url, args=(self.object.pk,))
 
 
-class StoryMainView(StoryAdminMixin, MessageMixin, generic.UpdateView):
+class StoryMainView(
+        StoryAdminMixin, games_views.MessageMixin, generic.UpdateView):
     template_name = 'base_cataloged_navig_form_game.haml'
-    form_class = EditStoryMainForm
-    page_url = EDIT_STORY_PAGES_MAIN
+    form_class = story_edit_forms.EditStoryMainForm
+    page_url = story_catalog.EDIT_STORY_PAGES_MAIN
 
 
-class StoryTextsView(StoryAdminMixin, MessageMixin, generic.UpdateView):
+class StoryTextsView(
+        StoryAdminMixin, games_views.MessageMixin, generic.UpdateView):
     template_name = 'stories/edit_story/texts.haml'
-    form_class = EditStoryTextsForm
-    page_url = EDIT_STORY_PAGES_TEXTS
+    form_class = story_edit_forms.EditStoryTextsForm
+    page_url = story_catalog.EDIT_STORY_PAGES_TEXTS
 
 
 class StoryFile:
@@ -74,7 +73,7 @@ class StoryFile:
 
 class StoryGraphics(StoryAdminMixin, generic.DetailView):
     template_name = 'stories/edit_story/graphics.haml'
-    page_url = EDIT_STORY_PAGES_GRAPHICS
+    page_url = story_catalog.EDIT_STORY_PAGES_GRAPHICS
 
     def get_context_data(self, **kwargs):
         kwargs['story_files'] = (
@@ -110,10 +109,14 @@ class UsersFormsets:
             self, data=None, instance=None, initial=None, static=True,
             **kwargs):
         self.authorformset = inlineformsets.get_formset(
-            Story, StoryAuthor, data, StoryAuthorForm, extra=1, static=static,
-            instance=instance, params={'static': static})
+            models.Story, models.StoryAuthor, data,
+            story_edit_forms.StoryAuthorForm,
+            extra=1, static=static, instance=instance,
+            params={'static': static})
         self.adminformset = inlineformsets.get_formset(
-            Story, StoryAdmin, data, StoryAdminForm, extra=1, static=static,
+            models.Story, models.StoryAdmin, data,
+            story_edit_forms.StoryAdminForm,
+            extra=1, static=static,
             instance=instance, params={'static': static})
         self.static = static
         self.instance = instance
@@ -132,17 +135,19 @@ class UsersFormsets:
 class StoryUsers(
         custom_views.ActionableViewMixin, StoryAdminMixin, generic.DetailView):
     template_name = 'stories/edit_story/users.haml'
-    page_url = EDIT_STORY_PAGES_USERS
+    page_url = story_catalog.EDIT_STORY_PAGES_USERS
 
     def get_editable(self):
         return self.request.user.is_superuser
 
     widgets = {
         'authorformset': {
-            'class': custom_views.FormsetWidget, 'model': StoryAuthor,
+            'class': custom_views.FormsetWidget,
+            'model': models.StoryAuthor,
             'table_class': 'table', 'editable': get_editable},
         'adminformset': {
-            'class': custom_views.FormsetWidget, 'model': StoryAdmin,
+            'class': custom_views.FormsetWidget,
+            'model': models.StoryAdmin,
             'table_class': 'table', 'editable': get_editable}
     }
 
@@ -153,31 +158,32 @@ class EditStoryVariations(
     template_name = 'stories/edit_story/variations.haml'
     sortable_key = "var_"
     sortable_field = 'order'
-    sortable_model = Variation
-    page_url = EDIT_STORY_PAGES_VARIATIONS
+    sortable_model = models.Variation
+    page_url = story_catalog.EDIT_STORY_PAGES_VARIATIONS
 
 
-class BaseStoryAddView(StoryAdminMixin, MessageMixin, subviews.SubCreateView):
-    parent_model = Story
+class BaseStoryAddView(
+        StoryAdminMixin, games_views.MessageMixin, subviews.SubCreateView):
+    parent_model = models.Story
 
     def check_parent_rights(self, obj, user):
         return self.check_rights(obj, user)
 
     def get_context_data(self, **kwargs):
         kwargs['form_submit_title'] = _("add")
-        kwargs['catalog_page'] = CatalogPage(
+        kwargs['catalog_page'] = story_catalog.CatalogPage(
             name=self.page_name,
-            parent=EditStorySubpage(
+            parent=story_catalog.EditStorySubpage(
                 self.parent_object, url=self.parent_page_url))
         return super(BaseStoryAddView, self).get_context_data(**kwargs)
 
 
 class AddVariationView(BaseStoryAddView):
     template_name = 'stories/edit_story/add_variation.haml'
-    form_class = VariationForm
-    parent_page_url = EDIT_STORY_PAGES_VARIATIONS
+    form_class = story_edit_forms.VariationForm
+    parent_page_url = story_catalog.EDIT_STORY_PAGES_VARIATIONS
     page_name = _('Add new variation')
-    model = Variation
+    model = models.Variation
 
     def form_valid(self, form):
         variation = form.save(commit=False)
@@ -187,9 +193,9 @@ class AddVariationView(BaseStoryAddView):
         variation.thread = gameforum.core.create_gameforum(
             self.request.user, variation)
         variation.save()
-        characters = Character.objects.filter(story=self.parent_object)
+        characters = models.Character.objects.filter(story=self.parent_object)
         for character in characters:
-            role = Role(variation=variation, character=character)
+            role = models.Role(variation=variation, character=character)
             role.avatar = character.avatar
             role.name = character.name
             role.description = character.description
@@ -206,12 +212,12 @@ class EditStoryCharacters(
     template_name = 'stories/edit_story/characters.haml'
     sortable_key = "char_"
     sortable_field = 'order'
-    sortable_model = Character
-    page_url = EDIT_STORY_PAGES_CHARACTERS
+    sortable_model = models.Character
+    page_url = story_catalog.EDIT_STORY_PAGES_CHARACTERS
 
 
 class CharacterFormMixin:
-    parent_page_url = EDIT_STORY_PAGES_CHARACTERS
+    parent_page_url = story_catalog.EDIT_STORY_PAGES_CHARACTERS
 
     def get_form_kwargs(self):
         kwargs = super(CharacterFormMixin, self).get_form_kwargs()
@@ -225,18 +231,18 @@ class CharacterFormMixin:
 
 class AddCharacterView(CharacterFormMixin, BaseStoryAddView):
     template_name = 'base_cataloged_navig_form_game.haml'
-    form_class = CharacterForm
-    model = Character
+    form_class = story_edit_forms.CharacterForm
+    model = models.Character
     page_name = _('Add new character')
     success_message = _('character was successfully added')
 
 
 class CharacterView(
-        CharacterFormMixin, djfw_views.RightsDetailMixin, MessageMixin,
-        generic.UpdateView):
+        CharacterFormMixin, djfw_views.RightsDetailMixin,
+        games_views.MessageMixin, generic.UpdateView):
     template_name = 'base_cataloged_navig_form_game.haml'
-    model = Character
-    form_class = CharacterForm
+    model = models.Character
+    form_class = story_edit_forms.CharacterForm
     success_message = _('character was successfully updated')
 
     def check_rights(self, obj, user):
@@ -245,41 +251,41 @@ class CharacterView(
 
     def get_context_data(self, **kwargs):
         kwargs['story'] = self.parent_object
-        kwargs['catalog_page'] = CatalogPage(
+        kwargs['catalog_page'] = story_catalog.CatalogPage(
             name=self.object,
-            parent=EditStorySubpage(
+            parent=story_catalog.EditStorySubpage(
                 self.parent_object, url=self.parent_page_url))
         return super(CharacterView, self).get_context_data(**kwargs)
 
 
 class StoryAvatarsView(StoryAdminMixin, generic.DetailView):
     template_name = 'stories/edit_story/avatars.haml'
-    page_url = EDIT_STORY_PAGES_AVATARS
+    page_url = story_catalog.EDIT_STORY_PAGES_AVATARS
 
 
 class StoryIllustrationsView(StoryAdminMixin, generic.DetailView):
     template_name = 'stories/materials/illustrations.haml'
-    page_url = EDIT_STORY_PAGES_ILLUSTRATIONS
+    page_url = story_catalog.EDIT_STORY_PAGES_ILLUSTRATIONS
 
     def get_context_data(self, **kwargs):
-        kwargs['illustrations'] = Illustration.objects.filter(
+        kwargs['illustrations'] = models.Illustration.objects.filter(
             story=self.object)
         return super(StoryIllustrationsView, self).get_context_data(**kwargs)
 
 
 class StoryMaterialsView(StoryAdminMixin, generic.DetailView):
     template_name = 'stories/materials/materials.haml'
-    page_url = EDIT_STORY_PAGES_MATERIALS
+    page_url = story_catalog.EDIT_STORY_PAGES_MATERIALS
 
     def get_context_data(self, **kwargs):
-        kwargs['materials'] = AdditionalMaterial.objects.filter(
+        kwargs['materials'] = models.AdditionalMaterial.objects.filter(
             story=self.object)
         return super(StoryMaterialsView, self).get_context_data(**kwargs)
 
 
 class StoryDeleteAvatarView(
         djfw_views.RightsDetailMixin, generic.edit.BaseDeleteView):
-    model = Avatar
+    model = models.Avatar
 
     def get(self, request, *args, **kwargs):
         return self.post(request, *args, **kwargs)
@@ -290,16 +296,18 @@ class StoryDeleteAvatarView(
 
     def get_success_url(self):
         return urls.reverse(
-            'stories:' + EDIT_STORY_PAGES_AVATARS, args=(self.story.pk,))
+            'stories:' + story_catalog.EDIT_STORY_PAGES_AVATARS,
+            args=(self.story.pk,))
 
 
 class EditAvatarView(
-        djfw_views.RightsDetailMixin, MessageMixin, generic.UpdateView):
+        djfw_views.RightsDetailMixin, games_views.MessageMixin,
+        generic.UpdateView):
     template_name = 'stories/edit_story/avatar.haml'
-    model = Avatar
-    form_class = AvatarForm
+    model = models.Avatar
+    form_class = story_edit_forms.AvatarForm
     success_message = _('avatar was successfully updated')
-    parent_page_url = EDIT_STORY_PAGES_AVATARS
+    parent_page_url = story_catalog.EDIT_STORY_PAGES_AVATARS
 
     def check_rights(self, obj, user):
         self.story = obj.story
@@ -307,9 +315,10 @@ class EditAvatarView(
 
     def get_context_data(self, **kwargs):
         kwargs['story'] = self.story
-        kwargs['catalog_page'] = CatalogPage(
+        kwargs['catalog_page'] = story_catalog.CatalogPage(
             name=self.object,
-            parent=EditStorySubpage(self.story, url=self.parent_page_url))
+            parent=story_catalog.EditStorySubpage(
+                self.story, url=self.parent_page_url))
         return super(EditAvatarView, self).get_context_data(**kwargs)
 
     def get_success_url(self):
@@ -318,13 +327,14 @@ class EditAvatarView(
 
 
 class EditIllustrationView(
-        djfw_views.RightsDetailMixin, MessageMixin, generic.UpdateView):
+        djfw_views.RightsDetailMixin, games_views.MessageMixin,
+        generic.UpdateView):
     template_name = 'stories/materials/illustration.haml'
-    model = Illustration
-    form_class = IllustrationForm
+    model = models.Illustration
+    form_class = materials_forms.IllustrationForm
     success_message = _('Illustration was successfully updated')
-    story_page_url = EDIT_STORY_PAGES_ILLUSTRATIONS
-    variation_page_url = EDIT_VARIATION_PAGES_ILLUSTRATIONS
+    story_page_url = story_catalog.EDIT_STORY_PAGES_ILLUSTRATIONS
+    variation_page_url = variation_catalog.EDIT_VARIATION_PAGES_ILLUSTRATIONS
     login_required = True
 
     def check_rights(self, obj, user):
@@ -332,15 +342,16 @@ class EditIllustrationView(
         self.variation = obj.variation
         if self.variation:
             self.story = obj.variation.story
-            self.catalog_page = CatalogPage(
+            self.catalog_page = story_catalog.CatalogPage(
                 name=obj,
-                parent=EditVariationSubpage(
+                parent=variation_catalog.EditVariationSubpage(
                     self.variation, url=self.variation_page_url))
         else:
             self.story = obj.story
-            self.catalog_page = CatalogPage(
+            self.catalog_page = story_catalog.CatalogPage(
                 name=obj,
-                parent=EditStorySubpage(self.story, url=self.story_page_url))
+                parent=story_catalog.EditStorySubpage(
+                    self.story, url=self.story_page_url))
         return self.story.edit_right(user)
 
     def get_context_data(self, **kwargs):
@@ -355,11 +366,11 @@ class EditIllustrationView(
 
 class EditMaterialView(EditIllustrationView):
     template_name = 'stories/materials/material.haml'
-    model = AdditionalMaterial
-    form_class = AdditionalMaterialForm
+    model = models.AdditionalMaterial
+    form_class = materials_forms.AdditionalMaterialForm
     success_message = _('Additional material was successfully updated')
-    story_page_url = EDIT_STORY_PAGES_MATERIALS
-    variation_page_url = EDIT_VARIATION_PAGES_MATERIALS
+    story_page_url = story_catalog.EDIT_STORY_PAGES_MATERIALS
+    variation_page_url = variation_catalog.EDIT_VARIATION_PAGES_MATERIALS
 
 
 def get_story(story_id, user):
@@ -367,7 +378,7 @@ def get_story(story_id, user):
         story_id = int(story_id)
     except:
         raise http.Http404()
-    story = shortcuts.get_object_or_404(Story, id=story_id)
+    story = shortcuts.get_object_or_404(models.Story, id=story_id)
     if not story.edit_right(user):
         raise http.Http404()
     return story
@@ -375,16 +386,16 @@ def get_story(story_id, user):
 
 @decorators.login_required
 def add_story_illustration(request, story_id):
-    return upload_illustration(
+    return materials_views.upload_illustration(
         request, get_story(story_id, request.user), None, None)
 
 
 class AddMaterialView(BaseStoryAddView):
     template_name = 'stories/materials/material.haml'
-    form_class = AdditionalMaterialForm
-    parent_page_url = EDIT_STORY_PAGES_MATERIALS
+    form_class = materials_forms.AdditionalMaterialForm
+    parent_page_url = story_catalog.EDIT_STORY_PAGES_MATERIALS
     page_name = _('Add material')
-    model = AdditionalMaterial
+    model = models.AdditionalMaterial
     success_message = _('Additional material was successfully added')
 
     def get_success_url(self):
@@ -394,9 +405,9 @@ class AddMaterialView(BaseStoryAddView):
 
 class DeleteIllustrationView(
         djfw_views.RightsDetailMixin, generic.edit.BaseDeleteView):
-    model = Illustration
-    variation_url = EDIT_VARIATION_PAGES_ILLUSTRATIONS
-    story_url = EDIT_STORY_PAGES_ILLUSTRATIONS
+    model = models.Illustration
+    variation_url = variation_catalog.EDIT_VARIATION_PAGES_ILLUSTRATIONS
+    story_url = story_catalog.EDIT_STORY_PAGES_ILLUSTRATIONS
 
     def get(self, request, *args, **kwargs):
         return self.post(request, *args, **kwargs)
@@ -415,6 +426,6 @@ class DeleteIllustrationView(
 
 
 class DeleteMaterialView(DeleteIllustrationView):
-    model = AdditionalMaterial
-    variation_url = EDIT_VARIATION_PAGES_MATERIALS
-    story_url = EDIT_STORY_PAGES_MATERIALS
+    model = models.AdditionalMaterial
+    variation_url = variation_catalog.EDIT_VARIATION_PAGES_MATERIALS
+    story_url = story_catalog.EDIT_STORY_PAGES_MATERIALS

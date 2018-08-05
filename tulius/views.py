@@ -1,40 +1,42 @@
 import datetime
 
 from django.utils.translation import ugettext_lazy as _
-from django.template.response import TemplateResponse
-from django.views.generic import TemplateView
-from django.utils.timezone import now
-from django.utils.timezone import get_current_timezone
+from django.template import response
+from django.views import generic
+from django.utils import timezone
 
-from djfw.news.models import NewsItem
+from djfw.news import models as news
 from djfw.profiler import graphs
-from tulius.games.models import Game
 
-from .forms import *
+from tulius import forms
+from tulius.games import models as games
 
 
-class HomeView(TemplateView):
+class HomeView(generic.TemplateView):
     template_name = 'home.haml'
 
     def get_context_data(self, **kwargs):
         user = self.request.user
         return {
-            'announced_games': Game.objects.new_games(user),
-            'request_accepting_games': Game.objects.announced_games(user),
-            'awaiting_start_games': Game.objects.awaiting_start_games(
+            'announced_games': games.Game.objects.new_games(user),
+            'request_accepting_games': games.Game.objects.announced_games(
                 user),
-            'current_games': Game.objects.current_games(user),
-            'news': NewsItem.objects.filter(is_published=True).filter(
-                published_at__lt=now()).order_by('-published_at')[:3],
+            'awaiting_start_games': games.Game.objects.awaiting_start_games(
+                user),
+            'current_games': games.Game.objects.current_games(user),
+            'news': news.NewsItem.objects.filter(
+                is_published=True
+            ).filter(
+                published_at__lt=timezone.now()).order_by('-published_at')[:3],
         }
 
 
 def error404(request, template_name='404.html', **kwargs):
-    return TemplateResponse(request, template_name, status=404)
+    return response.TemplateResponse(request, template_name, status=404)
 
 
 def error500(request, template_name='500.haml'):
-    return TemplateResponse(request, template_name, status=500)
+    return response.TemplateResponse(request, template_name, status=500)
 
 
 def logic_time(x):
@@ -44,19 +46,20 @@ def logic_time(x):
     return x.exec_time - time
 
 
-class StatisticsView(TemplateView):
+class StatisticsView(generic.TemplateView):
     template_name = 'statistics.haml'
 
     def get_context_data(self, **kwargs):
-        form = StatsFilterForm(self.request.GET or None)
-        graph_type = GRAPH_TYPE_LINEAR
-        linear_type = LINEAR_CALLS
-        linear_c_type = LINEAR_C_ANONS
-        sunlight_type = SUNLIGHT_BROWSERS
+        form = forms.StatsFilterForm(self.request.GET or None)
+        graph_type = forms.GRAPH_TYPE_LINEAR
+        linear_type = forms.LINEAR_CALLS
+        linear_c_type = forms.LINEAR_C_ANONS
+        sunlight_type = forms.SUNLIGHT_BROWSERS
         days = 1
         day = datetime.date.today()
         day_start = datetime.datetime(
-            day.year, day.month, day.day, tzinfo=get_current_timezone())
+            day.year, day.month, day.day,
+            tzinfo=timezone.get_current_timezone())
 
         graph = None
 
@@ -77,94 +80,94 @@ class StatisticsView(TemplateView):
                 days = int(self.request.GET['period'])
 
         day_start = day_start - datetime.timedelta(days=days)
-        if graph_type == GRAPH_TYPE_LINEAR:
-            if linear_type == LINEAR_CALLS:
+        if graph_type == forms.GRAPH_TYPE_LINEAR:
+            if linear_type == forms.LINEAR_CALLS:
                 graph = graphs.collapsed_time_period_graph(
                     day_start, days, 'calls_count')
-            elif linear_type == LINEAR_ERRORS:
+            elif linear_type == forms.LINEAR_ERRORS:
                 graph = graphs.collapsed_time_period_graph(
                     day_start, days, 'exceptions_count')
-            elif linear_type == LINEAR_ANONS:
+            elif linear_type == forms.LINEAR_ANONS:
                 graph = graphs.collapsed_time_period_graph(
                     day_start, days, 'anon_calls_count')
-            elif linear_type == LINEAR_MOBILES:
+            elif linear_type == forms.LINEAR_MOBILES:
                 graph = graphs.collapsed_time_period_graph(
                     day_start, days, 'mobiles_count')
-            elif linear_type == LINEAR_EXEC_TIME:
+            elif linear_type == forms.LINEAR_EXEC_TIME:
                 graph = graphs.collapsed_time_period_graph(
                     day_start, days, 'exec_time', multi=0.001)
-            elif linear_type == LINEAR_DB_CALLS:
+            elif linear_type == forms.LINEAR_DB_CALLS:
                 graph = graphs.collapsed_time_period_graph(
                     day_start, days, 'db_count')
-            elif linear_type == LINEAR_DB_EXEC:
+            elif linear_type == forms.LINEAR_DB_EXEC:
                 graph = graphs.collapsed_time_period_graph(
                     day_start, days, 'db_time', multi=0.001)
-            elif linear_type == LINEAR_TEMPLATE:
+            elif linear_type == forms.LINEAR_TEMPLATE:
                 graph = graphs.collapsed_time_period_graph(
                     day_start, days, 'template_time', multi=0.001)
-        elif graph_type == GRAPH_TYPE_SUNLIGHT:
-            if sunlight_type == SUNLIGHT_BROWSERS:
+        elif graph_type == forms.GRAPH_TYPE_SUNLIGHT:
+            if sunlight_type == forms.SUNLIGHT_BROWSERS:
                 graph = graphs.collapsed_sunlignt_graph(
                     day_start, days, 'browsers')
                 graph['name'] = _("Browsers")
-            elif sunlight_type == SUNLIGHT_OSES:
+            elif sunlight_type == forms.SUNLIGHT_OSES:
                 graph = graphs.collapsed_sunlignt_graph(
                     day_start, days, 'oses')
                 graph['name'] = _("Operating systems")
-            elif sunlight_type == SUNLIGHT_MOBILES:
+            elif sunlight_type == forms.SUNLIGHT_MOBILES:
                 graph = graphs.collapsed_sunlignt_graph(
                     day_start, days, 'devices')
                 graph['name'] = _("Mobile devices")
-            elif sunlight_type == SUNLIGHT_MOD_CALLS:
+            elif sunlight_type == forms.SUNLIGHT_MOD_CALLS:
                 graph = graphs.collapsed_sunlignt_graph(
                     day_start, days, 'modules', subfield="calls")
                 graph['name'] = _("Calls")
-            elif sunlight_type == SUNLIGHT_MOD_ANONS:
+            elif sunlight_type == forms.SUNLIGHT_MOD_ANONS:
                 graph = graphs.collapsed_sunlignt_graph(
                     day_start, days, 'modules', subfield="anons")
                 graph['name'] = _("Anonymous")
-            elif sunlight_type == SUNLIGHT_MOD_MOBILES:
+            elif sunlight_type == forms.SUNLIGHT_MOD_MOBILES:
                 graph = graphs.collapsed_sunlignt_graph(
                     day_start, days, 'modules', subfield="mobiles")
                 graph['name'] = _("Mobiles")
-            elif sunlight_type == SUNLIGHT_MOD_EXCEPT:
+            elif sunlight_type == forms.SUNLIGHT_MOD_EXCEPT:
                 graph = graphs.collapsed_sunlignt_graph(
                     day_start, days, 'modules', subfield="exceptions")
                 graph['name'] = _("Exceptions")
-            elif sunlight_type == SUNLIGHT_MOD_EXEC:
+            elif sunlight_type == forms.SUNLIGHT_MOD_EXEC:
                 graph = graphs.collapsed_sunlignt_graph(
                     day_start, days, 'modules', subfield="exec")
                 graph['name'] = _("Exec time")
-            elif sunlight_type == SUNLIGHT_MOD_DB_COUNT:
+            elif sunlight_type == forms.SUNLIGHT_MOD_DB_COUNT:
                 graph = graphs.collapsed_sunlignt_graph(
                     day_start, days, 'modules', subfield="db_count")
                 graph['name'] = _("DB queries")
-            elif sunlight_type == SUNLIGHT_MOD_DB_TIME:
+            elif sunlight_type == forms.SUNLIGHT_MOD_DB_TIME:
                 graph = graphs.collapsed_sunlignt_graph(
                     day_start, days, 'modules', subfield="db_time")
                 graph['name'] = _("DB time")
-            elif sunlight_type == SUNLIGHT_MOD_TEMPLATE:
+            elif sunlight_type == forms.SUNLIGHT_MOD_TEMPLATE:
                 graph = graphs.collapsed_sunlignt_graph(
                     day_start, days, 'modules', subfield="render")
                 graph['name'] = _("Template rendering")
-        elif graph_type == GRAPH_TYPE_LINEAR_C:
-            if linear_c_type == LINEAR_C_ANONS:
+        elif graph_type == forms.GRAPH_TYPE_LINEAR_C:
+            if linear_c_type == forms.LINEAR_C_ANONS:
                 graph = graphs.collapsed_sum_graph(
                     day_start, days,
                     ['calls_count', 'anon_calls_count'],
                     [_("All"), _("Anonymous")])
-            elif linear_c_type == LINEAR_C_MOBILES:
+            elif linear_c_type == forms.LINEAR_C_MOBILES:
                 graph = graphs.collapsed_sum_graph(
                     day_start, days,
                     ['calls_count', 'mobiles_count'],
                     [_("All"), _("Mobile devices")])
-            elif linear_c_type == LINEAR_C_EXEC:
+            elif linear_c_type == forms.LINEAR_C_EXEC:
                 graph = graphs.collapsed_sum_graph(
                     day_start, days,
                     [logic_time, 'db_time', 'template_time'],
                     [_("Logic"), _("DB"), _("Rendering")],
                     multi=0.001, incremental=True)
-            elif linear_c_type == LINEAR_C_ERRORS:
+            elif linear_c_type == forms.LINEAR_C_ERRORS:
                 graph = graphs.collapsed_sum_graph(
                     day_start, days,
                     ['calls_count', 'exceptions_count'],

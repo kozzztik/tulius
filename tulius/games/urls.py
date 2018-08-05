@@ -1,163 +1,167 @@
-from django.conf.urls import url
-from .views import *
-from .game_edit_catalog import *
-from .game_edit_views import *
-from .requests_view import make_game_request, cancel_game_request, \
-    role_assign_user, role_clear_user
+from django.conf import urls
+
+from tulius.games import views
+from tulius.games import game_edit_catalog
+from tulius.games import game_edit_views
+from tulius.games import requests_view
+
 
 app_name = 'tulius.games'
 
 urlpatterns = [
     # game list and details
-    url(r'^$', IndexView.as_view(), name='index'),
-    url(r'^announced/$', AnnouncedGames.as_view(), name='announced_games'),
-    url(
+    urls.url(r'^$', views.IndexView.as_view(), name='index'),
+    urls.url(
+        r'^announced/$',
+        views.AnnouncedGames.as_view(),
+        name='announced_games'),
+    urls.url(
         r'^accepting/$',
-        RequestAcceptingGames.as_view(),
+        views.RequestAcceptingGames.as_view(),
         name='request_accepting_games'),
-    url(
+    urls.url(
         r'^awaiting_start/$',
-        AwaitingStartGames.as_view(),
+        views.AwaitingStartGames.as_view(),
         name='awaiting_start_games'),
-    url(
+    urls.url(
         r'^current/$',
-        CurrentGames.as_view(),
+        views.CurrentGames.as_view(),
         name='current_games'),
-    url(
+    urls.url(
         r'^completed/$',
-        CompletedOpenedGames.as_view(),
+        views.CompletedOpenedGames.as_view(),
         name='completed_opened_games'),
-    url(
+    urls.url(
         r'^add_game/(?P<pk>\d+)/$',
-        CreateGame.as_view(),
+        views.CreateGame.as_view(),
         name='add_game'),
-    url(
+    urls.url(
         r'^game/(?P<pk>\d+)/$',
-        GameView.as_view(),
+        views.GameView.as_view(),
         name='game'),
-    url(
+    urls.url(
         r'^delete_game/(?P<pk>\d+)/$',
-        DeleteGame.as_view(),
+        views.DeleteGame.as_view(),
         name='delete_game'),
-    url(
+    urls.url(
         r'^change_story/(?P<pk>\d+)/$',
-        ChangeGameStoryView.as_view(),
+        views.ChangeGameStoryView.as_view(),
         name='change_game_story'),
-    url(
+    urls.url(
         r'^view_role/(?P<pk>\d+)/$',
-        GameRoleView.as_view(),
+        views.GameRoleView.as_view(),
         name='view_role'),
-    url(
+    urls.url(
         r'^edit_game/(?P<game_id>\d+)/main/$',
-        GameAdminMain.as_view(),
-        name=EDIT_GAME_PAGES_MAIN),
-    url(
+        game_edit_views.GameAdminMain.as_view(),
+        name=game_edit_catalog.EDIT_GAME_PAGES_MAIN),
+    urls.url(
         r'^edit_game/(?P<game_id>\d+)/texts/$',
-        GameAdminTexts.as_view(),
-        name=EDIT_GAME_PAGES_TEXTS),
-    url(
+        game_edit_views.GameAdminTexts.as_view(),
+        name=game_edit_catalog.EDIT_GAME_PAGES_TEXTS),
+    urls.url(
         r'^edit_game/(?P<game_id>\d+)/users/$',
-        GameAdminUsers.as_view(),
-        name=EDIT_GAME_PAGES_USERS),
-    url(
+        game_edit_views.GameAdminUsers.as_view(),
+        name=game_edit_catalog.EDIT_GAME_PAGES_USERS),
+    urls.url(
         r'^edit_game/(?P<game_id>\d+)/graphics/$',
-        GameAdminGraphics.as_view(),
-        name=EDIT_GAME_PAGES_GRAPHICS),
-    url(
+        game_edit_views.GameAdminGraphics.as_view(),
+        name=game_edit_catalog.EDIT_GAME_PAGES_GRAPHICS),
+    urls.url(
         r'^edit_game/(?P<game_id>\d+)/roles/$',
-        GameEditRoles.as_view(),
-        name=EDIT_GAME_PAGES_ROLES),
-    url(
+        game_edit_views.GameEditRoles.as_view(),
+        name=game_edit_catalog.EDIT_GAME_PAGES_ROLES),
+    urls.url(
         r'^edit_game/(?P<pk>\d+)/illustrations/$',
-        GameEditIllustrationsView.as_view(),
-        name=EDIT_GAME_PAGES_ILLUSTRATIONS),
-    url(
+        game_edit_views.GameEditIllustrationsView.as_view(),
+        name=game_edit_catalog.EDIT_GAME_PAGES_ILLUSTRATIONS),
+    urls.url(
         r'^edit_game/(?P<pk>\d+)/materials/$',
-        GameEditMaterialsView.as_view(),
-        name=EDIT_GAME_PAGES_MATERIALS),
-    url(
+        game_edit_views.GameEditMaterialsView.as_view(),
+        name=game_edit_catalog.EDIT_GAME_PAGES_MATERIALS),
+    urls.url(
         r'^edit_game/(?P<pk>\d+)/request_form/$',
-        EditRequestView.as_view(),
-        name=EDIT_GAME_PAGES_REQUEST_FORM),
-    url(
+        game_edit_views.EditRequestView.as_view(),
+        name=game_edit_catalog.EDIT_GAME_PAGES_REQUEST_FORM),
+    urls.url(
         r'^edit_game/(?P<pk>\d+)/requests/$',
-        EditRequestsView.as_view(),
-        name=EDIT_GAME_PAGES_REQUESTS),
-    url(
+        game_edit_views.EditRequestsView.as_view(),
+        name=game_edit_catalog.EDIT_GAME_PAGES_REQUESTS),
+    urls.url(
         r'^edit_game/(?P<pk>\d+)/winners/$',
-        EditWinnersView.as_view(),
-        name=EDIT_GAME_PAGES_WINNERS),
-    url(
+        game_edit_views.EditWinnersView.as_view(),
+        name=game_edit_catalog.EDIT_GAME_PAGES_WINNERS),
+    urls.url(
         r'^edit_game/(?P<pk>\d+)/forum/$',
-        GameForumView.as_view(),
-        name=EDIT_GAME_PAGES_FORUM),
-    url(
+        game_edit_views.GameForumView.as_view(),
+        name=game_edit_catalog.EDIT_GAME_PAGES_FORUM),
+    urls.url(
         r'^edit_game/(?P<game_id>\d+)/players/$',
-        game_edit_players,
+        game_edit_views.game_edit_players,
         name='game_edit_players'),
-    url(
+    urls.url(
         r'^edit_game/(?P<pk>\d+)/add_role/$',
-        AddRoleView.as_view(),
+        game_edit_views.AddRoleView.as_view(),
         name='add_role'),
-    url(
+    urls.url(
         r'^edit_game/(?P<pk>\d+)/add_material/$',
-        AddMaterialView.as_view(),
+        game_edit_views.AddMaterialView.as_view(),
         name='add_material'),
-    url(
+    urls.url(
         r'^role/(?P<pk>\d+)/$',
-        GameEditRoleView.as_view(),
+        game_edit_views.GameEditRoleView.as_view(),
         name='role'),
-    url(
+    urls.url(
         r'^role/(?P<pk>\d+)/text/$',
-        GameRoleTextView.as_view(),
+        game_edit_views.GameRoleTextView.as_view(),
         name='role_text'),
-    url(
+    urls.url(
         r'^role/(?P<pk>\d+)/assign/$',
-        EditRoleAssignView.as_view(),
+        game_edit_views.EditRoleAssignView.as_view(),
         name='role_assign'),
-    url(
+    urls.url(
         r'^edit_illustration/(?P<pk>\d+)/$',
-        EditIllustrationView.as_view(),
+        game_edit_views.EditIllustrationView.as_view(),
         name='edit_illustration'),
-    url(
+    urls.url(
         r'^edit_illustration/(?P<pk>\d+)/delete/$',
-        DeleteIllustration.as_view(),
+        game_edit_views.DeleteIllustration.as_view(),
         name='illustration_delete'),
-    url(
+    urls.url(
         r'^edit_material/(?P<pk>\d+)/$',
-        EditMaterialView.as_view(),
+        game_edit_views.EditMaterialView.as_view(),
         name='edit_material'),
-    url(
+    urls.url(
         r'^edit_material/(?P<pk>\d+)/delete/$',
-        DeleteMaterial.as_view(),
+        game_edit_views.DeleteMaterial.as_view(),
         name='material_delete'),
-    url(
+    urls.url(
         r'^material/(?P<pk>\d+)/$',
-        MaterialView.as_view(),
+        game_edit_views.MaterialView.as_view(),
         name='material'),
-    url(
+    urls.url(
         r'^game_request/(?P<game_id>\d+)/$',
-        make_game_request,
+        requests_view.make_game_request,
         name='game_request'),
-    url(
+    urls.url(
         r'^game_invite/(?P<game_id>\d+)/$',
-        invite_player,
+        views.invite_player,
         name='game_invite'),
-    url(
+    urls.url(
         r'^cancel_request/(?P<game_id>\d+)/$',
-        cancel_game_request,
+        requests_view.cancel_game_request,
         name='cancel_game_request'),
-    url(
+    urls.url(
         r'^role/(?P<role_id>\d+)/assign(?P<user_id>\d+)/$',
-        role_assign_user,
+        requests_view.role_assign_user,
         name='role_assign_user'),
-    url(
+    urls.url(
         r'^role/(?P<role_id>\d+)/assign(?P<user_id>\d+)/roles/$',
-        role_assign_user,
+        requests_view.role_assign_user,
         {'backtoroles': True},
         name='role_assign_user_roles'),
-    url(
+    urls.url(
         r'^role/(?P<role_id>\d+)/clearuser/$',
-        role_clear_user,
+        requests_view.role_clear_user,
         name='role_clear_user'),
 ]

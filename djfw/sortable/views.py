@@ -1,6 +1,6 @@
-from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.http import HttpResponse
+from django import http
 from django import forms
+from django.core import exceptions
 
 
 class SortableViewMixin:
@@ -14,7 +14,7 @@ class SortableViewMixin:
         if self.sortable_queryset is None:
             if self.sortable_model:
                 return self.sortable_model._default_manager.all()
-            raise ImproperlyConfigured(
+            raise exceptions.ImproperlyConfigured(
                 "%(cls)s is missing a sortable queryset. Define "
                 "%(cls)s.sortable_model or %(cls)s.sortable_queryset." % {
                     'cls': self.__class__.__name__
@@ -23,7 +23,7 @@ class SortableViewMixin:
 
     def post(self, request, *args, **kwargs):
         if self.login_required and self.request.user.is_anonymous:
-            raise PermissionDenied('Login required')
+            raise exceptions.PermissionDenied('Login required')
         items = request.POST['items']
         items = items.split(',')
         if self.sortable_key:
@@ -34,7 +34,7 @@ class SortableViewMixin:
         for item in items:
             order += 1
             queryset.filter(pk=item).update(**{self.sortable_field: order})
-        return HttpResponse("{}")
+        return http.HttpResponse("{}")
 
 
 class SortableDetailViewMixin(SortableViewMixin):
@@ -49,7 +49,7 @@ class SortableDetailViewMixin(SortableViewMixin):
             return queryset.filter(**{fk.name: self.object.pk})
         if self.sortable_fk:
             return queryset.filter(**{self.sortable_fk: self.object.pk})
-        raise ImproperlyConfigured(
+        raise exceptions.ImproperlyConfigured(
             "%(cls)s is missing a sortable foreign key. Define "
             "%(cls)s.sortable_model and %(cls)s.model, or "
             "%(cls)s.sortable_fk." % {
@@ -111,7 +111,7 @@ class ActionableFormsMixin(ActionableMixin):
         return context
 
     def invalid_form(self, action, form):
-        return HttpResponse(str(form))
+        return http.HttpResponse(str(form))
 
     def dispatch_action(self, action_name, **kwargs):
         if 'form' in kwargs:

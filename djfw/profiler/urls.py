@@ -1,44 +1,45 @@
-from django.conf.urls import url
-from .views import *
-from .time_selector import SetTimePeriod
+from django.conf import urls
+
+from djfw.profiler import views
+from djfw.profiler import time_selector
 
 app_name = 'djfw.profiler'
 
 urlpatterns = [
-    url(
+    urls.url(
         r'^reports/auditory/$',
-        AuditoryReport.as_view(),
+        views.AuditoryReport.as_view(),
         name='auditory_report'),
-    url(
+    urls.url(
         r'^reports/loading/$',
-        LoadingReport.as_view(),
+        views.LoadingReport.as_view(),
         name='loading_report'),
-    url(
+    urls.url(
         r'^reports/browsers/$',
-        BrowsersReport.as_view(),
+        views.BrowsersReport.as_view(),
         name='browsers_report'),
-    url(
+    urls.url(
         r'^reports/oses/$',
-        OsesReport.as_view(),
+        views.OsesReport.as_view(),
         name='oses_report'),
-    url(
+    urls.url(
         r'^reports/modules/$',
-        ModulesReport.as_view(),
+        views.ModulesReport.as_view(),
         name='modules_report'),
-    url(
+    urls.url(
         r'^reports/mobiles/$',
-        MobilesReport.as_view(),
+        views.MobilesReport.as_view(),
         name='mobiles_report'),
-    url(
+    urls.url(
         r'^reports/devices/$',
-        DevicesReport.as_view(),
+        views.DevicesReport.as_view(),
         name='devices_report'),
-    url(
+    urls.url(
         r'^reports/distribution/$',
-        DistributionReport.as_view(),
+        views.DistributionReport.as_view(),
         name='distribution_report'),
-    url(
+    urls.url(
         r'^set_time_selector/$',
-        SetTimePeriod.as_view(),
+        time_selector.SetTimePeriod.as_view(),
         name='set_time_selector'),
 ]
