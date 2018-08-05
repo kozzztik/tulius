@@ -1,24 +1,24 @@
+from django import http
 from django import urls
-from django.views.generic import TemplateView, DetailView
-from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import get_user_model
-from django.http import HttpResponseRedirect
-from websockets.publisher import RedisPublisher
-from ws4redis.redis_store import RedisMessage
+from django.contrib import auth
+from django.views import generic
+from django.utils import decorators
+from django.contrib.auth import decorators as auth_decorators
+from ws4redis import redis_store
+from websockets import publisher
 
 from .forms import PrivateMessageForm
 from .models import PrivateTalking, PrivateMessage
 
 
-class PlayerMessagesView(TemplateView):
+class PlayerMessagesView(generic.TemplateView):
     template_name = 'pm/messages.haml'
 
-    @method_decorator(login_required)
+    @decorators.method_decorator(auth_decorators.login_required)
     def get(self, *args, **kwargs):
         return super(PlayerMessagesView, self).get(*args, **kwargs)
 
-    @method_decorator(login_required)
+    @decorators.method_decorator(auth_decorators.login_required)
     def post(self, *args, **kwargs):
         return self.get(*args, **kwargs)
 
@@ -28,9 +28,9 @@ class PlayerMessagesView(TemplateView):
         return kwargs
 
 
-class PlayerSendMessageView(DetailView):
+class PlayerSendMessageView(generic.DetailView):
     template_name = "pm/to_user.haml"
-    queryset = get_user_model().objects.filter(is_active=True)
+    queryset = auth.get_user_model().objects.filter(is_active=True)
 
     def get_context_data(self, **kwargs):
         user = self.request.user
@@ -56,7 +56,7 @@ class PlayerSendMessageView(DetailView):
         form = PrivateMessageForm(user, player)
         return locals()
 
-    @method_decorator(login_required)
+    @decorators.method_decorator(auth_decorators.login_required)
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         form = PrivateMessageForm(
@@ -65,10 +65,10 @@ class PlayerSendMessageView(DetailView):
             m = form.save()
             # if the publisher is required only for fetching messages, use an
             # empty constructor, otherwise reuse an existing redis_publisher
-            redis_publisher = RedisPublisher(
+            redis_publisher = publisher.RedisPublisher(
                 facility='pm', users=[self.object])
-            message = RedisMessage(str(m.pk))
+            message = redis_store.RedisMessage(str(m.pk))
             # and somewhere else
             redis_publisher.publish_message(message)
-        return HttpResponseRedirect(
+        return http.HttpResponseRedirect(
             urls.reverse('pm:to_user', args=(self.object.pk,)))

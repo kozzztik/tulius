@@ -1,11 +1,18 @@
-from django.views.generic import DetailView
-from django.views.generic.edit import UpdateView, BaseDeleteView
-from django.contrib.auth.decorators import login_required
-from django.utils.translation import ugettext_lazy as _
-from django.shortcuts import get_object_or_404
+from django import http
+from django import shortcuts
 from django.contrib import messages
-from django.http import Http404, HttpResponseRedirect
-from .models import *
+from django.views import generic
+from django.contrib.auth import decorators
+from django.utils.translation import ugettext_lazy as _
+
+from djfw.uploader import handle_field_upload
+from djfw.inlineformsets import get_formset
+from djfw.sortable.views import DecoratorChainingMixin, SortableDetailViewMixin
+from djfw.custom_views import FormsetWidget, ActionableViewMixin
+from djfw.subviews import SubCreateView
+from djfw.views import RightsDetailMixin
+
+from tulius.core.autocomplete import autocomplete_result
 from tulius.stories.models import Role, Illustration, AdditionalMaterial,\
     Variation
 from tulius.stories.edit_variation_forms import RoleForm, RoleTextForm, \
@@ -14,22 +21,16 @@ from tulius.stories.materials_forms import IllustrationForm,\
     AdditionalMaterialForm
 from .game_edit_forms import *
 from .game_edit_catalog import *
-from djfw.uploader import handle_field_upload
-from djfw.inlineformsets import get_formset
-from tulius.core.autocomplete import autocomplete_result
 from .forms import GameInviteForm
-from djfw.sortable.views import DecoratorChainingMixin, SortableDetailViewMixin
-from djfw.custom_views import FormsetWidget, ActionableViewMixin
-from djfw.subviews import SubCreateView
-from djfw.views import RightsDetailMixin
 from .views import MessageMixin
+from .models import *
 
 
 class GameAdminViewMixin(DecoratorChainingMixin):
     model = Game
     context_object_name = 'game'
     pk_url_kwarg = 'game_id'
-    decorators = [login_required]
+    decorators = [decorators.login_required]
     page_url = None
     paging_class = EditGamePage
 
@@ -37,7 +38,7 @@ class GameAdminViewMixin(DecoratorChainingMixin):
         game = super(GameAdminViewMixin, self).get_object(*args, **kwargs)
         self.variation = game.variation
         if not game.edit_right(self.request.user):
-            raise Http404()
+            raise http.Http404()
         gamepage = self.paging_class(game)
         self.catalog_page = gamepage.get_subpage(
             urls.reverse(URL_PREFIX + self.page_url, args=(game.pk,)))
@@ -49,11 +50,11 @@ class GameAdminViewMixin(DecoratorChainingMixin):
         return context
 
 
-class GameAdminView(GameAdminViewMixin, DetailView):
+class GameAdminView(GameAdminViewMixin, generic.DetailView):
     pass
 
 
-class GameEditFormView(GameAdminViewMixin, UpdateView):
+class GameEditFormView(GameAdminViewMixin, generic.UpdateView):
     def get_success_url(self):
         messages.success(self.request, _('game was successfully updated'))
         return self.object.get_edit_url()
@@ -123,7 +124,7 @@ class GameAdminGraphics(GameAdminView):
         if field_name in GRAPHIC_FIELDS:
             field = getattr(obj, field_name)
         else:
-            raise Http404()
+            raise http.Http404()
         return handle_field_upload(request, field, '%s.jpg' % (obj.pk,))
 
 
@@ -197,7 +198,7 @@ class AddRoleView(EditRoleMixin, MessageMixin, SubCreateView):
     def get_parent_object(self, queryset=None):
         obj = super(AddRoleView, self).get_parent_object()
         if not obj.edit_right(self.request.user):
-            raise Http404()
+            raise http.Http404()
         return obj
 
     def form_valid(self, form):
@@ -205,7 +206,7 @@ class AddRoleView(EditRoleMixin, MessageMixin, SubCreateView):
         role.variation = self.parent_object.variation
         role.save()
         messages.success(self.request, self.success_message)
-        return HttpResponseRedirect(
+        return http.HttpResponseRedirect(
             urls.reverse(
                 'games:' + self.catalog_page_url,
                 args=(self.parent_object.id,)))
@@ -219,17 +220,17 @@ class AddMaterialView(AddRoleView):
     form_class = AdditionalMaterialForm
 
 
-class GameEditRoleView(EditRoleMixin, MessageMixin, UpdateView):
+class GameEditRoleView(EditRoleMixin, MessageMixin, generic.UpdateView):
     pass
 
 
-class GameRoleTextView(EditRoleMixin, MessageMixin, UpdateView):
+class GameRoleTextView(EditRoleMixin, MessageMixin, generic.UpdateView):
     template_name = 'stories/variation/role_text.haml'
     form_class = RoleTextForm
     catalog_page_name = _('text')
 
 
-class EditRoleAssignView(RightsDetailMixin, DetailView):
+class EditRoleAssignView(RightsDetailMixin, generic.DetailView):
     template_name = 'games/game_edit/role_assign.haml'
     model = Role
 
@@ -263,7 +264,7 @@ class EditRoleAssignView(RightsDetailMixin, DetailView):
         return super(EditRoleAssignView, self).get_context_data(**kwargs)
 
 
-class BaseGameDetailView(RightsDetailMixin, DetailView):
+class BaseGameDetailView(RightsDetailMixin, generic.DetailView):
     model = Game
 
     def check_rights(self, obj, user):
@@ -299,7 +300,7 @@ class GameEditMaterialsView(BaseGameDetailView):
         return super(GameEditMaterialsView, self).get_context_data(**kwargs)
 
 
-class BaseDeleteMaterialView(RightsDetailMixin, BaseDeleteView):
+class BaseDeleteMaterialView(RightsDetailMixin, generic.edit.BaseDeleteView):
     def get(self, request, *args, **kwargs):
         return self.post(request, *args, **kwargs)
 
@@ -328,7 +329,8 @@ class DeleteMaterial(BaseDeleteMaterialView):
             args=(self.variation.game.pk,))
 
 
-class BaseEditMaterialView(RightsDetailMixin, MessageMixin, UpdateView):
+class BaseEditMaterialView(
+        RightsDetailMixin, MessageMixin, generic.UpdateView):
     login_required = True
     parent_page_url = EDIT_GAME_PAGES_MATERIALS
 
@@ -369,7 +371,7 @@ class EditMaterialView(BaseEditMaterialView):
     success_message = _('Additional material was successfully updated')
 
 
-class MaterialView(RightsDetailMixin, DetailView):
+class MaterialView(RightsDetailMixin, generic.DetailView):
     template_name = 'stories/material.haml'
     model = AdditionalMaterial
     context_object_name = 'material'
@@ -379,7 +381,7 @@ class MaterialView(RightsDetailMixin, DetailView):
         if (not self.variation) or (not self.variation.game):
             return False
         if obj.admins_only and (not obj.edit_right(user)):
-            raise Http404()
+            raise http.Http404()
         return True
 
     def get_context_data(self, **kwargs):
@@ -402,7 +404,7 @@ def calc_games(user, status):
     return variations.count()
 
 
-class BaseEditGameView(RightsDetailMixin, DetailView):
+class BaseEditGameView(RightsDetailMixin, generic.DetailView):
     model = Game
 
     def check_rights(self, obj, user):
@@ -439,11 +441,11 @@ class EditRequestsView(BaseEditGameView):
 class GameForumView(BaseEditGameView):
     def get(self, request, *args, **kwargs):
         obj = self.get_object()
-        return HttpResponseRedirect(
+        return http.HttpResponseRedirect(
             urls.reverse('gameforum:game', args=(obj.pk,)))
 
 
-class BaseGameFormsetView(RightsDetailMixin, MessageMixin, UpdateView):
+class BaseGameFormsetView(RightsDetailMixin, MessageMixin, generic.UpdateView):
     model = Game
     template_name = 'games/game_edit/winners.haml'
 
@@ -460,7 +462,7 @@ class BaseGameFormsetView(RightsDetailMixin, MessageMixin, UpdateView):
 
     def form_valid(self, form):
         form.save()
-        return HttpResponseRedirect(
+        return http.HttpResponseRedirect(
             urls.reverse('games:' + self.catalog_url, args=(self.object.pk,)))
 
 
@@ -482,15 +484,15 @@ def get_game(user, game_id):
     try:
         game_id = int(game_id)
     except:
-        raise Http404()
-    game = get_object_or_404(Game, id=game_id)
+        raise http.Http404()
+    game = shortcuts.get_object_or_404(Game, id=game_id)
     if not game.edit_right(user):
-        raise Http404()
+        raise http.Http404()
     return game
 
 
 @autocomplete_result
-@login_required
+@decorators.login_required
 def game_edit_players(request, name, limit, game_id):
     game = get_game(request.user, game_id)
     users = game.get_assigned_users()

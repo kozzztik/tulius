@@ -1,25 +1,24 @@
-from django.utils.timezone import now
-from datetime import timedelta
-# TODO: fix this when module moved
-from tulius.forum.plugins import ForumPlugin
-from tulius.stories.models import Role
-from tulius.forum.online_status import OnlineStatusPlugin
+from django.utils import timezone
+
+from tulius.stories import models
+from tulius.forum import online_status
 
 
-class GameOnlineStatusPlugin(OnlineStatusPlugin):
+class GameOnlineStatusPlugin(online_status.OnlineStatusPlugin):
     online_list_template = 'gameforum/snippets/online_roles.haml'
 
     def update_role_online_status(self, user, variation):
         if variation.game_id and (not user.is_anonymous):
-            Role.objects.filter(
-                variation=variation, user=user).update(visit_time=now())
+            models.Role.objects.filter(
+                variation=variation, user=user
+            ).update(visit_time=timezone.now())
 
     def get_online_roles(self, user, thread, do_update=True):
         variation = thread.variation
         if do_update:
             self.update_role_online_status(user, variation)
         users = self.get_online_users(user, thread, do_update)
-        roles = Role.objects.filter(
+        roles = models.Role.objects.filter(
             variation=variation, show_in_online_character=True, user__in=users)
         strict_read = getattr(thread, 'strict_read', None)
         if strict_read is not None:

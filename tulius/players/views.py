@@ -1,12 +1,11 @@
-from django import urls
+from django import shortcuts
 from django.apps import apps
-from django.utils.translation import ugettext_lazy as _
-from django.views.generic import TemplateView, DetailView
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
 from django.contrib import messages
-from django.db.models import Count
-from django.utils.decorators import method_decorator
+from django.db import models as django_models
+from django.views import generic
+from django.utils import decorators
+from django.contrib.auth import decorators as auth_decorators
+from django.utils.translation import ugettext_lazy as _
 
 from tulius.forum.models import UploadedFile, Comment
 from tulius.stories.models import StoryAdmin, Role, Variation, StoryAuthor
@@ -14,11 +13,11 @@ from tulius.games.models import Game, GAME_STATUS_COMPLETED, \
     GAME_STATUS_COMPLETED_OPEN, GameWinner, GameAdmin
 from tulius.games.models import GameGuest
 from tulius.models import User
+from tulius.pm.models import PrivateMessage
 from .models import stars
 from .forms import PlayersFilterForm, PLAYERS_SORT_STORIES_AUTHORED,\
     PLAYERS_SORT_GAMES_PLAYED_INC, PLAYERS_SORT_GAMES_PLAYED_DEC, \
     PLAYERS_SORT_REG_DATE, PLAYERS_SORT_ALPH, RankForm
-from tulius.pm.models import PrivateMessage
 
 
 game_forum = apps.get_app_config('gameforum')
@@ -33,15 +32,16 @@ def filter_by_games(players):
     return players.filter(
         roles__variation__game__status__in=[
             GAME_STATUS_COMPLETED, GAME_STATUS_COMPLETED_OPEN
-        ]).annotate(games=Count('roles__variation__game', distinct=True))
+        ]).annotate(
+            games=django_models.Count('roles__variation__game', distinct=True))
 
 
 def filter_by_stories(players):
     return players.annotate(
-        stories=Count('authored_stories')).order_by('-stories')
+        stories=django_models.Count('authored_stories')).order_by('-stories')
 
 
-class PlayersListView(TemplateView):
+class PlayersListView(generic.TemplateView):
     template_name = 'players/player_list.haml'
 
     def get_context_data(self, **kwargs):
@@ -73,7 +73,7 @@ class PlayersListView(TemplateView):
         return locals()
 
 
-class PlayerView(DetailView):
+class PlayerView(generic.DetailView):
     queryset = User.objects.filter(is_active=True)
     pk_url_kwarg = 'player_id'
     context_object_name = 'player'
@@ -110,15 +110,15 @@ class PlayerDetailsView(PlayerView):
         return locals()
 
 
-class PlayerHistoryView(TemplateView):
+class PlayerHistoryView(generic.TemplateView):
     template_name = 'players/player_history.haml'
 
-    @method_decorator(login_required)
+    @decorators.method_decorator(auth_decorators.login_required)
     def get(self, *args, **kwargs):
         return super(PlayerHistoryView, self).get(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        player = get_object_or_404(
+        player = shortcuts.get_object_or_404(
             User, is_active=True, pk=kwargs['player_id'])
         message_list = PrivateMessage.objects.talking(
             self.request.user, player)
@@ -168,8 +168,8 @@ def get_played(request_user, player=None):
     return played_roles, played_games_uniq
 
 
-class LoginTemplateView(TemplateView):
-    @method_decorator(login_required)
+class LoginTemplateView(generic.TemplateView):
+    @decorators.method_decorator(auth_decorators.login_required)
     def get(self, *args, **kwargs):
         return super(LoginTemplateView, self).get(*args, **kwargs)
 
@@ -177,7 +177,7 @@ class LoginTemplateView(TemplateView):
 class PlayerProfileView(LoginTemplateView):
     template_name = 'profile/index.haml'
 
-    @method_decorator(login_required)
+    @decorators.method_decorator(auth_decorators.login_required)
     def post(self, *args, **kwargs):
         return self.get(*args, **kwargs)
 

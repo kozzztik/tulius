@@ -1,24 +1,23 @@
-from django.conf.urls import url
-from django.contrib.sitemaps.views import sitemap
+from django.conf import urls
+from django.contrib import sitemaps
+from django.contrib.auth import models
+from django.contrib.sitemaps import views
 
-# TODO: fix this when module moved
-from tulius.forum.plugins import ForumPlugin, BasePluginView
-from django.contrib.sitemaps import Sitemap
-from django.contrib.auth.models import AnonymousUser
+from tulius.forum import plugins
 
 
-class ForumSitemap(Sitemap):
+class ForumSitemap(sitemaps.Sitemap):
     changefreq = "daily"
     priority = 0.5
 
     def __init__(self, site, *args, **kwargs):
         super(ForumSitemap, self).__init__(*args, **kwargs)
         self.site = site
-        self.user = AnonymousUser()
+        self.user = models.AnonymousUser()
 
     def get_root_threads(self):
-        models = self.site.models
-        return models.Thread.objects.filter(
+        site_models = self.site.models
+        return site_models.Thread.objects.filter(
             parent=None, plugin_id=self.site.site_id,
             access_type__lt=models.THREAD_ACCESS_TYPE_NO_READ)
 
@@ -41,7 +40,7 @@ class ForumSitemap(Sitemap):
         return obj.get_absolute_url
 
 
-class SitemapPlugin(ForumPlugin):
+class SitemapPlugin(plugins.ForumPlugin):
     sitemap_class = ForumSitemap
 
     def init_core(self):
@@ -56,9 +55,9 @@ class SitemapPlugin(ForumPlugin):
 
     def get_urls(self):
         return [
-            url(
+            urls.url(
                 r'^sitemap\.xml$',
-                sitemap,
+                views.sitemap,
                 {'sitemaps': self.sitemaps()},
                 name='sitemap')
         ]

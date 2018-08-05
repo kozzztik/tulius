@@ -1,6 +1,6 @@
 from django.conf.urls import url
-# TODO: fix this when module moved
-from .core import CommentsCore, BasePluginView
+
+from .core import CommentsCore
 from .views import EditComment, FastReply, CommentsPage, \
     CommentRedirrect, Preview, DeleteComment
 

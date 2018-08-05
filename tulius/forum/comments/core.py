@@ -1,14 +1,14 @@
 from datetime import timedelta
 
+from django import dispatch
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
 from django.db import transaction
 from django.http import Http404
 from django.utils import timezone
-import django.dispatch
 
 # TODO: fix this when module moved
-from tulius.forum.plugins import ForumPlugin, BasePluginView
+from tulius.forum.plugins import ForumPlugin
 from .forms import CommentForm
 from .pagination import get_pagination_context, get_custom_pagination
 
@@ -277,27 +277,27 @@ class CommentsCore(ForumPlugin):
 
     def init_core(self):
         self.Comment = self.models.Comment
-        self.read_comments_signal = django.dispatch.Signal(
+        self.read_comments_signal = dispatch.Signal(
             providing_args=["user", "comments"])
-        self.before_add_comment_signal = django.dispatch.Signal(
+        self.before_add_comment_signal = dispatch.Signal(
             providing_args=["thread", "restore"])
-        self.before_delete_comment_signal = django.dispatch.Signal(
+        self.before_delete_comment_signal = dispatch.Signal(
             providing_args=["thread"])
-        self.after_add_comment_signal = django.dispatch.Signal(
+        self.after_add_comment_signal = dispatch.Signal(
             providing_args=["thread", "restore"])
-        self.after_delete_comment_signal = django.dispatch.Signal(
+        self.after_delete_comment_signal = dispatch.Signal(
             providing_args=["thread"])
-        self.before_save_comment_signal = django.dispatch.Signal(
+        self.before_save_comment_signal = dispatch.Signal(
             providing_args=["old_comment"])
-        self.view_comments_page = django.dispatch.Signal(
+        self.view_comments_page = dispatch.Signal(
             providing_args=["json", "page", "comments", "thread"])
-        self.comment_before_edit = django.dispatch.Signal(
+        self.comment_before_edit = dispatch.Signal(
             providing_args=["comment", "context"])
-        self.comment_after_edit = django.dispatch.Signal(
+        self.comment_after_edit = dispatch.Signal(
             providing_args=["comment", "context", "adding"])
-        self.comment_before_fastreply = django.dispatch.Signal(
+        self.comment_before_fastreply = dispatch.Signal(
             providing_args=["context"])
-        self.comment_after_fastreply = django.dispatch.Signal()
+        self.comment_after_fastreply = dispatch.Signal()
         self.core['get_parent_comment'] = self.get_parent_comment
         self.core['process_edit_comment'] = self.process_edit_comment
         self.core['get_comments_page'] = self.get_comments_page

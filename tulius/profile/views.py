@@ -1,26 +1,26 @@
+from django import http
 from django import urls
 from django.apps import apps
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import TemplateView, DetailView
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
-from django.http import HttpResponseRedirect
+from django.views import generic
+from django.utils import decorators
 from django.contrib import messages
+from django.contrib.auth import decorators as auth_decorators
+from django.db.models import query_utils
 
 from tulius.events.models import UserNotification, Notification
 from tulius.forum.models import CommentLike
 from tulius.stories.models import StoryAdmin, Role, Variation
 from tulius.games.views import invite_accept, invite_decline, set_edit
-from .forms import NotificationForm, ChangeEmailForm, ProfileSettingsForm, \
-    PersonalSettingsForm
 from tulius.games.models import Game, GAME_STATUS_COMPLETED, \
     GAME_STATUS_COMPLETED_OPEN, GameAdmin, GameInvite
 from tulius.games.models import GAME_INVITE_STATUS_NEW, GameGuest, \
     GAME_STATUS_IN_PROGRESS, GAME_STATUS_FINISHING
-from django.db.models.query_utils import Q
+from .forms import NotificationForm, ChangeEmailForm, ProfileSettingsForm, \
+    PersonalSettingsForm
 
 
-class PlayerSettingsView(TemplateView):
+class PlayerSettingsView(generic.TemplateView):
     template_name = 'profile/settings.haml'
 
     def get_context_data(self, **kwargs):
@@ -31,7 +31,7 @@ class PlayerSettingsView(TemplateView):
             instance=self.request.user)
         return kwargs
 
-    @method_decorator(login_required)
+    @decorators.method_decorator(auth_decorators.login_required)
     def post(self, request, *args, **kwargs):
         email_form = ChangeEmailForm(request.user, request.POST)
         settings_form = ProfileSettingsForm(
@@ -49,12 +49,12 @@ class PlayerSettingsView(TemplateView):
             settings_form.save()
             personal_settings_form.save()
             messages.success(request, _('Settings changed'))
-            return HttpResponseRedirect(urls.reverse('profile:settings'))
+            return http.HttpResponseRedirect(urls.reverse('profile:settings'))
         return self.render_to_response(locals())
 
 
-class LoginTemplateView(TemplateView):
-    @method_decorator(login_required)
+class LoginTemplateView(generic.TemplateView):
+    @decorators.method_decorator(auth_decorators.login_required)
     def get(self, *args, **kwargs):
         return super(LoginTemplateView, self).get(*args, **kwargs)
 
@@ -126,7 +126,7 @@ class PlayerSubscriptionsView(LoginTemplateView):
             forms += [form]
         return locals()
 
-    @method_decorator(login_required)
+    @decorators.method_decorator(auth_decorators.login_required)
     def post(self, request):
         notifications = [n for n in Notification.objects.all()]
         forms = []
@@ -147,13 +147,13 @@ class PlayerSubscriptionsView(LoginTemplateView):
                         notification=form.notification)[0]
                     n.enabled = False
                     n.save()
-        return HttpResponseRedirect(urls.reverse('profile:subscriptions'))
+        return http.HttpResponseRedirect(urls.reverse('profile:subscriptions'))
 
 
 class InvitesView(LoginTemplateView):
     template_name = 'profile/invites.haml'
 
-    @method_decorator(login_required)
+    @decorators.method_decorator(auth_decorators.login_required)
     def post(self, *args, **kwargs):
         return self.get(*args, **kwargs)
 
@@ -165,15 +165,15 @@ class InvitesView(LoginTemplateView):
         return kwargs
 
 
-class PlayerInviteBaseView(DetailView):
+class PlayerInviteBaseView(generic.DetailView):
     model = GameInvite
     proc = None
     pk_url_kwarg = 'invite_id'
 
-    @method_decorator(login_required)
+    @decorators.method_decorator(auth_decorators.login_required)
     def get(self, request, *args, **kwargs):
         self.proc[0](request, self.get_object())
-        return HttpResponseRedirect(urls.reverse('profile:invites'))
+        return http.HttpResponseRedirect(urls.reverse('profile:invites'))
 
 
 class PlayerInviteAcceptView(PlayerInviteBaseView):
@@ -208,7 +208,9 @@ class PlayerGamesView(LoginTemplateView):
             role.variation.game.id for role in Role.objects.filter(
                 user=user, variation__game__isnull=False)]
         games = Game.objects.filter(
-            Q(id__in=admined) | Q(id__in=guested) | Q(id__in=played))
+            query_utils.Q(id__in=admined) |
+            query_utils.Q(id__in=guested) |
+            query_utils.Q(id__in=played))
         current_games = set_edit(
             games.filter(
                 status__in=[GAME_STATUS_IN_PROGRESS, GAME_STATUS_FINISHING]),

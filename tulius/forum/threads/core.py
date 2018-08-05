@@ -1,38 +1,36 @@
+from django import dispatch
+from django import http
+from django import shortcuts
+from django.core import exceptions
 from django.utils.translation import ugettext_lazy as _
-from django.shortcuts import get_object_or_404
-from django.db import transaction
-from django.http import Http404
-import django.dispatch
 
-from djfw.inlineformsets import get_formset
+from djfw import inlineformsets
 
-# TODO: fix this when module moved
-from tulius.forum.plugins import ForumPlugin
+from tulius.forum import plugins
+from tulius.forum.threads import forms
 
-from .forms import RoomForm, ThreadForm
-from django.core.exceptions import PermissionDenied
 
 ERROR_VALIDATION = _('there were some errors during form validation')
 
 
-class ThreadsCorePlugin(ForumPlugin):
+class ThreadsCorePlugin(plugins.ForumPlugin):
     def get_parent_thread(self, user, thread_id, is_room=None):
         try:
             thread_id = int(thread_id)
         except:
-            raise Http404()
+            raise http.Http404()
         if is_room is None:
-            parent_post = get_object_or_404(
+            parent_post = shortcuts.get_object_or_404(
                 self.site.core.models.Thread,
                 id=thread_id, plugin_id=self.site_id)
         else:
-            parent_post = get_object_or_404(
+            parent_post = shortcuts.get_object_or_404(
                 self.site.core.models.Thread,
                 id=thread_id, plugin_id=self.site_id, room=is_room)
         if parent_post.check_deleted():
-            raise Http404(str(_('Post was deleted')))
+            raise http.Http404(str(_('Post was deleted')))
         if not parent_post.read_right(user):
-            raise PermissionDenied()
+            raise exceptions.PermissionDenied()
         return parent_post
 
     def room_descendants(self, user, room):
@@ -153,36 +151,35 @@ class ThreadsCorePlugin(ForumPlugin):
         right_model = self.site.core.right_model
         right_form = self.site.core.right_form
         adding = thread is None
-        form = RoomForm(models, thread, data=request.POST or None)
+        form = forms.RoomForm(models, thread, data=request.POST or None)
         form.room = True
         formset_params['parent_thread'] = parent_thread or thread
-        formset = get_formset(
+        formset = inlineformsets.get_formset(
             models.Thread, right_model, request.POST,
             base_form=right_form, extra=1, params=formset_params,
             instance=thread)
         if request.method == 'POST':
             if form.is_valid():
-                with transaction.commit_on_success():
-                    if not thread:
-                        thread = models.Thread(room=True)
-                    thread.title = form.cleaned_data['title']
-                    thread.body = form.cleaned_data['body']
-                    thread.access_type = form.cleaned_data['access_type']
-                    if not thread.id:
-                        thread.user = request.user
-                        thread.parent = parent_thread
-                    thread.plugin_id = self.site_id
-                    if formset.is_valid():
-                        thread.save()
-                        for form in formset:
-                            if form.is_valid():
-                                right = form.save(commit=False)
-                                right.thread = thread
-                                right.save()
-                        if not adding:
-                            formset.save()
-                    else:
-                        thread = None
+                if not thread:
+                    thread = models.Thread(room=True)
+                thread.title = form.cleaned_data['title']
+                thread.body = form.cleaned_data['body']
+                thread.access_type = form.cleaned_data['access_type']
+                if not thread.id:
+                    thread.user = request.user
+                    thread.parent = parent_thread
+                thread.plugin_id = self.site_id
+                if formset.is_valid():
+                    thread.save()
+                    for form in formset:
+                        if form.is_valid():
+                            right = form.save(commit=False)
+                            right.thread = thread
+                            right.save()
+                    if not adding:
+                        formset.save()
+                else:
+                    thread = None
         return form, formset, thread
 
     def process_edit_thread(
@@ -201,11 +198,11 @@ class ThreadsCorePlugin(ForumPlugin):
             if comments:
                 comment = comments[0]
         formset_params['parent_thread'] = parent_thread
-        form = ThreadForm(
+        form = forms.ThreadForm(
             models, thread, comment, voting_enabled, moderate,
             data=request.POST or None)
 
-        formset = get_formset(
+        formset = inlineformsets.get_formset(
             models.Thread, right_model, request.POST,
             base_form=right_form, extra=1, params=formset_params,
             instance=thread)
@@ -218,42 +215,41 @@ class ThreadsCorePlugin(ForumPlugin):
                 access_type = int(form.cleaned_data['access_type'])
                 free_access = (access_type <= models.THREAD_ACCESS_TYPE_OPEN)
                 if free_access or formset.is_valid():
-                    with transaction.commit_on_success():
-                        if not thread:
-                            thread = models.Thread(
-                                parent=parent_thread, room=False)
-                        thread.title = form.cleaned_data['title']
-                        if not thread.title:
-                            thread.title = ''
-                        thread.title = thread.title[:120]
-                        thread.body = form.cleaned_data['body'][:255]
-                        thread.plugin_id = parent_thread.plugin_id
+                    if not thread:
+                        thread = models.Thread(
+                            parent=parent_thread, room=False)
+                    thread.title = form.cleaned_data['title']
+                    if not thread.title:
+                        thread.title = ''
+                    thread.title = thread.title[:120]
+                    thread.body = form.cleaned_data['body'][:255]
+                    thread.plugin_id = parent_thread.plugin_id
+                    if adding:
+                        thread.user = request.user
+                    thread.access_type = access_type
+                    if moderate:
+                        thread.important = form.cleaned_data['important']
+                    thread.closed = form.cleaned_data['closed']
+                    thread.save()
+                    if not comment:
+                        comment = models.Comment(parent=thread)
+                    comment.title = thread.title
+                    comment.body = form.cleaned_data['body']
+                    if adding:
+                        comment.user = thread.user
+                    comment.plugin_id = parent_thread.plugin_id
+                    if voting_enabled:
+                        comment.voting = form.cleaned_data['voting']
+                    comment.save()
+                    if formset and not free_access:
                         if adding:
-                            thread.user = request.user
-                        thread.access_type = access_type
-                        if moderate:
-                            thread.important = form.cleaned_data['important']
-                        thread.closed = form.cleaned_data['closed']
-                        thread.save()
-                        if not comment:
-                            comment = models.Comment(parent=thread)
-                        comment.title = thread.title
-                        comment.body = form.cleaned_data['body']
-                        if adding:
-                            comment.user = thread.user
-                        comment.plugin_id = parent_thread.plugin_id
-                        if voting_enabled:
-                            comment.voting = form.cleaned_data['voting']
-                        comment.save()
-                        if formset and not free_access:
-                            if adding:
-                                for form in formset:
-                                    if form.is_valid():
-                                        right = form.save(commit=False)
-                                        right.thread = thread
-                                        right.save()
-                            else:
-                                formset.save()
+                            for form in formset:
+                                if form.is_valid():
+                                    right = form.save(commit=False)
+                                    right.thread = thread
+                                    right.save()
+                        else:
+                            formset.save()
                 else:
                     thread = None
         else:
@@ -267,32 +263,31 @@ class ThreadsCorePlugin(ForumPlugin):
         redirect = ''
         text = ''
         thread = None
-        with transaction.commit_on_success():
-            try:
-                thread_id = int(thread_id)
-                thread = models.Thread.objects.select_for_update().get(
-                    id=thread_id)
-            except:
-                error_text = _('Thread not found %(post_id)s.') % {
-                    'post_id': thread_id}
-            if thread:
-                if not thread.edit_right(user):
-                    error_text = _(
-                        'You have no rights to delete thread %(post_id)s.') % {
-                            'post_id': thread_id}
+        try:
+            thread_id = int(thread_id)
+            thread = models.Thread.objects.select_for_update().get(
+                id=thread_id)
+        except:
+            error_text = _('Thread not found %(post_id)s.') % {
+                'post_id': thread_id}
+        if thread:
+            if not thread.edit_right(user):
+                error_text = _(
+                    'You have no rights to delete thread %(post_id)s.') % {
+                        'post_id': thread_id}
+            else:
+                thread.deleted = True
+                delete_mark = models.ThreadDeleteMark(
+                    thread=thread, user=user, description=message)
+                thread.save()
+                delete_mark.save()
+                if thread.parent:
+                    redirect = thread.parent.get_absolute_url
                 else:
-                    thread.deleted = True
-                    delete_mark = models.ThreadDeleteMark(
-                        thread=thread, user=user, description=message)
-                    thread.save()
-                    delete_mark.save()
-                    if thread.parent:
-                        redirect = thread.parent.get_absolute_url
-                    else:
-                        redirect = self.reverse('index')
-                success = 'success'
-                text = _('Room successfully deleted!') if thread.room else _(
-                    'Thread successfully deleted!')
+                    redirect = self.reverse('index')
+            success = 'success'
+            text = _('Room successfully deleted!') if thread.room else _(
+                'Thread successfully deleted!')
         return success, error_text, redirect, text
 
     def search_list(self, user, parent, **kwargs):
@@ -332,18 +327,18 @@ class ThreadsCorePlugin(ForumPlugin):
 
     def move_thread(self, thread, user, new_parent):
         if not thread.edit_right(user):
-            raise Http404("no rights")
+            raise http.Http404("no rights")
         if new_parent:
             if not new_parent.write_right(user):
-                raise Http404("no rights")
+                raise http.Http404("no rights")
         else:
             if not user.is_superuser:
-                raise Http404("no rights")
+                raise http.Http404("no rights")
         if new_parent not in self.move_list(thread, user):
-            raise Http404("bad new parent")
+            raise http.Http404("bad new parent")
         if new_parent and new_parent.is_descendant_of(
                 thread, include_self=True):
-            raise Http404("can`t move to a descendant")
+            raise http.Http404("can`t move to a descendant")
         old_parent = thread.parent
         old_tree_id = thread.tree_id
         thread.parent = new_parent
@@ -380,23 +375,23 @@ class ThreadsCorePlugin(ForumPlugin):
             t.save()
 
     def init_core(self):
-        self.thread_view_signal = django.dispatch.Signal(
+        self.thread_view_signal = dispatch.Signal(
             providing_args=["context", "user", "request"])
-        self.threads_list_signal = django.dispatch.Signal(
+        self.threads_list_signal = dispatch.Signal(
             providing_args=["threads", "is_room"])
-        self.thread_prepare_room_signal = django.dispatch.Signal(
+        self.thread_prepare_room_signal = dispatch.Signal(
             providing_args=["parent_thread", "threads", "user"])
-        self.thread_prepare_room_group_signal = django.dispatch.Signal(
+        self.thread_prepare_room_group_signal = dispatch.Signal(
             providing_args=["user"])
-        self.thread_before_edit = django.dispatch.Signal(
+        self.thread_before_edit = dispatch.Signal(
             providing_args=["thread", "context"])
-        self.thread_after_edit = django.dispatch.Signal(
+        self.thread_after_edit = dispatch.Signal(
             providing_args=["thread", "context"])
-        self.thread_on_move = django.dispatch.Signal(
+        self.thread_on_move = dispatch.Signal(
             providing_args=["user", "old_parent", "old_tree_id"])
-        self.thread_repair_counters = django.dispatch.Signal(providing_args=[])
-        self.thread_on_create = django.dispatch.Signal(providing_args=[])
-        self.thread_on_update = django.dispatch.Signal(
+        self.thread_repair_counters = dispatch.Signal(providing_args=[])
+        self.thread_on_create = dispatch.Signal(providing_args=[])
+        self.thread_on_update = dispatch.Signal(
             providing_args=["old_thread"])
         self.core['get_parent_thread'] = self.get_parent_thread
         self.core['prepare_room_list'] = self.prepare_room_list

@@ -1,14 +1,15 @@
-from django.utils.translation import ugettext_lazy as _
-from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.utils.timezone import now
-from django import http
 import json
-from .plugin import BasePluginView
-from .forms import CommentForm, CommentDeleteForm
-from .pagination import get_custom_pagination, get_pagination_context
+
+from django import http
+from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
+
+from tulius.forum import plugins
+from tulius.forum.comments import forms
+from tulius.forum.comments import pagination
 
 
-class BaseCommentView(BasePluginView):
+class BaseCommentView(plugins.BasePluginView):
     def get_context_data(self, **kwargs):
         context = super(BaseCommentView, self).get_context_data(**kwargs)
         reply_id = kwargs['reply_id'] if 'reply_id' in kwargs else None
@@ -17,7 +18,7 @@ class BaseCommentView(BasePluginView):
         self.comment = None
         self.reply = None
         if not (reply_id or self.comment_id):
-            raise Http404()
+            raise http.Http404()
         if reply_id:
             (self.parent_thread, self.reply) = self.core.get_parent_comment(
                 self.request.user, reply_id, True)
@@ -37,7 +38,7 @@ class EditComment(BaseCommentView):
         if self.comment:
             self.comment.view_user = self.request.user
             if not self.comment.edit_right:
-                raise Http404()
+                raise http.Http404()
         context['show_voting'] = True
         context['show_preview'] = True
         self.edit_is_valid = True
@@ -81,10 +82,10 @@ class FastReply(BaseCommentView):
         context = super(FastReply, self).get_context_data(**kwargs)
         context['parent_comment'] = self.comment
         if not self.parent_thread.write_right():
-            raise Http404()
+            raise http.Http404()
         context['error_message'] = self.error_message
-        context['reply_form'] = CommentForm(True)
-        self.form = CommentForm(True, data=self.request.POST or None)
+        context['reply_form'] = forms.CommentForm(True)
+        self.form = forms.CommentForm(True, data=self.request.POST or None)
         context['form'] = self.form
         self.site.signals.comment_before_fastreply.send(self, context=context)
         return context
@@ -110,10 +111,10 @@ class FastReply(BaseCommentView):
         if comment:
             ret_json['id'] = comment.id
             ret_json['page'] = comment.page
-        return HttpResponse(json.dumps(ret_json))
+        return http.HttpResponse(json.dumps(ret_json))
 
 
-class CommentsPage(BasePluginView):
+class CommentsPage(plugins.BasePluginView):
     template_name = 'comments'
 
     def get_context_data(self, **kwargs):
@@ -127,7 +128,7 @@ class CommentsPage(BasePluginView):
         try:
             self.page_num = int(self.page_num)
         except:
-            raise Http404()
+            raise http.Http404()
         self.comments = self.core.get_comments_page(
             self.request.user, self.parent_thread, self.page_num)
         context['comments'] = self.comments
@@ -135,32 +136,34 @@ class CommentsPage(BasePluginView):
 
     def get(self, request, *args, **kwargs):
         html = self.render(**kwargs)
-        pagination_context = get_pagination_context(
+        pagination_context = pagination.get_pagination_context(
             request, self.page_num, self.pages)
         pagination_context['bottom'] = False
-        pagination_top = get_custom_pagination(request, pagination_context)
+        pagination_top = pagination.get_custom_pagination(
+            request, pagination_context)
         pagination_context['bottom'] = True
-        pagination_bottom = get_custom_pagination(request, pagination_context)
+        pagination_bottom = pagination.get_custom_pagination(
+            request, pagination_context)
         ret_json = dict(html=html, pagination=pagination_top)
         ret_json['pagination_bottom'] = pagination_bottom
         self.site.signals.view_comments_page.send(
             self, json=ret_json, comments=self.comments, page=self.page_num,
             thread=self.parent_thread)
-        return HttpResponse(json.dumps(ret_json))
+        return http.HttpResponse(json.dumps(ret_json))
 
 
 class CommentRedirrect(BaseCommentView):
     def get(self, request, *args, **kwargs):
         self.get_context_data(**kwargs)
         if self.parent_thread.check_deleted():
-            raise Http404(str(_('Post was deleted')))
+            raise http.Http404(str(_('Post was deleted')))
         if self.comment.deleted:
-            raise Http404(str(_('Comment was deleted')))
-        return HttpResponseRedirect(
+            raise http.Http404(str(_('Comment was deleted')))
+        return http.HttpResponseRedirect(
             self.site.urlizer.comment_paged(self.comment))
 
 
-class Preview(BasePluginView):
+class Preview(plugins.BasePluginView):
     template_name = 'comment_preview'
     require_user = True
 
@@ -170,16 +173,16 @@ class Preview(BasePluginView):
             'body'] if 'body' in self.request.POST else ''
         context['title'] = self.request.POST[
             'title'] if 'title' in self.request.POST else ''
-        context['create_time'] = now()
+        context['create_time'] = timezone.now()
         return context
 
     def post(self, request, *args, **kwargs):
         return self.get(request, *args, **kwargs)
 
 
-class DeleteComment(BasePluginView):
+class DeleteComment(plugins.BasePluginView):
     def post(self, request, *args, **kwargs):
-        form = CommentDeleteForm(data=request.POST or None)
+        form = forms.CommentDeleteForm(data=request.POST or None)
         success = 'error'
         text = ''
         redirect = ''
@@ -190,7 +193,7 @@ class DeleteComment(BasePluginView):
             message = form.cleaned_data['message']
             (success, error_text, redirect, text) = self.core.delete_comment(
                 request.user, comment_id, message)
-        return HttpResponse(
+        return http.HttpResponse(
             json.dumps(
                 {
                     'result': success,
