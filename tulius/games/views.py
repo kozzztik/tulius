@@ -219,9 +219,7 @@ def role_text_read_right(role, user, game):
         return True
     if user.is_anonymous:
         return False
-    if user.is_superuser:
-        return True
-    if game.edit_right(user):
+    if user.is_superuser or game.edit_right(user):
         return True
     if role.user == user and (
             game.status >= models.GAME_STATUS_REGISTRATION_COMPLETED):
