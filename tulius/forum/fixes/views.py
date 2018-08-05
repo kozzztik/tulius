@@ -3,10 +3,11 @@ import gc
 import logging
 
 from django import http
-from . import plugin
+
+from tulius.forum import plugins
 
 
-class RebuildNums(plugin.BasePluginView):
+class RebuildNums(plugins.BasePluginView):
     template_name = 'fixes'
 
     def get_context_data(self, post_id=None, **kwargs):
@@ -18,10 +19,10 @@ class RebuildNums(plugin.BasePluginView):
         else:
             parent_post = None
             self.core.rebuild_tree(parent_post)
-        return plugin.BasePluginView.get_context_data(self, **kwargs)
+        return plugins.BasePluginView.get_context_data(self, **kwargs)
 
 
-class FixLastPost(plugin.BasePluginView):
+class FixLastPost(plugins.BasePluginView):
     template_name = 'fixes'
 
     def get_context_data(self, **kwargs):
@@ -35,10 +36,10 @@ class FixLastPost(plugin.BasePluginView):
             if comment:
                 models.Thread.objects.filter(
                     id=thread.id).update(last_comment=comment[0].id)
-        return plugin.BasePluginView.get_context_data(self, **kwargs)
+        return plugins.BasePluginView.get_context_data(self, **kwargs)
 
 
-class FixHtml(plugin.BasePluginView):
+class FixHtml(plugins.BasePluginView):
     template_name = 'fixes'
 
     def get_context_data(self, **kwargs):
@@ -76,4 +77,4 @@ class FixHtml(plugin.BasePluginView):
                     gc.collect()
         scan_threads(None)
         logger.error("forum fixing html done.")
-        return plugin.BasePluginView.get_context_data(self, **kwargs)
+        return plugins.BasePluginView.get_context_data(self, **kwargs)

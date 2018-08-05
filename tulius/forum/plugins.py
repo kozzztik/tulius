@@ -1,9 +1,8 @@
 from django import urls
-from django.utils.decorators import classonlymethod
-from django.views.generic import TemplateView
-from django.template import loader
-from django.core.exceptions import PermissionDenied
-from django.contrib.auth.views import redirect_to_login
+from django.contrib.auth import views
+from django.core import exceptions
+from django.utils import decorators
+from django.views import generic
 
 
 class ForumPlugin:
@@ -40,7 +39,7 @@ class ForumPlugin:
             self.site.name + ':' + viewname, args=args, kwargs=kwargs)
 
 
-class BasePluginView(TemplateView):
+class BasePluginView(generic.TemplateView):
     plugin = None
     require_user = False
 
@@ -49,14 +48,14 @@ class BasePluginView(TemplateView):
         self.site = self.plugin.site
         self.core = self.site.core
 
-    @classonlymethod
+    @decorators.classonlymethod
     def as_view(cls, plugin, **initkwargs):
         initkwargs['plugin'] = plugin
         return super(BasePluginView, cls).as_view(**initkwargs)
 
     def get_context_data(self, **kwargs):
         if self.require_user and self.request.user.is_anonymous:
-            raise PermissionDenied()
+            raise exceptions.PermissionDenied()
         return {'forum_site': self.site, 'core': self.core}
 
     def get_template_names(self):
@@ -71,11 +70,11 @@ class BasePluginView(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         if self.require_user and (not request.user.is_authenticated):
-            return redirect_to_login(request.build_absolute_uri())
+            return views.redirect_to_login(request.build_absolute_uri())
         try:
             return super(BasePluginView, self).dispatch(
                 request, *args, **kwargs)
-        except PermissionDenied:
+        except exceptions.PermissionDenied:
             if not request.user.is_authenticated:
-                return redirect_to_login(request.build_absolute_uri())
+                return views.redirect_to_login(request.build_absolute_uri())
             raise

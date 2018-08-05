@@ -1,10 +1,10 @@
-from django.conf.urls import url
-# TODO: fix this when module moved
-from tulius.forum.plugins import ForumPlugin, BasePluginView
-from .views import RebuildNums, FixLastPost, FixHtml
+from django.conf import urls
+
+from tulius.forum import plugins
+from tulius.forum.fixes import views
 
 
-class FixesPlugin(ForumPlugin):
+class FixesPlugin(plugins.ForumPlugin):
     def init_core(self):
         super(FixesPlugin, self).init_core()
         self.templates['fixes'] = 'forum/fixes/success.haml'
@@ -15,20 +15,20 @@ class FixesPlugin(ForumPlugin):
 
     def get_urls(self):
         return [
-            url(
+            urls.url(
                 r'^rebuild_nums/(?P<post_id>\d+)/$',
-                RebuildNums.as_view(plugin=self),
+                views.RebuildNums.as_view(plugin=self),
                 name='rebuild_nums'),
-            url(
+            urls.url(
                 r'^rebuild_nums/$',
-                RebuildNums.as_view(plugin=self),
+                views.RebuildNums.as_view(plugin=self),
                 name='rebuild_nums'),
-            url(
+            urls.url(
                 r'^fix_last_post/$',
-                FixLastPost.as_view(plugin=self),
+                views.FixLastPost.as_view(plugin=self),
                 name='fix_last_post'),
-            url(
+            urls.url(
                 r'^fix_html/$',
-                FixHtml.as_view(plugin=self),
+                views.FixHtml.as_view(plugin=self),
                 name='fix_html'),
         ]

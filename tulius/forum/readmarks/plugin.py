@@ -1,10 +1,10 @@
-from django.conf.urls import url
-# TODO: fix this when module moved
-from tulius.forum.plugins import ForumPlugin, BasePluginView
-from .views import MarkAsRead
+from django.conf import urls
+
+from tulius.forum import plugins
+from tulius.forum.readmarks import views
 
 
-class ReadMarksPlugin(ForumPlugin):
+class ReadMarksPlugin(plugins.ForumPlugin):
     def mark_thread_url(self, thread):
         return self.reverse('mark_as_readed', thread.id)
 
@@ -225,12 +225,12 @@ class ReadMarksPlugin(ForumPlugin):
 
     def get_urls(self):
         return [
-            url(
+            urls.url(
                 r'^mark_all_as_readed/$',
-                MarkAsRead.as_view(self),
+                views.MarkAsRead.as_view(self),
                 name='mark_as_readed'),
-            url(
+            urls.url(
                 r'^mark_all_as_readed/(?P<thread_id>\d+)/$',
-                MarkAsRead.as_view(self),
+                views.MarkAsRead.as_view(self),
                 name='mark_as_readed'),
         ]

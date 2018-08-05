@@ -1,10 +1,11 @@
-from django.conf.urls import url
-from .views import Like, Vote, PreviewResults
+from django.conf import urls
 
-from .core import VotingCore
+from tulius.forum.voting import core
+from tulius.forum.voting import views
 
 
-class VotingPlugin(VotingCore):
+
+class VotingPlugin(core.VotingCore):
     def comment_voting(self, comment):
         votings = self.models.Voting.objects.filter(comment=comment)
         if not votings:
@@ -44,9 +45,10 @@ class VotingPlugin(VotingCore):
 
     def get_urls(self):
         return [
-            url(r'^like/$', Like.as_view(plugin=self), name='like'),
-            url(r'^vote/$', Vote.as_view(plugin=self), name='vote'),
-            url(
-                r'^preview_results/$', PreviewResults.as_view(plugin=self),
+            urls.url(r'^like/$', views.Like.as_view(plugin=self), name='like'),
+            urls.url(r'^vote/$', views.Vote.as_view(plugin=self), name='vote'),
+            urls.url(
+                r'^preview_results/$',
+                views.PreviewResults.as_view(plugin=self),
                 name='preview_results'),
         ]

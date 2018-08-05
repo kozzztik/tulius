@@ -1,17 +1,17 @@
-from threading import current_thread, Lock
+import threading
 import time
 import logging
 
-from .wrappers import templates_decorator, local_counter, \
-    cursor_exec_decorator, CursorWrapper
-from .models import ProfilerMessage
-from .ua_parser import user_agent_parser
+from djfw.profiler import models
+from djfw.profiler import wrappers
+from djfw.profiler.ua_parser import user_agent_parser
 
-decorators_lock = Lock()
+
+decorators_lock = threading.Lock()
 decorated = False
 
 
-class ProfilerMiddleware():
+class ProfilerMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
         # TODO: DB logging broken after django 2.0 migration
@@ -30,7 +30,7 @@ class ProfilerMiddleware():
         #     decorators_lock.release()
 
     def process_view(self, request, view_func, view_args, view_kwargs):
-        rec = ProfilerMessage()
+        rec = models.ProfilerMessage()
         rec.module_name = view_func.__module__[:255]
         rec.func_name = getattr(view_func, '__name__', None)
         if not rec.func_name:
@@ -44,13 +44,13 @@ class ProfilerMiddleware():
         if user and (not user.is_anonymous):
             rec.user_id = user.pk
         rec.exec_time = int(time.clock() * 1000)
-        local_counter.clear()
+        wrappers.local_counter.clear()
         rec.db_time = 0
         rec.db_count = 0
         rec.template_time = 0
         rec.template_db_time = 0
         rec.template_db_count = 0
-        rec.thread_id = current_thread().ident
+        rec.thread_id = threading.current_thread().ident
         if view_args:
             try:
                 rec.exec_param = int(view_args[0])
@@ -99,13 +99,13 @@ class ProfilerMiddleware():
             return
         end_time = int(time.clock() * 1000)
         rec.exec_time = end_time - rec.exec_time
-        rec.db_time = local_counter.exec_time
-        rec.template_time = local_counter.temlate_time
-        rec.template_db_time = local_counter.template_db_time
-        rec.template_db_count = local_counter.template_db_count
+        rec.db_time = wrappers.local_counter.exec_time
+        rec.template_time = wrappers.local_counter.temlate_time
+        rec.template_db_time = wrappers.local_counter.template_db_time
+        rec.template_db_count = wrappers.local_counter.template_db_count
         if rec.db_time > rec.exec_time:
             rec.db_time = rec.exec_time
-        rec.db_count = local_counter.exec_count
+        rec.db_count = wrappers.local_counter.exec_count
         rec.error = error
         rec.save()
 

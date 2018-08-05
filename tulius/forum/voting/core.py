@@ -1,10 +1,10 @@
 from djfw.inlineformsets import get_formset
-# TODO: fix this when module moved
-from tulius.forum.plugins import ForumPlugin, BasePluginView
-from .forms import DeleteVotingForm, VoitingForm, VoitingChoiceForm, ManageForm
+
+from tulius.forum import plugins
+from tulius.forum.voting import forms
 
 
-class VotingCore(ForumPlugin):
+class VotingCore(plugins.ForumPlugin):
     def prepare_voting_results(self, voting, view_user, force_results=False):
         models = self.site.core.models
         if view_user and not view_user.is_anonymous:
@@ -30,12 +30,12 @@ class VotingCore(ForumPlugin):
 
     def preprocess_add_voting(self, request):
         models = self.site.core.models
-        form = VoitingForm(data=request.POST or None)
+        form = forms.VoitingForm(data=request.POST or None)
         formset = get_formset(
             models.Voting,
             models.VotingChoice,
             request.POST,
-            VoitingChoiceForm,
+            forms.VoitingChoiceForm,
             extra=2)
         valid = False
         if request.method == 'POST':
@@ -62,19 +62,20 @@ class VotingCore(ForumPlugin):
             voting = None
         if voting:
             if voting.closed:
-                voting_delete = DeleteVotingForm(data=request.POST or None)
+                voting_delete = forms.DeleteVotingForm(
+                    data=request.POST or None)
             else:
-                voting_delete = ManageForm(data=request.POST or None)
+                voting_delete = forms.ManageForm(data=request.POST or None)
             voting_form = None
             voting_formset = None
         else:
             voting_delete = None
-            voting_form = VoitingForm(data=request.POST or None)
+            voting_form = forms.VoitingForm(data=request.POST or None)
             voting_formset = get_formset(
                 models.Voting,
                 models.VotingChoice,
                 request.POST,
-                VoitingChoiceForm,
+                forms.VoitingChoiceForm,
                 extra=2)
         valid = False
         if request.method == 'POST':
