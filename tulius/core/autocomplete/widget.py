@@ -45,7 +45,7 @@ class AutocompleteWidget(TextInput):
             * ``related_fields`` - Fields that relates to current (value
             of this field will sended to autocomplete view via POST)
         """
-        self.attrs = attrs or {}
+        super(AutocompleteWidget, self).__init__(attrs=attrs)
         self.options = options or {}
         self.token = token
         self.model = model

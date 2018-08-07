@@ -8,7 +8,7 @@ from .models import NewsItem
 class NewsItemAdmin(CustomModelAdmin):
     list_display = (
         'id',
-        '__unicode__',
+        '__str__',
         'caption',
         'is_published',
         'published_at',

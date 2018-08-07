@@ -12,14 +12,14 @@ class CustomModelAdmin(admin.ModelAdmin):
 
     list_display = (
         'id',
-        '__unicode__',
+        '__str__',
         'created_at',
         'updated_at',
     )
 
     list_display_links = (
         'id',
-        '__unicode__',
+        '__str__',
     )
 
     search_fields = (

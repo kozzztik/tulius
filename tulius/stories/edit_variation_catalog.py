@@ -27,21 +27,22 @@ class EditVariationPage(CatalogPage):
             for (name, url) in EDIT_VARIATION_PAGES]
 
     def __init__(self, variation):
-        self.parent = EditStoryPage(variation.story)
-        self.name = str(variation)
-        self.url = variation.get_absolute_url()
-        self.is_index = True
+        super(EditVariationPage, self).__init__(
+            parent=EditStoryPage(variation.story),
+            name=str(variation),
+            url=variation.get_absolute_url(),
+            is_index=True,
+        )
         self.instance = variation
 
 
 class EditVariationSubpage(CatalogPage):
     def __init__(self, variation, name='', url='', parent=None):
-        if parent:
-            self.parent = parent
-        else:
-            self.parent = EditVariationPage(variation)
-        self.name = str(name)
-        self.url = urls.reverse('stories:' + url, args=(variation.pk,))
+        super(EditVariationSubpage, self).__init__(
+            parent=parent or EditVariationPage(variation),
+            name=name,
+            url=urls.reverse('stories:' + url, args=(variation.pk,))
+        )
         if not name:
             for page in EDIT_VARIATION_PAGES:
                 if page[1] == url:

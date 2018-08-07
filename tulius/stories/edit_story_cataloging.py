@@ -40,21 +40,22 @@ class EditStoryPage(CatalogPage):
         return str(self.instance)
 
     def __init__(self, story):
-        self.parent = stories_catalog_page()
-        self.name = "%s %s" % (str(_('edit')), story)
-        self.url = story.get_edit_url()
-        self.is_index = True
+        super(EditStoryPage, self).__init__(
+            is_index=True,
+            parent=stories_catalog_page(),
+            name="%s %s" % (str(_('edit')), story),
+            url=story.get_edit_url(),
+        )
         self.instance = story
 
 
 class EditStorySubpage(CatalogPage):
     def __init__(self, story, name='', url='', parent=None):
-        if parent:
-            self.parent = parent
-        else:
-            self.parent = EditStoryPage(story)
-        self.name = str(name)
-        self.url = urls.reverse('stories:' + url, args=(story.pk,))
+        super(EditStorySubpage, self).__init__(
+            parent=parent or EditStoryPage(story),
+            name=name,
+            url=urls.reverse('stories:' + url, args=(story.pk,)),
+        )
         if not name:
             for page in EDIT_STORY_PAGES:
                 if page[1] == url:

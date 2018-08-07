@@ -56,10 +56,12 @@ class EditGamePage(CatalogPage):
         return str(self.instance)
 
     def __init__(self, game):
-        self.parent = games_catalog_page()
-        self.name = "%s %s" % (str(_('edit')), game)
-        self.url = game.get_edit_url()
-        self.is_index = True
+        super(EditGamePage, self).__init__(
+            parent=games_catalog_page(),
+            name="%s %s" % (str(_('edit')), game),
+            url=game.get_edit_url(),
+            is_index=True,
+        )
         self.instance = game
 
 
