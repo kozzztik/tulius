@@ -1,5 +1,4 @@
 from django.db import models
-from django.db import transaction
 from django.core.exceptions import ValidationError
 from django.db.models.query_utils import Q
 from django.utils.translation import ugettext_lazy as _
@@ -338,23 +337,26 @@ class Game(models.Model):
     def vacant_roles(self):
         return Role.objects.filter(variation=self.variation, user=None)
 
-    def delete(self, *args, **kwargs):
+    def delete(self, using=None, keep_parents=False):
         self.deleted = True
         self.save()
 
-    def save(self, *args, **kwargs):
-        with transaction.commit_on_success():
-            was_none = self.id is None
-            old_self = None
-            if not was_none:
-                old_self = Game.objects.select_for_update().get(id=self.id)
+    def save(
+            self, force_insert=False, force_update=False, using=None,
+            update_fields=None):
+        was_none = self.id is None
+        old_self = None
+        if not was_none:
+            old_self = Game.objects.select_for_update().get(id=self.id)
 
-            super(Game, self).save(*args, **kwargs)
-            if old_self:
-                if old_self.status != self.status:
-                    game_status_changed.send(
-                        self, old_status=old_self.status,
-                        new_status=self.status)
+        super(Game, self).save(
+            force_insert=force_insert, force_update=force_update, using=using,
+            update_fields=update_fields)
+        if old_self:
+            if old_self.status != self.status:
+                game_status_changed.send(
+                    self, old_status=old_self.status,
+                    new_status=self.status)
 
 
 class GameAdmin(models.Model):

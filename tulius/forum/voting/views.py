@@ -12,7 +12,7 @@ class Like(plugins.BasePluginView):
     """
     require_user = True
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         if request.user.is_anonymous:
             raise http.Http404()
         comment_id = request.GET['postid']
@@ -67,7 +67,7 @@ class Vote(BaseVoting):
     require_user = True
     no_revote = False
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         models = self.core.models
         choice_id = int(request.GET['choice_id'])
         choice = shortcuts.get_object_or_404(models.VotingChoice, id=choice_id)
@@ -93,7 +93,7 @@ class PreviewResults(BaseVoting):
     require_user = True
     force_results = True
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         models = self.core.models
         voting_id = int(request.GET['voting_id'])
         self.voting = shortcuts.get_object_or_404(models.Voting, id=voting_id)

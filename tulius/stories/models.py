@@ -187,11 +187,12 @@ class Avatar(models.Model):
         except:
             pass
 
-    def delete(self, using=None):
+    def delete(self, using=None, keep_parents=False):
         self.delete_data()
         Character.objects.filter(avatar=self).update(avatar=None)
         Role.objects.filter(avatar=self).update(avatar=None)
-        return super(Avatar, self).delete(using=using)
+        return super(Avatar, self).delete(
+            using=using, keep_parents=keep_parents)
 
     def __str__(self):
         return '%s' % (self.name,)
@@ -378,7 +379,7 @@ class Variation(SortableModelMixin):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('stories:variation', (self.id,), {})
+        return 'stories:variation', (self.id,), {}
 
     def edit_right(self, user):
         if self.game:
@@ -406,13 +407,13 @@ class Variation(SortableModelMixin):
             illustration.copy(self)
         return rolelinks
 
-    def delete(self, *args, **kwargs):
+    def delete(self, using=None, keep_parents=False):
         self.deleted = True
         self.save()
 
     @models.permalink
     def forumlink(self):
-        return ('gameforum:variation', (self.pk,), {})
+        return 'gameforum:variation', (self.pk,), {}
 
     def get_roles(self):
         return Role.objects.filter(variation=self).exclude(deleted=True)
@@ -523,11 +524,11 @@ class Role(SortableModelMixin):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('stories:role', (self.id,), {})
+        return 'stories:role', (self.id,), {}
 
     @models.permalink
     def get_text_url(self):
-        return ('stories:role_text', (self.id,), {})
+        return 'stories:role_text', (self.id,), {}
 
     def is_online(self):
         return self.visit_time > now() - timedelta(minutes=3)
@@ -684,20 +685,20 @@ class AdditionalMaterial(models.Model):
     @models.permalink
     def get_absolute_url(self):
         if self.variation and self.variation.game:
-            return ('games:edit_material', (self.id,), {})
-        return ('stories:edit_material', (self.id,), {})
+            return 'games:edit_material', (self.id,), {}
+        return 'stories:edit_material', (self.id,), {}
 
     @models.permalink
     def url(self):
         if self.variation and self.variation.game:
-            return ('games:material', (self.id,), {})
-        return ('stories:material', (self.id,), {})
+            return 'games:material', (self.id,), {}
+        return 'stories:material', (self.id,), {}
 
     @models.permalink
     def delete_url(self):
         if self.variation and self.variation.game:
-            return ('games:material_delete', (self.id,), {})
-        return ('stories:material_delete', (self.id,), {})
+            return 'games:material_delete', (self.id,), {}
+        return 'stories:material_delete', (self.id,), {}
 
     def edit_right(self, user):
         if self.story:
@@ -788,9 +789,10 @@ class Illustration(models.Model):
         except:
             pass
 
-    def delete(self, *args, **kwargs):
+    def delete(self, using=None, keep_parents=False):
         self.delete_data()
-        return super(Illustration, self).delete(*args, **kwargs)
+        return super(Illustration, self).delete(
+            using=using, keep_parents=keep_parents)
 
     def edit_right(self, user):
         if self.story:

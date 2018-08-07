@@ -8,7 +8,7 @@ from django.conf import settings
 class Command(BaseCommand):
     logger = logging.getLogger('installer')
 
-    def handle(self, migrate_all=False, **options):
+    def handle(self, *args, **options):
         self.logger.info('Start clearing...')
         print('Start clearing...')
         try:

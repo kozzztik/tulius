@@ -87,7 +87,7 @@ class Backup(models.Model):
         verbose_name=_(u'size'),
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s %s" % (self.category.name, self.create_time)
 
     def backups_dir(self):
@@ -119,10 +119,10 @@ class Backup(models.Model):
     url.short_description = _(u'URL')
     url.allow_tags = True
 
-    def delete(self, using=None):
+    def delete(self, using=None, keep_parents=False):
         if os.path.exists(self.path()):
             os.remove(self.path())
-        super(Backup, self).delete(using=using)
+        super(Backup, self).delete(using=using, keep_parents=keep_parents)
 
 
 def get_lock_file_name():
@@ -160,7 +160,7 @@ class Revision(models.Model):
         verbose_name=_('end time'),
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s %s %s" % (self.number, self.author, self.comment)
 
 
@@ -254,10 +254,12 @@ class MaintenanceLog(models.Model):
         verbose_name=_('Parameters')
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s" % (self.start_time,)
 
-    def save(self, *args, **kwargs):
+    def save(
+            self, force_insert=False, force_update=False, using=None,
+            update_fields=None):
         file_name = get_lock_file_name()
         was_none = not self.pk
         if (not was_none) and self.end_time and (os.path.exists(file_name)):
@@ -269,7 +271,9 @@ class MaintenanceLog(models.Model):
                 f.close()
             if old_id == self.id:
                 os.remove(file_name)
-        super(MaintenanceLog, self).save(*args, **kwargs)
+        super(MaintenanceLog, self).save(
+            force_insert=force_insert, force_update=force_update,
+            using=using, update_fields=update_fields)
         if was_none and not self.end_time:
             if os.path.exists(file_name):
                 os.remove(file_name)

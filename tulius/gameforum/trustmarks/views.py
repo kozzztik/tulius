@@ -8,7 +8,7 @@ from tulius.stories.models import Role
 
 
 class DoTrustmark(BasePluginView):
-    def get(self, request, **kwargs):
+    def get(self, request, *args, **kwargs):
         models = self.site.gamemodels
         target_id = int(request.GET['target_id'])
         value = int(request.GET['value'])

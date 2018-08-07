@@ -44,6 +44,6 @@ class CollapsingThreadsPlugin(ForumPlugin):
         return [
             url(
                 r'^collapse_thread/(?P<parent_id>\d+)/$',
-                CollapseThreads.as_view(self),
+                CollapseThreads.as_view(plugin=self),
                 name='collapse_thread'),
         ]

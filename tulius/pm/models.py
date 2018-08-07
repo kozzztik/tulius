@@ -42,18 +42,21 @@ class PrivateMessage(AbstractBaseModel):
         verbose_name=_('removed by receiver'))
     body = models.TextField(default='', verbose_name=_('message body'))
 
-    def save(self, *args, **kwargs):
+    def save(
+            self, force_insert=False, force_update=False, using=None,
+            update_fields=None):
         if self.sender_id == self.receiver_id:
             self.is_read = True
-        if not self.id:
-            super(PrivateMessage, self).save(*args, **kwargs)
+        created = not self.id
+        super(PrivateMessage, self).save(
+            force_insert=force_insert, force_update=force_update,
+            using=using, update_fields=update_fields)
+        if created:
             private_message_created.send(sender=self, game=self)
             PrivateTalking.objects.update_talking(
                 self.sender, self.receiver, self)
             PrivateTalking.objects.update_talking(
                 self.receiver, self.sender, self)
-        else:
-            super(PrivateMessage, self).save(*args, **kwargs)
 
 
 class PrivateTalkingManager(models.Manager):

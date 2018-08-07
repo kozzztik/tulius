@@ -74,29 +74,46 @@ class ThreadsPlugin(ThreadsCorePlugin):
 
     def get_urls(self):
         return [
-            url(r'^$', views.Index.as_view(self), name='index'),
-            url(r'^room/(?P<parent_id>\d+)/$', views.Room.as_view(self),
-                name='room'),
-            url(r'^add_room/$', views.EditView.as_view(
-                self, self_is_room=True), name='add_room'),
-            url(r'^add_room/(?P<parent_id>\d+)/$', views.EditView.as_view(
-                self, self_is_room=True), name='add_room'),
-            url(r'^edit_room/(?P<thread_id>\d+)/$', views.EditView.as_view(
-                self, self_is_room=True), name='edit_room'),
-            url(r'^add_thread/(?P<parent_id>\d+)/$', views.EditView.as_view(
-                self, self_is_room=False), name='add_thread'),
-            url(r'^edit_thread/(?P<thread_id>\d+)/$', views.EditView.as_view(
-                self, self_is_room=False), name='edit_thread'),
-            url(r'^thread/(?P<parent_id>\d+)/$', views.Thread.as_view(self),
-                name='thread'),
-            url(r'^thread/(?P<parent_id>\d+)/move/$',
-                views.MoveThreadSelect.as_view(self), name='thread_move'),
-            url(r'^thread/(?P<parent_id>\d+)/move/(?P<thread_id>\d+)/$',
-                views.MoveThreadConfirm.as_view(self),
+            url(r'^$', views.Index.as_view(plugin=self), name='index'),
+            url(
+                r'^room/(?P<parent_id>\d+)/$',
+                views.Room.as_view(plugin=self), name='room'),
+            url(
+                r'^add_room/$',
+                views.EditView.as_view(plugin=self, self_is_room=True),
+                name='add_room'),
+            url(
+                r'^add_room/(?P<parent_id>\d+)/$',
+                views.EditView.as_view(plugin=self, self_is_room=True),
+                name='add_room'),
+            url(
+                r'^edit_room/(?P<thread_id>\d+)/$',
+                views.EditView.as_view(plugin=self, self_is_room=True),
+                name='edit_room'),
+            url(
+                r'^add_thread/(?P<parent_id>\d+)/$',
+                views.EditView.as_view(plugin=self, self_is_room=False),
+                name='add_thread'),
+            url(
+                r'^edit_thread/(?P<thread_id>\d+)/$',
+                views.EditView.as_view(plugin=self, self_is_room=False),
+                name='edit_thread'),
+            url(
+                r'^thread/(?P<parent_id>\d+)/$',
+                views.Thread.as_view(plugin=self), name='thread'),
+            url(
+                r'^thread/(?P<parent_id>\d+)/move/$',
+                views.MoveThreadSelect.as_view(plugin=self),
+                name='thread_move'),
+            url(
+                r'^thread/(?P<parent_id>\d+)/move/(?P<thread_id>\d+)/$',
+                views.MoveThreadConfirm.as_view(plugin=self),
                 name='thread_move_confirm'),
             url(r'^thread/(?P<parent_id>\d+)/move/root/$',
-                views.MoveThreadConfirm.as_view(self),
+                views.MoveThreadConfirm.as_view(plugin=self),
                 name='thread_move_confirm'),
-            url(r'^delete_thread/$', views.DeleteThread.as_view(self),
+            url(
+                r'^delete_thread/$',
+                views.DeleteThread.as_view(plugin=self),
                 name='delete_thread'),
         ]

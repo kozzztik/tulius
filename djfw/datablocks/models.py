@@ -79,16 +79,20 @@ class DataBlock(models.Model):
         editable=False
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
+    def save(
+            self, force_insert=False, force_update=False, using=None,
+            update_fields=None):
         lang = translation.get_language()
         drop_cache = False
         if lang != self.language:
             self.language = lang
             self.pk = None
             drop_cache = True
-        super(DataBlock, self).save(*args, **kwargs)
+        super(DataBlock, self).save(
+            force_insert=force_insert, force_update=force_update,
+            using=using, update_fields=update_fields)
         if drop_cache:
             cache.delete(CACHE_PREFIX + lang)

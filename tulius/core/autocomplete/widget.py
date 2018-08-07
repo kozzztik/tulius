@@ -62,10 +62,9 @@ class AutocompleteWidget(TextInput):
         else:
             self.extra = {}
 
-    def render(self, name, value=None, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         self.choices_url = urls.reverse(
             'autocomplete:autocomplete', args=[self.token])
-        choices = ''
         final_attrs = self.build_attrs(attrs)
         try:
             choices = urls.reverse(str(self.choices_url))

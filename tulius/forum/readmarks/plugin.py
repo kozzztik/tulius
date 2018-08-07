@@ -227,10 +227,10 @@ class ReadMarksPlugin(plugins.ForumPlugin):
         return [
             urls.url(
                 r'^mark_all_as_readed/$',
-                views.MarkAsRead.as_view(self),
+                views.MarkAsRead.as_view(plugin=self),
                 name='mark_as_readed'),
             urls.url(
                 r'^mark_all_as_readed/(?P<thread_id>\d+)/$',
-                views.MarkAsRead.as_view(self),
+                views.MarkAsRead.as_view(plugin=self),
                 name='mark_as_readed'),
         ]

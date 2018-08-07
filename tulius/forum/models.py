@@ -499,7 +499,7 @@ class Comment(SitedModelMixin):
 
     view_user = None
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title[:40] if self.title else self.body[:40]
 
     def get_delete_mark(self):
@@ -511,10 +511,9 @@ class Comment(SitedModelMixin):
     def is_thread(self):
         return self.id == self.parent.first_comment_id
 
-    def save(self, *args, fast_save=False, **kwargs):
-        if fast_save:
-            super(Comment, self).save(*args, **kwargs)
-            return
+    def save(
+            self, force_insert=False, force_update=False, using=None,
+            update_fields=None):
         was_none = self.id is None
         thread = Thread.objects.select_for_update().get(id=self.parent_id)
         delete_changed = False
@@ -544,7 +543,9 @@ class Comment(SitedModelMixin):
             self.site().signals.before_add_comment.send(
                 self, thread=thread, restore=False)
         # real safe
-        super(Comment, self).save(*args, **kwargs)
+        super(Comment, self).save(
+            force_insert=force_insert, force_update=force_update,
+            using=using, update_fields=update_fields)
         # after save
         if was_none:
             if not thread.first_comment_id:
@@ -620,13 +621,17 @@ class CommentLike(models.Model):
         verbose_name=_('comment'),
     )
 
-    def save(self, *args, **kwargs):
+    def save(
+            self, force_insert=False, force_update=False, using=None,
+            update_fields=None):
         if self.id is None:
             comment = Comment.objects.select_for_update().get(
                 id=self.comment_id)
             comment.likes += 1
             comment.save()
-        super(CommentLike, self).save(*args, **kwargs)
+        super(CommentLike, self).save(
+            force_insert=force_insert, force_update=force_update,
+            using=using, update_fields=update_fields)
 
     def delete(self, using=None, keep_parents=False):
         comment = Comment.objects.select_for_update().get(

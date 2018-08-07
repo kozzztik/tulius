@@ -44,14 +44,19 @@ class NewsItem(AbstractBaseModel):
         blank=False,
         editable=False
     )
-    def __unicode__(self):
+
+    def __str__(self):
         return self.caption
 
     @models.permalink
     def get_absolute_url(self):
         return 'news:detail', (), {'pk': self.id}
 
-    def save(self, *args, **kwargs):
+    def save(
+            self, force_insert=False, force_update=False, using=None,
+            update_fields=None):
         if not self.language:
             self.language = translation.get_language()
-        super(NewsItem, self).save(*args, **kwargs)
+        super(NewsItem, self).save(
+            force_insert=force_insert, force_update=force_update,
+            using=using, update_fields=update_fields)

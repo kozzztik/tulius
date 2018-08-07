@@ -4,7 +4,6 @@ from tulius.pm import models
 
 
 class PrivateMessageForm(forms.ModelForm):
-
     class Meta:
         model = models.PrivateMessage
         fields = ('body',)
@@ -14,7 +13,7 @@ class PrivateMessageForm(forms.ModelForm):
         self.receiver = receiver
         super(PrivateMessageForm, self).__init__(*args, **kwargs)
 
-    def save(self, *args, **kwargs):
+    def save(self, commit=True):
         pm = super(PrivateMessageForm, self).save(commit=False)
         pm.receiver = self.receiver
         pm.sender = self.sender

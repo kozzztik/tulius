@@ -10,7 +10,8 @@ from tulius.forum import plugins
 class RebuildNums(plugins.BasePluginView):
     template_name = 'fixes'
 
-    def get_context_data(self, post_id=None, **kwargs):
+    def get_context_data(self, **kwargs):
+        post_id = kwargs.get('post_id', None)
         thread = self.core.models.Thread
         if not self.request.user.is_superuser:
             raise http.Http404

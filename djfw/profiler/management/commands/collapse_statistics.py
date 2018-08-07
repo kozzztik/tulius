@@ -8,8 +8,9 @@ class Command(BaseCommand):
     usage_str = "Usage: ./manage.py collapse_statistisc day. Day may be " \
         "'last'(previous day), 'all'(recalc all) or date like '2014-01-01'."
 
-    def handle(self, day, **options):
+    def handle(self, *args, **options):
         from djfw.profiler.collapse import do_collapse
+        day = options['day']
         if day == 'last':
             day = datetime.date.today() - datetime.timedelta(days=1)
         elif day == 'all':

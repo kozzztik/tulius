@@ -7,7 +7,8 @@ from tulius.forum.plugins import BasePluginView
 
 
 class GameIndex(BasePluginView):
-    def get(self, request, game_id, **kwargs):
+    def get(self, request, *args, **kwargs):
+        game_id = args[0]
         try:
             game_id = int(game_id)
         except:
@@ -25,7 +26,8 @@ class GameIndex(BasePluginView):
 
 
 class VariationIndex(BasePluginView):
-    def get(self, request, variation_id, **kwargs):
+    def get(self, request, *args, **kwargs):
+        variation_id = args[0]
         try:
             variation_id = int(variation_id)
         except:
@@ -47,6 +49,6 @@ class VariationIndex(BasePluginView):
 class Fix(BasePluginView):
     template_name = 'fix_games'
 
-    def get(self, request, **kwargs):
+    def get(self, request, *args, **kwargs):
         self.site.core.fix_games()
-        return super(Fix, self).get(request, **kwargs)
+        return super(Fix, self).get(request, *args, **kwargs)

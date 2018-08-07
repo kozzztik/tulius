@@ -19,7 +19,8 @@ class MarkAsRead(plugins.BasePluginView):
             else:
                 thread.mark_as_readed()  # TODO may not work
 
-    def get(self, request, thread_id=None, **kwargs):
+    def get(self, request, *args, **kwargs):
+        thread_id = kwargs.get('thread_id', None)
         if thread_id:
             try:
                 thread_id = int(thread_id)

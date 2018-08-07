@@ -119,8 +119,8 @@ class PlayerHistoryView(generic.TemplateView):
     template_name = 'players/player_history.haml'
 
     @decorators.method_decorator(auth_decorators.login_required)
-    def get(self, *args, **kwargs):
-        return super(PlayerHistoryView, self).get(*args, **kwargs)
+    def get(self, request, *args, **kwargs):
+        return super(PlayerHistoryView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         player = shortcuts.get_object_or_404(
@@ -180,8 +180,8 @@ def get_played(request_user, player=None):
 
 class LoginTemplateView(generic.TemplateView):
     @decorators.method_decorator(auth_decorators.login_required)
-    def get(self, *args, **kwargs):
-        return super(LoginTemplateView, self).get(*args, **kwargs)
+    def get(self, request, *args, **kwargs):
+        return super(LoginTemplateView, self).get(request, *args, **kwargs)
 
 
 class PlayerProfileView(LoginTemplateView):

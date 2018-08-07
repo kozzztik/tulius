@@ -15,8 +15,8 @@ class PlayerMessagesView(generic.TemplateView):
     template_name = 'pm/messages.haml'
 
     @decorators.method_decorator(auth_decorators.login_required)
-    def get(self, *args, **kwargs):
-        return super(PlayerMessagesView, self).get(*args, **kwargs)
+    def get(self, request, *args, **kwargs):
+        return super(PlayerMessagesView, self).get(request, *args, **kwargs)
 
     @decorators.method_decorator(auth_decorators.login_required)
     def post(self, *args, **kwargs):

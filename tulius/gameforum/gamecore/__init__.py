@@ -309,14 +309,14 @@ class GamePlugin(ForumPlugin):
         return [
             url(
                 r'^game/(?P<game_id>\d+)/$',
-                GameIndex.as_view(self),
+                GameIndex.as_view(plugin=self),
                 name='game'),
             url(
                 r'^variation/(?P<variation_id>\d+)/$',
-                VariationIndex.as_view(self),
+                VariationIndex.as_view(plugin=self),
                 name='variation'),
             url(
                 r'^fix/$',
-                Fix.as_view(self),
+                Fix.as_view(plugin=self),
                 name='fix'),
         ]

@@ -1,7 +1,6 @@
 from django import urls
 from django.contrib.auth import views
 from django.core import exceptions
-from django.utils import decorators
 from django.views import generic
 
 
@@ -47,11 +46,6 @@ class BasePluginView(generic.TemplateView):
         super(BasePluginView, self).__init__(**kwargs)
         self.site = self.plugin.site
         self.core = self.site.core
-
-    @decorators.classonlymethod
-    def as_view(cls, plugin, **initkwargs):
-        initkwargs['plugin'] = plugin
-        return super(BasePluginView, cls).as_view(**initkwargs)
 
     def get_context_data(self, **kwargs):
         if self.require_user and self.request.user.is_anonymous:

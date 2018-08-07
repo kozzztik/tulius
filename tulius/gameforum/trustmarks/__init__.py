@@ -40,6 +40,6 @@ class TrustmarksPlugin(ForumPlugin):
         return [
             url(
                 r'^do_trustmark/$',
-                DoTrustmark.as_view(self),
+                DoTrustmark.as_view(plugin=self),
                 name='do_trustmark'),
         ]

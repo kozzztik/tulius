@@ -1,3 +1,5 @@
+import urllib
+
 from django.contrib.auth.backends import ModelBackend
 from django.core.files.base import ContentFile
 from tulius.models import User, USER_SEX_FEMALE, USER_SEX_MALE, \
@@ -36,14 +38,15 @@ class VKBackend(ModelBackend):
         else:
             user.sex = USER_SEX_UNDEFINED
         user.username = self.get_valid_name(profile)
-        import urllib
         data = urllib.urlopen(profile.photo)
         img = ContentFile(data.read())
         user.avatar.save('vk_' + str(profile.vk_id), img, False)
         user.save()
         return user
 
-    def authenticate(self, vk_profile=None, email=None):
+    def authenticate(self, request, username=None, password=None, **kwargs):
+        vk_profile = kwargs.get('vk_profile', None)
+        email = kwargs.get('email', None)
         try:
             return User.objects.get(vk_profile_id=vk_profile.pk)
         except User.DoesNotExist:
