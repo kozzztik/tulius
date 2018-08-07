@@ -25,13 +25,13 @@ def get_mail(mail):
             receiver = User.objects.get(username=receiver, is_active=True)
     except User.DoesNotExist:
         logger.warning(
-            'Email not received. Recipient %s not found' % (receiver,))
+            'Email not received. Recipient %s not found', receiver)
         return True
     try:
         sender = User.objects.get(email=mail.sender_mail, is_active=True)
     except User.DoesNotExist:
         logger.warning(
-            'Email not received. Sender %s not found' % (mail.sender_mail,))
+            'Email not received. Sender %s not found', mail.sender_mail)
         return True
 
     body = mail.body.replace('\\n', '\n').strip(' \n').replace('\n', '\t\n')

@@ -63,7 +63,7 @@ class FixHtml(plugins.BasePluginView):
                 parent=parent_thread).order_by('id')
             for thread in threads:
                 if not parent_thread:
-                    logger.error("Fixing thread %s" % (thread.id,))
+                    logger.error("Fixing thread %s", thread.id)
                 if thread.room:
                     scan_threads(thread)
                 else:

@@ -70,7 +70,7 @@ class GameRightsPlugin(RightsPlugin):
             else:
                 import logging
                 logger = logging.getLogger('django.request')
-                logger.fatal('Game thread %s have no variation' % (thread.id,))
+                logger.fatal('Game thread %s have no variation', thread.id)
                 raise Exception('game post have no variation')
             thread.game = thread.variation.game
             thread.admin = thread.variation.edit_right(user)

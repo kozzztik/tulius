@@ -90,7 +90,7 @@ class ProfilerMiddleware:
         except:
             logger = logging.getLogger('django.request')
             logger.error(
-                'Cant parse user agent ' + request.META['HTTP_USER_AGENT'])
+                'Cant parse user agent %s', request.META['HTTP_USER_AGENT'])
         request.profiler = rec
 
     def save_rec(self, request, error=False):

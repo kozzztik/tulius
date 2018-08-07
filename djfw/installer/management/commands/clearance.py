@@ -28,12 +28,12 @@ class Command(BaseCommand):
             for installer in installers:
                 clear_proc = getattr(installer[1], 'clear', None)
                 if clear_proc:
-                    self.logger.debug("Clearing %s" % installer[0])
+                    self.logger.debug("Clearing %s", installer[0])
                     print("Clearing %s..." % installer[0])
                     rec_cleared = clear_proc() or 0
                     self.logger.debug(
-                        "%s cleared. %s records deleted." % (
-                            installer[0], rec_cleared))
+                        "%s cleared. %s records deleted.",
+                        installer[0], rec_cleared)
                     print("%s cleared. %s records deleted." % (
                         installer[0], rec_cleared))
             if 'django.contrib.sessions' in settings.INSTALLED_APPS:

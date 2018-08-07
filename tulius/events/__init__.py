@@ -29,8 +29,8 @@ def send_notifications(users, notification_id, varibles):
             reencode(notification.body_template))
     except Exception as e:
         logger.error(
-            'Can`t send email notification %s, template not loaded.' % (
-                notification.id))
+            'Can`t send email notification %s, template not loaded.',
+            notification.id)
         logger.error(e)
     user_notifications = UserNotification.objects.filter(
         notification=notification, enabled=False)
@@ -51,8 +51,8 @@ def send_notifications(users, notification_id, varibles):
             msg.send()
         except Exception as e:
             logger.error(
-                'Can`t send email notification %s to %s' % (
-                    notification.id, user.id))
+                'Can`t send email notification %s to %s',
+                notification.id, user.id)
             logger.error(e)
 
 
