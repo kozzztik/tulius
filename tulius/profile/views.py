@@ -105,10 +105,14 @@ class PlayerFavoritesView(LoginTemplateView):
             comment for comment in comments if comment.parent.read_right]
         groups = []
         for comment in comments:
-            groups = self.get_post_group(groups, comment)
+            self.get_post_group(groups, comment)
         block_trustmarks = True
         block_reply = True
-        return locals()
+        return {
+            'groups': groups,
+            'block_trustmarks': block_trustmarks,
+            'block_reply': block_reply,
+        }
 
 
 class PlayerSubscriptionsView(LoginTemplateView):
@@ -221,4 +225,8 @@ class PlayerGamesView(LoginTemplateView):
                     GAME_STATUS_COMPLETED, GAME_STATUS_COMPLETED_OPEN]),
             user)
         admined_games = set_edit(games.filter(id__in=admined), user)
-        return locals()
+        return {
+            'current_games': current_games,
+            'admined_games': admined_games,
+            'old_games': old_games,
+        }

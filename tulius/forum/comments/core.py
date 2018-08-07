@@ -1,39 +1,37 @@
 from datetime import timedelta
 
 from django import dispatch
+from django import http
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
-from django.db import transaction
-from django.http import Http404
 from django.utils import timezone
 
-# TODO: fix this when module moved
-from tulius.forum.plugins import ForumPlugin
-from .forms import CommentForm
-from .pagination import get_pagination_context, get_custom_pagination
+from tulius.forum import plugins
+from tulius.forum.comments import forms
+from tulius.forum.comments import pagination
 
 ERROR_VALIDATION = _('there were some errors during form validation')
 
 
-class CommentsCore(ForumPlugin):
+class CommentsCore(plugins.ForumPlugin):
     COMMENTS_ON_PAGE = 25
 
     def get_parent_comment(self, user, comment_id, check_write):
         try:
             comment_id = int(comment_id)
         except:
-            raise Http404()
+            raise http.Http404()
         models = self.site.core.models
         try:
             parent_comment = models.Comment.objects.select_related(
                 'parent').get(id=comment_id, plugin_id=self.site_id)
         except models.Comment.DoesNotExist:
-            raise Http404()
+            raise http.Http404()
         parent_thread = parent_comment.parent
         if not parent_thread.read_right(user):
-            raise Http404()
+            raise http.Http404()
         if check_write and (not parent_thread.write_right(user)):
-            raise Http404()
+            raise http.Http404()
         return parent_thread, parent_comment
 
     def process_edit_comment(
@@ -41,7 +39,7 @@ class CommentsCore(ForumPlugin):
             voting_valid):
         adding = comment is None
         if comment and (comment.parent_id != parent_thread.id):
-            raise Http404()
+            raise http.Http404()
         initial = {}
         if comment:
             initial['title'] = comment.title
@@ -50,7 +48,7 @@ class CommentsCore(ForumPlugin):
         else:
             initial['title'] = "Re: " + parent_thread.title
 
-        form = CommentForm(
+        form = forms.CommentForm(
             voting_enabled, initial=initial, data=request.POST or None)
         if comment:
             form.caption = _('edit post')
@@ -117,46 +115,54 @@ class CommentsCore(ForumPlugin):
         redirect = ''
         text = ''
         comment = None
-        with transaction.commit_on_success():
-            try:
-                comment_id = int(comment_id)
-                comment = models.Comment.objects.select_for_update(
+        try:
+            comment_id = int(comment_id)
+            comment = models.Comment.objects.select_for_update(
 
-                ).select_related('parent').get(id=comment_id)
-            except:
+            ).select_related('parent').get(id=comment_id)
+        except:
+            error_text = _(
+                'Comment not found %(post_id)s.') % {'post_id': comment_id}
+        if comment:
+            if comment.is_thread():
+                return self.site.core.delete_thread(
+                    user, comment.parent_id, message)
+            if not ((comment.user_id == user.id) or
+                    comment.parent.moderate_right(user)):
                 error_text = _(
-                    'Comment not found %(post_id)s.') % {'post_id': comment_id}
-            if comment:
-                if comment.is_thread():
-                    return self.site.core.delete_thread(
-                        user, comment.parent_id, message)
-                if not ((comment.user_id == user.id) or
-                        comment.parent.moderate_right(user)):
-                    error_text = _(
-                        'You have no rights to delete comment %(post_id)s.'
-                    ) % {'post_id': comment_id}
-                else:
-                    comment.deleted = True
-                    delete_mark = models.CommentDeleteMark(
-                        comment=comment, user=user, description=message)
-                    comment.save()
-                    delete_mark.save()
-                    redirect = comment.parent.get_absolute_url
-                success = 'success'
-                text = _('Comment successfully deleted!')
+                    'You have no rights to delete comment %(post_id)s.'
+                ) % {'post_id': comment_id}
+            else:
+                comment.deleted = True
+                delete_mark = models.CommentDeleteMark(
+                    comment=comment, user=user, description=message)
+                comment.save()
+                delete_mark.save()
+                redirect = comment.parent.get_absolute_url
+            success = 'success'
+            text = _('Comment successfully deleted!')
         return success, error_text, redirect, text
 
     def thread_pages_count(self, thread):
-        return int((thread.comments_count - 1) / self.COMMENTS_ON_PAGE + 1) or 1
+        return int(
+            (thread.comments_count - 1) / self.COMMENTS_ON_PAGE + 1) or 1
 
     def get_comments_pagination(self, request, thread, page):
         pages = thread.pages_count
-        pagination_context = get_pagination_context(request, page, pages,)
-        pagination = get_custom_pagination(request, pagination_context)
+        pagination_context = pagination.get_pagination_context(
+            request, page, pages)
+        pagination_top = pagination.get_custom_pagination(
+            request, pagination_context)
         pagination_context['bottom'] = True
-        pagination_bottom = get_custom_pagination(request, pagination_context)
-        reply_form = CommentForm(True) if thread.write_right() else None
-        return locals()
+        reply_form = forms.CommentForm(True) if thread.write_right() else None
+        return {
+            'pages': pages,
+            'pagination_context': pagination_context,
+            'reply_form': reply_form,
+            'pagination': pagination_top,
+            'pagination_bottom': pagination.get_custom_pagination(
+                request, pagination_context)
+        }
 
     def before_add_comment(self, sender, **kwargs):
         thread = kwargs['thread']

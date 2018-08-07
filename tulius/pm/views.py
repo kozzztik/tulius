@@ -37,10 +37,6 @@ class PlayerSendMessageView(generic.DetailView):
         player = self.object
         message_list_tmp = PrivateMessage.objects.talking(user, player)
 
-        pre_unread_messages = PrivateMessage.objects.filter(
-            receiver=user, is_read=False)
-        pre_unread_messages_count = pre_unread_messages.count()
-
         unread = PrivateMessage.objects.filter(
             receiver=user, sender=player, is_read=False)
         unread_count = unread.count()
@@ -54,7 +50,11 @@ class PlayerSendMessageView(generic.DetailView):
         unread.update(is_read=True)
         user.update_not_readed()
         form = PrivateMessageForm(user, player)
-        return locals()
+        return {
+            'player': player,
+            'message_list': message_list,
+            'form': form,
+        }
 
     @decorators.method_decorator(auth_decorators.login_required)
     def post(self, request, *args, **kwargs):

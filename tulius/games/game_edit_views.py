@@ -147,9 +147,10 @@ class GameEditRoles(GameAdminView, sortable_views.SortableDetailViewMixin):
         for role in roles:
             role.invitings = models.GameInvite.objects.filter(
                 role=role, status=models.GAME_INVITE_STATUS_NEW)
-        inviteform = forms.GameInviteForm(variation=self.variation)
-        delete_role_form = variation_forms.RoleDeleteForm(self.variation)
-        context.update(locals())
+        context['roles'] = roles
+        context['inviteform'] = forms.GameInviteForm(variation=self.variation)
+        context['delete_role_form'] = variation_forms.RoleDeleteForm(
+            self.variation)
         return context
 
 
@@ -452,7 +453,11 @@ class EditRequestsView(BaseEditGameView):
                 ])
             role_request.roles = models.RoleRequestSelection.objects.filter(
                 role_request=role_request).exclude(role__in=assigned_roles)
-        return locals()
+        return {
+            'catalog_page': catalog_page,
+            'requests': requests,
+            'all_roles': all_roles,
+        }
 
 
 class GameForumView(BaseEditGameView):

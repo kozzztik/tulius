@@ -27,7 +27,6 @@ class IndexView(generic.TemplateView):
     def get_context_data(self, **kwargs):
         stories_filter_form = forms.StoryFilterForm(self.request.GET or None)
         stories = models.Story.objects.order_by('-creation_year')
-        catalog_page = catalog.stories_catalog_page()
         total_stories_count = stories.count()
         if self.request.GET:
             if ('filter_by_genre' in self.request.GET) and self.request.GET[
@@ -48,11 +47,18 @@ class IndexView(generic.TemplateView):
         filtered_stories_count = len(stories)
         filtered = self.request.GET and (filtered_stories_count
                                          != total_stories_count)
-        add_form = forms.AddStoryForm()
         for story in stories:
             story.editable = story.edit_right(self.request.user)
             story.authors.all()
-        return locals()
+        return {
+            'stories_filter_form': stories_filter_form,
+            'filtered_stories_count': filtered_stories_count,
+            'filtered': filtered,
+            'total_stories_count': total_stories_count,
+            'stories': stories,
+            'add_form': forms.AddStoryForm(),
+            'catalog_page': catalog.stories_catalog_page(),
+        }
 
 
 class AddStory(djfw_views.LoginRequiredMixin, djfw_views.AjaxModelFormView):

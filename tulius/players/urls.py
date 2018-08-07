@@ -26,7 +26,7 @@ urlpatterns = [
     # url(
     #     r'^profile/files/$', PlayerUploadedFilesView.as_view(),
     #     name='profile_files'),
-    # url(
-    #     r'^profile/played/$', PlayerPlayedView.as_view(),
-    #     name='profile_played'),
+    urls.url(
+        r'^profile/played/$', views.PlayerPlayedView.as_view(),
+        name='profile_played'),
 ]

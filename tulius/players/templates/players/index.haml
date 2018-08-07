@@ -64,7 +64,7 @@
             - include "players/statistics.haml"
             - if played_roles and played_games
                 - include "players/snippets/played_table.haml"
-                - if played_games > 5
+                - if stats.total_games > 5
                     - if player.show_played_games and player.show_played_characters
                         %a{href: '{% url "players:player_played" player.id %}'}
                             {% trans "All played games and characters" %}...

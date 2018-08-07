@@ -7,23 +7,19 @@ from django.utils import decorators
 from django.contrib.auth import decorators as auth_decorators
 from django.utils.translation import ugettext_lazy as _
 
-from tulius.forum.models import UploadedFile, Comment
-from tulius.stories.models import StoryAdmin, Role, Variation, StoryAuthor
-from tulius.games.models import Game, GAME_STATUS_COMPLETED, \
-    GAME_STATUS_COMPLETED_OPEN, GameWinner, GameAdmin
-from tulius.games.models import GameGuest
-from tulius.models import User
-from tulius.pm.models import PrivateMessage
-from .models import stars
-from .forms import PlayersFilterForm, PLAYERS_SORT_STORIES_AUTHORED,\
-    PLAYERS_SORT_GAMES_PLAYED_INC, PLAYERS_SORT_GAMES_PLAYED_DEC, \
-    PLAYERS_SORT_REG_DATE, PLAYERS_SORT_ALPH, RankForm
+from tulius import models as tulius
+from tulius.forum import models as forum
+from tulius.games import models as games
+from tulius.players import models
+from tulius.players import forms
+from tulius.pm import models as pm
+from tulius.stories import models as stories
 
 
 game_forum = apps.get_app_config('gameforum')
 
 try:
-    stars.flush_stars_cache()
+    models.stars.flush_stars_cache()
 except:
     pass
 
@@ -31,7 +27,7 @@ except:
 def filter_by_games(players):
     return players.filter(
         roles__variation__game__status__in=[
-            GAME_STATUS_COMPLETED, GAME_STATUS_COMPLETED_OPEN
+            games.GAME_STATUS_COMPLETED, games.GAME_STATUS_COMPLETED_OPEN
         ]).annotate(
             games=django_models.Count('roles__variation__game', distinct=True))
 
@@ -45,36 +41,45 @@ class PlayersListView(generic.TemplateView):
     template_name = 'players/player_list.haml'
 
     def get_context_data(self, **kwargs):
+        show_games = False
+        show_reg_date = False
+        show_stories = False
         GET = self.request.GET
-        players_filter_form = PlayersFilterForm(GET or None)
-        players = User.objects.filter(is_active=True)
+        players_filter_form = forms.PlayersFilterForm(GET or None)
+        players = tulius.User.objects.filter(is_active=True)
         if GET:
             if GET.get('filter_by_player', None):
                 players = players.filter(id=GET['filter_by_player'])
             v = int(GET.get('sort_type', 0))
             if v:
-                if v == PLAYERS_SORT_STORIES_AUTHORED:
+                if v == forms.PLAYERS_SORT_STORIES_AUTHORED:
                     players = filter_by_stories(players)
                     show_stories = True
-                elif v == PLAYERS_SORT_GAMES_PLAYED_INC:
+                elif v == forms.PLAYERS_SORT_GAMES_PLAYED_INC:
                     players = filter_by_games(players).order_by('games')
                     show_games = True
-                elif v == PLAYERS_SORT_GAMES_PLAYED_DEC:
+                elif v == forms.PLAYERS_SORT_GAMES_PLAYED_DEC:
                     players = filter_by_games(players).order_by('-games')
                     show_games = True
-                elif v == PLAYERS_SORT_REG_DATE:
+                elif v == forms.PLAYERS_SORT_REG_DATE:
                     players = players.order_by('date_joined')
                     show_reg_date = True
-                elif v == PLAYERS_SORT_ALPH:
+                elif v == forms.PLAYERS_SORT_ALPH:
                     players = players.order_by('username')
         else:
             players = filter_by_stories(players)
             show_stories = True
-        return locals()
+        return {
+            'players_filter_form': players_filter_form,
+            'players': players,
+            'show_games': show_games,
+            'show_reg_date': show_reg_date,
+            'show_stories': show_stories,
+        }
 
 
 class PlayerView(generic.DetailView):
-    queryset = User.objects.filter(is_active=True)
+    queryset = tulius.User.objects.filter(is_active=True)
     pk_url_kwarg = 'player_id'
     context_object_name = 'player'
 
@@ -96,7 +101,7 @@ class PlayerDetailsView(PlayerView):
             if played_games.count() > 5:
                 played_games = played_games[:5]
         if user.is_superuser:
-            rankform = RankForm(
+            rankform = forms.RankForm(
                 data=self.request.POST or None, instance=player)
             if self.request.method == 'POST':
                 if rankform.is_valid():
@@ -119,29 +124,34 @@ class PlayerHistoryView(generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         player = shortcuts.get_object_or_404(
-            User, is_active=True, pk=kwargs['player_id'])
-        message_list = PrivateMessage.objects.talking(
-            self.request.user, player)
-        message_on_page = 50
-        return locals()
+            tulius.User, is_active=True, pk=kwargs['player_id'])
+        return {
+            'player': player,
+            'message_list': pm.PrivateMessage.objects.talking(
+                self.request.user, player),
+            'message_on_page': 50,
+        }
 
 
 class Statistics:
     def __init__(self, user):
-        self.posts = Comment.objects.filter(user=user, plugin_id=None).count()
-        self.game_posts = Comment.objects.filter(
+        self.posts = forum.Comment.objects.filter(
+            user=user, plugin_id=None).count()
+        self.game_posts = forum.Comment.objects.filter(
             user=user, plugin_id=game_forum.GAME_FORUM_SITE_ID).count()
         variation_ids = [
             role['variation'] for role in
-            Role.objects.filter(user=user).values('variation').distinct()]
-        variations = Variation.objects.filter(id__in=variation_ids)
+            stories.Role.objects.filter(
+                user=user).values('variation').distinct()]
+        variations = stories.Variation.objects.filter(id__in=variation_ids)
         variations = variations.filter(
             game__status__in=[
-                GAME_STATUS_COMPLETED, GAME_STATUS_COMPLETED_OPEN])
-        self.games_won = GameWinner.objects.filter(user=user).count()
-        self.games_admin = GameAdmin.objects.filter(user=user).count()
-        self.story_admin = StoryAdmin.objects.filter(user=user).count()
-        self.story_author = StoryAuthor.objects.filter(user=user).count()
+                games.GAME_STATUS_COMPLETED, games.GAME_STATUS_COMPLETED_OPEN])
+        self.games_won = games.GameWinner.objects.filter(user=user).count()
+        self.games_admin = games.GameAdmin.objects.filter(user=user).count()
+        self.story_admin = stories.StoryAdmin.objects.filter(user=user).count()
+        self.story_author = stories.StoryAuthor.objects.filter(
+            user=user).count()
         self.total_games = variations.count()
 
 
@@ -151,16 +161,16 @@ def get_played(request_user, player=None):
     else:
         user = request_user
     played_games = []
-    played_roles = Role.objects.filter(
+    played_roles = stories.Role.objects.filter(
         user=user,
         variation__game__status__in=[
-            GAME_STATUS_COMPLETED, GAME_STATUS_COMPLETED_OPEN]
+            games.GAME_STATUS_COMPLETED, games.GAME_STATUS_COMPLETED_OPEN]
     ).order_by('-variation__game__id')
     for role in played_roles:
         if role.variation.game.read_right(request_user):
             role.variation.game.url = role.variation.thread.get_absolute_url
         played_games = [role.variation.game.id] + played_games
-    played_games_uniq = Game.objects.filter(
+    played_games_uniq = games.Game.objects.filter(
         id__in=played_games).order_by('-id')
     for game in played_games_uniq:
         if game.read_right(request_user):
@@ -184,18 +194,16 @@ class PlayerProfileView(LoginTemplateView):
     def get_context_data(self, **kwargs):
         request = self.request
         stats = Statistics(request.user)
+        played_games = []
+        played_roles = []
         if stats.total_games > 0:
             played_roles, played_games = get_played(request.user)
             if played_roles.count() > 5:
                 played_roles = played_roles[:5]
-        show_stories = (stats.story_admin > 0)
-        show_games = (
-            stats.total_games +
-            GameGuest.objects.filter(user=request.user).count() +
-            stats.games_admin > 0)
 
+        rankform = None
         if request.user.is_superuser:
-            rankform = RankForm(
+            rankform = forms.RankForm(
                 data=request.POST or None, instance=request.user)
             if request.method == 'POST':
                 if rankform.is_valid():
@@ -206,7 +214,12 @@ class PlayerProfileView(LoginTemplateView):
                     messages.error(
                         request,
                         _('there were some errors during form validation'))
-        return locals()
+        return {
+            'rankform': rankform,
+            'played_games': played_games,
+            'played_roles': played_roles,
+            'stats': stats,
+        }
 
 
 class PlayerPlayedView(LoginTemplateView):
@@ -214,22 +227,30 @@ class PlayerPlayedView(LoginTemplateView):
 
     def get_context_data(self, **kwargs):
         played_roles, played_games = get_played(self.request.user)
-        roles_on_page = 50
-        return locals()
+        return {
+            'played_roles': played_roles,
+            'played_games': played_games,
+            'roles_on_page': 50,
+        }
 
 
 class PlayerUserProfileView(PlayerView):
     template_name = 'players/played.haml'
 
     def get_context_data(self, **kwargs):
-        player = self.object
-        played_roles, played_games = get_played(self.request.user, player)
-        items_on_page = 50
-        return locals()
+        played_roles, played_games = get_played(self.request.user, self.object)
+        return {
+            'player': self.object,
+            'played_roles': played_roles,
+            'played_games': played_games,
+            'items_on_page': 50,
+        }
 
 
 class PlayerUploadedFilesView(LoginTemplateView):
     template_name = 'profile/files.haml'
 
     def get_context_data(self, **kwargs):
-        return {'files': UploadedFile.objects.filter(user=self.request.user)}
+        return {
+            'files': forum.UploadedFile.objects.filter(user=self.request.user)
+        }
