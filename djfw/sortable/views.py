@@ -106,7 +106,7 @@ class ActionableFormsMixin(ActionableMixin):
         return forms_dict
 
     def get_context_data(self, **kwargs):
-        context = super(ActionableMixin, self).get_context_data(**kwargs)
+        context = super(ActionableFormsMixin, self).get_context_data(**kwargs)
         context.update(self.get_forms())
         return context
 

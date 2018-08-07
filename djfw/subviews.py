@@ -119,14 +119,16 @@ class BaseParentCreateView(
     def form_valid(self, form):
         self.object = form.save(commit=False)
         if not self.parent_obj_foreign_key:
-            raise AttributeError(u"BaseCreate can`t determine foreign "
-                                 u"key for linking models.")
+            raise AttributeError("BaseCreate can`t determine foreign "
+                                 "key for linking models.")
         setattr(self.object, self.parent_obj_foreign_key, self.parent_object)
         self.object.save()
-        return super(edit.ModelFormMixin, self).form_valid(form)
+        return super(BaseParentCreateView, self).form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = kwargs
+        if 'form' not in context:
+            context['form'] = self.get_form()
         if self.object:
             context['object'] = self.object
             context_object_name = self.get_context_object_name(self.object)

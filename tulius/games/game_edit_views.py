@@ -62,7 +62,7 @@ class GameEditFormView(GameAdminViewMixin, generic.UpdateView):
     def form_invalid(self, form):
         messages.error(
             self.request, _('there were some errors during form validation'))
-        return super(GameAdminMain, self).form_invalid(form)
+        return super(GameEditFormView, self).form_invalid(form)
 
 
 class GameAdminMain(GameEditFormView):
