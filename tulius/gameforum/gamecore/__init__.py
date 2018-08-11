@@ -97,6 +97,7 @@ class GamePlugin(ForumPlugin):
                 return role
         raise Http404()
 
+    # pylint: disable=too-many-branches
     def process_role(
             self, request, parent_thread, init_role_id, new=False, user=None):
         if not user:

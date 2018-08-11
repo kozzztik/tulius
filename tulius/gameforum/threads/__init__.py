@@ -12,6 +12,7 @@ class GameThreadsPlugin(ThreadsPlugin):
     thread_list_template = 'gameforum/snippets/thread_list.haml'
     thread_edit_template = 'gameforum/add_post.haml'
 
+    # pylint: disable=too-many-branches
     def get_parent_thread(self, user, thread_id, is_room=None):
         thread = super(GameThreadsPlugin, self).get_parent_thread(
             user, thread_id, is_room)

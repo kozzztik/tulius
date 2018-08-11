@@ -182,6 +182,7 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
                     thread = None
         return form, formset, thread
 
+    # pylint: disable=too-many-branches,too-many-nested-blocks
     def process_edit_thread(
             self, request, parent_thread, thread, voting_enabled,
             voting_valid, formset_params=None):

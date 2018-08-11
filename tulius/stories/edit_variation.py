@@ -230,6 +230,7 @@ def edit_variation_forum(request, variation_id):
         urls.reverse('gameforum:variation', args=(variation.pk,)))
 
 
+# pylint: disable=too-many-branches
 @decorators.login_required
 def delete_role(request, variation_id):
     success = 'error'

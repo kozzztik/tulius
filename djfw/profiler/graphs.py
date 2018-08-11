@@ -248,6 +248,7 @@ def collapsed_time_period_graph(start_day, days, weight_field, multi=1):
     return data
 
 
+# pylint: disable=too-many-branches,too-many-nested-blocks
 def collapsed_sunlignt_graph(
         start_day, days, weight_field, subfield=None, mappings=None,
         strict_mappings=False):

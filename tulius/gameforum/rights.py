@@ -7,6 +7,7 @@ from . import models
 
 
 class GameRightsPlugin(RightsPlugin):
+    # pylint: disable=too-many-branches
     def strict_roles(self, thread):
         if not thread.parent_id:
             thread.strict_read = [] if (

@@ -85,6 +85,7 @@ def add__to_backup(backup_file, file_path):
         raise
 
 
+# pylint: disable=too-many-branches
 def do_backup(category_name):
     log("Starting backup...")
     try:

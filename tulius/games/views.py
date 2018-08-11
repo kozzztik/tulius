@@ -40,6 +40,7 @@ class MessageMixin:
         return super(MessageMixin, self).form_invalid(form)
 
 
+# pylint: disable=too-many-branches
 def set_edit(games, user):
     for game in games:
         game.text_hint = ''

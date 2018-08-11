@@ -53,6 +53,7 @@ class VotingCore(plugins.ForumPlugin):
             voting_choice.save()
         return voting
 
+    # pylint: disable=too-many-branches
     def preprocess_edit_voting(self, request, comment):
         models = self.site.core.models
         votings = models.Voting.objects.filter(comment=comment)

@@ -58,6 +58,7 @@ def _wrap_sessions(sessions, request):
 
 
 class RedisStore(OldRedisStore):
+    # pylint: disable=too-many-branches
     def _get_message_channels(
             self, request=None, facility='{facility}', broadcast=False,
             groups=(), users=(), sessions=()):

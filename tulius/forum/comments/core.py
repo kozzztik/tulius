@@ -34,6 +34,7 @@ class CommentsCore(plugins.ForumPlugin):
             raise http.Http404()
         return parent_thread, parent_comment
 
+    # pylint: disable=too-many-branches
     def process_edit_comment(
             self, request, parent_thread, comment, reply, voting_enabled,
             voting_valid):
