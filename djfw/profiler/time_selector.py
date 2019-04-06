@@ -30,6 +30,7 @@ WEIGHT_SELECTOR_EXCEPTIONS = 7
 
 
 class LastTime:
+    # pylint: disable=too-many-arguments
     def __init__(
             self, offset_days=0, offset_month=0, round_day=False,
             round_month=False, round_week=False):

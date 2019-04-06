@@ -278,6 +278,7 @@ def PrettyOS(os_name, os_v1=None, os_v2=None, os_v3=None, os_v4=None):
     return os_name
 
 
+# pylint: disable=too-many-arguments
 def ParseWithJSOverrides(user_agent_string,
                          js_user_agent_string=None,
                          js_user_agent_family=None,
@@ -329,6 +330,7 @@ def Pretty(family, v1=None, v2=None, v3=None):
     return family
 
 
+# pylint: disable=too-many-arguments
 def GetFilters(user_agent_string, js_user_agent_string=None,
                js_user_agent_family=None,
                js_user_agent_v1=None,

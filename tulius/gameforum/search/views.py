@@ -55,6 +55,7 @@ class ExtendedSearchView(BasePluginView, DetailView):
 class SearchView(ExtendedSearchView):
     template_name = 'search'
 
+    # pylint: disable=too-many-statements
     def get_context_data(self, **kwargs):
         context = super(SearchView, self).get_context_data(**kwargs)
         variation = self.object

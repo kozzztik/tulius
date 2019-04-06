@@ -25,6 +25,7 @@ class CatalogPage:
                 return page
         return None
 
+    # pylint: disable=too-many-arguments
     def __init__(
             self, name='', url='', instance=None, is_index=False, parent=None):
         self.is_index = is_index

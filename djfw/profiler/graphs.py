@@ -11,6 +11,7 @@ from .models import ProfilerMessage, TimeCollapse
 from .collapse import COLLAPSE_INTERVALS
 
 
+# pylint: disable=too-many-statements
 def time_period_graph(request, *args, **kwargs):
     endtime = request.profiler_period.end
     starttime = request.profiler_period.start
@@ -248,7 +249,8 @@ def collapsed_time_period_graph(start_day, days, weight_field, multi=1):
     return data
 
 
-# pylint: disable=too-many-branches,too-many-nested-blocks
+# pylint: disable=too-many-branches,too-many-nested-blocks,too-many-statements
+# pylint: disable=too-many-arguments
 def collapsed_sunlignt_graph(
         start_day, days, weight_field, subfield=None, mappings=None,
         strict_mappings=False):
@@ -347,6 +349,7 @@ def collapsed_sunlignt_graph(
         'category_subfield': category_subfield}
 
 
+# pylint: disable=too-many-arguments
 def collapsed_sum_graph(
         start_day, days, weight_fields, captions, incremental=False, multi=1):
     intervals = days if days > PARTING_DAYS else COLLAPSE_INTERVALS * days

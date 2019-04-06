@@ -5,6 +5,7 @@ from django import forms
 
 
 class InlineFormset(forms.models.BaseInlineFormSet):
+    # pylint: disable=too-many-arguments
     def __init__(
             self, data=None, instance=None, queryset=None,
             errorclass='help-inline', tableclass='', params=None,
@@ -47,6 +48,7 @@ class InlineFormset(forms.models.BaseInlineFormSet):
 
 
 class SimpleFormset(forms.models.BaseModelFormSet):
+    # pylint: disable=too-many-arguments
     def __init__(
             self, data=None, queryset=None, errorclass='help-inline',
             tableclass='', params=None, static=False, **kwargs):
@@ -89,6 +91,7 @@ class SimpleFormset(forms.models.BaseModelFormSet):
         return ''
 
 
+# pylint: disable=too-many-arguments
 def get_formset_factory(
         parent_model, model, form=None, fk_name=None, fields=None,
         exclude=None, extra=3, can_order=False, can_delete=True, max_num=None,
@@ -130,6 +133,7 @@ def get_formset_factory(
     return FormSet
 
 
+# pylint: disable=too-many-arguments
 def get_formset(
         parent_model, model, data, form=None, fk_name=None,
         fields=None, exclude=None, extra=3, can_order=False, can_delete=True,

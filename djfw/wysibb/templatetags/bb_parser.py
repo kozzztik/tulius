@@ -5,7 +5,7 @@ bb_codes_list = {}
 bb_simple_codes_list = {'br': '<br/>'}
 
 
-# pylint: disable=too-many-nested-blocks,too-many-branches
+# pylint: disable=too-many-nested-blocks,too-many-branches,too-many-statements
 def bbcode_to_html(data_str, codes_list=None, simple_codes_list=None):
     current = 0
     state = 0

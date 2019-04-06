@@ -9,7 +9,7 @@ from .models import ProfilerMessage, ClientCollapse, TimeCollapse
 COLLAPSE_INTERVALS = 24 * 2  # intervals in day, 30 minutes
 
 
-# pylint: disable=too-many-branches
+# pylint: disable=too-many-branches,too-many-statements
 def do_collapse(day):
     if not day:
         query = ProfilerMessage.objects.aggregate(

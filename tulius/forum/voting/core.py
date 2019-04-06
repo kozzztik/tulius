@@ -97,6 +97,7 @@ class VotingCore(plugins.ForumPlugin):
                 self.prepare_voting_results(voting, request.user, True)
         return valid, voting, voting_form, voting_formset, voting_delete
 
+    # pylint: disable=too-many-arguments
     def process_edit_voting(self, voting, form, formset, comment, user):
         if voting:
             if voting.do_delete:
