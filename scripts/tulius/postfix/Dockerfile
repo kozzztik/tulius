@@ -1,5 +1,6 @@
 FROM ubuntu:xenial
 
+COPY ./main.cf /etc/postfix/main.cf
 
 RUN apt-get update && apt-get install -y postfix rsyslog && adduser postfix sasl && touch /var/log/mail.log
 
