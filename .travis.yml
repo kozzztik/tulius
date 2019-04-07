@@ -6,7 +6,7 @@ install:
 script:
   - tox -e py36
 addons:
-  ssh_known_hosts: tulius.com:33023
+  ssh_known_hosts: tulius2.co-de.org:22
 deploy:
   - provider: script
     script: bash scripts/deploy.sh
