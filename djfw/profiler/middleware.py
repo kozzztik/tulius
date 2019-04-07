@@ -85,9 +85,9 @@ class ProfilerMiddleware:
             device = user_data['device']
             device_family = device['family']
             rec.device = device_family
-            rec.mobile = True if (
+            rec.mobile = bool(
                 device_family and not (device_family == 'Spider')
-            ) else False
+            )
         except:
             logger = logging.getLogger('django.request')
             logger.error(

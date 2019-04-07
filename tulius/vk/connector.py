@@ -40,8 +40,7 @@ class VKConnector():
         response = requests.get(url)
         if response.status_code not in [200, 201]:
             raise Exception(response.text)
-        else:
-            return json.loads(response.text)
+        return json.loads(response.text)
 
     def user_get(self, pk, fields, access_token):
         params = {'user_id': pk, 'fields': ','.join(fields), 'v': '5.28'}

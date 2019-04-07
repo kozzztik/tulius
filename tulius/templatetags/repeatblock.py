@@ -126,14 +126,13 @@ class RepeatNode(template.Node):
             raise TemplateSyntaxError(
                 "cannot repeat '%s': block or macro not found" %
                 self.block_name)
+        context.push(self.extra_context)
+        if isinstance(block, MacroNode):
+            result = block.repeat(context)
         else:
-            context.push(self.extra_context)
-            if isinstance(block, MacroNode):
-                result = block.repeat(context)
-            else:
-                result = block.render(context)
-            context.pop()
-            return result
+            result = block.render(context)
+        context.pop()
+        return result
 
 
 def do_repeat(parser, token):

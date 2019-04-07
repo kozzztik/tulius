@@ -101,7 +101,7 @@ class EditView(BaseThreadView):
                         raise Http404()
         self.parent_thread = parent_thread
         comment = None
-        self.adding = False if thread else True
+        self.adding = not bool(thread)
         self.edit_is_valid = True
         self.site.signals.thread_before_edit.send(
             self, thread=thread, context=context)

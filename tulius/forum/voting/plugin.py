@@ -26,7 +26,7 @@ class VotingPlugin(core.VotingCore):
     def is_liked(self, comment):
         likes = self.models.CommentLike.objects.filter(
             comment=comment, user=comment.view_user)
-        return True if likes else False
+        return bool(likes)
 
     def init_core(self):
         super(VotingPlugin, self).init_core()

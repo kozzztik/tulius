@@ -65,8 +65,7 @@ def get_flatpages(parser, token):
         context_name = bits[-1]
 
         return FlatpageNode(context_name, starts_with=prefix)
-    else:
-        raise template.TemplateSyntaxError(syntax_message)
+    raise template.TemplateSyntaxError(syntax_message)
 
 
 register.tag('get_flatpages', get_flatpages)

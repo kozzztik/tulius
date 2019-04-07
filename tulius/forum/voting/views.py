@@ -80,8 +80,7 @@ class Vote(BaseVoting):
         if votes:
             if self.no_revote:
                 raise http.Http404()
-            else:
-                votes.delete()
+            votes.delete()
         vote = models.VotingVote(user=request.user, choice=choice)
         vote.save()
         self.voting = choice.voting

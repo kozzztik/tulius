@@ -311,7 +311,7 @@ class Game(models.Model):
         return 'games:cancel_game_request', (), {'game_id': self.id}
 
     def __str__(self):
-        return '%s - %d' % (self.name, self.serial_number)
+        return '%s - %d' % (self.name, int(self.serial_number))
 
     def clean(self):
         super(Game, self).clean()
