@@ -29,6 +29,7 @@ def check_mime(request):
 ILLUSTRATION_THUMBNAIL = (100, 100)
 
 
+# pylint: disable=too-many-arguments
 def save_illustration(
         request, upload, filename, story, variation, illustration):
     """

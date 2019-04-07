@@ -49,7 +49,7 @@ def logic_time(x):
 class StatisticsView(generic.TemplateView):
     template_name = 'statistics.haml'
 
-    # pylint: disable=too-many-branches
+    # pylint: disable=too-many-branches,too-many-statements
     def get_context_data(self, **kwargs):
         form = forms.StatsFilterForm(self.request.GET or None)
         graph_type = forms.GRAPH_TYPE_LINEAR

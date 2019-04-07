@@ -7,7 +7,7 @@ class ForumConfig(AppConfig):
     site = None
 
     def ready(self):
-        from .sites import ForumSite
+        from .site import ForumSite
         from .threads.plugin import ThreadsPlugin
         from .search.plugin import SearchPlugin
         from .comments.plugin import CommentsPlugin

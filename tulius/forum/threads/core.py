@@ -183,6 +183,7 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
         return form, formset, thread
 
     # pylint: disable=too-many-branches,too-many-nested-blocks
+    # pylint: disable=too-many-arguments,too-many-statements
     def process_edit_thread(
             self, request, parent_thread, thread, voting_enabled,
             voting_valid, formset_params=None):

@@ -117,7 +117,7 @@ class AutoPaginateNode(template.Node):
         return u''
 
 
-# pylint: disable=too-many-branches
+# pylint: disable=too-many-branches,too-many-statements
 def paginate(context, window=DEFAULT_WINDOW, hashtag=''):
     """
     Renders the ``pagination/pagination.html`` template, resulting in a

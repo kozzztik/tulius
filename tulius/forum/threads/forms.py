@@ -80,6 +80,7 @@ class ThreadForm(forms.Form):
         initial=False
     )
 
+    # pylint: disable=too-many-arguments
     def __init__(
             self, models, thread, comment, voting, moderate, *args, **kwargs):
         self.base_fields['access_type'].choices = \

@@ -1,10 +1,13 @@
 from django.db import models
 from django.db.models.query_utils import Q
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth import get_user_model
 
 from djfw.common.models import AbstractBaseModel
-from tulius.models import User
 from tulius.pm.signals import private_message_created
+
+
+User = get_user_model()
 
 
 class PrivateMessageManager(models.Manager):

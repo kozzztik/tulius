@@ -26,6 +26,7 @@ class AutocompleteWidget(TextInput):
             'autocomplete/jquery-ui-1.8.21.custom.min.js',
             'autocomplete/autocomplete-select.js')
 
+    # pylint: disable=too-many-arguments
     def __init__(
             self, model, token, attrs=None, options=None,
             related_fields=None):

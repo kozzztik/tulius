@@ -1,7 +1,7 @@
 from django.template.response import TemplateResponse
 
 
-# pylint: disable=too-many-branches
+# pylint: disable=too-many-branches,too-many-statements
 def get_pagination_context(request, page_num, pages_count, window=4):
     try:
         page_range = range(1, pages_count + 1)

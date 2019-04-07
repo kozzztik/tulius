@@ -29,7 +29,7 @@ class ProfilerMiddleware:
         # finally:
         #     decorators_lock.release()
 
-    # pylint: disable=too-many-branches
+    # pylint: disable=too-many-branches,too-many-statements
     def process_view(self, request, view_func, view_args, view_kwargs):
         rec = models.ProfilerMessage()
         rec.module_name = view_func.__module__[:255]
