@@ -38,6 +38,7 @@ class SiteCore:
 
 
 class BaseForumSite:
+    _models = None
     plugins = {}
     plugin_classes = ()
     core = None
@@ -55,14 +56,18 @@ class BaseForumSite:
         self.templates = SiteCore(self)
         self.urlizer = SiteCore(self)
         self.signals = SiteCore(self)
+        if self._models is None:
+            raise NotImplementedError()
         self.init_core()
-        self.models = self.core.models
+        self.models = self._models
         self.init_plugins()
         sites_manager.add_site(self)
 
     def init_core(self):
-        from . import models
-        self.core.models = models
+        self.templates['base'] = 'forum/base.haml'
+        self.templates['form_field'] = 'snippets/form_field.haml'
+        self.templates['init_editor'] = 'wysibb/init.html'
+        self.templates['actions'] = 'forum/snippets/forum_actions_menu.haml'
 
     def get_own_urls(self):
         return []
@@ -94,13 +99,3 @@ class BaseForumSite:
     @property
     def urls(self):
         return self.get_urls(), self.app_name
-
-
-class ForumSite(BaseForumSite):
-
-    def init_core(self):
-        super(ForumSite, self).init_core()
-        self.templates['base'] = 'forum/base.haml'
-        self.templates['form_field'] = 'snippets/form_field.haml'
-        self.templates['init_editor'] = 'wysibb/init.html'
-        self.templates['actions'] = 'forum/snippets/forum_actions_menu.haml'

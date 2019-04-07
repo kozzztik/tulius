@@ -3,11 +3,14 @@ from datetime import timedelta
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import now
+from django.contrib.auth import get_user_model
 
 from djfw.common import CREATION_YEAR_CHOICES
 from djfw.sortable.models import SortableModelMixin
-from tulius.models import User
 from tulius.forum.models import Thread
+
+
+User = get_user_model()
 
 
 class Genre(models.Model):

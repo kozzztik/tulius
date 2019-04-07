@@ -2,12 +2,13 @@
 Forum engine models for Tulius project
 """
 from django.db import models
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey, TreeManager
 
-from tulius.models import User
 
+User = get_user_model()
 COMMENTS_ON_PAGE = 25
 
 
