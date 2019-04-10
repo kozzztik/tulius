@@ -73,7 +73,7 @@ def bbcode_to_html(data_str, codes_list=None, simple_codes_list=None):
                             data = tag(stack_tagname, stack_param, text)
                         except:
                             pass
-                        if not data is not None:
+                        if data is not None:
                             old_len = current - stack_tag_opened
                             data_str = data_str[0:stack_tag_opened] + data + \
                                 data_str[(current + 1):len(data_str)]

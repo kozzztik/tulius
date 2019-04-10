@@ -141,6 +141,7 @@ class Thread(BaseThreadView):
         context = super(Thread, self).get_context_data(**kwargs)
         page = int(self.request.GET['page']) if \
             'page' in self.request.GET else 1
+        context['page'] = page
         context.update(self.core.get_comments_pagination(
             self.request, self.parent_thread, page))
 
