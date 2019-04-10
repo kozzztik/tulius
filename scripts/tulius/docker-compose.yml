@@ -19,8 +19,6 @@ services:
         source: "../../data/mysql"
         target: "/var/lib/mysql"
       - ./mysql.cnf:/etc/my.cnf:ro
-    ports:
-      - "0.0.0.0:3307:3306"
     container_name: tulius_mysql
 
   nginx:
