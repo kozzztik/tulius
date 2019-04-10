@@ -60,6 +60,7 @@ class BaseForumSite:
             raise NotImplementedError()
         self.init_core()
         self.models = self._models
+        self.core.models = self._models
         self.init_plugins()
         sites_manager.add_site(self)
 
