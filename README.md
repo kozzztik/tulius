@@ -18,13 +18,15 @@ Repo for http://tulius.com project.
     git clone https://github.com/kozzztik/tulius.git master
     git clone https://github.com/kozzztik/tulius.git dev
     cd /home/travis/dev
-    git co dev
+    git checkout dev
     ```
 4. Create data folders structure:
     ```bash
+    mkdir /home/travis/master/data
     mkdir /home/travis/master/data/mysql
     mkdir /home/travis/master/data/static
     mkdir /home/travis/master/data/media
+    mkdir /home/travis/dev/data
     mkdir /home/travis/dev/data/static
     mkdir /home/travis/dev/data/media
     ```
@@ -82,14 +84,22 @@ Repo for http://tulius.com project.
     ```
     Edit settings files. Change DB passwords and sentry DSN.
    
-11. Check that known host in repo `.travis.yml` file and ssh host in `scripts/deploy.sh` points on target server. 
+11. Install nginx. Configure it using templates:
+    ```bash
+    cp /home/travis/master/scripts/tulius/nginx/sentry.conf /etc/nginx/conf.d/sentry.conf
+    cp /home/travis/master/scripts/tulius/nginx/tulius.conf /etc/nginx/conf.d/tulius.conf
+    ```
+    
+12. Install letsEncrypt and configure SSL.
+
+13. Check that known host in repo `.travis.yml` file and ssh host in `scripts/deploy.sh` points on target server. 
 Update repo if needed (use separate branch and PR)
 
-12. Trigger build on CI, or run it manually on server:
+14. Trigger build on CI, or run it manually on server:
     ```bash
     cd /home/travis/master
     . scripts/on_update.sh master
     cd /home/travis/dev
     . scripts/on_update.sh dev
     ``` 
-13. Check that everything works. Profit.
+15. Check that everything works. Profit.
