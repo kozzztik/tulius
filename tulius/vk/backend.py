@@ -47,6 +47,8 @@ class VKBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
         vk_profile = kwargs.get('vk_profile', None)
         email = kwargs.get('email', None)
+        if not vk_profile:
+            return None
         try:
             return User.objects.get(vk_profile_id=vk_profile.pk)
         except User.DoesNotExist:
