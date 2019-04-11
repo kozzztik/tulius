@@ -183,7 +183,8 @@ class GameRightsPlugin(RightsPlugin):
         if user.is_superuser or thread.admin or thread.guest or self.read_all(
                 thread):
             threads = site_models.Thread.objects.get_descendants(
-                thread).filter(
+                thread
+            ).filter(
                 deleted=False,
                 access_type=site_models.THREAD_ACCESS_TYPE_NO_READ)
             if thread and thread.user_roles:
