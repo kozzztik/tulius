@@ -20,7 +20,7 @@ def save_upload(request, upload, filename, user):
     image = Image.open(upload)
     image.thumbnail(AVATAR_SAVE_SIZE, Image.ANTIALIAS)
     imageformat = getattr(settings, 'IMAGE_FORMAT', 'jpeg')
-    image_content = io.StringIO()
+    image_content = io.BytesIO()
     image.save(image_content, format=imageformat)
     image_file = ContentFile(image_content.getvalue())
     if user.avatar:

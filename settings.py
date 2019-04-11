@@ -155,7 +155,7 @@ ALLOWED_HOSTS = [
 INLINE_FORMSET_CLASS = 'table'
 ACCOUNT_ACTIVATION_DAYS = 2
 LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = '/accounts/auth/login/'
+LOGIN_URL = '/accounts/login/'
 AUTOCOMPLETE_MODELS = ('auth.user', 'tulius.user')
 
 DEFAULT_THEME = 'classic'
