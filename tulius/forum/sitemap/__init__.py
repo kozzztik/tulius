@@ -19,7 +19,7 @@ class ForumSitemap(sitemaps.Sitemap):
         site_models = self.site.models
         return site_models.Thread.objects.filter(
             parent=None, plugin_id=self.site.site_id,
-            access_type__lt=models.THREAD_ACCESS_TYPE_NO_READ)
+            access_type__lt=site_models.THREAD_ACCESS_TYPE_NO_READ)
 
     def items(self):
         root_threads = self.get_root_threads()
