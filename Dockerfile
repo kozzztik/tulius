@@ -10,7 +10,7 @@ RUN pip install django==2.0.6 pytz==2018.4 pillow==5.1.0 \
     django-hamlpy==1.1.1 python-memcached==1.59 \
     django-memcache-status==1.3 raven==6.6.0 gevent==1.2.2 \
     redis==2.10.6 django-websocket-redis==0.5.1 \
-    django-redis-cache==1.7.1 requests==2.18.4
+    django-redis-cache==1.7.1 requests==2.18.4 sentry-sdk==0.7.10
 
 RUN mkdir /opt/tulius
 ADD tulius /opt/tulius/tulius
