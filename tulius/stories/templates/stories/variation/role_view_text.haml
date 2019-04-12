@@ -6,13 +6,15 @@
     = variation.name
     \-
     {% trans "Roles" %}
-    %a.submit.btn.btn-primary.pull-right{href: '{% url "stories:edit_variation_roles" variation.id %}'}
-        {% trans "to roles" %}
 
 - block extra_scripts
     %link{rel: 'stylesheet', href: '{{ MEDIA_URL }}css/tulius-stories.css', type: 'text/css'}
     
 - block content
+    .pull-right
+        %a.submit.btn.btn-primary.pull-right{href: '{% url "stories:edit_variation_roles" variation.id %}'}
+            {% trans "to roles" %}
+        
    %table
         %tr
             %td{style: 'text-align: center'}
