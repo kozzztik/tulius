@@ -51,21 +51,20 @@ class PlayersListView(generic.TemplateView):
             if GET.get('filter_by_player', None):
                 players = players.filter(id=GET['filter_by_player'])
             v = int(GET.get('sort_type', 0))
-            if v:
-                if v == forms.PLAYERS_SORT_STORIES_AUTHORED:
-                    players = filter_by_stories(players)
-                    show_stories = True
-                elif v == forms.PLAYERS_SORT_GAMES_PLAYED_INC:
-                    players = filter_by_games(players).order_by('games')
-                    show_games = True
-                elif v == forms.PLAYERS_SORT_GAMES_PLAYED_DEC:
-                    players = filter_by_games(players).order_by('-games')
-                    show_games = True
-                elif v == forms.PLAYERS_SORT_REG_DATE:
-                    players = players.order_by('date_joined')
-                    show_reg_date = True
-                elif v == forms.PLAYERS_SORT_ALPH:
-                    players = players.order_by('username')
+            if v == forms.PLAYERS_SORT_STORIES_AUTHORED:
+                players = filter_by_stories(players)
+                show_stories = True
+            elif v == forms.PLAYERS_SORT_GAMES_PLAYED_INC:
+                players = filter_by_games(players).order_by('games')
+                show_games = True
+            elif v == forms.PLAYERS_SORT_GAMES_PLAYED_DEC:
+                players = filter_by_games(players).order_by('-games')
+                show_games = True
+            elif v == forms.PLAYERS_SORT_REG_DATE:
+                players = players.order_by('date_joined')
+                show_reg_date = True
+            elif v == forms.PLAYERS_SORT_ALPH:
+                players = players.order_by('username')
         else:
             players = filter_by_stories(players)
             show_stories = True
