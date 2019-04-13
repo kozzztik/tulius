@@ -4,35 +4,33 @@
     %thead
         %tr
             %th{width: '40'}
+                .td-text-left
                 .bord1-left
                     .bord1-center
-                .td-text-left
             %th 
-                .bord1-center
-                    .bord1-center2
                 .td-text-center
                     {% trans "room" %}
-            %th.hidden-phone{width: '80'} 
                 .bord1-center
                     .bord1-center2
+            %th.hidden-phone{width: '80'} 
                 .td-text-center            
                     {% trans "threads" %}
-            %th.miniphone-hidden{width: '80'}
                 .bord1-center
                     .bord1-center2
+            %th.miniphone-hidden{width: '80'}
                 .td-text-center                
                     {% trans "posts" %}
+                .bord1-center
+                    .bord1-center2
             %th.miniphone-hidden{width: '200'}
-                .bord1-right
-                    .bord1-center
                 .td-text-right
                     {% trans "latest post" %}
+                .bord1-right
+                    .bord1-center
     %tbody
         - for room in rooms
             %tr{class: '{% if room.deleted %}deleted-thread{%endif%}'}
                 %td.forum-post-icon.td-bord
-                    .bord2-left
-                        .bord2-center
                     .td-text-left
                         - with unreaded=room.unreaded
                             - if unreaded
@@ -40,10 +38,10 @@
                                     %img{src: '{{ MEDIA_URL }}forum/unreadedmark.gif'}
                             - else
                                 %img{src: '{{ MEDIA_URL }}forum/readedmark.gif'}
+                    .bord2-left
+                        .bord2-center
                 %td
                     .forum-post-description.td-bord
-                        .bord2-center
-                            .bord2-center2
                         .td-text-center
                             %h4
                                 %a{href: '{{ room.get_absolute_url }}'}
@@ -61,22 +59,24 @@
                                 %ul.moderators
                                     - for accessed_user in room.accessed_users
                                         <li><a href="{{ accessed_user.get_absolute_url }}">{{ accessed_user }}</a></li>
+                        .bord2-center
+                            .bord2-center2
                 %td.hidden-phone.td-bord
-                    .bord2-center
-                        .bord2-center2
                     .td-text-center    
                         = room.threads_count
-                %td.miniphone-hidden.td-bord
                     .bord2-center
-                        .bord2-center2
+                        .bord2-center2                     
+                %td.miniphone-hidden.td-bord
                     .td-text-center
                         = room.comments_count
+                    .bord2-center
+                        .bord2-center2                        
                 %td.miniphone-hidden.td-bord
-                    .bord2-right
-                        .bord2-center
                     .td-text-right
                         - with comment=room.last_comment
                             - include forum_site.templates.thread_latest_post
+                    .bord2-right
+                        .bord2-center
         - empty
             - if not parent_thread
                 %tr
