@@ -420,18 +420,22 @@ body .quote {
 }
 
 .pagination .progress .bar{ background-color: #53381a; }
+
 th{
 	text-align: left;
 	color: #941a09;
 	}
+
 .bord1-center {
 	background-image: url(img/bord1-center.png);
 	background-repeat: repeat-x;
 	height: 14px;
 }
+
 .bord1-center2 {
 	height: 14px;
 }
+
 .bord1-left {
 	background-image: url(img/bord1-left.png);
 	background-repeat: no-repeat;
@@ -439,6 +443,7 @@ th{
 	width: auto;
 	clip: rect(auto,auto,auto,auto);
 }
+
 .bord1-right {
 	background-image: url(img/bord1-right.png);
 	background-repeat: no-repeat;
@@ -452,16 +457,18 @@ th{
 	height: 5px;
 	width: auto;
 }
+
 .bord2-center2 {
-	
 	height: 5px;
 }
+
 .bord2-left {
 	background-image: url(img/bord2-left.png);
 	background-repeat: no-repeat;
 	height: 5px;
 	margin-left: 11px;
 }
+
 .bord2-right {
 	background-image: url(img/bord2-right.png);
 	background-repeat: no-repeat;
@@ -469,19 +476,23 @@ th{
 	height: 5px;
 	background-position: right;
 }
+
 .td-bord {
 	vertical-align: top;
 }
+
 .td-text-left {
 	width: auto;
 	margin-right: 7px;
 	margin-left: 33px;
 }
+
 .td-text-center {
 	width: auto;
 	margin-right: 7px;
 	margin-left: 7px;
 }
+
 .td-text-right {
 	width: auto;
 	margin-right: 33px;
