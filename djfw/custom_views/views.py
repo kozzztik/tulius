@@ -1,7 +1,7 @@
 from django import forms
 from django import http
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.template import loader, Context
+from django.template import loader
 from django.forms.models import fields_for_model, modelform_factory
 
 
