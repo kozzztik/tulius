@@ -1,5 +1,10 @@
 from django import forms
+from django.contrib import auth
+
 from . import models
+
+
+User = auth.get_user_model()
 
 
 class EditStoryMainForm(forms.ModelForm):
@@ -18,7 +23,10 @@ class EditStoryTextsForm(forms.ModelForm):
 class StoryAuthorForm(forms.models.ModelForm):
     class Meta:
         model = models.StoryAuthor
-        fields = '__all__'
+        fields = ('user',)
+        widgets = {
+            'user': User.autocomplete_widget,
+        }
 
     def after_constuct(self, formset, params, i):
         static = params['static']
@@ -30,7 +38,11 @@ class StoryAuthorForm(forms.models.ModelForm):
 class StoryAdminForm(forms.models.ModelForm):
     class Meta:
         model = models.StoryAdmin
-        fields = '__all__'
+        fields = ('user', 'create_game')
+        widgets = {
+            'user': User.autocomplete_widget,
+        }
+
 
     def after_constuct(self, formset, params, i):
         static = params['static']

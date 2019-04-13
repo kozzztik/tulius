@@ -143,10 +143,12 @@ class StoryUsers(
     widgets = {
         'authorformset': {
             'class': custom_views.FormsetWidget,
+            'form_class': story_edit_forms.StoryAuthorForm,
             'model': models.StoryAuthor,
             'table_class': 'table', 'editable': get_editable},
         'adminformset': {
             'class': custom_views.FormsetWidget,
+            'form_class': story_edit_forms.StoryAdminForm,
             'model': models.StoryAdmin,
             'table_class': 'table', 'editable': get_editable}
     }

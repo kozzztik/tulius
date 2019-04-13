@@ -206,7 +206,7 @@ class WidgetBase(ActionableBase):
         self.view = view
         self.name = name
         cls = self.__class__
-        for key, value in kwargs.iteritems():
+        for key, value in kwargs.items():
             if not hasattr(cls, key):
                 raise TypeError(
                     "%s() received an invalid keyword %r" % (
@@ -231,10 +231,10 @@ class TemplatedWidget(WidgetBase):
     def get_template_name(self):
         return self.template_name
 
-    def __unicode__(self):
+    def __str__(self):
         if not self.get_read_right():
             return ''
-        c = Context(self.get_context_data())
+        c = self.get_context_data()
         t = loader.get_template(self.get_template_name())
         return t.render(c)
 
@@ -283,15 +283,15 @@ class FormWidget(TemplatedWidget):
 
     def valid_form(self, form):
         if self.valid_template:
-            c = Context(self.get_context_data())
+            c = self.get_context_data()
             t = loader.get_template(self.get_template_name())
             template = t.render(c)
         else:
-            template = self.__unicode__()
+            template = str(self)
         return http.HttpResponse(template)
 
     def invalid_form(self, form):
-        return http.HTTPResponse(self.__unicode__())
+        return http.HTTPResponse(str(self))
 
 
 class TwitterFormWidget(FormWidget):
