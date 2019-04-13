@@ -4,50 +4,79 @@
     %thead
         %tr
             %th{width: '40'}
-                &nbsp;
+                .bord1-left
+                    .bord1-center
+                .td-text-left
             %th 
-                {% trans "room" %}
+                .bord1-center
+                    .bord1-center2
+                .td-text-center
+                    {% trans "room" %}
             %th.hidden-phone{width: '80'} 
-                {% trans "threads" %}
+                .bord1-center
+                    .bord1-center2
+                .td-text-center            
+                    {% trans "threads" %}
             %th.miniphone-hidden{width: '80'}
-                {% trans "posts" %}
+                .bord1-center
+                    .bord1-center2
+                .td-text-center                
+                    {% trans "posts" %}
             %th.miniphone-hidden{width: '200'}
-                {% trans "latest post" %}
+                .bord1-right
+                    .bord1-center
+                .td-text-right
+                    {% trans "latest post" %}
     %tbody
         - for room in rooms
             %tr{class: '{% if room.deleted %}deleted-thread{%endif%}'}
-                %td.forum-post-icon
-                    - with unreaded=room.unreaded
-                        - if unreaded
-                            %a{href:'{{ unreaded.get_absolute_url }}'}
-                                %img{src: '{{ MEDIA_URL }}forum/unreadedmark.gif'}
-                        - else
-                            %img{src: '{{ MEDIA_URL }}forum/readedmark.gif'}
+                %td.forum-post-icon.td-bord
+                    .bord2-left
+                        .bord2-center
+                    .td-text-left
+                        - with unreaded=room.unreaded
+                            - if unreaded
+                                %a{href:'{{ unreaded.get_absolute_url }}'}
+                                    %img{src: '{{ MEDIA_URL }}forum/unreadedmark.gif'}
+                            - else
+                                %img{src: '{{ MEDIA_URL }}forum/readedmark.gif'}
                 %td
-                    .forum-post-description
-                        %h4
-                            %a{href: '{{ room.get_absolute_url }}'}
-                                = room.title
-                        - if room.body
-                            .hidden-phone
-                                = room.body|safe
-                        - if room.moderators
-                            %h6.moderators {% trans "Moderators" %}:
-                            %ul.moderators
-                                - for moderator in room.moderators
-                                    <li><a href="{{ moderator.get_absolute_url }}">{{ moderator }}</a></li>
-                        - if room.accessed_users
-                            %h6.moderators {% trans "Opened for" %}:
-                            %ul.moderators
-                                - for accessed_user in room.accessed_users
-                                    <li><a href="{{ accessed_user.get_absolute_url }}">{{ accessed_user }}</a></li>
-                %td.hidden-phone
-                    = room.threads_count
-                %td.miniphone-hidden
-                    = room.comments_count
-                %td.miniphone-hidden
-                    - with comment=room.last_comment
-                        - include forum_site.templates.thread_latest_post
+                    .forum-post-description.td-bord
+                        .bord2-center
+                            .bord2-center2
+                        .td-text-center
+                            %h4
+                                %a{href: '{{ room.get_absolute_url }}'}
+                                    = room.title
+                            - if room.body
+                                .hidden-phone
+                                    = room.body|safe
+                            - if room.moderators
+                                %h6.moderators {% trans "Moderators" %}:
+                                %ul.moderators
+                                    - for moderator in room.moderators
+                                        <li><a href="{{ moderator.get_absolute_url }}">{{ moderator }}</a></li>
+                            - if room.accessed_users
+                                %h6.moderators {% trans "Opened for" %}:
+                                %ul.moderators
+                                    - for accessed_user in room.accessed_users
+                                        <li><a href="{{ accessed_user.get_absolute_url }}">{{ accessed_user }}</a></li>
+                %td.hidden-phone.td-bord
+                    .bord2-center
+                        .bord2-center2
+                    .td-text-center    
+                        = room.threads_count
+                %td.miniphone-hidden.td-bord
+                    .bord2-center
+                        .bord2-center2
+                    .td-text-center
+                        = room.comments_count
+                %td.miniphone-hidden.td-bord
+                    .bord2-right
+                        .bord2-center
+                    .td-text-right
+                        - with comment=room.last_comment
+                            - include forum_site.templates.thread_latest_post
         - empty
             - if not parent_thread
                 %tr
