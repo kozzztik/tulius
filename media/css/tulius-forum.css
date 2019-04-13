@@ -35,7 +35,7 @@ h3 {
 }
 
 .forum-room-list thead tr th {
-    background-color: rgb(42, 120, 0);
+    /*background-color: rgb(42, 120, 0);*/
     background-image: none;
     color: white;
 }
