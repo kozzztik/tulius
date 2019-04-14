@@ -84,10 +84,12 @@ class GameAdminUsers(custom_views.ActionableViewMixin, GameAdminView):
         'game_admins': {
             'class': custom_views.FormsetWidget,
             'model': models.GameAdmin,
+            'form_class': game_edit_forms.GameAdminForm,
             'table_class': 'table'},
         'game_guests': {
             'class': custom_views.FormsetWidget,
             'model': models.GameGuest,
+            'form_class': game_edit_forms.GameGuestForm,
             'table_class': 'table'}}
 
 
