@@ -27,7 +27,7 @@
                             %td
                                 %ul#links.nav.nav-pills.nav-stacked.span4
                                     %li
-                                        %a{href:'/games/'}
+                                        %a{href:'{% url "games:index" %}'}
                                             {% trans "games" %}
                                     %li
                                         %a{href:'{% url "stories:index" %}'}
