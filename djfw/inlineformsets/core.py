@@ -30,7 +30,7 @@ class InlineFormset(forms.models.BaseInlineFormSet):
         self._after_form_constuct(form, i)
         return form
 
-    def __unicode__(self):
+    def __str__(self):
         if self.instance:
             pk = self.instance.pk
         else:

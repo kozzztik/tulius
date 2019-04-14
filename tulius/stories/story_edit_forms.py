@@ -43,7 +43,6 @@ class StoryAdminForm(forms.models.ModelForm):
             'user': User.autocomplete_widget,
         }
 
-
     def after_constuct(self, formset, params, i):
         static = params['static']
         if static:
