@@ -1,7 +1,10 @@
+import logging
+
 from django.db.models.query_utils import Q
 
 from tulius.games.models import GameGuest, GAME_STATUS_FINISHING
 from tulius.forum.rights.plugin import RightsPlugin
+from tulius.stories import models as stories_models
 from .forms import GameRightForm
 from . import models
 
@@ -27,7 +30,7 @@ class GameRightsPlugin(RightsPlugin):
             if (thread.access_type >= sm.THREAD_ACCESS_TYPE_NO_WRITE) and (
                     thread.strict_write is None):
                 thread.strict_write = []
-        rights = sm.GameThreadRight.objects.filter(
+        rights = self.site.gamemodels.GameThreadRight.objects.filter(
             thread_id=thread.id).distinct()
         rights = rights.select_related('role')
         read_roles = [
@@ -56,7 +59,7 @@ class GameRightsPlugin(RightsPlugin):
         # fix:thread author can write and read
         if thread.data1 and ((thread.strict_read is not None) or (
                 thread.strict_write is not None)):
-            role = sm.Role.objects.get(id=thread.data1)
+            role = stories_models.Role.objects.get(id=thread.data1)
             if thread.strict_read is not None:
                 if role not in thread.strict_read:
                     thread.strict_read += [role]
@@ -65,16 +68,13 @@ class GameRightsPlugin(RightsPlugin):
                     thread.strict_write += [role]
 
     def get_parent_rights(self, thread, user):
-        site_models = self.site.models
         if not thread.parent_id:
-            variations = site_models.Variation.objects.filter(thread=thread)
-            if variations:
-                thread.variation = variations[0]
-            else:
-                import logging
+            variations = stories_models.Variation.objects.filter(thread=thread)
+            if not variations:
                 logger = logging.getLogger('django.request')
                 logger.fatal('Game thread %s have no variation', thread.id)
                 raise Exception('game post have no variation')
+            thread.variation = variations[0]
             thread.game = thread.variation.game
             thread.admin = thread.variation.edit_right(user)
             thread.guest = False
@@ -85,16 +85,16 @@ class GameRightsPlugin(RightsPlugin):
                         game=thread.game, user=user)
                     if guests:
                         thread.guest = True
-                thread.user_roles = site_models.Role.objects.filter(
+                thread.user_roles = stories_models.Role.objects.filter(
                     variation=thread.variation, user=user).values('id')
                 thread.user_roles = [role['id'] for role in thread.user_roles]
             else:
                 thread.user_roles = []
                 thread.user_accesed_roles = []
             if thread.admin:
-                return (True, True, True)
+                return True, True, True
             if not thread.game:
-                return (False, False, False)
+                return False, False, False
             parent_read = thread.game.read_right(user)
             parent_write = thread.game.write_right(user)
             return parent_read, parent_write, False
