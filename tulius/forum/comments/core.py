@@ -165,11 +165,12 @@ class CommentsCore(plugins.ForumPlugin):
                 request, pagination_context)
         }
 
-    def before_add_comment(self, sender, **kwargs):
-        thread = kwargs['thread']
+    def before_add_comment(self, **kwargs):
+        thread = kwargs['sender']
+        instance = kwargs['instance']
         comments_count = self.models.Comment.objects.filter(
             parent=thread, deleted=False).count()
-        sender.page = int(comments_count / self.COMMENTS_ON_PAGE) + 1
+        instance.page = int(comments_count / self.COMMENTS_ON_PAGE) + 1
         thread.comments_count += 1
 
     def before_delete_comment(self, sender, **kwargs):
@@ -287,7 +288,7 @@ class CommentsCore(plugins.ForumPlugin):
         self.read_comments_signal = dispatch.Signal(
             providing_args=["user", "comments"])
         self.before_add_comment_signal = dispatch.Signal(
-            providing_args=["thread", "restore"])
+            providing_args=["instance", "restore"])
         self.before_delete_comment_signal = dispatch.Signal(
             providing_args=["thread"])
         self.after_add_comment_signal = dispatch.Signal(
