@@ -1,12 +1,18 @@
 from django import forms
+from django.contrib import auth
 
 from tulius.forum.models import ThreadAccessRight
+
+User = auth.get_user_model()
 
 
 class ThreadAccessRightForm(forms.ModelForm):
     class Meta:
         model = ThreadAccessRight
-        fields = '__all__'
+        fields = ('user', 'access_level')
+        widgets = {
+            'user': User.autocomplete_widget,
+        }
 
     def after_constuct(self, formset, params, i):
         if 'parent_thread' in params:
