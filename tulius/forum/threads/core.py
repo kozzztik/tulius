@@ -392,7 +392,7 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
         self.thread_on_move = dispatch.Signal(
             providing_args=["user", "old_parent", "old_tree_id"])
         self.thread_repair_counters = dispatch.Signal(providing_args=[])
-        self.thread_on_create = dispatch.Signal(providing_args=[])
+        self.thread_on_create = dispatch.Signal(providing_args=['instance'])
         self.thread_on_update = dispatch.Signal(
             providing_args=["old_thread"])
         self.core['get_parent_thread'] = self.get_parent_thread

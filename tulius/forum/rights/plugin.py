@@ -207,10 +207,11 @@ class RightsPlugin(ForumPlugin):
             (comment.user == comment.view_user) or
             comment.parent.moderate_right(comment.view_user))
 
-    def thread_on_create(self, sender, **kwargs):
-        ancestors = self.models.Thread.objects.get_ancestors(sender)
-        if (not sender.free_access_type()) and (sender.parent_id):
-            if sender.room:
+    def thread_on_create(self, **kwargs):
+        instance = kwargs['instance']
+        ancestors = self.models.Thread.objects.get_ancestors(instance)
+        if (not instance.free_access_type()) and instance.parent_id:
+            if instance.room:
                 ancestors.filter(
                     protected_threads=THREAD_NO_PR
                 ).update(protected_threads=THREAD_HAVE_PR_ROOMS)
