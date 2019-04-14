@@ -27,7 +27,7 @@ class GameIndex(BasePluginView):
 
 class VariationIndex(BasePluginView):
     def get(self, request, *args, **kwargs):
-        variation_id = args[0]
+        variation_id = kwargs.get('variation_id')
         try:
             variation_id = int(variation_id)
         except:

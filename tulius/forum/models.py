@@ -340,7 +340,8 @@ class Thread(MPTTModel, SitedModelMixin):
 
     def save(self, *args, **kwargs):
         if not self.id:
-            self.site().signals.thread_on_create.send(self)
+            self.site().signals.thread_on_create.send(
+                self.parent, instance=self)
         else:
             old_thread = Thread.objects.select_for_update().get(id=self.id)
             self.site().signals.thread_on_update.send(
@@ -527,7 +528,7 @@ class Comment(SitedModelMixin):
                     id=self.parent.id)
                 if old_self.deleted:
                     self.site().signals.before_add_comment.send(
-                        self, thread=thread, restore=True)
+                        thread, instance=self, restore=True)
                 else:
                     self.site().signals.before_delete_comment.send(
                         self, thread=thread)
@@ -542,7 +543,7 @@ class Comment(SitedModelMixin):
                     self.parent.first_comment_id != self.id):
                 self.reply_id = self.parent.first_comment_id
             self.site().signals.before_add_comment.send(
-                self, thread=thread, restore=False)
+                thread, instance=self, restore=False)
         # real safe
         super(Comment, self).save(
             force_insert=force_insert, force_update=force_update,
