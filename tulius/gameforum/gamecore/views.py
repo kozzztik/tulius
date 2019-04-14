@@ -8,7 +8,7 @@ from tulius.forum.plugins import BasePluginView
 
 class GameIndex(BasePluginView):
     def get(self, request, *args, **kwargs):
-        game_id = args[0]
+        game_id = kwargs.get('game_id')
         try:
             game_id = int(game_id)
         except:

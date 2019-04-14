@@ -42,7 +42,6 @@ LANGUAGES = (
 AUTH_USER_MODEL = 'tulius.User'
 
 INSTALLED_APPS = (
-    'raven.contrib.django.raven_compat',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -182,11 +181,6 @@ LOGGING = {
         'null': {
             'level': 'DEBUG',
             'class': 'logging.NullHandler',
-        },
-        'sentry': {
-            'level': 'ERROR',
-            'class':
-                'raven.contrib.django.raven_compat.handlers.SentryHandler',
         },
         'mail_admins': {
             'level': 'ERROR',

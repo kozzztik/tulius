@@ -55,12 +55,12 @@ def save_illustration(
     except:
         pass
     imageformat = getattr(settings, 'IMAGE_FORMAT', 'jpeg')
-    image_content = io.StringIO()
+    image_content = io.BytesIO()
     image.save(image_content, format=imageformat)
     image_file = ContentFile(image_content.getvalue())
     illustration.image.save('%s.%s' % (name, imageformat,), image_file)
     image.thumbnail(ILLUSTRATION_THUMBNAIL, Image.ANTIALIAS)
-    image_content = io.StringIO()
+    image_content = io.BytesIO()
     image.save(image_content, format=imageformat)
     image_file = ContentFile(image_content.getvalue())
     illustration.thumb.save('%s_thumb.%s' % (name, imageformat,), image_file)

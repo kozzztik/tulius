@@ -1,8 +1,12 @@
 from django import forms
 from django import urls
+from django.contrib import auth
 
 from tulius.games.models import RequestQuestion
 from .models import Game, GameGuest, GameAdmin, GameWinner
+
+
+User = auth.get_user_model()
 
 
 class EditGameMainForm(forms.ModelForm):
@@ -24,13 +28,19 @@ class EditGameTextsForm(forms.ModelForm):
 class GameGuestForm(forms.models.ModelForm):
     class Meta:
         model = GameGuest
-        fields = '__all__'
+        fields = ('user',)
+        widgets = {
+            'user': User.autocomplete_widget,
+        }
 
 
 class GameAdminForm(forms.models.ModelForm):
     class Meta:
         model = GameAdmin
-        fields = '__all__'
+        fields = ('user',)
+        widgets = {
+            'user': User.autocomplete_widget,
+        }
 
 
 class GameWinnerForm(forms.models.ModelForm):

@@ -19,4 +19,4 @@ gevent == 1.2.2
 redis == 2.10.6
 django-websocket-redis == 0.5.1
 django-redis-cache == 1.7.1
-requests == 2.18.4
+requests == 2.21.0
