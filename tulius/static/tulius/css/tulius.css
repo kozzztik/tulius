@@ -95,7 +95,7 @@ ul {
     text-decoration: underline; 
  }
 .table th, .table td {
-    border-top: 1px solid black;
+    /*border-top: 1px solid black;*/
 }
 
 
