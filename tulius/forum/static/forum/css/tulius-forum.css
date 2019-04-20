@@ -427,13 +427,13 @@ th{
 	}
 
 .bord1-center {
-	background-image: url("/media/forum/bord1-center.png");
+	background-image: url("../img/bord1-center.png");
 	background-repeat: repeat-x;
 	height: 14px;
 }
 
 .bord1-left {
-	background-image: url("/media/forum/bord1-left.png"); 
+	background-image: url("../img/bord1-left.png"); 
 	background-repeat: no-repeat;
 	height: 14px;
 	width: 44px;
@@ -442,7 +442,7 @@ th{
 }
 
 .bord1-right {
-	background-image: url("/media/forum/bord1-right.png");  
+	background-image: url("../img/bord1-right.png");  
 	background-repeat: no-repeat;
 	width: 44px;
 	height: 14px;
@@ -453,7 +453,7 @@ th{
 }
 
 .bord2-center {
-	background-image: url("/media/forum/bord2-center.png");   
+	background-image: url("../img/bord2-center.png");   
 	background-repeat: repeat-x;
 	height: 5px;
 	width: 100%;
@@ -461,7 +461,7 @@ th{
 }
 
 .bord2-left {
-	background-image: url("/media/forum/bord2-left.png"); 
+	background-image: url("../img/bord2-left.png"); 
 	background-repeat: no-repeat;
 	height: 5px;
 	margin-left: 11px;
@@ -470,7 +470,7 @@ th{
 }
 
 .bord2-right {
-	background-image: url("/media/forum/bord2-right.png"); 
+	background-image: url("../img/bord2-right.png"); 
 	background-repeat: no-repeat;
 	background-position: right;
 	margin-right: 11px;
