@@ -4,7 +4,7 @@ install:
 script:
   - tox -e py27
 addons:
-  ssh_known_hosts: tulius2.co-de.org:22
+  ssh_known_hosts: tulius.co-de.org:22
 deploy:
   - provider: script
     script: bash scripts/deploy.sh
