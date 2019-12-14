@@ -1,4 +1,4 @@
-FROM python:2.7
+FROM python:2.7-stretch
 EXPOSE 7000
 RUN apt-get update && apt-get install gettext locales -y
 RUN locale-gen ru_RU.UTF-8
