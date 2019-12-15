@@ -5,7 +5,7 @@ ENV PYTHONUNBUFFERED 1
 RUN pip install uwsgi
 
 ## install requirements, so they can be cached by Docker
-RUN pip install django==2.0.6 pytz==2018.4 pillow==5.1.0 \
+RUN pip install django==2.0.12 pytz==2018.4 pillow==5.1.0 \
     mysqlclient==1.3.12 django-mptt==0.9.0 pyyaml==3.12 \
     django-hamlpy==1.1.1 python-memcached==1.59 \
     django-memcache-status==1.3 raven==6.6.0 gevent==1.2.2 \
