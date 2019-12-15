@@ -1,5 +1,5 @@
 - load i18n
-- load url from future
+
 %form#replyform.form-horizontal{method: 'POST', action: '{{ parent_thread.first_comment.get_fast_reply_url }}'}
     - csrf_token
     = reply_form.media

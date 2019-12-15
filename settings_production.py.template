@@ -12,6 +12,10 @@ DATABASES = {
     }
 }
 
-RAVEN_CONFIG = {
-    'dsn': '< ADD SENTRY DSN HERE>',
-}
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+sentry_sdk.init(
+    dsn="",
+    integrations=[DjangoIntegration()]
+)

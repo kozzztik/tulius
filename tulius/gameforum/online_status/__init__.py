@@ -1,25 +1,27 @@
-from django.utils.timezone import now
-from datetime import timedelta
-# TODO: fix this when module moved
-from tulius.forum.plugins import ForumPlugin
-from tulius.stories.models import Role
-from tulius.forum import OnlineStatusPlugin
+from django.utils import timezone
 
-class GameOnlineStatusPlugin(OnlineStatusPlugin):
+from tulius.stories import models
+from tulius.forum import online_status
+
+
+class GameOnlineStatusPlugin(online_status.OnlineStatusPlugin):
     online_list_template = 'gameforum/snippets/online_roles.haml'
-    
+
     def update_role_online_status(self, user, variation):
-        if variation.game_id and (not user.is_anonymous()):
-            Role.objects.filter(variation=variation, user=user).update(visit_time=now())
-    
+        if variation.game_id and (not user.is_anonymous):
+            models.Role.objects.filter(
+                variation=variation, user=user
+            ).update(visit_time=timezone.now())
+
     def get_online_roles(self, user, thread, do_update=True):
         variation = thread.variation
         if do_update:
             self.update_role_online_status(user, variation)
         users = self.get_online_users(user, thread, do_update)
-        roles = Role.objects.filter(variation=variation, show_in_online_character=True, user__in=users)
+        roles = models.Role.objects.filter(
+            variation=variation, show_in_online_character=True, user__in=users)
         strict_read = getattr(thread, 'strict_read', None)
-        if not strict_read is None:
+        if strict_read is not None:
             roles = [role for role in roles if role in strict_read]
         return roles
 
@@ -27,9 +29,9 @@ class GameOnlineStatusPlugin(OnlineStatusPlugin):
         context = kwargs['context']
         user = kwargs["user"]
         context['online_roles'] = self.get_online_roles(user, sender)
-            
+
     def comments_page(self, sender, **kwargs):
-        user = kwargs["user"] 
+        user = kwargs["user"]
         comments = kwargs["comments"]
         online_roles = self.get_online_roles(user, sender)
         role_ids = [role.id for role in online_roles]
@@ -40,7 +42,7 @@ class GameOnlineStatusPlugin(OnlineStatusPlugin):
         for comment in comments:
             role_id = comment.data1
             comment.online_here = role_id and (role_id in role_ids)
-            
+
     def init_core(self):
         super(GameOnlineStatusPlugin, self).init_core()
         self.core['update_role_online_status'] = self.update_role_online_status

@@ -32,11 +32,12 @@ $(document).ready(function() {
    });
 
 
-    var ws4redis = WS4Redis({
-        uri: websocket_uri + 'pm?subscribe-user',
-        receive_message: receiveMessage,
-        heartbeat_msg: 'heartbeat'
-    });
+    // TODO: enabling it with failing sockets crushes JS on page
+    // var ws4redis = WS4Redis({
+    //    uri: websocket_uri + 'pm?subscribe-user',
+    //    receive_message: receiveMessage,
+    //    heartbeat_msg: 'heartbeat'
+    //});
     // receive a message though the websocket from the server
     function receiveMessage(msg) {
         if (msg > last_read_pm_id) {

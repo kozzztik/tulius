@@ -1,0 +1,27 @@
+{% extends "base.haml" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+    <li>
+        <div class="divider"></div>
+        <a href="">
+            {% trans "Switch user" %}
+        </a>
+    </li>
+{% endblock %}
+
+{% block caption %}
+    {% trans "Switch user" %}
+{% endblock %}
+
+{% block content %}
+    <form id="reloginModal" class="form-horizontal" method="POST" action="">
+   		<fieldset>
+            {% csrf_token %}
+            {% include 'snippets/form_fields_only.haml' %}
+		<button class="btn btn-primary" type="submit">
+			{% trans "Switch" %}
+        </button>
+        </fieldset>
+    </form>
+{% endblock %}

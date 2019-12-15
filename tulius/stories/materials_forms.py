@@ -1,12 +1,14 @@
-from .models import *
 from django import forms
+from . import models
+
 
 class AdditionalMaterialForm(forms.ModelForm):
     class Meta:
-        model = AdditionalMaterial
-        exclude=('story', 'variation',)
-        
+        model = models.AdditionalMaterial
+        exclude = ('story', 'variation',)
+
+
 class IllustrationForm(forms.ModelForm):
     class Meta:
-        model = Illustration
-        fields=('name', 'admins_only',)
+        model = models.Illustration
+        fields = ('name', 'admins_only',)

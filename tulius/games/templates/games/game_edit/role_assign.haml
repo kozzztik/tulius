@@ -1,10 +1,9 @@
 - extends 'base_cataloged_navig_game.haml'
 - load i18n
-- load url from future
 
 - block extra_scripts
-    %link{'rel': 'stylesheet', 'href':'{{ MEDIA_URL }}css/tulius-games.css', 'type': 'text/css'}
-    %script{'type': 'text/javascript', 'src': '{{ MEDIA_URL }}games/reqtooltips.js'}
+    %link{'rel': 'stylesheet', 'href':'{{ STATIC_URL }}games/css/tulius-games.css', 'type': 'text/css'}
+    %script{'type': 'text/javascript', 'src': '{{ STATIC_URL }}games/js/reqtooltips.js'}
     
 - block page_content
     %table.table
@@ -74,15 +73,15 @@
                             %ul
                                 %li
                                     {% trans "New games" %}
-                                    :
+                                    \:
                                     = request.new_games
                                 %li
                                     {% trans "Current games" %}
-                                    :
+                                    \:
                                     =request.current_games
                                 %li
                                     {% trans "Complited games" %}
-                                    :
+                                    \:
                                     =request.complited_games
                     %td
                         %a.reqtooltip{'href': '#', 'request': '{{ request.id }}', 'id': 'tip{{ request.id }}', 'title': '{% trans "Answers" %}'}

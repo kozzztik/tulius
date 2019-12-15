@@ -1,41 +1,39 @@
-from djfw.common.admin.actions import export_as_csv
 from django.contrib import admin
+
 
 class CustomModelAdmin(admin.ModelAdmin):
 
-    #class Media:
-        #js = [
-        #    '/media/tinymce/jscripts/tiny_mce/tiny_mce.js',
-        #    '/media/tinymce_setup/tinymce_setup.js',
-        #]
-    save_on_top     = True
+    # class Media:
+        # js = [
+        #     '/media/tinymce/jscripts/tiny_mce/tiny_mce.js',
+        #     '/media/tinymce_setup/tinymce_setup.js',
+        # ]
+    save_on_top = True
 
-    list_display    = (
+    list_display = (
         'id',
-        '__unicode__',
+        '__str__',
         'created_at',
         'updated_at',
     )
 
     list_display_links = (
         'id',
-        '__unicode__',
+        '__str__',
     )
 
     search_fields = (
         'pk',
     )
 
-    actions = [export_as_csv]
-
     list_per_page = 100
 
     date_hierarchy = 'created_at'
 
 
-class StatusAdmin(CustomModelAdmin):    
+class StatusAdmin(CustomModelAdmin):
 
-    list_display    = (
+    list_display = (
         'id',
         '__unicode__',
         'name',
@@ -55,9 +53,10 @@ class StatusAdmin(CustomModelAdmin):
         'name',
     )
 
-class DescribedStatusAdmin(CustomModelAdmin):    
 
-    list_display    = (
+class DescribedStatusAdmin(CustomModelAdmin):
+
+    list_display = (
         'id',
         '__unicode__',
         'name',

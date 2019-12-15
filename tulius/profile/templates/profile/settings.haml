@@ -1,6 +1,5 @@
 - extends 'base.haml'
 - load i18n
-- load url from future
 
 - block breadcrumbs
     %li
@@ -12,7 +11,6 @@
     {% trans "Settings" %}
 
 - block content
-        <link rel="stylesheet" href="{{ STATIC_URL }}wysibb/theme/default/wbbtheme.css" type="text/css" />
         %form#settings_form.form-horizontal{method: 'POST', action: ''}
             - csrf_token
             %h3
@@ -21,7 +19,6 @@
                 - include 'snippets/form_fields_only.haml'
             - with form=personal_settings_form
                 - include 'snippets/form_fields_only.haml'
-                - include 'wysibb/init.html'
             %h3
                 {% trans "Email and password" %}
             - with form=email_form

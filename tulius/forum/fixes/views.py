@@ -1,62 +1,69 @@
-from django.http import Http404
-from .plugin import BasePluginView
+import re
+import gc
+import logging
 
-class RebuildNums(BasePluginView):
+from django import http
+
+from tulius.forum import plugins
+
+
+class RebuildNums(plugins.BasePluginView):
     template_name = 'fixes'
-    
-    def get_context_data(self, post_id=None, **kwargs):
+
+    def get_context_data(self, **kwargs):
+        post_id = kwargs.get('post_id', None)
         thread = self.core.models.Thread
         if not self.request.user.is_superuser:
-            raise Http404
+            raise http.Http404
         if post_id:
-            thread.objects.get(id=post_id).rebuild
+            thread.objects.get(id=post_id).rebuild()
         else:
             parent_post = None
             self.core.rebuild_tree(parent_post)
-        return BasePluginView.get_context_data(self, **kwargs)
+        return plugins.BasePluginView.get_context_data(self, **kwargs)
 
-class FixLastPost(BasePluginView):
+
+class FixLastPost(plugins.BasePluginView):
     template_name = 'fixes'
-    
+
     def get_context_data(self, **kwargs):
         if not self.request.user.is_superuser:
-            raise Http404
+            raise http.Http404
         models = self.core.models
         threads = models.Thread.objects.all()
         for thread in threads:
-            comment = models.Comment.objects.filter(parent=thread).order_by('-id')[:1]
+            comment = models.Comment.objects.filter(
+                parent=thread).order_by('-id')[:1]
             if comment:
-                models.Thread.objects.filter(id=thread.id).update(last_comment=comment[0].id)
-        return BasePluginView.get_context_data(self, **kwargs)
-    
-class FixHtml(BasePluginView):
-    template_name = 'fixes'
-    
-    def get_context_data(self, **kwargs):
+                models.Thread.objects.filter(
+                    id=thread.id).update(last_comment=comment[0].id)
+        return plugins.BasePluginView.get_context_data(self, **kwargs)
 
+
+class FixHtml(plugins.BasePluginView):
+    template_name = 'fixes'
+
+    def get_context_data(self, **kwargs):
         fix_expr = [
             (r'<p (.*?)>', r''),
-            ]
-        import re
-        import gc
-        import logging
+        ]
         models = self.core.models
         logger = logging.getLogger('django.request')
         logger.error("Started forum fixing html")
+
         def do_fix_comment(comment):
             value = comment.body
-    
             for expr in fix_expr:
                 p = re.compile(expr[0], re.DOTALL)
                 value = p.sub(expr[1], value)
-            
             comment.body = value
-            
+
         def scan_threads(parent_thread):
-            threads = models.Thread.objects.filter(parent=parent_thread).order_by('id')
+            threads = models.Thread.objects.filter(
+                parent=parent_thread).order_by('id')
             for thread in threads:
                 if not parent_thread:
-                    logger.error("Fixing thread %s" % (thread.id,))
+                    logger.error("Fixing thread %s", thread.id)
                 if thread.room:
                     scan_threads(thread)
                 else:
@@ -71,4 +78,4 @@ class FixHtml(BasePluginView):
                     gc.collect()
         scan_threads(None)
         logger.error("forum fixing html done.")
-        return BasePluginView.get_context_data(self, **kwargs)
+        return plugins.BasePluginView.get_context_data(self, **kwargs)

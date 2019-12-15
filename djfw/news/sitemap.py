@@ -1,13 +1,16 @@
-from django.contrib.sitemaps import Sitemap
-from django.utils.timezone import now
-from .models import NewsItem
+from django.contrib import sitemaps
+from django.utils import timezone
 
-class NewsSitemap(Sitemap):
+from . import models
+
+
+class NewsSitemap(sitemaps.Sitemap):
     changefreq = "daily"
     priority = 1.0
 
     def items(self):
-        return NewsItem.objects.filter(is_published=True).filter(published_at__lt=now()).order_by('-published_at')
+        return models.NewsItem.objects.filter(is_published=True).filter(
+            published_at__lt=timezone.now()).order_by('-published_at')
 
     def lastmod(self, obj):
         return obj.updated_at

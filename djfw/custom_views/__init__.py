@@ -1,1 +1,2 @@
-from .views import SortableViewMixin, SortableDetailViewMixin, FormsetWidget, ActionableViewMixin
+from .views import SortableViewMixin, SortableDetailViewMixin, \
+    FormsetWidget, ActionableViewMixin

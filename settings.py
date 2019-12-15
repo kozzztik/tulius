@@ -42,8 +42,6 @@ LANGUAGES = (
 AUTH_USER_MODEL = 'tulius.User'
 
 INSTALLED_APPS = (
-    'south',
-    'raven.contrib.django.raven_compat',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -54,17 +52,16 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'django.contrib.sitemaps',
     'memcache_status',
-    'ws4redis',
-    'djaml',
+    # TODO: fix it
+    # 'ws4redis',
+    'hamlpy',
     'djfw',
-    'tulius',
     'djfw.datablocks',
     'djfw.logger',
     'djfw.pagination',
     'djfw.flatpages',
     'djfw.tinymce',
     'djfw.wysibb',
-    'djfw.autocomplete',
     'djfw.inlineformsets',
     'djfw.cataloging',
     'djfw.news',
@@ -73,8 +70,7 @@ INSTALLED_APPS = (
     'djfw.photos',
     'djfw.sortable',
     'djfw.custom_views',
-    'django_mailer',
-    'pm',
+    'tulius.pm',
     'tulius',
     'tulius.login',
     'tulius.players',
@@ -84,14 +80,13 @@ INSTALLED_APPS = (
     'tulius.stories',
     'tulius.gameforum',
     'djfw.installer',
-    'events',
+    'tulius.events',
     'tulius.vk',
     'tulius.counters',
 )
 
-MIDDLEWARE_CLASSES = (
-    'djfw.installer.middleware.MaintenanceMiddleware',
-#    'raven.contrib.django.raven_compat.middleware.Sentry404CatchMiddleware',
+MIDDLEWARE = (
+    # 'raven.contrib.django.raven_compat.middleware.Sentry404CatchMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -108,30 +103,43 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
-TEMPLATE_LOADERS = (
-    'hamlpy.template.loaders.HamlPyFilesystemLoader',
-    'hamlpy.template.loaders.HamlPyAppDirectoriesLoader',
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'OPTIONS': {
+            'loaders': [
+                'hamlpy.template.loaders.HamlPyFilesystemLoader',
+                'hamlpy.template.loaders.HamlPyAppDirectoriesLoader',
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+            ],
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.request',
+                'django.template.context_processors.static',
+                'ws4redis.context_processors.default',
+                'djfw.flatpages.context_processors.flatpages',
+                'djfw.datablocks.context_processors.datablocks',
+            ],
+            'libraries': {
 
-if not DEBUG:
-    TEMPLATE_LOADERS = (
-        ('django.template.loaders.cached.Loader', TEMPLATE_LOADERS),)
+            }
+        }
+    },
+]
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.debug',
-    'django.core.context_processors.i18n',
-    'django.core.context_processors.media',
-    'django.core.context_processors.request',
-    'django.core.context_processors.static',
-    'django.contrib.messages.context_processors.messages',
-    'django.contrib.auth.context_processors.auth',
-    'ws4redis.context_processors.default',
-    'djfw.flatpages.context_processors.flatpages',
-    'tulius.login.context_processors.relogin',
-    'djfw.datablocks.context_processors.datablocks',
-)
+# TODO that must not work now
+# if not DEBUG:
+#     TEMPLATES += [
+#         {
+#             'BACKEND': 'django.template.loaders.cached.Loader'
+#         }
+#     ]
+
 
 AUTHENTICATION_BACKENDS = (
     'tulius.vk.backend.VKBackend',
@@ -143,12 +151,10 @@ ALLOWED_HOSTS = [
     'localhost',
 ]
 
-# EMAIL_BACKEND = 'django_mailer.backend.DbBackend'
-
 INLINE_FORMSET_CLASS = 'table'
 ACCOUNT_ACTIVATION_DAYS = 2
 LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = '/accounts/auth/login/'
+LOGIN_URL = '/accounts/login/'
 AUTOCOMPLETE_MODELS = ('auth.user', 'tulius.user')
 
 DEFAULT_THEME = 'classic'
@@ -174,11 +180,7 @@ LOGGING = {
     'handlers': {
         'null': {
             'level': 'DEBUG',
-            'class': 'django.utils.log.NullHandler', 
-        },
-        'sentry': {
-            'level': 'ERROR',
-            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+            'class': 'logging.NullHandler',
         },
         'mail_admins': {
             'level': 'ERROR',
@@ -229,10 +231,6 @@ if DEBUG:
         'error', r"DateTimeField received a naive datetime",
         RuntimeWarning, r'django\.db\.models\.fields')
 
-# TODO remove with 3.6
-THEMING_ROOT = MEDIA_ROOT + 'uploads/themes/'
-THEMING_URL = MEDIA_URL + 'uploads/themes/'
-
 EMAIL_HOST = 'tulius_mail' if env == 'prod' else 'localhost'
 EMAIL_PORT = 25
 EMAIL_HOST_USER = '' 
@@ -270,6 +268,10 @@ DATABASES = {
         'PASSWORD': 'tulius',
         'PORT': '',
         'CONN_MAX_AGE': 20,
+        'ATOMIC_REQUESTS': True,
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+        }
     }
 }
 

@@ -22,11 +22,6 @@ echo "Migrate"
 docker run \
     -e TULIUS_BRANCH="$1" \
     --net tuliusnet \
-    tulius_$1 python manage.py syncdb
-
-docker run \
-    -e TULIUS_BRANCH="$1" \
-    --net tuliusnet \
     tulius_$1 python manage.py migrate
 
 

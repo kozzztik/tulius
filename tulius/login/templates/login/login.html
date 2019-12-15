@@ -1,0 +1,46 @@
+{% extends 'base.haml' %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+    <li>
+        <div class="divider"></div>
+        <a href="{% url 'auth:login_choose' %}">
+            {% trans "Choose login type" %}
+        </a>
+    </li>
+    <li>
+        <div class="divider"></div>
+        <a href=''>
+            {% trans "Login" %}
+        </a>
+    </li>
+{% endblock %}
+
+{% block caption %}
+    {% trans "Login" %}
+{% endblock %}
+
+
+{% block content %}
+    <p>
+        {% trans "Enter yout Tulius login/password. If you have no Tulius login," %}
+        <a href="{% url 'auth:login_choose' %}">
+            {% trans "choose other way of authorize" %}
+        </a>
+        {% trans "or use old type of" %}
+        <a href="{% url 'auth:registration_register' %}">
+            {% trans "registration" %}
+        </a>
+	</p>
+	<form action="" method="POST" style="text-align: center">
+		<fieldset>
+            {% csrf_token %}
+            {% for field in form %}
+                {% include 'snippets/form_field.haml' %}
+            {% endfor %}
+		<button class="btn btn-info" type="submit">
+			{% trans "Login" %}
+        </button>
+        </fieldset>
+    </form>
+{% endblock %}

@@ -1,14 +1,17 @@
-from django.utils.translation import ugettext_lazy as _
-from django.utils.timezone import get_current_timezone
-#TODO: needs to be fixed
-from tulius.forum.plugins import BasePluginView
-from django.core.exceptions import PermissionDenied
-from .forms import ExtendedSearchForm
-from django.views.generic import View
 import json
 import datetime
-from django.http import HttpResponse
+
+from django.utils.translation import ugettext_lazy as _
+from django.utils.timezone import get_current_timezone
+from django.core.exceptions import PermissionDenied
+from django.views.generic import View
+from django import http
+
+# TODO: needs to be fixed
+from tulius.forum.plugins import BasePluginView
 from tulius.models import User
+from .forms import ExtendedSearchForm
+
 
 def get_datetime(text):
     date = None
@@ -16,11 +19,13 @@ def get_datetime(text):
         date = datetime.datetime.strptime(text, "%d.%m.%Y")
     except:
         pass
-    return datetime.datetime(date.year, date.month, date.day, tzinfo=get_current_timezone())
-    
+    return datetime.datetime(
+        date.year, date.month, date.day, tzinfo=get_current_timezone())
+
+
 class ExtendedSearchView(BasePluginView):
     template_name = 'search_form'
-    
+
     def get_context_data(self, **kwargs):
         context = super(ExtendedSearchView, self).get_context_data(**kwargs)
         pk = self.kwargs.get('pk')
@@ -31,17 +36,20 @@ class ExtendedSearchView(BasePluginView):
             raise PermissionDenied()
         threads = self.core.threads_search_list(self.request.user, thread)
         threads = [thread] + threads
-        threads = [(thread.id, '- ' * (thread.level) + thread.title) for thread in threads]
+        threads = [
+            (thread.id, '- ' * thread.level + thread.title)
+            for thread in threads]
         self.form = ExtendedSearchForm(threads, data=self.request.POST or None)
         context['form'] = self.form
         context['parent_thread'] = self.object
         context['form_submit_title'] = _(u'Search')
         context['form_action'] = thread.search_url
         return context
-    
+
+
 class SearchView(ExtendedSearchView):
     template_name = 'search'
-    
+
     def get_context_data(self, **kwargs):
         context = super(SearchView, self).get_context_data(**kwargs)
         form = self.form
@@ -52,7 +60,8 @@ class SearchView(ExtendedSearchView):
         conditions = []
         parent_thread = self.object
         parent_thread.write_right = False
-        comments = self.site.models.Comment.objects.select_related('parent').filter(plugin_id=self.plugin.site_id)
+        comments = self.site.models.Comment.objects.select_related(
+            'parent').filter(plugin_id=self.plugin.site_id)
         comments = comments.filter(parent__tree_id=parent_thread.tree_id)
         filter_thread = data.get('thread', None)
         filter_users = data.get('users', [])
@@ -60,7 +69,7 @@ class SearchView(ExtendedSearchView):
         filter_date_from = data.get('date_from', [])
         filter_date_to = data.get('date_to', [])
         filter_text = data.get('text', [])
-        
+
         if filter_thread:
             thread = self.site.models.Thread.objects.get(pk=filter_thread)
             if thread.read_right(self.request.user):
@@ -68,14 +77,19 @@ class SearchView(ExtendedSearchView):
                     conditions += [_(u'In room: ') + thread.title]
                 else:
                     conditions += [_(u'In thread: ') + thread.title]
-                comments = comments.filter(parent__lft__gte=thread.lft, parent__rght__lte=thread.rght)
-        
+                comments = comments.filter(
+                    parent__lft__gte=thread.lft, parent__rght__lte=thread.rght)
+
         if filter_users:
-            conditions += [_(u'From users: ') + ', '.join([user.username for user in filter_users])]
+            conditions += [
+                _(u'From users: ') + ', '.join(
+                    [user.username for user in filter_users])]
             comments = comments.filter(user__in=filter_users)
-            
+
         if filter_not_users:
-            conditions += [_(u'Not from users: ') + ', '.join([user.username for user in filter_not_users])]
+            conditions += [
+                _(u'Not from users: ') + ', '.join(
+                    [user.username for user in filter_not_users])]
             comments = comments.exclude(user__in=filter_not_users)
 
         if filter_date_from:
@@ -94,8 +108,11 @@ class SearchView(ExtendedSearchView):
             conditions += [_(u'With text: ') + filter_text]
             comments = comments.filter(body__icontains=filter_text)
         comments = comments[:50]
-        search_results = [comment for comment in comments if comment.parent.read_right(self.request.user)]
-        self.site.signals.read_comments.send(parent_thread, comments=search_results, user=self.request.user)
+        search_results = [
+            comment for comment in comments
+            if comment.parent.read_right(self.request.user)]
+        self.site.signals.read_comments.send(
+            parent_thread, comments=search_results, user=self.request.user)
         context['conditions'] = conditions
         context['posts_on_page'] = self.core.models.COMMENTS_ON_PAGE
         context['search_results'] = search_results
@@ -105,6 +122,7 @@ class SearchView(ExtendedSearchView):
         context = self.get_context_data(**kwargs)
         return self.render_to_response(context)
 
+
 class SearchVariantsView(View):
     def get(self, request, *args, **kwargs):
         q = self.request.GET['q']
@@ -113,4 +131,4 @@ class SearchVariantsView(View):
             res = User.objects.filter(username__istartswith=q)[:5]
         res = [{'id': str(user.id), 'text': user.username} for user in res]
         s = json.dumps(res)
-        return HttpResponse(s)
+        return http.HttpResponse(s)

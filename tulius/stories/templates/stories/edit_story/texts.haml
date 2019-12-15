@@ -16,7 +16,7 @@
             %ul
                 - for field in form
                     %li
-                        %a{'href': '#{{ field.name }}'}
+                        %a{'href': "\#{{ field.name }}"}
                             %span
                                 {{ field.label }}
             - for field in form

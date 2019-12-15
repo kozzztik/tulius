@@ -27,7 +27,7 @@ import yaml
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
-class UserAgentParser(object):
+class UserAgentParser:
     def __init__(self, pattern, family_replacement=None, v1_replacement=None):
         """Initialize UserAgentParser.
 
@@ -73,7 +73,7 @@ class UserAgentParser(object):
         return family, v1, v2, v3
 
 
-class OSParser(object):
+class OSParser:
     def __init__(self, pattern, os_replacement=None):
         """Initialize UserAgentParser.
 
@@ -94,13 +94,13 @@ class OSParser(object):
         return match_spans
 
     def Parse(self, user_agent_string):
-        os, os_v1, os_v2, os_v3, os_v4 = None, None, None, None, None
+        os_name, os_v1, os_v2, os_v3, os_v4 = None, None, None, None, None
         match = self.user_agent_re.search(user_agent_string)
         if match:
             if self.os_replacement:
-                os = self.os_replacement
+                os_name = self.os_replacement
             else:
-                os = match.group(1)
+                os_name = match.group(1)
 
             if match.lastindex >= 2:
                 os_v1 = match.group(2)
@@ -111,10 +111,10 @@ class OSParser(object):
                         if match.lastindex >= 5:
                             os_v4 = match.group(5)
 
-        return os, os_v1, os_v2, os_v3, os_v4
+        return os_name, os_v1, os_v2, os_v3, os_v4
 
 
-class DeviceParser(object):
+class DeviceParser:
     def __init__(self, pattern, device_replacement=None):
         """Initialize UserAgentParser.
 
@@ -159,10 +159,10 @@ def Parse(user_agent_string, **jsParseBits):
     """
     jsParseBits = jsParseBits or {}
     return {
-      'user_agent': ParseUserAgent(user_agent_string, **jsParseBits),
-      'os': ParseOS(user_agent_string, **jsParseBits),
-      'device': ParseDevice(user_agent_string, **jsParseBits),
-      'string': user_agent_string
+        'user_agent': ParseUserAgent(user_agent_string, **jsParseBits),
+        'os': ParseOS(user_agent_string, **jsParseBits),
+        'device': ParseDevice(user_agent_string, **jsParseBits),
+        'string': user_agent_string
     }
 
 
@@ -191,9 +191,10 @@ def ParseUserAgent(user_agent_string, **jsParseBits):
     # Override for Chrome Frame IFF Chrome is enabled.
     if 'js_user_agent_string' in jsParseBits:
         js_user_agent_string = jsParseBits['js_user_agent_string']
-        if (js_user_agent_string and js_user_agent_string.find('Chrome/') > -1 and
-            user_agent_string.find('chromeframe') > -1):
-            jsOverride = {}
+        if (
+                js_user_agent_string and
+                js_user_agent_string.find('Chrome/') > -1 and
+                user_agent_string.find('chromeframe') > -1):
             jsOverride = ParseUserAgent(js_user_agent_string)
             family = 'Chrome Frame (%s %s)' % (family, v1)
             v1 = jsOverride['major']
@@ -218,12 +219,12 @@ def ParseOS(user_agent_string, **jsParseBits):
       A dictionary containing parsed bits.
     """
     for osParser in OS_PARSERS:
-        os, os_v1, os_v2, os_v3, os_v4 = osParser.Parse(user_agent_string)
-        if os:
+        os_name, os_v1, os_v2, os_v3, os_v4 = osParser.Parse(user_agent_string)
+        if os_name:
             break
-    os = os or 'Other'
+    os_name = os_name or 'Other'
     return {
-        'family': os,
+        'family': os_name,
         'major': os_v1,
         'minor': os_v2,
         'patch': os_v3,
@@ -245,7 +246,7 @@ def ParseDevice(user_agent_string):
             break
 
     return {
-      'family': device
+        'family': device
     }
 
 
@@ -254,31 +255,30 @@ def PrettyUserAgent(family, v1=None, v2=None, v3=None):
     if v3:
         if v3[0].isdigit():
             return '%s %s.%s.%s' % (family, v1, v2, v3)
-        else:
-            return '%s %s.%s%s' % (family, v1, v2, v3)
-    elif v2:
+        return '%s %s.%s%s' % (family, v1, v2, v3)
+    if v2:
         return '%s %s.%s' % (family, v1, v2)
-    elif v1:
+    if v1:
         return '%s %s' % (family, v1)
     return family
 
 
-def PrettyOS(os, os_v1=None, os_v2=None, os_v3=None, os_v4=None):
+def PrettyOS(os_name, os_v1=None, os_v2=None, os_v3=None, os_v4=None):
     """Pretty os string."""
     if os_v4:
-        return '%s %s.%s.%s.%s' % (os, os_v1, os_v2, os_v3, os_v4)
+        return '%s %s.%s.%s.%s' % (os_name, os_v1, os_v2, os_v3, os_v4)
     if os_v3:
         if os_v3[0].isdigit():
-            return '%s %s.%s.%s' % (os, os_v1, os_v2, os_v3)
-        else:
-            return '%s %s.%s%s' % (os, os_v1, os_v2, os_v3)
-    elif os_v2:
-        return '%s %s.%s' % (os, os_v1, os_v2)
-    elif os_v1:
-        return '%s %s' % (os, os_v1)
-    return os
+            return '%s %s.%s.%s' % (os_name, os_v1, os_v2, os_v3)
+        return '%s %s.%s%s' % (os_name, os_v1, os_v2, os_v3)
+    if os_v2:
+        return '%s %s.%s' % (os_name, os_v1, os_v2)
+    if os_v1:
+        return '%s %s' % (os_name, os_v1)
+    return os_name
 
 
+# pylint: disable=too-many-arguments
 def ParseWithJSOverrides(user_agent_string,
                          js_user_agent_string=None,
                          js_user_agent_family=None,
@@ -307,7 +307,7 @@ def ParseWithJSOverrides(user_agent_string,
 
     # Override for Chrome Frame IFF Chrome is enabled.
     if (js_user_agent_string and js_user_agent_string.find('Chrome/') > -1 and
-        user_agent_string.find('chromeframe') > -1):
+            user_agent_string.find('chromeframe') > -1):
         family = 'Chrome Frame (%s %s)' % (family, v1)
         ua_dict = ParseUserAgent(js_user_agent_string)
         v1 = ua_dict['major']
@@ -322,15 +322,15 @@ def Pretty(family, v1=None, v2=None, v3=None):
     if v3:
         if v3[0].isdigit():
             return '%s %s.%s.%s' % (family, v1, v2, v3)
-        else:
-            return '%s %s.%s%s' % (family, v1, v2, v3)
-    elif v2:
+        return '%s %s.%s%s' % (family, v1, v2, v3)
+    if v2:
         return '%s %s.%s' % (family, v1, v2)
-    elif v1:
+    if v1:
         return '%s %s' % (family, v1)
     return family
 
 
+# pylint: disable=too-many-arguments
 def GetFilters(user_agent_string, js_user_agent_string=None,
                js_user_agent_family=None,
                js_user_agent_v1=None,
@@ -363,11 +363,11 @@ def GetFilters(user_agent_string, js_user_agent_string=None,
     """
     filters = {}
     filterdict = {
-      'js_user_agent_string': js_user_agent_string,
-      'js_user_agent_family': js_user_agent_family,
-      'js_user_agent_v1': js_user_agent_v1,
-      'js_user_agent_v2': js_user_agent_v2,
-      'js_user_agent_v3': js_user_agent_v3
+        'js_user_agent_string': js_user_agent_string,
+        'js_user_agent_family': js_user_agent_family,
+        'js_user_agent_v1': js_user_agent_v1,
+        'js_user_agent_v2': js_user_agent_v2,
+        'js_user_agent_v3': js_user_agent_v3
     }
     for key, value in filterdict.items():
         if value is not None and value != '':
@@ -436,4 +436,3 @@ for _device_parser in regexes['device_parsers']:
         _device_replacement = _device_parser['device_replacement']
 
     DEVICE_PARSERS.append(DeviceParser(_regex, _device_replacement))
-

@@ -1,17 +1,22 @@
-from django.utils.translation import ugettext_lazy as _
-from django.contrib import admin
 from django import forms
+from django.contrib import admin
+from django.utils.translation import ugettext_lazy as _
+
 from .models import PlayerStar
 
+
 _('players')
+
 
 class PlayerStarForm(forms.ModelForm):
     class Meta:
         model = PlayerStar
-    
+        fields = '__all__'
+
+
 class PlayerStarAdmin(admin.ModelAdmin):
     form = PlayerStarForm
-    
+
     list_display = (
         'id',
         'games',
@@ -22,5 +27,6 @@ class PlayerStarAdmin(admin.ModelAdmin):
     list_editable = (
         'games',
     )
-    
+
+
 admin.site.register(PlayerStar, PlayerStarAdmin)
