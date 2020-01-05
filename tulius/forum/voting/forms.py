@@ -18,6 +18,7 @@ class VoitingForm(forms.models.ModelForm):
         model = Voting
         fields = (
             'voting_name', 'voting_body', 'show_results', 'preview_results')
+    use_required_attribute = False
 
 
 class VoitingChoiceForm(forms.models.ModelForm):
