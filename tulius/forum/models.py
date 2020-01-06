@@ -373,7 +373,7 @@ class ThreadAccessRight(models.Model):
         verbose_name=_('user')
     )
     access_level = models.SmallIntegerField(
-        default=0,
+        default=THREAD_ACCESS_READ + THREAD_ACCESS_WRITE,
         verbose_name=_(u'access rights'),
         choices=THREAD_ACCESS_CHOICES,
     )

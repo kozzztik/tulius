@@ -14,6 +14,9 @@ class ThreadAccessRightForm(forms.ModelForm):
             'user': User.autocomplete_widget,
         }
 
+    use_required_attribute = False
+    empty_permitted = True
+
     def after_constuct(self, formset, params, i):
         if 'parent_thread' in params:
             parent_thread = params['parent_thread']

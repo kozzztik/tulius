@@ -10,6 +10,9 @@ class GameRightForm(forms.models.ModelForm):
         model = GameThreadRight
         fields = '__all__'
 
+    use_required_attribute = False
+    empty_permitted = True
+
     def after_constuct(self, formset, params, i):
         parent_thread = params['parent_thread']
         variation = parent_thread.variation

@@ -19,6 +19,7 @@ class VoitingForm(forms.models.ModelForm):
         fields = (
             'voting_name', 'voting_body', 'show_results', 'preview_results')
     use_required_attribute = False
+    empty_permitted = True
 
 
 class VoitingChoiceForm(forms.models.ModelForm):

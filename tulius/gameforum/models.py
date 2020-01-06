@@ -31,7 +31,7 @@ class GameThreadRight(models.Model):
     )
 
     access_level = models.SmallIntegerField(
-        default=0,
+        default=forum.THREAD_ACCESS_READ + forum.THREAD_ACCESS_WRITE,
         verbose_name=_(u'access rights'),
         choices=forum.THREAD_ACCESS_CHOICES,
     )
