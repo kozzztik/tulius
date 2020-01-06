@@ -94,8 +94,10 @@ class SimpleFormset(forms.models.BaseModelFormSet):
 # pylint: disable=too-many-arguments
 def get_formset_factory(
         parent_model, model, form=None, fk_name=None, fields=None,
-        exclude=None, extra=3, can_order=False, can_delete=True, max_num=None,
-        formfield_callback=None, params=None, base_form=forms.ModelForm):
+        exclude=None, extra=3, can_order=False, can_delete=True,
+        min_num=0, max_num=None,
+        formfield_callback=None, params=None, base_form=forms.ModelForm,
+        validate_min=False, validate_max=False):
     if parent_model:
         fk = forms.models._get_foreign_key(
             parent_model, model, fk_name=fk_name)
@@ -119,9 +121,11 @@ def get_formset_factory(
     attrs = {
         'form': form, 'extra': extra,
         'can_order': can_order, 'can_delete': can_delete,
-        'min_num': 1,
+        'min_num': min_num,
         'max_num': max_num,
-        'params': params, 'absolute_max': absolute_max}
+        'params': params, 'absolute_max': absolute_max,
+        'validate_min': validate_min, 'validate_max': validate_max
+    }
     if fk:
         FormSet = type(form.__name__ + 'FormSet', (InlineFormset,), attrs)
         FormSet.model = model
@@ -137,12 +141,13 @@ def get_formset_factory(
 def get_formset(
         parent_model, model, data, form=None, fk_name=None,
         fields=None, exclude=None, extra=3, can_order=False, can_delete=True,
-        max_num=None, instance=None, formfield_callback=None, params=None,
-        static=False, queryset=None, base_form=forms.ModelForm):
+        min_num=0, max_num=None, instance=None, formfield_callback=None,
+        params=None, static=False, queryset=None, base_form=forms.ModelForm):
     factory = get_formset_factory(
         parent_model, model, form, fk_name, fields, exclude,
-        extra, can_order, can_delete, max_num, formfield_callback,
-        params, base_form=base_form)
+        extra, can_order, can_delete, min_num=min_num, max_num=max_num,
+        formfield_callback=formfield_callback,
+        params=params, base_form=base_form)
     if instance:
         return factory(
             data or None,
