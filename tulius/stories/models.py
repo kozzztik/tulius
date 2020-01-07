@@ -534,6 +534,8 @@ class Role(SortableModelMixin):
         return 'stories:role_text', (self.id,), {}
 
     def is_online(self):
+        if not self.visit_time:
+            return False
         return self.visit_time > now() - timedelta(minutes=3)
 
     def copy(self, new_variation):
