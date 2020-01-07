@@ -82,7 +82,7 @@ class RegisterView(FormView):
 
     def get_context_data(self, **kwargs):
         kwargs['form_submit_title'] = _('Sign up')
-        return kwargs
+        return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
         data = form.cleaned_data
@@ -97,10 +97,10 @@ class RegisterView(FormView):
         new_user.is_active = False
         new_user.save()
 
-        salt = hashlib.sha1(str(random.random())).hexdigest()[:5]
-        if isinstance(username, str):
-            username = username.encode('utf-8')
-        activation_key = hashlib.sha1(salt+username).hexdigest()
+        salt = hashlib.sha1(
+            str(random.random()).encode('ascii')).hexdigest()[:5]
+        activation_key = hashlib.sha1(
+            (salt+username).encode('utf-8')).hexdigest()
         registration_profile = RegistrationProfile.objects.create(
             user=new_user, activation_key=activation_key)
         registration_profile.send_activation_email(site)
