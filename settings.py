@@ -238,8 +238,9 @@ EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = False
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 
-# EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-# EMAIL_FILE_PATH = PROJECT_ROOT +  'mail_dump/'
+if env != 'prod':
+    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+    EMAIL_FILE_PATH = BASE_DIR +  'mail_dump/'
 
 MAIL_RECEIVERS = ['pm.mail.get_mail']
 
@@ -301,7 +302,6 @@ if env == 'prod':
 ]
 elif env == 'qa':
     DEFAULT_FROM_EMAIL = 'tulius-test@tulius.com'
-    EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
 
     CACHES = {
         'default': {

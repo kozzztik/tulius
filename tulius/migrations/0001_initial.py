@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
                 (
                     'last_login',
                     models.DateTimeField(
-                        blank=True, null=True, verbose_name='last login')),
+                        blank=False, null=False, verbose_name='last login')),
                 (
                     'is_superuser',
                     models.BooleanField(
