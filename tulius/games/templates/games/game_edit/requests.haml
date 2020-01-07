@@ -32,16 +32,19 @@
                             .requests-list.request-list-table
                                 %ul
                                     - for prefer in request.roles
-                                        %li.dropdown
-                                            %a.dropdown-toggle{href: '#', id: 'p{{prefer.id}}', 'role': 'button', 'data-toggle': 'dropdown'}
-                                                = prefer.role
-                                            %ul.dropdown-menu{'role': 'menu', 'aria-labelledby': 'p{{prefer.id}}'}
-                                                %li
-                                                    %a{'tabindex': '-1', 'href': '{{ prefer.role.get_absolute_url }}'}
-                                                        {% trans "View role" %}
-                                                %li
-                                                    %a{'tabindex': '0', 'href': '{% url "games:role_assign_user" prefer.role.id request.user.id %}'}
-                                                        {% trans "Assign" %}
+                                        - if prefer.role.deleted
+                                            = prefer.role
+                                        - else
+                                            %li.dropdown
+                                                %a.dropdown-toggle{href: '#', id: 'p{{prefer.id}}', 'role': 'button', 'data-toggle': 'dropdown'}
+                                                    = prefer.role
+                                                %ul.dropdown-menu{'role': 'menu', 'aria-labelledby': 'p{{prefer.id}}'}
+                                                    %li
+                                                        %a{'tabindex': '-1', 'href': '{{ prefer.role.get_absolute_url }}'}
+                                                            {% trans "View role" %}
+                                                    %li
+                                                        %a{'tabindex': '0', 'href': '{% url "games:role_assign_user" prefer.role.id request.user.id %}'}
+                                                            {% trans "Assign" %}
                         - else
                             - if all_roles
                                 .requests-list.request-list-table

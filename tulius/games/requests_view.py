@@ -162,7 +162,7 @@ def role_assign_user(request, role_id, user_id, backtoroles=False):
         user_id = int(user_id)
     except:
         raise Http404()
-    role = get_object_or_404(Role, id=role_id)
+    role = get_object_or_404(Role, id=role_id, deleted=False)
     user = get_object_or_404(User, id=user_id)
     if not role.variation.game:
         raise Http404()
