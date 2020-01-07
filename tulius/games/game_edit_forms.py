@@ -69,3 +69,6 @@ class GameRequestQuestionForm(forms.models.ModelForm):
     class Meta:
         model = RequestQuestion
         fields = '__all__'
+
+    use_required_attribute = False
+    empty_permitted = True
