@@ -2,6 +2,7 @@ from django import forms
 from django import urls
 from django.contrib import auth
 
+from tulius.core.autocomplete.models import add_autocomplete_widget
 from tulius.games.models import RequestQuestion
 from .models import Game, GameGuest, GameAdmin, GameWinner
 
@@ -48,8 +49,12 @@ class GameWinnerForm(forms.models.ModelForm):
         model = GameWinner
         fields = '__all__'
 
+    use_required_attribute = False
+
     def after_constuct(self, formset, params, i):
         game = params['game']
+        self.fields['user'].widget = add_autocomplete_widget(
+            User, User.objects.all(), User.USERNAME_FIELD)
         self.fields['user'].widget.choices_url = urls.reverse(
             'games:game_edit_players', args=(game.pk,))
 

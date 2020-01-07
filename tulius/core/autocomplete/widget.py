@@ -50,6 +50,8 @@ class AutocompleteWidget(TextInput):
         self.options = options or {}
         self.token = token
         self.model = model
+        self.choices_url = urls.reverse_lazy(
+            'autocomplete:autocomplete', args=[self.token])
 
         if related_fields:
             extra = {}
@@ -64,8 +66,6 @@ class AutocompleteWidget(TextInput):
             self.extra = {}
 
     def render(self, name, value, attrs=None, renderer=None):
-        self.choices_url = urls.reverse(
-            'autocomplete:autocomplete', args=[self.token])
         final_attrs = self.build_attrs(attrs)
         try:
             choices = urls.reverse(str(self.choices_url))

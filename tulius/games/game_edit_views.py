@@ -480,10 +480,11 @@ class BaseGameFormsetView(
             extra=1, instance=self.object, params={'game': self.object})
 
     def get_context_data(self, **kwargs):
+        kwargs = super(BaseGameFormsetView, self).get_context_data(**kwargs)
         kwargs['formset'] = kwargs.pop('form')
         kwargs['catalog_page'] = game_edit_catalog.EditGameSubpage(
             self.object, url=self.catalog_url)
-        return super(BaseGameFormsetView, self).get_context_data(**kwargs)
+        return kwargs
 
     def form_valid(self, form):
         form.save()
