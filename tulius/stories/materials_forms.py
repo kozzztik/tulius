@@ -7,6 +7,8 @@ class AdditionalMaterialForm(forms.ModelForm):
         model = models.AdditionalMaterial
         exclude = ('story', 'variation',)
 
+    use_required_attribute = False
+
 
 class IllustrationForm(forms.ModelForm):
     class Meta:
