@@ -17,7 +17,7 @@ class MarkAsRead(plugins.BasePluginView):
             if thread.room:
                 self.mark_as_readed(thread, user)
             else:
-                thread.mark_as_readed  # magic here
+                thread.mark_as_readed  # pylint: disable=W0104
 
     def get(self, request, *args, **kwargs):
         thread_id = kwargs.get('thread_id', None)
