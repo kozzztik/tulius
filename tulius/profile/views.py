@@ -6,6 +6,7 @@ from django.views import generic
 from django.utils import decorators
 from django.contrib import messages
 from django.contrib.auth import decorators as auth_decorators
+from django.contrib.auth import update_session_auth_hash
 from django.db.models import query_utils
 
 from tulius.events.models import UserNotification, Notification
@@ -45,6 +46,7 @@ class PlayerSettingsView(generic.TemplateView):
                 request.user.save()
             if email_form.change_pass:
                 request.user.set_password(email_form.cleaned_data['new_pass'])
+                update_session_auth_hash(request, request.user)
                 request.user.save()
             settings_form.save()
             personal_settings_form.save()
