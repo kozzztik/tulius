@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
-from django.http import Http404, HttpResponseRedirect, HttpResponse
-from django.template import loader, RequestContext
+from django.http import Http404, HttpResponseRedirect
+from django.template.response import TemplateResponse
 
 from djfw.cataloging.core import CatalogPage
 from djfw.inlineformsets import get_formset
@@ -43,6 +43,9 @@ class RequestAnswerForm(forms.models.ModelForm):
         model = RequestQuestionAnswer
         fields = ('answer', )
 
+    use_required_attribute = False
+    empty_permitted = True
+
     def after_constuct(self, formset, params, i):
         questions = params['questions']
         if i is not None:
@@ -53,6 +56,9 @@ class RequestSelectionForm(forms.models.ModelForm):
     class Meta:
         model = RoleRequestSelection
         exclude = ('prefer_order',)
+
+    use_required_attribute = False
+    empty_permitted = True
 
     def after_constuct(self, formset, params, i):
         game = params['game']
@@ -122,9 +128,7 @@ def make_game_request(
             return HttpResponseRedirect(catalog_page.parent.parent.url)
         messages.error(
             request, _('there were some errors during form validation'))
-    c = RequestContext(request, locals())
-    t = loader.get_template(template_name)
-    return HttpResponse(t.render(c))
+    return TemplateResponse(request, template_name, locals())
 
 
 @login_required
