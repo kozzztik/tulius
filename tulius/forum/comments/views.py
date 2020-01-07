@@ -67,7 +67,7 @@ class EditComment(BaseCommentView):
         context = self.get_context_data(**kwargs)
         if self.comment:
             return http.HttpResponseRedirect(self.comment.get_absolute_url)
-        return self.render_to_response(context, current_app=self.site.app_name)
+        return self.render_to_response(context)
 
 
 ERROR_VALIDATION = _('there were some errors during form validation')

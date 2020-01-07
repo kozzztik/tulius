@@ -151,12 +151,12 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
         right_model = self.site.core.right_model
         right_form = self.site.core.right_form
         adding = thread is None
-        form = forms.RoomForm(models, thread, data=request.POST or None)
+        form = forms.RoomForm(models, thread=thread, data=request.POST or None)
         form.room = True
         formset_params['parent_thread'] = parent_thread or thread
         formset = inlineformsets.get_formset(
             models.Thread, right_model, request.POST,
-            base_form=right_form, extra=1, params=formset_params,
+            form=right_form, extra=1, params=formset_params,
             instance=thread)
         if request.method == 'POST':
             if form.is_valid():
@@ -164,7 +164,7 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
                     thread = models.Thread(room=True)
                 thread.title = form.cleaned_data['title']
                 thread.body = form.cleaned_data['body']
-                thread.access_type = form.cleaned_data['access_type']
+                thread.access_type = int(form.cleaned_data['access_type'])
                 if not thread.id:
                     thread.user = request.user
                     thread.parent = parent_thread
@@ -172,7 +172,7 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
                 if formset.is_valid():
                     thread.save()
                     for form in formset:
-                        if form.is_valid():
+                        if form.is_valid() and form.changed_data:
                             right = form.save(commit=False)
                             right.thread = thread
                             right.save()
