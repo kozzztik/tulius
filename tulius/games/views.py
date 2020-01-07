@@ -2,7 +2,6 @@ import json
 
 from django import urls
 from django import http
-from django import template
 from django.apps import apps
 from django.contrib import messages
 from django.db.models import query_utils
@@ -319,7 +318,7 @@ def invite_player(
                     inv_user.send_pm(request.user, inv_message)
                 success = 'success'
     t = loader.get_template(template_name)
-    response = t.render(template.Context(locals()))
+    response = t.render(locals())
     return http.HttpResponse(
         json.dumps(
             {'response': str(response), 'result': success,
