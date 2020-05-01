@@ -7,6 +7,9 @@ ROOTDIR=$PWD
 echo "Stop existing compose"
 cd scripts/tulius/$1
 docker-compose down
+docker system prune
+docker rm -v $(docker ps --filter status=exited -q 2>/dev/null) 2>/dev/null
+docker rmi $(docker images --filter dangling=true -q 2>/dev/null) 2>/dev/null
 cd $ROOTDIR
 
 echo "Build docker container tulius_$1"
