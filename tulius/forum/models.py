@@ -270,7 +270,7 @@ class Thread(MPTTModel, SitedModelMixin):
         verbose_name=_(u'protected comments'),
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title[:40] if self.title else self.body[:40]
 
     def check_deleted(self):
