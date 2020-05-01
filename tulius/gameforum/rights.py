@@ -190,7 +190,7 @@ class GameRightsPlugin(RightsPlugin):
             if thread and thread.user_roles:
                 threads = threads.exclude(data1__in=thread.user_roles)
             return threads
-        rights = site_models.GameThreadRight.objects.filter(
+        rights = models.GameThreadRight.objects.filter(
             role_id__in=thread.user_roles,
             thread__tree_id=thread.tree_id,
             thread__lft__gt=thread.lft,
