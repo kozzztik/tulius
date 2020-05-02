@@ -9,7 +9,7 @@ RUN pip install django==2.0.12 pytz==2018.4 pillow==6.2.0 \
     mysqlclient==1.3.12 django-mptt==0.9.0 pyyaml==3.12 \
     django-hamlpy==1.1.1 \
     redis==2.10.6 django-redis-cache==2.1.1 aioredis==1.3.1 \
-    requests==2.18.4 sentry-sdk==0.14.3 \
+    requests==2.21.0 sentry-sdk==0.14.3 \
     aiohttp==3.6.2
 
 RUN mkdir /opt/tulius
