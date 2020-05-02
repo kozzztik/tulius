@@ -30,11 +30,4 @@ class WebsocketHandler:
 
 
 def setup_routes(app):
-    params = settings.CACHES['default'].copy()
-    if params['BACKEND'] != 'redis_cache.RedisCache':
-        raise NotImplementedError()
-    redis_location = params.pop('LOCATION')
-    global redis_cache
-    redis_cache = RedisCache(redis_location, params)
-
     app.add_routes([web.get('/', WebsocketHandler().handler)])
