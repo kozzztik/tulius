@@ -1,9 +1,7 @@
 version: '3.5'
 services:
   uwsgi:
-    build:
-      context: ../../..
-      dockerfile: Dockerfile
+    image: tulius_dev:latest
     networks:
       tuliusnet:
         ipv4_address: 10.5.0.20
@@ -19,9 +17,7 @@ services:
         max-file: "10"
 
   websockets:
-    build:
-      context: ../../..
-      dockerfile: Dockerfile
+    image: tulius_dev:latest
     networks:
       tuliusnet:
         ipv4_address: 10.5.0.21
