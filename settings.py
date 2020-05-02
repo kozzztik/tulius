@@ -10,7 +10,7 @@ elif branch == 'dev':
     env = 'qa'
 else:
     env = 'dev'
-
+ENV = env
 BASE_DIR = os.path.dirname(__file__) + '/'
 PROJECT_NAME = 'tulius'
 
@@ -51,9 +51,6 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'django.contrib.sitemaps',
-    'memcache_status',
-    # TODO: fix it
-    # 'ws4redis',
     'hamlpy',
     'djfw',
     'djfw.datablocks',
@@ -83,6 +80,7 @@ INSTALLED_APPS = (
     'tulius.events',
     'tulius.vk',
     'tulius.counters',
+    'tulius.websockets',
 )
 
 MIDDLEWARE = (
@@ -121,7 +119,7 @@ TEMPLATES = [
                 'django.template.context_processors.media',
                 'django.template.context_processors.request',
                 'django.template.context_processors.static',
-                'ws4redis.context_processors.default',
+                'tulius.websockets.context_processors.default',
                 'djfw.flatpages.context_processors.flatpages',
                 'djfw.datablocks.context_processors.datablocks',
             ],
@@ -222,6 +220,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
+        'async_app': {
+            'handlers': ['console'],
+            'level': 'DEBUG' if env == 'dev' else 'ERROR',
+            'propagate': True,
+        }
     }
 }
 
@@ -245,19 +248,19 @@ if env != 'prod':
 MAIL_RECEIVERS = ['pm.mail.get_mail']
 
 
-WS4REDIS_CONNECTION = {
-    'host': 'tulius_redis',
+REDIS_CONNECTION = {
+    'host': '127.0.0.1' if env == 'dev' else 'tulius_redis',
     'port': 6379,
-    'db': 10,
+    'db': {'prod': 3, 'qa': 2, 'dev': 1}[env],
     'password': '',
 }
 
-WS4REDIS_EXPIRE = 60
-WS4REDIS_PREFIX = 'ws_{}'.format(env)
+ASYNC_SERVER = {
+    'host': '127.0.0.1',
+    'port': 7000
+}
+
 WEBSOCKET_URL = '/ws/'
-WS4REDIS_SUBSCRIBER = 'websockets.subscriber.RedisSubscriber'
-WSGI_APPLICATION = 'ws4redis.django_runserver.application'
-WS4REDIS_HEARTBEAT = 'heartbeat'
 
 # Actual credentials are hold in settings_production.py file.
 DATABASES = {
@@ -276,41 +279,30 @@ DATABASES = {
     }
 }
 
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'redis_cache.RedisCache',
-#         'LOCATION': '/var/run/redis/redis.sock',
-#         'KEY_PREFIX': 'tulius',
-#     }
-# }
-#
-# SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+# it is important to use Redis as session cache as it is used by Async app
+# to identify users
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+CACHES = {
+    'default': {
+        'BACKEND': 'redis_cache.RedisCache',
+        'LOCATION': '{host}:{port}'.format(**REDIS_CONNECTION),
+        'OPTIONS': {
+            'DB': REDIS_CONNECTION['db'],
+            'PARSER_CLASS': 'redis.connection.HiredisParser',
+            'CONNECTION_POOL_CLASS': 'redis.BlockingConnectionPool',
+            'PICKLE_VERSION': -1,
+        },
+    },
+}
 
 if env == 'prod':
     DEFAULT_FROM_EMAIL = 'tulius@tulius.com'
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-            'LOCATION': '127.0.0.1:11211',
-            'KEY_PREFIX': 'tulius',
-        }
-    }
-    SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
     ALLOWED_HOSTS += [
         'tulius.com',
         'tulius.co-de.org',
 ]
 elif env == 'qa':
     DEFAULT_FROM_EMAIL = 'tulius-test@tulius.com'
-
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-            'LOCATION': '127.0.0.1:11211',
-            'KEY_PREFIX': 'testtulius',
-        }
-    }
-    SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
     ALLOWED_HOSTS += [
         'test.tulius.com',
         'test.tulius.co-de.org',

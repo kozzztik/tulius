@@ -4,8 +4,8 @@ from django.contrib import auth
 from django.views import generic
 from django.utils import decorators
 from django.contrib.auth import decorators as auth_decorators
-from ws4redis import redis_store
-from websockets import publisher
+
+from tulius.websockets import publisher
 
 from .forms import PrivateMessageForm
 from .models import PrivateTalking, PrivateMessage
@@ -63,12 +63,7 @@ class PlayerSendMessageView(generic.DetailView):
             request.user, self.object, data=request.POST or None)
         if form.is_valid():
             m = form.save()
-            # if the publisher is required only for fetching messages, use an
-            # empty constructor, otherwise reuse an existing redis_publisher
-            redis_publisher = publisher.RedisPublisher(
-                facility='pm', users=[self.object])
-            message = redis_store.RedisMessage(str(m.pk))
-            # and somewhere else
-            redis_publisher.publish_message(message)
+            publisher.publish_message_to_user(
+                self.object.pk, publisher.consts.USER_NEW_PM, m.pk)
         return http.HttpResponseRedirect(
             urls.reverse('pm:to_user', args=(self.object.pk,)))
