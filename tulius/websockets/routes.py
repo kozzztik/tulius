@@ -30,4 +30,5 @@ class WebsocketHandler:
 
 
 def setup_routes(app):
-    app.add_routes([web.get('/', WebsocketHandler().handler)])
+    app.add_routes([
+        web.get(settings.WEBSOCKET_URL, WebsocketHandler().handler)])

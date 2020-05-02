@@ -256,7 +256,7 @@ REDIS_CONNECTION = {
 }
 
 ASYNC_SERVER = {
-    'host': '127.0.0.1',
+    'host': '127.0.0.1' if env == 'dev' else '0.0.0.0',
     'port': 7000
 }
 

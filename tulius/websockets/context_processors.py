@@ -11,7 +11,8 @@ def default(request):
             protocol,
             settings.ASYNC_SERVER['host'],
             ':',
-            str(settings.ASYNC_SERVER['port'])
+            str(settings.ASYNC_SERVER['port']),
+            settings.WEBSOCKET_URL
         ])
     else:
         uri = protocol + request.get_host() + settings.WEBSOCKET_URL
