@@ -5,10 +5,10 @@ from django.utils.translation import ugettext_lazy as _
 
 branch = os.environ.get("TULIUS_BRANCH", '')
 env = {
-    'master': 'prod',
-    'dev': 'qa',
-    'local': 'dev',
-    'test': 'test'
+    'master': 'prod',  # production env
+    'dev': 'qa',  # test staging env
+    'local': 'dev',  # local development env
+    'test': 'test'  # ci tests env
 }[branch]
 
 ENV = env
@@ -250,14 +250,14 @@ MAIL_RECEIVERS = ['pm.mail.get_mail']
 
 
 REDIS_CONNECTION = {
-    'host': '127.0.0.1' if env in ['dev', 'test'] else 'tulius_redis',
+    'host': '127.0.0.1' if env == 'dev' else 'tulius_redis',
     'port': 6379,
     'db': {'prod': 3, 'qa': 2, 'dev': 1, 'test': 4}[env],
     'password': '',
 }
 
 ASYNC_SERVER = {
-    'host': '127.0.0.1' if env in ['dev', 'tests'] else '0.0.0.0',
+    'host': '127.0.0.1' if env == 'dev' else '0.0.0.0',
     'port': 7000
 }
 
@@ -268,7 +268,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'tulius_{}'.format(env),
-        'HOST': '127.0.0.1' if env in ['dev', 'test'] else 'tulius_mysql',
+        'HOST': '127.0.0.1' if env == 'dev' else 'tulius_mysql',
         'USER': 'tulius_{}'.format(env),
         'PASSWORD': 'tulius',
         'PORT': '',
