@@ -3,12 +3,11 @@ python:
   - "3.6"
 services:
   - docker
-install:
-  - pip install tox
 before_script:
   - docker build -t kozzztik/tulius:$TRAVIS_BRANCH .
+  - docker tag kozzztik/tulius:$TRAVIS_BRANCH tulius_test
 script:
-  - tox -e py36
+  - docker run tulius_test python3 -m pylint djfw tulius
 addons:
   ssh_known_hosts: tulius.co-de.org:22
 before_deploy:
