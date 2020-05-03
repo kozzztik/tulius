@@ -1,7 +1,7 @@
 version: '3.5'
 services:
   uwsgi:
-    image: tulius_dev:latest
+    image: kozzztik/tulius:dev
     networks:
       tuliusnet:
         ipv4_address: 10.5.0.20
@@ -17,7 +17,7 @@ services:
         max-file: "10"
 
   websockets:
-    image: tulius_dev:latest
+    image: kozzztik/tulius:dev
     networks:
       tuliusnet:
         ipv4_address: 10.5.0.21

@@ -1,12 +1,19 @@
 language: python
 python:
   - "3.6"
+services:
+  - docker
 install:
   - pip install tox
+before_script:
+  - docker build -t kozzztik/tulius:$TRAVIS_BRANCH .
 script:
   - tox -e py36
 addons:
   ssh_known_hosts: tulius.co-de.org:22
+before_deploy:
+  - docker login -u kozzztik -p "$docker_api_key"
+  - docker push kozzztik/tulius
 deploy:
   - provider: script
     script: bash scripts/deploy.sh
