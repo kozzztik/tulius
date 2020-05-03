@@ -13,7 +13,7 @@ docker rmi $(docker images --filter dangling=true -q 2>/dev/null) 2>/dev/null
 cd $ROOTDIR
 
 echo "Pull docker container tulius_$1"
-docker pull kozzztik/tulius:$1 .
+docker pull kozzztik/tulius:$1
 
 echo "Collect static"
 docker run -v "$PWD/data/static":/opt/tulius/data/static \
