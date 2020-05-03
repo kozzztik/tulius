@@ -13,4 +13,5 @@ ADD tests /opt/tulius/tests
 # update requirements
 RUN pip install -r requirements.txt
 
+ENV TULIUS_BRANCH local
 RUN python manage.py compilemessages

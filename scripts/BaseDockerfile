@@ -2,6 +2,7 @@ FROM python:3.6
 EXPOSE 7000
 RUN apt-get update && apt-get install gettext -y
 ENV PYTHONUNBUFFERED 1
+ENV TULIUS_BRANCH local
 RUN mkdir /opt/tulius
 WORKDIR /opt/tulius
 
