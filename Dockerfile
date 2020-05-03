@@ -9,6 +9,7 @@ ADD async_app.py /opt/tulius/async_app.py
 ADD settings.py /opt/tulius/settings.py
 ADD .pylintrc /opt/tulius/.pylintrc
 ADD tests /opt/tulius/tests
+ADD pytest.ini /opt/tulius/pytest.ini
 
 # update requirements
 RUN pip install -r requirements.txt
