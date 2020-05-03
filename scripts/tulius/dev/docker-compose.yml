@@ -10,7 +10,7 @@ services:
       TULIUS_BRANCH: dev
     volumes:
       - ../../../data/media:/opt/tulius/data/media
-      - ../../../settings_production.py: /opt/tulius/settings_production.py
+      - ../../../settings_production.py:/opt/tulius/settings_production.py
     logging:
       driver: json-file
       options:
@@ -27,7 +27,7 @@ services:
     environment:
       TULIUS_BRANCH: dev
     volumes:
-      - ../../../settings_production.py: /opt/tulius/settings_production.py
+      - ../../../settings_production.py:/opt/tulius/settings_production.py
     logging:
       driver: json-file
       options:
