@@ -8,7 +8,7 @@ script:
   - docker network create tnet
   - docker run --name tulius_mysql -e MYSQL_USER=tulius_test -e MYSQL_PASSWORD=tulius -d --network tnet mysql/mysql-server:5.7.22
   - docker run --name tulius_redis -d --network tnet redis
-  - docker run -e TRAVIS_BRANCH=test --network tnet tulius_test python3 -m pytest tests --reuse-db --create-db
+  - docker run -e TULIUS_BRANCH=test --network tnet tulius_test python3 -m pytest tests --reuse-db --create-db
 addons:
   ssh_known_hosts: tulius.co-de.org:22
 before_deploy:
