@@ -1,4 +1,4 @@
-FROM kozzztik/tulius:base_3.0.0
+FROM kozzztik/tulius:base_3.0.1
 
 ADD tulius /opt/tulius/tulius
 ADD djfw /opt/tulius/djfw
