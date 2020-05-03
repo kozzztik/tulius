@@ -7,6 +7,7 @@ install:
   - pip install tox
 before_script:
   - docker build -t kozzztik/tulius:$TRAVIS_BRANCH .
+  - docker tag kozzztik/tulius:$TRAVIS_BRANCH tulius_test
 script:
   - tox -e py36
 addons:
