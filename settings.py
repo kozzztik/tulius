@@ -4,12 +4,13 @@ import os
 from django.utils.translation import ugettext_lazy as _
 
 branch = os.environ.get("TULIUS_BRANCH", '')
-if branch == 'master':
-    env = 'prod'
-elif branch == 'dev':
-    env = 'qa'
-else:
-    env = 'dev'
+env = {
+    'master': 'prod',
+    'dev': 'qa',
+    'local': 'dev',
+    'test': 'test'
+}[branch]
+
 ENV = env
 BASE_DIR = os.path.dirname(__file__) + '/'
 PROJECT_NAME = 'tulius'
@@ -222,7 +223,7 @@ LOGGING = {
         },
         'async_app': {
             'handlers': ['console'],
-            'level': 'DEBUG' if env == 'dev' else 'ERROR',
+            'level': 'DEBUG' if env == 'local' else 'ERROR',
             'propagate': True,
         }
     }
@@ -249,14 +250,14 @@ MAIL_RECEIVERS = ['pm.mail.get_mail']
 
 
 REDIS_CONNECTION = {
-    'host': '127.0.0.1' if env == 'dev' else 'tulius_redis',
+    'host': '127.0.0.1' if env in ['dev', 'test'] else 'tulius_redis',
     'port': 6379,
-    'db': {'prod': 3, 'qa': 2, 'dev': 1}[env],
+    'db': {'prod': 3, 'qa': 2, 'dev': 1, 'test': 4}[env],
     'password': '',
 }
 
 ASYNC_SERVER = {
-    'host': '127.0.0.1' if env == 'dev' else '0.0.0.0',
+    'host': '127.0.0.1' if env in ['dev', 'tests'] else '0.0.0.0',
     'port': 7000
 }
 
@@ -267,7 +268,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'tulius_{}'.format(env),
-        'HOST': '127.0.0.1' if env == 'dev' else 'tulius_mysql',
+        'HOST': '127.0.0.1' if env in ['dev', 'test'] else 'tulius_mysql',
         'USER': 'tulius_{}'.format(env),
         'PASSWORD': 'tulius',
         'PORT': '',

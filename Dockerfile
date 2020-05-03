@@ -8,6 +8,7 @@ ADD wsgi.py /opt/tulius/wsgi.py
 ADD async_app.py /opt/tulius/async_app.py
 ADD settings.py /opt/tulius/settings.py
 ADD .pylintrc /opt/tulius/.pylintrc
+ADD test /opt/tulius/tests
 
 # update requirements
 RUN pip install -r requirements.txt

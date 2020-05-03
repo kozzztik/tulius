@@ -11,7 +11,9 @@ def publish_message(channel, message, *params):
         db=settings.REDIS_CONNECTION['db']
     )
     redis_client.publish(
-        channel, ' '.join([message, *(str(p) for p in params)]))
+        consts.make_channel_name(channel),
+        ' '.join([message, *(str(p) for p in params)])
+    )
 
 
 def publish_message_to_user(user_id, message, *params):
