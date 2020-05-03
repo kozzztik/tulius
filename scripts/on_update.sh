@@ -12,8 +12,8 @@ docker rm -v $(docker ps --filter status=exited -q 2>/dev/null) 2>/dev/null
 docker rmi $(docker images --filter dangling=true -q 2>/dev/null) 2>/dev/null
 cd $ROOTDIR
 
-echo "Build docker container tulius_$1"
-docker build -t tulius_$1 .
+echo "Pull docker container tulius_$1"
+docker pull kozzztik/tulius:$1 .
 
 echo "Collect static"
 docker run -v "$PWD/data/static":/opt/tulius/data/static \

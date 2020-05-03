@@ -1,9 +1,7 @@
 version: '3.5'
 services:
   uwsgi:
-    build:
-      context: ../../..
-      dockerfile: Dockerfile
+    image: kozzztik/tulius:master
     networks:
       tuliusnet:
         ipv4_address: 10.5.0.10
@@ -12,6 +10,7 @@ services:
       TULIUS_BRANCH: master
     volumes:
       - ../../../data/media:/opt/tulius/data/media
+      - ../../../settings_production.py: /opt/tulius/settings_production.py
     logging:
       driver: json-file
       options:
@@ -19,25 +18,16 @@ services:
         max-file: "10"
 
   websockets:
-    build:
-      context: ../../..
-      dockerfile: Dockerfile
+    image: kozzztik/tulius:master
     networks:
       tuliusnet:
         ipv4_address: 10.5.0.11
     restart: unless-stopped
-    command: ["uwsgi", "--http", "0.0.0.0:7000",
-               "--max-requests", "10000",
-               "--threads", "2",
-               "--processes", "1",
-               "--master",
-               "--gevent", "100",
-               "--http-websockets",
-               "--wsgi", "wsgi_websocket:application"]
+    command: ["python3", "/opt/tulius/async_app.py"]
     environment:
       TULIUS_BRANCH: master
     volumes:
-      - ../../../data/media:/opt/tulius/data/media
+      - ../../../settings_production.py: /opt/tulius/settings_production.py
     logging:
       driver: json-file
       options:

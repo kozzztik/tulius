@@ -1,7 +1,7 @@
 version: '3.5'
 services:
   uwsgi:
-    image: tulius_dev:latest
+    image: kozzztik/tulius:dev
     networks:
       tuliusnet:
         ipv4_address: 10.5.0.20
@@ -10,6 +10,7 @@ services:
       TULIUS_BRANCH: dev
     volumes:
       - ../../../data/media:/opt/tulius/data/media
+      - ../../../settings_production.py: /opt/tulius/settings_production.py
     logging:
       driver: json-file
       options:
@@ -17,7 +18,7 @@ services:
         max-file: "10"
 
   websockets:
-    image: tulius_dev:latest
+    image: kozzztik/tulius:dev
     networks:
       tuliusnet:
         ipv4_address: 10.5.0.21
@@ -25,6 +26,8 @@ services:
     command: ["python3", "/opt/tulius/async_app.py"]
     environment:
       TULIUS_BRANCH: dev
+    volumes:
+      - ../../../settings_production.py: /opt/tulius/settings_production.py
     logging:
       driver: json-file
       options:
