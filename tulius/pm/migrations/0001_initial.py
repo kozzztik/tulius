@@ -17,16 +17,31 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PrivateMessage',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='updated at')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='created at')),
-                ('position', models.PositiveSmallIntegerField(blank=True, null=True, verbose_name='Position')),
-                ('is_read', models.BooleanField(default=False, verbose_name='is read')),
-                ('removed_by_sender', models.BooleanField(default=False, verbose_name='removed by sender')),
-                ('removed_by_receiver', models.BooleanField(default=False, verbose_name='removed by receiver')),
-                ('body', models.TextField(default='', verbose_name='message body')),
-                ('receiver', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='messages_recieved', to=settings.AUTH_USER_MODEL, verbose_name='receiver')),
-                ('sender', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='messages_sent', to=settings.AUTH_USER_MODEL, verbose_name='sender')),
+                ('id', models.AutoField(
+                    auto_created=True, primary_key=True, serialize=False,
+                    verbose_name='ID')),
+                ('updated_at', models.DateTimeField(
+                    auto_now=True, verbose_name='updated at')),
+                ('created_at', models.DateTimeField(
+                    auto_now_add=True, verbose_name='created at')),
+                ('position', models.PositiveSmallIntegerField(
+                    blank=True, null=True, verbose_name='Position')),
+                ('is_read', models.BooleanField(
+                    default=False, verbose_name='is read')),
+                ('removed_by_sender', models.BooleanField(
+                    default=False, verbose_name='removed by sender')),
+                ('removed_by_receiver', models.BooleanField(
+                    default=False, verbose_name='removed by receiver')),
+                ('body', models.TextField(
+                    default='', verbose_name='message body')),
+                ('receiver', models.ForeignKey(
+                    on_delete=django.db.models.deletion.PROTECT,
+                    related_name='messages_recieved',
+                    to=settings.AUTH_USER_MODEL, verbose_name='receiver')),
+                ('sender', models.ForeignKey(
+                    on_delete=django.db.models.deletion.PROTECT,
+                    related_name='messages_sent', to=settings.AUTH_USER_MODEL,
+                    verbose_name='sender')),
             ],
             options={
                 'verbose_name': 'private message',
@@ -38,10 +53,21 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PrivateTalking',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('last', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='talking', to='pm.PrivateMessage', verbose_name='talking')),
-                ('receiver', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='talkings_recieved', to=settings.AUTH_USER_MODEL, verbose_name='receiver')),
-                ('sender', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='talkings_sent', to=settings.AUTH_USER_MODEL, verbose_name='sender')),
+                ('id', models.AutoField(
+                    auto_created=True, primary_key=True, serialize=False,
+                    verbose_name='ID')),
+                ('last', models.ForeignKey(
+                    on_delete=django.db.models.deletion.PROTECT,
+                    related_name='talking', to='pm.PrivateMessage',
+                    verbose_name='talking')),
+                ('receiver', models.ForeignKey(
+                    on_delete=django.db.models.deletion.PROTECT,
+                    related_name='talkings_recieved',
+                    to=settings.AUTH_USER_MODEL, verbose_name='receiver')),
+                ('sender', models.ForeignKey(
+                    on_delete=django.db.models.deletion.PROTECT,
+                    related_name='talkings_sent', to=settings.AUTH_USER_MODEL,
+                    verbose_name='sender')),
             ],
             options={
                 'verbose_name': 'private talking',

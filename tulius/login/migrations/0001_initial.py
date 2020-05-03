@@ -17,9 +17,14 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='RegistrationProfile',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('activation_key', models.CharField(max_length=40, verbose_name='activation key')),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL, verbose_name='user')),
+                ('id', models.AutoField(
+                    auto_created=True, primary_key=True,
+                    serialize=False, verbose_name='ID')),
+                ('activation_key', models.CharField(
+                    max_length=40, verbose_name='activation key')),
+                ('user', models.OneToOneField(
+                    on_delete=django.db.models.deletion.PROTECT,
+                    to=settings.AUTH_USER_MODEL, verbose_name='user')),
             ],
             options={
                 'verbose_name': 'registration profile',

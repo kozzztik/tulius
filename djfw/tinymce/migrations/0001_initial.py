@@ -17,10 +17,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Emotion',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=500, verbose_name='name')),
-                ('text', models.CharField(max_length=500, verbose_name='text')),
-                ('filename', models.CharField(max_length=500, verbose_name='filename')),
+                ('id', models.AutoField(
+                    auto_created=True, primary_key=True, serialize=False,
+                    verbose_name='ID')),
+                ('name', models.CharField(
+                    max_length=500, verbose_name='name')),
+                ('text', models.CharField(
+                    max_length=500, verbose_name='text')),
+                ('filename', models.CharField(
+                    max_length=500, verbose_name='filename')),
             ],
             options={
                 'verbose_name': 'emotion',
@@ -30,13 +35,25 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='FileUpload',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('filename', models.CharField(max_length=500, verbose_name='filename')),
-                ('body', models.FileField(upload_to='tinymce/uploaded_files/', verbose_name='body')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='created at')),
-                ('mime', models.CharField(blank=True, default='', max_length=500, verbose_name='mime type')),
-                ('file_length', models.IntegerField(default=0, verbose_name='file length')),
-                ('user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='tinymce_uploads', to=settings.AUTH_USER_MODEL, verbose_name='user')),
+                ('id', models.AutoField(
+                    auto_created=True, primary_key=True, serialize=False,
+                    verbose_name='ID')),
+                ('filename', models.CharField(
+                    max_length=500, verbose_name='filename')),
+                ('body', models.FileField(
+                    upload_to='tinymce/uploaded_files/', verbose_name='body')),
+                ('created_at', models.DateTimeField(
+                    auto_now_add=True, verbose_name='created at')),
+                ('mime', models.CharField(
+                    blank=True, default='', max_length=500,
+                    verbose_name='mime type')),
+                ('file_length', models.IntegerField(
+                    default=0, verbose_name='file length')),
+                ('user', models.ForeignKey(
+                    blank=True, null=True,
+                    on_delete=django.db.models.deletion.PROTECT,
+                    related_name='tinymce_uploads',
+                    to=settings.AUTH_USER_MODEL, verbose_name='user')),
             ],
             options={
                 'verbose_name': 'uploaded file',

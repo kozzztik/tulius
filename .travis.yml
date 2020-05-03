@@ -7,11 +7,11 @@ before_script:
   - docker build -t kozzztik/tulius:$TRAVIS_BRANCH .
   - docker tag kozzztik/tulius:$TRAVIS_BRANCH tulius_test
 script:
-  - docker run tulius_test python3 -m pylint djfw tulius
+  - docker run tulius_test python3 -m pylint djfw tulius tests
   - docker network create tnet
   - docker run --name tulius_mysql -e MYSQL_USER=tulius_test -e MYSQL_PASSWORD=tulius -d --network tnet mysql/mysql-server:5.7.22
   - docker run --name tulius_redis -d --network tnet redis
-  - docker run -e TRAVIS_BRANCH=test --network tnet tulius_test python3 -m pytest tests
+  - docker run -e TRAVIS_BRANCH=test --network tnet tulius_test python3 -m pytest tests --reuse-db --create-db
 addons:
   ssh_known_hosts: tulius.co-de.org:22
 before_deploy:

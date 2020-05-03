@@ -17,10 +17,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Smile',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=500, verbose_name='name')),
-                ('text', models.CharField(max_length=500, verbose_name='text')),
-                ('image', models.ImageField(upload_to='wysibb/smiles/', verbose_name='image')),
+                ('id', models.AutoField(
+                    auto_created=True, primary_key=True, serialize=False,
+                    verbose_name='ID')),
+                ('name', models.CharField(
+                    max_length=500, verbose_name='name')),
+                ('text', models.CharField(
+                    max_length=500, verbose_name='text')),
+                ('image', models.ImageField(
+                    upload_to='wysibb/smiles/', verbose_name='image')),
             ],
             options={
                 'verbose_name': 'smile',
@@ -30,13 +35,24 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='UploadedFile',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('filename', models.CharField(max_length=500, verbose_name='filename')),
-                ('body', models.FileField(upload_to='wysibb/uploaded_files/', verbose_name='body')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='create time')),
-                ('mime', models.CharField(max_length=500, verbose_name='mime type')),
-                ('file_size', models.IntegerField(default=0, verbose_name='file length')),
-                ('user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='wysibb_files', to=settings.AUTH_USER_MODEL, verbose_name='user')),
+                ('id', models.AutoField(
+                    auto_created=True, primary_key=True, serialize=False,
+                    verbose_name='ID')),
+                ('filename', models.CharField(
+                    max_length=500, verbose_name='filename')),
+                ('body', models.FileField(
+                    upload_to='wysibb/uploaded_files/', verbose_name='body')),
+                ('created_at', models.DateTimeField(
+                    auto_now_add=True, verbose_name='create time')),
+                ('mime', models.CharField(
+                    max_length=500, verbose_name='mime type')),
+                ('file_size', models.IntegerField(
+                    default=0, verbose_name='file length')),
+                ('user', models.ForeignKey(
+                    blank=True, null=True,
+                    on_delete=django.db.models.deletion.PROTECT,
+                    related_name='wysibb_files', to=settings.AUTH_USER_MODEL,
+                    verbose_name='user')),
             ],
             options={
                 'verbose_name': 'uploaded file',
@@ -47,14 +63,27 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='UploadedImage',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('filename', models.CharField(max_length=500, verbose_name='filename')),
-                ('image', models.ImageField(upload_to='wysibb/uploaded_image/', verbose_name='image')),
-                ('thumb', models.ImageField(upload_to='wysibb/uploaded_thumbs/', verbose_name='thumbnail')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='create time')),
-                ('mime', models.CharField(max_length=500, verbose_name='mime type')),
-                ('file_size', models.IntegerField(default=0, verbose_name='file length')),
-                ('user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='wysibb_images', to=settings.AUTH_USER_MODEL, verbose_name='user')),
+                ('id', models.AutoField(
+                    auto_created=True, primary_key=True, serialize=False,
+                    verbose_name='ID')),
+                ('filename', models.CharField(
+                    max_length=500, verbose_name='filename')),
+                ('image', models.ImageField(
+                    upload_to='wysibb/uploaded_image/', verbose_name='image')),
+                ('thumb', models.ImageField(
+                    upload_to='wysibb/uploaded_thumbs/',
+                    verbose_name='thumbnail')),
+                ('created_at', models.DateTimeField(
+                    auto_now_add=True, verbose_name='create time')),
+                ('mime', models.CharField(
+                    max_length=500, verbose_name='mime type')),
+                ('file_size', models.IntegerField(
+                    default=0, verbose_name='file length')),
+                ('user', models.ForeignKey(
+                    blank=True, null=True,
+                    on_delete=django.db.models.deletion.PROTECT,
+                    related_name='wysibb_images', to=settings.AUTH_USER_MODEL,
+                    verbose_name='user')),
             ],
             options={
                 'verbose_name': 'uploaded image',
