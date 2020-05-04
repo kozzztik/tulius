@@ -10,7 +10,7 @@ ADD settings.py /opt/tulius/settings.py
 ADD .pylintrc /opt/tulius/.pylintrc
 ADD tests /opt/tulius/tests
 ADD pytest.ini /opt/tulius/pytest.ini
-RUN touch /opt/tulius/.coverage
+ADD .coveragerc /opt/tulius/.coveragerc
 
 # update requirements
 RUN pip install -r requirements.txt

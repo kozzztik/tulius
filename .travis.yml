@@ -12,7 +12,8 @@ before_script:
 script:
   - docker run tulius_test python3 -m pylint djfw tulius tests
   - mkdir coverage
-  - docker run -e TULIUS_BRANCH=test --net="host" -v coverage:/opt/tulius/coverage tulius_test python3 -m pytest tests && mv .coverage coverage/.coverage
+  - docker run -e TULIUS_BRANCH=test --net="host" -v coverage:/opt/tulius/coverage tulius_test python3 -m pytest tests
+  - ls coverage/
   - mv coverage/.coverage ./.coverage
 addons:
   ssh_known_hosts: tulius.co-de.org:22
