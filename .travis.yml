@@ -13,8 +13,6 @@ script:
   - docker run tulius_test python3 -m pylint djfw tulius tests
   - mkdir $PWD/coverage
   - docker run -e TULIUS_BRANCH=test --net="host" -v $PWD/coverage:/opt/tulius/coverage tulius_test python3 -m pytest tests
-  - cp $PWD/coverage/.coverage $PWD/.coverage
-  - stat $PWD/.coverage
 addons:
   ssh_known_hosts: tulius.co-de.org:22
 before_deploy:
@@ -30,4 +28,5 @@ deploy:
     on:
       branch: master
 after_success:
+  - ln -s tulius /opt/tulius
   - coveralls debug -v
