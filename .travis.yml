@@ -28,5 +28,5 @@ deploy:
     on:
       branch: master
 after_success:
-  - ln -s tulius /opt/tulius
+  - ln -s $PWD /opt/tulius
   - coveralls debug -v
