@@ -11,8 +11,8 @@ before_script:
   - docker tag kozzztik/tulius:$TRAVIS_BRANCH tulius_test
 script:
   - docker run tulius_test python3 -m pylint djfw tulius tests
-  - touch .coveralls
-  - docker run -e TULIUS_BRANCH=test --net="host" -v $(pwd)/.coveralls:/opt/tulius/.coveralls tulius_test python3 -m pytest tests
+  - touch .coverage
+  - docker run -e TULIUS_BRANCH=test --net="host" -v $(pwd)/.coverage:/opt/tulius/.coverage tulius_test python3 -m pytest tests
 addons:
   ssh_known_hosts: tulius.co-de.org:22
 before_deploy:
