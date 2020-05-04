@@ -223,7 +223,7 @@ LOGGING = {
         },
         'async_app': {
             'handlers': ['console'],
-            'level': 'DEBUG' if env == 'local' else 'ERROR',
+            'level': 'DEBUG' if env == 'dev' else 'ERROR',
             'propagate': True,
         }
     }
