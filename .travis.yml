@@ -5,7 +5,7 @@ services:
   - docker
   - mysql
   - redis
-install: pip install python-coveralls
+install: pip install python-coveralls pytest-cov == 2.8.1
 before_script:
   - docker build -t kozzztik/tulius:$TRAVIS_BRANCH .
   - docker tag kozzztik/tulius:$TRAVIS_BRANCH tulius_test
