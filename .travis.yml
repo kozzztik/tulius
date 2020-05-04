@@ -11,10 +11,10 @@ before_script:
   - docker tag kozzztik/tulius:$TRAVIS_BRANCH tulius_test
 script:
   - docker run tulius_test python3 -m pylint djfw tulius tests
-  - mkdir coverage
-  - docker run -e TULIUS_BRANCH=test --net="host" -v coverage:/opt/tulius/coverage tulius_test python3 -m pytest tests
-  - ls coverage/
-  - mv coverage/.coverage ./.coverage
+  - mkdir /home/travis/build/kozzztik/tulius/coverage
+  - docker run -e TULIUS_BRANCH=test --net="host" -v /home/travis/build/kozzztik/tulius/coverage:/opt/tulius/coverage tulius_test python3 -m pytest tests
+  - ls /home/travis/build/kozzztik/tulius/coverage
+  - mv /home/travis/build/kozzztik/tulius/coverage/.coverage /home/travis/build/kozzztik/tulius/.coverage
 addons:
   ssh_known_hosts: tulius.co-de.org:22
 before_deploy:
