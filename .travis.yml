@@ -29,4 +29,5 @@ deploy:
       branch: master
 after_success:
   - ln -s $PWD /opt/tulius
+  - cd /opt/tulius
   - coveralls -v
