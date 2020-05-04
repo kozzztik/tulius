@@ -31,4 +31,4 @@ deploy:
     on:
       branch: master
 after_success:
-  - coveralls
+  - coveralls --data_file /home/travis/build/kozzztik/tulius/.coverage
