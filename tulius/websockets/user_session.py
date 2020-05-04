@@ -36,7 +36,7 @@ class UserSession:
             await func(name, message.decode('utf-8'))
 
     async def subscribe_channel(self, name, func):
-        channels = await self.redis.subscribe(name)
+        channels = await self.redis.subscribe(consts.make_channel_name(name))
         for channel in channels:
             asyncio.get_event_loop().create_task(
                 self._channel_listener_task(channel, name, func))

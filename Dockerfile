@@ -8,8 +8,12 @@ ADD wsgi.py /opt/tulius/wsgi.py
 ADD async_app.py /opt/tulius/async_app.py
 ADD settings.py /opt/tulius/settings.py
 ADD .pylintrc /opt/tulius/.pylintrc
+ADD tests /opt/tulius/tests
+ADD pytest.ini /opt/tulius/pytest.ini
+ADD .coveragerc /opt/tulius/.coveragerc
 
 # update requirements
 RUN pip install -r requirements.txt
 
+ENV TULIUS_BRANCH local
 RUN python manage.py compilemessages

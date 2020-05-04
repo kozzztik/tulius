@@ -3,11 +3,16 @@ python:
   - "3.6"
 services:
   - docker
+  - mysql
+  - redis
+install: pip install coveralls
 before_script:
   - docker build -t kozzztik/tulius:$TRAVIS_BRANCH .
   - docker tag kozzztik/tulius:$TRAVIS_BRANCH tulius_test
 script:
-  - docker run tulius_test python3 -m pylint djfw tulius
+  - docker run tulius_test python3 -m pylint djfw tulius tests
+  - mkdir $PWD/coverage
+  - docker run -e TULIUS_BRANCH=test --net="host" -v $PWD/coverage:/opt/tulius/coverage tulius_test python3 -m pytest tests
 addons:
   ssh_known_hosts: tulius.co-de.org:22
 before_deploy:
@@ -22,3 +27,7 @@ deploy:
     script: bash scripts/deploy.sh
     on:
       branch: master
+after_success:
+  - ln -s $PWD /opt/tulius
+  - cd /opt/tulius
+  - coveralls -v
