@@ -19,13 +19,15 @@ echo "Collect static"
 docker run -v "$PWD/data/static":/opt/tulius/data/static \
     -e TULIUS_BRANCH="$1" \
     --net tuliusnet \
-    tulius_$1 python manage.py collectstatic --noinput
+    -v "/home/travis/$1/settings_production.py":/opt/tulius/settings_production.py \
+    kozzztik/tulius:$1 python manage.py collectstatic --noinput
 
 echo "Migrate"
 docker run \
     -e TULIUS_BRANCH="$1" \
     --net tuliusnet \
-    tulius_$1 python manage.py migrate
+    -v "/home/travis/$1/settings_production.py":/opt/tulius/settings_production.py \
+    kozzztik/tulius:$1 python manage.py migrate
 
 
 echo "Run compose"
