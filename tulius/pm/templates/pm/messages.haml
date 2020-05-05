@@ -1,0 +1,41 @@
+- extends 'base.haml'
+- load i18n
+- load bbcodes
+
+
+- block extra_scripts
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}tulius/css/tulius-players.css'}
+
+- block breadcrumbs
+    %li
+        .divider
+        %a{href: ''}
+            {% trans "Messages" %}
+
+- block caption
+    {% trans "Messages" %}
+
+- block content
+    - if talkings
+        %table.messages-table.table
+            %tbody
+                - for talking in talkings
+                    %tr{class: '{% if talking.last.sender != request.user and not talking.last.is_read %}unread-talking{% endif %}'}
+                        %td.messages-avatar.hidden-phone
+                            - if talking.sender.avatar
+                                %img{width: '50px', height: '50px', src: '{{ talking.sender.avatar.url }}'}
+                        %td.messages-sender
+                            %a{href: '{{ talking.sender.get_absolute_url }}'}
+                                = talking.sender
+                            %br
+                            %small
+                                = talking.last.created_at
+                        %td
+                            .messages-text
+                                %a{href: '{% url "pm:to_user" talking.sender.pk %}'}
+                                    = talking.last.body|bbcode|safe|truncatewords:20
+    - else
+        %br
+        {% trans "You have no messages yet" %}
+        %br
+        %br

@@ -1,12 +1,12 @@
-from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist,\
-    PermissionDenied
-from django.http import Http404
+from django import http
+from django import forms
+from django.core import exceptions
+from django.views.generic import edit
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
-from django import forms
-from django.views.generic.edit import ModelFormMixin, ProcessFormView, SingleObjectTemplateResponseMixin
 
-class ParentObjectMixin(object):
+
+class ParentObjectMixin:
     """
     Provides the ability to retrieve a parent object for further manipulation.
     """
@@ -17,10 +17,10 @@ class ParentObjectMixin(object):
     parent_slug_url_kwarg = 'slug'
     parent_pk_url_kwarg = 'pk'
     parent_obj_foreign_key = None
-    
+
     def check_parent_rights(self, obj, user):
         return True
-    
+
     def get_parent_object(self, queryset=None):
         if queryset is None:
             queryset = self.get_parent_queryset()
@@ -35,17 +35,18 @@ class ParentObjectMixin(object):
             queryset = queryset.filter(**{slug_field: slug})
         # If none of those are defined, it's an error.
         else:
-            raise AttributeError(u"Generic parent detail view %s must be called with "
-                                 u"either an object pk or a slug."
-                                 % self.__class__.__name__)
+            raise AttributeError(
+                'Generic parent detail view %s must be called with '
+                'either an object pk or a slug.' % self.__class__.__name__)
         try:
             parent_obj = queryset.get()
-        except ObjectDoesNotExist:
-            raise Http404(_(u"No %(verbose_name)s found matching the query") %
-                          {'verbose_name': queryset.model._meta.verbose_name})
+        except exceptions.ObjectDoesNotExist:
+            raise http.Http404(
+                _('No %(verbose_name)s found matching the query') %
+                {'verbose_name': queryset.model._meta.verbose_name})
         if not self.check_parent_rights(parent_obj, self.request.user):
-            raise PermissionDenied()
-        
+            raise exceptions.PermissionDenied()
+
         if not self.parent_obj_foreign_key:
             obj = getattr(self, 'object')
             if obj:
@@ -65,12 +66,12 @@ class ParentObjectMixin(object):
         if self.parent_queryset is None:
             if self.parent_model:
                 return self.parent_model._default_manager.all()
-            else:
-                raise ImproperlyConfigured(u"%(cls)s is missing a queryset. Define "
-                                           u"%(cls)s.model, %(cls)s.queryset, or override "
-                                           u"%(cls)s.get_object()." % {
-                                                'cls': self.__class__.__name__
-                                        })
+            raise exceptions.ImproperlyConfigured(
+                '%(cls)s is missing a queryset. Define '
+                '%(cls)s.model, %(cls)s.queryset, or override '
+                '%(cls)s.get_object().' % {
+                    'cls': self.__class__.__name__
+                })
         return self.parent_queryset._clone()
 
     def get_parent_slug_field(self):
@@ -85,19 +86,21 @@ class ParentObjectMixin(object):
         """
         if self.parent_context_object_name:
             return self.parent_context_object_name
-        elif hasattr(obj, '_meta'):
+        if hasattr(obj, '_meta'):
             return smart_str(obj._meta.object_name.lower())
-        else:
-            return None
+        return None
 
     def get_context_data(self, **kwargs):
         context = kwargs
-        context_object_name = self.get_parent_context_object_name(self.parent_object)
+        context_object_name = self.get_parent_context_object_name(
+            self.parent_object)
         if context_object_name:
             context[context_object_name] = self.parent_object
         return context
 
-class BaseParentCreateView(ParentObjectMixin, ModelFormMixin, ProcessFormView):
+
+class BaseParentCreateView(
+        ParentObjectMixin, edit.ModelFormMixin, edit.ProcessFormView):
     """
     Base view for creating an new object instance.
 
@@ -112,18 +115,20 @@ class BaseParentCreateView(ParentObjectMixin, ModelFormMixin, ProcessFormView):
         self.object = None
         self.parent_object = self.get_parent_object()
         return super(BaseParentCreateView, self).post(request, *args, **kwargs)
-    
+
     def form_valid(self, form):
         self.object = form.save(commit=False)
         if not self.parent_obj_foreign_key:
-            raise AttributeError(u"BaseCreate can`t determine foreign "
-                                 u"key for linking models.")
+            raise AttributeError("BaseCreate can`t determine foreign "
+                                 "key for linking models.")
         setattr(self.object, self.parent_obj_foreign_key, self.parent_object)
         self.object.save()
-        return super(ModelFormMixin, self).form_valid(form)
+        return super(BaseParentCreateView, self).form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = kwargs
+        if 'form' not in context:
+            context['form'] = self.get_form()
         if self.object:
             context['object'] = self.object
             context_object_name = self.get_context_object_name(self.object)
@@ -131,10 +136,13 @@ class BaseParentCreateView(ParentObjectMixin, ModelFormMixin, ProcessFormView):
                 context[context_object_name] = self.object
         if self.parent_object:
             context['parent_object'] = self.parent_object
-            context_object_name = self.get_parent_context_object_name(self.parent_object)
+            context_object_name = self.get_parent_context_object_name(
+                self.parent_object)
             if context_object_name:
                 context[context_object_name] = self.parent_object
         return context
-    
-class SubCreateView(SingleObjectTemplateResponseMixin, BaseParentCreateView):
+
+
+class SubCreateView(
+        edit.SingleObjectTemplateResponseMixin, BaseParentCreateView):
     template_name_suffix = '_form'

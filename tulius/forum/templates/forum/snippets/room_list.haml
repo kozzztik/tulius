@@ -20,9 +20,9 @@
                     - with unreaded=room.unreaded
                         - if unreaded
                             %a{href:'{{ unreaded.get_absolute_url }}'}
-                                %img{src: '{{ MEDIA_URL }}forum/unreadedmark.gif'}
+                                %img{src: '{{ STATIC_URL }}forum/img/unreadedmark.gif'}
                         - else
-                            %img{src: '{{ MEDIA_URL }}forum/readedmark.gif'}
+                            %img{src: '{{ STATIC_URL }}forum/img/readedmark.gif'}
                 %td
                     .forum-post-description
                         %h4

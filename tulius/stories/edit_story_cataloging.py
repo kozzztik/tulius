@@ -1,7 +1,9 @@
+from django import urls
 from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse
+
 from tulius.stories.catalog import stories_catalog_page
 from djfw.cataloging.core import CatalogPage
+
 
 EDIT_STORY_PAGES_MAIN = 'edit_story_main'
 EDIT_STORY_PAGES_TEXTS = 'edit_story_texts'
@@ -15,42 +17,47 @@ EDIT_STORY_PAGES_ILLUSTRATIONS = 'edit_story_illustrations'
 EDIT_STORY_PAGES_MATERIALS = 'edit_story_materials'
 STORY_GRAPHICS = 'story_pics'
 
-EDIT_STORY_PAGES= (
-        (_('main'), EDIT_STORY_PAGES_MAIN),
-        (_('texts'), EDIT_STORY_PAGES_TEXTS),
-        (_('users'), EDIT_STORY_PAGES_USERS),
-        (_('graphics'), EDIT_STORY_PAGES_GRAPHICS),
-        (_('characters'), EDIT_STORY_PAGES_CHARACTERS),
-        (_('avatars'), EDIT_STORY_PAGES_AVATARS),
-        (_('illustrations'), EDIT_STORY_PAGES_ILLUSTRATIONS),
-        (_('materials'), EDIT_STORY_PAGES_MATERIALS),
-        (_('variations'), EDIT_STORY_PAGES_VARIATIONS),
-    )
-    
+EDIT_STORY_PAGES = (
+    (_('main'), EDIT_STORY_PAGES_MAIN),
+    (_('texts'), EDIT_STORY_PAGES_TEXTS),
+    (_('users'), EDIT_STORY_PAGES_USERS),
+    (_('graphics'), EDIT_STORY_PAGES_GRAPHICS),
+    (_('characters'), EDIT_STORY_PAGES_CHARACTERS),
+    (_('avatars'), EDIT_STORY_PAGES_AVATARS),
+    (_('illustrations'), EDIT_STORY_PAGES_ILLUSTRATIONS),
+    (_('materials'), EDIT_STORY_PAGES_MATERIALS),
+    (_('variations'), EDIT_STORY_PAGES_VARIATIONS),
+)
+
+
 class EditStoryPage(CatalogPage):
     def get_subpages(self):
-        return [EditStorySubpage(self.instance, name, url, self) for (name, url) in EDIT_STORY_PAGES]
-    
+        return [
+            EditStorySubpage(self.instance, name, url, self)
+            for (name, url) in EDIT_STORY_PAGES]
+
     def get_caption(self):
-        return unicode(self.instance)
-        
+        return str(self.instance)
+
     def __init__(self, story):
-        self.parent = stories_catalog_page()
-        self.name = "%s %s" % (unicode(_('edit')), story)
-        self.url = story.get_edit_url()
-        self.is_index = True
+        super(EditStoryPage, self).__init__(
+            is_index=True,
+            parent=stories_catalog_page(),
+            name="%s %s" % (str(_('edit')), story),
+            url=story.get_edit_url(),
+        )
         self.instance = story
-        
+
+
 class EditStorySubpage(CatalogPage):
     def __init__(self, story, name='', url='', parent=None):
-        if parent:
-            self.parent = parent
-        else:
-            self.parent = EditStoryPage(story)
-        self.name = unicode(name)
-        self.url = reverse('stories:' + url, args=(story.pk,))
+        super(EditStorySubpage, self).__init__(
+            parent=parent or EditStoryPage(story),
+            name=name,
+            url=urls.reverse('stories:' + url, args=(story.pk,)),
+        )
         if not name:
             for page in EDIT_STORY_PAGES:
                 if page[1] == url:
-                    self.name = unicode(page[0])
+                    self.name = str(page[0])
         self.instance = story

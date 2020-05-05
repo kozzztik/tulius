@@ -1,7 +1,7 @@
 - load i18n
 - if bottom_online_users
     .pull-right
-        - if request.user.game_inline = 1
+        - if request.user.game_inline == 1
             {% trans "Messages:" %}
             = variation.comments_count
         - else

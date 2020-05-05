@@ -87,30 +87,30 @@ PERIOD_CHOICES = (
     (PERIOD_MONTH, 'Last month'),
     )
 
-class StatsFilterForm(forms.Form):
 
+class StatsFilterForm(forms.Form):
     graph_type = forms.ChoiceField(
-        required = True,
-        choices = GRAPH_TYPE_CHOICES,
-        label = _(u'type'),
+        required=True,
+        choices=GRAPH_TYPE_CHOICES,
+        label=_(u'type'),
     )
     linear_type = forms.ChoiceField(
-        required = True,
-        choices = LINEAR_GRAPH_CHOICES,
-        label = _(u'report'),
+        required=True,
+        choices=LINEAR_GRAPH_CHOICES,
+        label=_(u'report'),
     )
     linear_c_type = forms.ChoiceField(
-        required = True,
-        choices = LINEAR_C_GRAPH_CHOICES,
-        label = _(u'report'),
+        required=True,
+        choices=LINEAR_C_GRAPH_CHOICES,
+        label=_(u'report'),
     )
     sunlight_type = forms.ChoiceField(
-        required = True,
-        choices = SUNLIGHT_CHOICES,
-        label = _(u'report'),
+        required=True,
+        choices=SUNLIGHT_CHOICES,
+        label=_(u'report'),
     )
     period = forms.ChoiceField(
-        required = True,
-        choices = PERIOD_CHOICES,
-        label = _(u'report'),
+        required=True,
+        choices=PERIOD_CHOICES,
+        label=_(u'report'),
     )

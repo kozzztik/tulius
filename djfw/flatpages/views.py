@@ -1,11 +1,12 @@
-from .models import FlatPage
-from django.template import loader, RequestContext
+from django.template.response import TemplateResponse
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.conf import settings
-from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import TemplateView
+
+from .models import FlatPage
+
 
 DEFAULT_TEMPLATE = 'flatpages/default.haml'
 
@@ -17,6 +18,8 @@ DEFAULT_TEMPLATE = 'flatpages/default.haml'
 # or a redirect is required for authentication, the 404 needs to be returned
 # without any CSRF checks. Therefore, we only
 # CSRF protect the internal implementation.
+
+
 def flatpage(request, url):
     """
     Public interface to the flat page view.
@@ -35,20 +38,20 @@ def flatpage(request, url):
     f = get_object_or_404(FlatPage, url__exact=url, is_enabled=True)
     return render_flatpage(request, f)
 
+
 @csrf_protect
 def render_flatpage(request, f):
     """
     Internal interface to the flat page view.
     """
     template_name = getattr(settings, 'FLATPAGES_TEMPLATE', DEFAULT_TEMPLATE)
-    t = loader.get_template(template_name)
+    template = TemplateResponse(request, template_name, {'flatpage': f})
+    template.render()
+    return template
 
-    c = RequestContext(request, {
-        'flatpage': f,
-    })
-    return HttpResponse(t.render(c))
 
 class FlatpagesList(TemplateView):
-    template_name='flatpages/list.haml'
+    template_name = 'flatpages/list.haml'
+
     def get_context_data(self, **kwargs):
         return {'flatpages': FlatPage.objects.all()}

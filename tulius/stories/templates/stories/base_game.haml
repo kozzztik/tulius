@@ -1,5 +1,4 @@
 - extends 'base_game.haml'
-- load url from future
 - load i18n
 
 - block breadcrumbs
@@ -16,4 +15,4 @@
     {% trans "Story catalog" %}
     
 - block extra_scripts
-    %link{rel: 'stylesheet', href: '{{ MEDIA_URL }}css/tulius-stories.css', type: 'text/css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}stories/tulius-stories.css'}

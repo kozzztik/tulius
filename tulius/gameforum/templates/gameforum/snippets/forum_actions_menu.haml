@@ -1,5 +1,5 @@
 - load i18n
-- load url from future
+
 - if not request.user.is_anonymous
     .btn-toolbar
         .btn-group{class: '{% if dropupmenu %}dropup{% endif %}'}
@@ -10,23 +10,23 @@
                 - if not parent_thread.room
                     %li
                         %a{data-toggle: 'modal', href: '#quoteAnswer'}
-                            %img{src: '{{ MEDIA_URL }}games/button_blue_heart.png', style: 'height: 25px'}
+                            %img{src: '{{ STATIC_URL }}games/img/button_blue_heart.png', style: 'height: 25px'}
                             {% trans "Answer with quote" %}
                 - else
                     - if parent_thread.moderate_right
                         %li
                             %a{href: '{{ parent_thread.get_add_room_url}}'}
-                                %img{src: '{{ MEDIA_URL }}games/button_green_add.png', style: 'height: 25px'}
+                                %img{src: '{{ STATIC_URL }}games/img/button_green_add.png', style: 'height: 25px'}
                                 {% trans "add room" %}
                     - if parent_thread.write_right
                         %li
                             %a{href: '{{ parent_thread.get_add_thread_url }}'}
-                                %img{src: '{{ MEDIA_URL }}games/button_red_add.png', style: 'height: 25px'}
+                                %img{src: '{{ STATIC_URL }}games/img/button_red_add.png', style: 'height: 25px'}
                                 {% trans "add thread" %}
                     - if parent_thread.edit_right
                         %li
                             %a{href: '{{ parent_thread.get_edit_url }}'}
-                                %img{src: '{{ MEDIA_URL }}games/button_blue_fastforward.png', style: 'height: 25px'}
+                                %img{src: '{{ STATIC_URL }}games/img/button_blue_fastforward.png', style: 'height: 25px'}
                                 {% trans "edit" %}
                     - if parent_thread.move_right
                         - if parent_thread.parent
@@ -41,7 +41,7 @@
                     - if not request.user.is_anonymous
                         %li
                             %a{href: '{{ parent_thread.get_mark_all_as_readed_url }}'}
-                                %img{src: '{{ MEDIA_URL }}games/check.png', style: 'height: 25px'}
+                                %img{src: '{{ STATIC_URL }}games/img/check.png', style: 'height: 25px'}
                                 {% trans "Mark all as readed" %}
                     - if request.user.is_superuser and parent_thread
                         %li
@@ -87,17 +87,17 @@
                     - if parent_thread.game
                         %li
                             %a{href: '{{ parent_thread.game.get_absolute_url }}', target: '_blank'}
-                                %img{src: '{{ MEDIA_URL }}games/clipboard.png', style: 'height: 25px'}
+                                %img{src: '{{ STATIC_URL }}games/img/clipboard.png', style: 'height: 25px'}
                                 {% trans "Introduction" %}
                     - for material in parent_thread.materials
                         %li
                             %a{href: '{{ material.url }}', target: '_blank'}
-                                %img{src: '{{ MEDIA_URL }}games/document_blank.png', style: 'height: 25px'}
+                                %img{src: '{{ STATIC_URL }}games/img/document_blank.png', style: 'height: 25px'}
                                 = material
                     - for illustration in parent_thread.illustrations
                         %li
                             %a{href: '{{ illustration.image.url }}', rel: 'lightbox[illustrations{% if dropupmenu %}2{% endif %}]', title: '{{ illustration.name }}'}
-                                %img{src: '{{ MEDIA_URL }}games/chart.png', style: 'height: 25px'}
+                                %img{src: '{{ STATIC_URL }}games/img/chart.png', style: 'height: 25px'}
                                 = illustration
         - if parent_thread.roles_list
             .btn-group.hidden-phone{class: '{% if dropupmenu %}dropup{% endif %}'}
@@ -141,10 +141,10 @@
                     {% trans "Quoting" %}
             %p
                 {% trans "Quoting now is simple! Just select text with mouse:" %}
-            %img{src: '{{ MEDIA_URL }}/forum/quote_help1.png'}
+            %img{src: '{{ STATIC_URL }}forum/img/quote_help1.png'}
             %p
                 {% trans 'And press "Answer" button. Fast reply form will appear under this post, and selected text will be added as quote.' %}
-            %img{src: '{{ MEDIA_URL }}/forum/quote_help2.png'}
+            %img{src: '{{ STATIC_URL }}forum/img/quote_help2.png'}
             .modal-footer
                 %button.btn.btn-primary{data-dismiss: "modal"}
                     {% trans "Close" %}

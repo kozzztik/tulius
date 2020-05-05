@@ -4,13 +4,14 @@ import os
 from django.utils.translation import ugettext_lazy as _
 
 branch = os.environ.get("TULIUS_BRANCH", '')
-if branch == 'master':
-    env = 'prod'
-elif branch == 'dev':
-    env = 'qa'
-else:
-    env = 'dev'
+env = {
+    'master': 'prod',  # production env
+    'dev': 'qa',  # test staging env
+    'local': 'dev',  # local development env
+    'test': 'test'  # ci tests env
+}[branch]
 
+ENV = env
 BASE_DIR = os.path.dirname(__file__) + '/'
 PROJECT_NAME = 'tulius'
 
@@ -42,8 +43,6 @@ LANGUAGES = (
 AUTH_USER_MODEL = 'tulius.User'
 
 INSTALLED_APPS = (
-    'south',
-    'raven.contrib.django.raven_compat',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -53,18 +52,14 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'django.contrib.sitemaps',
-    'memcache_status',
-    'ws4redis',
-    'djaml',
+    'hamlpy',
     'djfw',
-    'tulius',
     'djfw.datablocks',
     'djfw.logger',
     'djfw.pagination',
     'djfw.flatpages',
     'djfw.tinymce',
     'djfw.wysibb',
-    'djfw.autocomplete',
     'djfw.inlineformsets',
     'djfw.cataloging',
     'djfw.news',
@@ -73,8 +68,7 @@ INSTALLED_APPS = (
     'djfw.photos',
     'djfw.sortable',
     'djfw.custom_views',
-    'django_mailer',
-    'pm',
+    'tulius.pm',
     'tulius',
     'tulius.login',
     'tulius.players',
@@ -84,14 +78,14 @@ INSTALLED_APPS = (
     'tulius.stories',
     'tulius.gameforum',
     'djfw.installer',
-    'events',
+    'tulius.events',
     'tulius.vk',
     'tulius.counters',
+    'tulius.websockets',
 )
 
-MIDDLEWARE_CLASSES = (
-    'djfw.installer.middleware.MaintenanceMiddleware',
-#    'raven.contrib.django.raven_compat.middleware.Sentry404CatchMiddleware',
+MIDDLEWARE = (
+    # 'raven.contrib.django.raven_compat.middleware.Sentry404CatchMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -108,30 +102,43 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
-TEMPLATE_LOADERS = (
-    'hamlpy.template.loaders.HamlPyFilesystemLoader',
-    'hamlpy.template.loaders.HamlPyAppDirectoriesLoader',
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'OPTIONS': {
+            'loaders': [
+                'hamlpy.template.loaders.HamlPyFilesystemLoader',
+                'hamlpy.template.loaders.HamlPyAppDirectoriesLoader',
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+            ],
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.request',
+                'django.template.context_processors.static',
+                'tulius.websockets.context_processors.default',
+                'djfw.flatpages.context_processors.flatpages',
+                'djfw.datablocks.context_processors.datablocks',
+            ],
+            'libraries': {
 
-if not DEBUG:
-    TEMPLATE_LOADERS = (
-        ('django.template.loaders.cached.Loader', TEMPLATE_LOADERS),)
+            }
+        }
+    },
+]
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.debug',
-    'django.core.context_processors.i18n',
-    'django.core.context_processors.media',
-    'django.core.context_processors.request',
-    'django.core.context_processors.static',
-    'django.contrib.messages.context_processors.messages',
-    'django.contrib.auth.context_processors.auth',
-    'ws4redis.context_processors.default',
-    'djfw.flatpages.context_processors.flatpages',
-    'tulius.login.context_processors.relogin',
-    'djfw.datablocks.context_processors.datablocks',
-)
+# TODO that must not work now
+# if not DEBUG:
+#     TEMPLATES += [
+#         {
+#             'BACKEND': 'django.template.loaders.cached.Loader'
+#         }
+#     ]
+
 
 AUTHENTICATION_BACKENDS = (
     'tulius.vk.backend.VKBackend',
@@ -143,12 +150,10 @@ ALLOWED_HOSTS = [
     'localhost',
 ]
 
-# EMAIL_BACKEND = 'django_mailer.backend.DbBackend'
-
 INLINE_FORMSET_CLASS = 'table'
 ACCOUNT_ACTIVATION_DAYS = 2
 LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = '/accounts/auth/login/'
+LOGIN_URL = '/accounts/login/'
 AUTOCOMPLETE_MODELS = ('auth.user', 'tulius.user')
 
 DEFAULT_THEME = 'classic'
@@ -174,11 +179,7 @@ LOGGING = {
     'handlers': {
         'null': {
             'level': 'DEBUG',
-            'class': 'django.utils.log.NullHandler', 
-        },
-        'sentry': {
-            'level': 'ERROR',
-            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+            'class': 'logging.NullHandler',
         },
         'mail_admins': {
             'level': 'ERROR',
@@ -220,6 +221,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
+        'async_app': {
+            'handlers': ['console'],
+            'level': 'DEBUG' if env == 'dev' else 'ERROR',
+            'propagate': True,
+        }
     }
 }
 
@@ -229,10 +235,6 @@ if DEBUG:
         'error', r"DateTimeField received a naive datetime",
         RuntimeWarning, r'django\.db\.models\.fields')
 
-# TODO remove with 3.6
-THEMING_ROOT = MEDIA_ROOT + 'uploads/themes/'
-THEMING_URL = MEDIA_URL + 'uploads/themes/'
-
 EMAIL_HOST = 'tulius_mail' if env == 'prod' else 'localhost'
 EMAIL_PORT = 25
 EMAIL_HOST_USER = '' 
@@ -240,75 +242,68 @@ EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = False
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 
-# EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-# EMAIL_FILE_PATH = PROJECT_ROOT +  'mail_dump/'
+if env != 'prod':
+    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+    EMAIL_FILE_PATH = BASE_DIR +  'mail_dump/'
 
 MAIL_RECEIVERS = ['pm.mail.get_mail']
 
 
-WS4REDIS_CONNECTION = {
-    'host': 'tulius_redis',
+REDIS_CONNECTION = {
+    'host': '127.0.0.1' if env in ['dev', 'test'] else 'tulius_redis',
     'port': 6379,
-    'db': 10,
+    'db': {'prod': 3, 'qa': 2, 'dev': 1, 'test': 4}[env],
     'password': '',
 }
 
-WS4REDIS_EXPIRE = 60
-WS4REDIS_PREFIX = 'ws_{}'.format(env)
+ASYNC_SERVER = {
+    'host': '127.0.0.1' if env == 'dev' else '0.0.0.0',
+    'port': 7000
+}
+
 WEBSOCKET_URL = '/ws/'
-WS4REDIS_SUBSCRIBER = 'websockets.subscriber.RedisSubscriber'
-WSGI_APPLICATION = 'ws4redis.django_runserver.application'
-WS4REDIS_HEARTBEAT = 'heartbeat'
 
 # Actual credentials are hold in settings_production.py file.
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'tulius_{}'.format(env),
-        'HOST': '127.0.0.1' if env == 'dev' else 'tulius_mysql',
-        'USER': 'tulius_{}'.format(env),
-        'PASSWORD': 'tulius',
+        'HOST': '127.0.0.1' if env in ['dev', 'test'] else 'tulius_mysql',
+        'USER': 'travis' if env == 'test' else 'tulius_{}'.format(env),
+        'PASSWORD': '' if env == 'test' else 'tulius',
         'PORT': '',
         'CONN_MAX_AGE': 20,
+        'ATOMIC_REQUESTS': True,
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+        }
     }
 }
 
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'redis_cache.RedisCache',
-#         'LOCATION': '/var/run/redis/redis.sock',
-#         'KEY_PREFIX': 'tulius',
-#     }
-# }
-#
-# SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+# it is important to use Redis as session cache as it is used by Async app
+# to identify users
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+CACHES = {
+    'default': {
+        'BACKEND': 'redis_cache.RedisCache',
+        'LOCATION': '{host}:{port}'.format(**REDIS_CONNECTION),
+        'OPTIONS': {
+            'DB': REDIS_CONNECTION['db'],
+            'PARSER_CLASS': 'redis.connection.HiredisParser',
+            'CONNECTION_POOL_CLASS': 'redis.BlockingConnectionPool',
+            'PICKLE_VERSION': -1,
+        },
+    },
+}
 
 if env == 'prod':
     DEFAULT_FROM_EMAIL = 'tulius@tulius.com'
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-            'LOCATION': '127.0.0.1:11211',
-            'KEY_PREFIX': 'tulius',
-        }
-    }
-    SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
     ALLOWED_HOSTS += [
         'tulius.com',
         'tulius.co-de.org',
 ]
 elif env == 'qa':
     DEFAULT_FROM_EMAIL = 'tulius-test@tulius.com'
-    EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
-
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-            'LOCATION': '127.0.0.1:11211',
-            'KEY_PREFIX': 'testtulius',
-        }
-    }
-    SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
     ALLOWED_HOSTS += [
         'test.tulius.com',
         'test.tulius.co-de.org',

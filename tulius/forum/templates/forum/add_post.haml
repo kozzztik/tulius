@@ -2,7 +2,6 @@
 - load i18n
 - load repeatblock
 - enablemacros
-- load url from future
 
 - block page_scripts
     - include forum_site.templates.init_editor
@@ -10,7 +9,7 @@
         $(document).ready(function() { $("#tabs").tabs(); });
     </script>
     - if show_preview
-        %script{type: 'text/javascript', src: '{{ MEDIA_URL }}forum/preview.js'}
+        %script{type: 'text/javascript', src: '{{ STATIC_URL }}forum/js/preview.js'}
     
     - if not form.room
         - if formset

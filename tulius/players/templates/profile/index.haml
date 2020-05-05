@@ -1,13 +1,11 @@
 - extends 'base.haml'
 - load i18n
-- load url from future
 
 - block extra_scripts
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}ajaxuploader/js/fileuploader.js'}
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}ajaxuploader/css/fileuploader.css'}
-    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-players.css'}
-    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-forum.css'}
-    
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}tulius/css/tulius-players.css'}
+
 - block breadcrumbs
     %li
         .divider
@@ -61,6 +59,6 @@
                     - include "players/statistics.haml"
                 - if played_roles
                     - include "profile/snippets/played_table.haml"
-                    - if played_roles.count > 5
+                    - if stats.total_games > 5
                         %a{href: '{% url "players:profile_played" %}'}
                             {% trans "All played games and characters" %}

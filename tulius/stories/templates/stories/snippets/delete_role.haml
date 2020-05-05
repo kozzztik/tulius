@@ -1,5 +1,5 @@
 - load i18n
-- load url from future
+
 %form#RoleDeleteModal.modal.hide.fade.in.well.form-horizontal{method: 'POST', action: '{% url "stories:delete_role" variation.id %}', }
     - csrf_token
     .modal-header
@@ -18,4 +18,4 @@
             {% trans "Delete" %}
         %button.btn{'data-dismiss': "modal"}
             {% trans "Cancel" %}
-%script{'type': 'text/javascript', 'src': '{{ MEDIA_URL }}stories/role-delete.js'}
+%script{'type': 'text/javascript', 'src': '{{ STATIC_URL }}stories/role-delete.js'}

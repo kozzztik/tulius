@@ -1,13 +1,13 @@
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
-from django import forms
-from .models import LogMessage, ExceptionMessage
+from . import models
 
 _('logger')
 
+
 class LogMessageAdmin(admin.ModelAdmin):
     list_filter = ['level']
-    
+
     list_display = (
         'create_time',
         'level',
@@ -22,12 +22,12 @@ class LogMessageAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
-    
-admin.site.register(LogMessage, LogMessageAdmin)
+
+
+admin.site.register(models.LogMessage, LogMessageAdmin)
 
 
 class ExceptionMessageAdmin(admin.ModelAdmin):
-    
     list_display = (
         'create_time',
         'user_link',
@@ -40,8 +40,9 @@ class ExceptionMessageAdmin(admin.ModelAdmin):
     )
     list_editable = (
     )
-    
+
     def has_add_permission(self, request):
         return False
-        
-admin.site.register(ExceptionMessage, ExceptionMessageAdmin)
+
+
+admin.site.register(models.ExceptionMessage, ExceptionMessageAdmin)

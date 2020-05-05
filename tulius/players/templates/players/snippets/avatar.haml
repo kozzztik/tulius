@@ -3,4 +3,4 @@
     - if player.avatar
         %img{src: '{{ player.avatar.url }}', id: 'avatar{{ player.id }}'}
     - else
-        %img{src: '{{ MEDIA_URL }}blank_avatar.jpg', id: 'avatar{{ player.id }}'}
+        %img{src: '{{ STATIC_URL }}tulius/img/blank_avatar.jpg', id: 'avatar{{ player.id }}'}

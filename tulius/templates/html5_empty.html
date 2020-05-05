@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+<html lang="{% block site_language %}ru{% endblock %}">
+    {% block head %}
+        <head>
+            {% block meta %}
+                <meta charset="utf-8" />
+                <meta name="viewport" content="{% block meta_viewport %}width=device-width, initial-scale=1.0{% endblock %}" />
+                <meta name="author" content="http://vk.com/kozzztik" />
+                <meta name="description" content="{% block meta_description %}{% endblock %}" />
+                <meta name="keywords" content="{% block meta_keywords %}{% endblock %}" />
+            {% endblock %}
+            {% block favicon %}
+                <link rel="SHORTCUT ICON" href="{{ STATIC_URL }}favicon.ico" />
+            {% endblock %}
+            {% block additional_meta %} {% endblock %}
+            <title>
+                {% block title %}{% endblock %}
+            </title>
+            {% block styles %}
+                {% block jquery_styles %}
+                    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}common/jquery/css/jquery-ui-1.10.3.custom.min.css" />
+                {% endblock %}
+                {% block bootstrap_styles %}
+                    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}common/twitter_bootstrap/css/bootstrap.min.css" />
+                    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}common/twitter_bootstrap/css/bootstrap-responsive.min.css" />
+                    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}common/fortawesome/css/font-awesome.min.css" />
+                    <!--[if IE 7]>
+                    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}common/fortawesome/css/font-awesome-ie7.min.css" />
+                    <![endif]-->
+                {% endblock %}
+                {% block sitewide_styles %}{% endblock %}
+                {% block page_styles %}{% endblock %}
+                {% block additional_styles %}{% endblock %}
+                {% block user_styles %}{% endblock %}
+            {% endblock %}
+            {% block scripts %}
+                {% block jquery_scripts %}
+                    <script type="text/javascript" src="{{ STATIC_URL }}common/jquery/js/jquery-1.9.1.js"></script>
+                    <script type="text/javascript" src="{{ STATIC_URL }}common/jquery/js/jquery-ui-1.10.3.custom.min.js"></script>
+                    <script type="text/javascript" src="{{ STATIC_URL }}common/jquery/js/jquery.form.js"></script>
+                {% endblock %}
+                {% block bootstrap_scripts %}
+                    <script type="text/javascript" src="{{ STATIC_URL }}common/twitter_bootstrap/js/bootstrap.min.js"></script>
+                {% endblock %}
+                {% block ajax_scripts %}
+                    <script type="text/javascript" src="{{ STATIC_URL }}tulius/js/ajax_form.js"></script>
+                {% endblock %}
+                {% block sitewide_scripts %}{% endblock %}
+                {% block additional_scripts %}{% endblock %}
+                {% block page_scripts %}{% endblock %}
+                {% block user_scripts %}{% endblock %}
+                {% block counters %}{% endblock %}
+            {% endblock %}
+        </head>
+    {% endblock %}
+    {% block body %}{% endblock %}
+</html>

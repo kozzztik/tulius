@@ -1,8 +1,9 @@
 from django import template
-from django.conf import settings
-from tulius.flatpages.models import FlatPage
+
+from djfw.flatpages.models import FlatPage
 
 register = template.Library()
+
 
 class FlatpageNode(template.Node):
     def __init__(self, context_name, starts_with=None):
@@ -13,7 +14,8 @@ class FlatpageNode(template.Node):
             self.starts_with = None
 
     def render(self, context):
-        flatpages = FlatPage.objects.fileter(is_enabled=True)#filter(sites__id=settings.SITE_ID)
+        flatpages = FlatPage.objects.fileter(is_enabled=True)  # filter(
+        # sites__id=settings.SITE_ID)
         # If a prefix was specified, add a filter
         if self.starts_with:
             flatpages = flatpages.filter(
@@ -45,10 +47,10 @@ def get_flatpages(parser, token):
         {% get_flatpages prefix as about_pages %}
     """
     bits = token.split_contents()
-    syntax_message = ("%(tag_name)s expects a syntax of %(tag_name)s "
-                       "['url_starts_with'] as context_name" %
-                       dict(tag_name=bits[0]))
-   # Must have at 3-6 bits in the tag
+    syntax_message = (
+        "%(tag_name)s expects a syntax of %(tag_name)s "
+        "['url_starts_with'] as context_name" % dict(tag_name=bits[0]))
+    # Must have at 3-6 bits in the tag
     if len(bits) >= 3 and len(bits) <= 4:
 
         # If there's an even number of bits, there's no prefix
@@ -63,7 +65,7 @@ def get_flatpages(parser, token):
         context_name = bits[-1]
 
         return FlatpageNode(context_name, starts_with=prefix)
-    else:
-        raise template.TemplateSyntaxError(syntax_message)
+    raise template.TemplateSyntaxError(syntax_message)
+
 
 register.tag('get_flatpages', get_flatpages)

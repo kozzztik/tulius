@@ -1,23 +1,30 @@
-from django.conf.urls import patterns, url
-from .views import *
+from django.conf import urls
+
+from tulius.profile import views
 
 
-urlpatterns = patterns(
-    '',
-    url(r'^favorites/$', PlayerFavoritesView.as_view(), name='favorites'),
-    url(r'^stories/$', PlayerStoriesView.as_view(), name='stories'),
-    url(r'^games/$', PlayerGamesView.as_view(), name='games'),
-    url(r'^settings/$', PlayerSettingsView.as_view(), name='settings'),
-    url(r'^invites/$', InvitesView.as_view(), name='invites'),
-    url(
+app_name = 'tulius.profile'
+
+
+urlpatterns = [
+    urls.url(
+        r'^favorites/$',
+        views.PlayerFavoritesView.as_view(),
+        name='favorites'),
+    urls.url(r'^stories/$', views.PlayerStoriesView.as_view(), name='stories'),
+    urls.url(r'^games/$', views.PlayerGamesView.as_view(), name='games'),
+    urls.url(
+        r'^settings/$', views.PlayerSettingsView.as_view(), name='settings'),
+    urls.url(r'^invites/$', views.InvitesView.as_view(), name='invites'),
+    urls.url(
         r'^invite_accept(?P<invite_id>\d+)/$',
-        PlayerInviteAcceptView.as_view(),
+        views.PlayerInviteAcceptView.as_view(),
         name='invite_accept'),
-    url(
+    urls.url(
         r'^invite_decline(?P<invite_id>\d+)/$',
-        PlayerInviteDeclineView.as_view(),
+        views.PlayerInviteDeclineView.as_view(),
         name='invite_decline'),
-    url(
-        r'^subscriptions/$', PlayerSubscriptionsView.as_view(),
+    urls.url(
+        r'^subscriptions/$', views.PlayerSubscriptionsView.as_view(),
         name='subscriptions'),
-)
+]

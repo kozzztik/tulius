@@ -1,6 +1,7 @@
-from django.template import loader, RequestContext
+from django.template.response import TemplateResponse
 
 
+# pylint: disable=too-many-branches,too-many-statements
 def get_pagination_context(request, page_num, pages_count, window=4):
     try:
         page_range = range(1, pages_count + 1)
@@ -18,7 +19,7 @@ def get_pagination_context(request, page_num, pages_count, window=4):
         pages = []
         # If there's no overlap between the first set of pages and the current
         # set of pages, then there's a possible need for elusion.
-        if len(first.intersection(current)) == 0:
+        if not first.intersection(current):
             first_list = list(first)
             first_list.sort()
             second_list = list(current)
@@ -45,12 +46,12 @@ def get_pagination_context(request, page_num, pages_count, window=4):
             pages.extend(unioned)
         # If there's no overlap between the current set of pages and the last
         # set of pages, then there's a possible need for elusion.
-        if len(current.intersection(last)) == 0:
+        if not current.intersection(last):
             second_list = list(last)
             second_list.sort()
             diff = second_list[0] - pages[-1]
             # If there is a gap of two, between the last page of the current
-            # set and the first page of the last set, then we're missing a 
+            # set and the first page of the last set, then we're missing a
             # page.
             if diff == 2:
                 pages.append(second_list[0] - 1)
@@ -78,21 +79,24 @@ def get_pagination_context(request, page_num, pages_count, window=4):
         getvars = request.GET.copy()
         if 'page' in getvars:
             del getvars['page']
-        if len(getvars.keys()) > 0:
+        if getvars.keys():
             to_return['getvars'] = "&%s" % getvars.urlencode()
         else:
             to_return['getvars'] = ''
         return to_return
-    except KeyError, AttributeError:
+    except (KeyError, AttributeError):
         return {}
 
 
-def get_custom_pagination(request, context, template_name='forum/snippets/pagination.haml'):
-    c = RequestContext(request, context)
-    t = loader.get_template(template_name)
-    return t.render(c)
+def get_custom_pagination(
+        request, context, template_name='forum/snippets/pagination.haml'):
+    response = TemplateResponse(request, template_name, context=context)
+    response.render()
+    return response.content.decode()
 
 
-def get_pagination(request, page_num, pages_count, window=4, template_name='forum/snippets/pagination.haml'):
+def get_pagination(
+        request, page_num, pages_count, window=4,
+        template_name='forum/snippets/pagination.haml'):
     context = get_pagination_context(request, page_num, pages_count, window)
     return get_custom_pagination(request, context, template_name)

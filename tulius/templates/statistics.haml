@@ -14,9 +14,9 @@
     {% trans "Statistics" %}
     
 - block extra_scripts
-    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-stories.css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}stories/tulius-stories.css'}
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}profiler/css/profiler.css'}
-    %link{rel: 'stylesheet', type: 'text/css', href: '{{ MEDIA_URL }}css/tulius-stats.css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}tulius/css/tulius-stats.css'}
     
 
 - block content
@@ -25,15 +25,15 @@
         %label
            {% trans "Type" %}
         = form.graph_type
-        %span#graphtype0{style: '{% if graph_type = 0 %}{% else %}display: None{% endif %}'}
+        %span#graphtype0{style: '{% if graph_type == 0 %}{% else %}display: None{% endif %}'}
             %label
                {% trans "Report" %}
             = form.linear_type
-        %span#graphtype1{style: '{% if graph_type = 1 %}{% else %}display: None{% endif %}'}
+        %span#graphtype1{style: '{% if graph_type == 1 %}{% else %}display: None{% endif %}'}
             %label
                {% trans "Report" %}
             = form.linear_c_type
-        %span#graphtype2{style: '{% if graph_type = 2 %}{% else %}display: None{% endif %}'}
+        %span#graphtype2{style: '{% if graph_type == 2 %}{% else %}display: None{% endif %}'}
             %label
                {% trans "Report" %}
             = form.sunlight_type
@@ -42,13 +42,13 @@
         = form.period
         %button.submit.btn.btn-small{type: 'submit'}
             {% trans "Show" %}
-    - if graph_type = 0
+    - if graph_type == 0
         - with data=graph
             - include 'profiler/auditory.html'
-    - if graph_type = 1
+    - if graph_type == 1
         - with data=graph
             - include 'profiler/collapsed_sum.html'
-    - if graph_type = 2 
+    - if graph_type == 2
         #tabs
             %ul
                 %li

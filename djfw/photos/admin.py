@@ -1,7 +1,8 @@
-from django.contrib import admin
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.contrib import admin
+
 from .models import PhotoAlbum, Photo
+
 
 class PhotoAlbumForm(forms.ModelForm):
     class Meta:
@@ -9,6 +10,9 @@ class PhotoAlbumForm(forms.ModelForm):
         widgets = {
             'description': forms.Textarea(attrs={'class': 'mceNoEditor'}),
         }
+        fields = '__all__'
+
+
 class PhotoForm(forms.ModelForm):
     class Meta:
         model = Photo
@@ -16,18 +20,18 @@ class PhotoForm(forms.ModelForm):
         widgets = {
             'description': forms.Textarea(attrs={'class': 'mceNoEditor'}),
         }
-        
+
+
 class PhotoInline(admin.TabularInline):
-    model           = Photo
+    model = Photo
     template = 'photos/admin_photos.haml'
     form = PhotoForm
-
-    
     extra = 0
-    
+
+
 class PhotoAlbumAdmin(admin.ModelAdmin):
     form = PhotoAlbumForm
-    inlines = [ PhotoInline, ]
+    inlines = [PhotoInline, ]
 
     list_display = (
         'preview_image_url',
@@ -43,5 +47,6 @@ class PhotoAlbumAdmin(admin.ModelAdmin):
         'title',
         'enabled',
     )
-    
+
+
 admin.site.register(PhotoAlbum, PhotoAlbumAdmin)

@@ -1,5 +1,6 @@
-from django.forms import SelectMultiple  
+from django import forms
 
-class AutocompleteUsersWidget(SelectMultiple):  
+
+class AutocompleteUsersWidget(forms.SelectMultiple):
     def render_options(self, choices, selected_choices):
         return ''

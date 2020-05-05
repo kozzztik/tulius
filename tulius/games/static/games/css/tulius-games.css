@@ -1,0 +1,67 @@
+.requests-list { text-align: left; }
+.requests-list ul { list-style: none outside; }
+.requests-list ul li { text-transform: capitalize; }
+
+.request-list-table ul { margin: 0; }
+#request-list-cell { padding: 5px; }
+
+.game-description h3 .content {
+    _background: url("../img/anons-2.png") no-repeat;
+    background-position: top right;
+    margin-left: 70px;
+}
+
+.game-description h3 .content .sub-content {
+    margin-right: 100px;
+    padding-top: 10px;
+    color: black;
+    _background: url("../img/anons-center.png") repeat-x;
+    height: 54px;
+}
+
+.game-description h3 {
+    _background: url("../img/anons-1.png") no-repeat;
+    background-position: top left;
+    display: inline-block;
+    margin-top: 10px;
+    margin-bottom: 0px;
+}
+
+.game-action { margin-right: 10px }
+
+.game-avatar-image {
+    max-height: 180px;
+    max-width: 180px;
+}
+
+.post-avatar {width: 180px;}
+
+@media (max-width: 767px) {
+    .post-avatar {width: 100px;}
+}
+
+.wide.game-table {table-layout: auto;}
+
+.modal-header h3 {
+    background: none;
+}
+
+.popover { width: 400px; }
+
+.game-table img {
+    max-width: none;
+}
+@media (min-width: 768px) {
+    .games-table-title {
+        width: 22%;
+    }
+}
+
+#replyform .roleform .control-label {
+    width: 190px;
+    text-align: center;
+}
+
+#replyform .roleform .controls {
+    margin-left: 195px;
+}

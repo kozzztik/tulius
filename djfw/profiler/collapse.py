@@ -1,24 +1,32 @@
-from .models import ProfilerMessage, ClientCollapse, TimeCollapse
-from django.db.models import Min, Max
-from django.utils.timezone import get_current_timezone
 import datetime
 import json
 
-COLLAPSE_INTERVALS = 24 * 2 # intervals in day, 30 minutes
+from django.db.models import Min, Max
+from django.utils.timezone import get_current_timezone
 
+from .models import ProfilerMessage, ClientCollapse, TimeCollapse
+
+COLLAPSE_INTERVALS = 24 * 2  # intervals in day, 30 minutes
+
+
+# pylint: disable=too-many-branches,too-many-statements
 def do_collapse(day):
     if not day:
-        query = ProfilerMessage.objects.aggregate(time_min=Min('create_time'), time_max=Max('create_time'))
+        query = ProfilerMessage.objects.aggregate(
+            time_min=Min('create_time'), time_max=Max('create_time'))
         max_time = query['time_max'].date()
         min_time = query['time_min'].date()
         timedelta = max_time - min_time
         ClientCollapse.objects.all().delete()
         TimeCollapse.objects.all().delete()
-        dates = ((min_time + datetime.timedelta(days=x)) for x in range(timedelta.days))
+        dates = (
+            (min_time + datetime.timedelta(days=x))
+            for x in range(timedelta.days))
         for x in dates:
             do_collapse(x)
         return
-    day_start = datetime.datetime(day.year, day.month, day.day, tzinfo=get_current_timezone())
+    day_start = datetime.datetime(
+        day.year, day.month, day.day, tzinfo=get_current_timezone())
     ClientCollapse.objects.filter(day=day_start).delete()
     TimeCollapse.objects.filter(day=day_start).delete()
     client_stats = ClientCollapse(day=day_start)
@@ -29,7 +37,8 @@ def do_collapse(day):
     for x in range(COLLAPSE_INTERVALS):
         min_time = day_start + datetime.timedelta(minutes=x*30)
         max_time = day_start + datetime.timedelta(minutes=(x + 1)*30)
-        messages = ProfilerMessage.objects.filter(create_time__gte=min_time, create_time__lt=max_time)
+        messages = ProfilerMessage.objects.filter(
+            create_time__gte=min_time, create_time__lt=max_time)
         time_stats = TimeCollapse(day=day_start, create_time=min_time)
         time_stats.calls_count = 0
         time_stats.anon_calls_count = 0
@@ -56,30 +65,32 @@ def do_collapse(day):
             if message.mobile:
                 time_stats.mobiles_count += 1
             if message.device:
-                if not message.device in devices:
+                if message.device not in devices:
                     devices[message.device] = 0
                 devices[message.device] += 1
             os = message.os
             os_version = message.os_version or '-'
-            if not os in oses:
+            if os not in oses:
                 oses[os] = {}
-            if not os_version in oses[os]:
+            if os_version not in oses[os]:
                 oses[os][os_version] = 0
             oses[os][os_version] += 1
             browser = message.browser
             browser_version = message.browser_version or '-'
-            if not browser in browsers:
+            if browser not in browsers:
                 browsers[browser] = {}
-            if not browser_version in browsers[browser]:
+            if browser_version not in browsers[browser]:
                 browsers[browser][browser_version] = 0
             browsers[browser][browser_version] += 1
             module = message.module_name
             func = message.func_name or '-'
-            if not module in modules:
+            if module not in modules:
                 modules[module] = {}
-            if not func in modules[module]:
-                modules[module][func] = {'calls': 0, 'exec': 0, 'db_count':0, 
-                                         'db_time': 0, 'render': 0, 'exceptions': 0, 'mobiles': 0, 'anons': 0}
+            if func not in modules[module]:
+                modules[module][func] = {
+                    'calls': 0, 'exec': 0, 'db_count': 0,
+                    'db_time': 0, 'render': 0, 'exceptions': 0, 'mobiles': 0,
+                    'anons': 0}
             modules[module][func]['calls'] += 1
             modules[module][func]['exec'] += message.exec_time
             modules[module][func]['db_count'] += message.db_count
@@ -91,8 +102,6 @@ def do_collapse(day):
                 modules[module][func]['mobiles'] += 1
             if not message.user_id:
                 modules[module][func]['anons'] += 1
-
-                
         time_stats.save()
     client_stats.browsers = json.dumps(browsers)
     client_stats.oses = json.dumps(oses)
