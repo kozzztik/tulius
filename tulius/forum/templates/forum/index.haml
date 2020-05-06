@@ -3,9 +3,17 @@
 
 - block page_scripts
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}forum/js/collapse_threads.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/js/vue.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}forum/js/app.js'}
 
 - block custom_content
     - include forum_site.templates.index_actions
+    :plain
+        {% verbatim %}
+        {{ message }}
+        <span v-bind:title="message" v-html="message">span</span>
+        {% endverbatim %}
+
     - for group in groups
         .content
             .caption{align:"center"}
