@@ -1,3 +1,6 @@
+import room_list from '../snippets/room_list.js'
+
+
 export default LazyComponent('forum_index_page', {
     template: '/static/forum/pages/index.html',
     data: function () {
