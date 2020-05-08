@@ -5,8 +5,8 @@ export default LazyComponent('forum_index_page', {
     template: '/static/forum/pages/index.html',
     data: function () {
         return {
-            index: null,
-            collapses: null,
+            loading: true,
+            index: {},
         }
     },
     mounted() {
@@ -18,6 +18,7 @@ export default LazyComponent('forum_index_page', {
                     api_response.groups[num]['collapsed'] = false;
                 }
                 this.index = api_response;
+                this.loading = false;
                 axios
                     .get('/api/forum/collapse/')
                     .then(response => {

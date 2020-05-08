@@ -11,3 +11,6 @@ function LazyComponent(name, defs) {
 
 axios.defaults.xsrfCookieName = 'csrftoken';
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
+
+Vue.use(VueLoading);
+Vue.component('loading', VueLoading)

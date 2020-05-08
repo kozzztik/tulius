@@ -1,5 +1,25 @@
 <div>
-    <div class="content" v-for="group in index.groups">
+    <loading :active.sync="loading" :is-full-page="fullPage"></loading>
+    <div class="btn-toolbar forum-menu" v-if="!loading && !index.is_anonymous">
+        <div class="btn-group">
+            <button class="btn dropdown-toggle" data-toggle="dropdown">
+                Действия <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a href="/forums/mark_all_as_readed/">
+                        Пометить все как прочитанное
+                    </a>
+                </li>
+                <li v-if="index.is_superuser">
+                    <a href="/forums/add_room/">
+                        Добавить комнату
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="content" v-for="group in index.groups" v-if="!loading">
         <div class="caption" align="center">
             <div class="captionleft"></div>
             <div class="captioncontent">

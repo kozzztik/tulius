@@ -55,7 +55,6 @@ class IndexView(plugins.BaseAPIView):
             None, context=context, user=self.request.user,
             request=self.request)
         # TODO online users
-        # todo actions
         # TODO deleted class in room list?
         # TODO refactor signals
         # TODO refactor this class
