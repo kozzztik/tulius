@@ -1,7 +1,9 @@
 from django import urls
+from django import http
 from django.contrib.auth import views
 from django.core import exceptions
 from django.views import generic
+from django.views.generic import base
 
 
 class ForumPlugin:
@@ -72,3 +74,27 @@ class BasePluginView(generic.TemplateView):
             if not request.user.is_authenticated:
                 return views.redirect_to_login(request.build_absolute_uri())
             raise
+
+
+class BaseAPIView(base.ContextMixin, base.View):
+    """
+    Transform view context to json response.
+    """
+    require_user = False
+    user = None
+
+    def get_context_data(self, **kwargs):
+        if self.require_user and self.request.user.is_anonymous:
+            raise exceptions.PermissionDenied()
+        return {}
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        self.user = self.request.user
+        if self.require_user and (not request.user.is_authenticated):
+            return http.HttpResponseForbidden()
+        return http.JsonResponse(super(BaseAPIView, self).dispatch(
+            request, *args, **kwargs))

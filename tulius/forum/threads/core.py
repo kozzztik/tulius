@@ -85,6 +85,7 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
         for thread in rooms:
             thread.parent = parent_room
             thread._site = site
+        # TODO not sure this is needed
         rooms = [thread for thread in rooms if thread.view_right(user)]
         for room in rooms:
             threads = self.room_descendants(user, room)[1]

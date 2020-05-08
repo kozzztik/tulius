@@ -4,8 +4,13 @@
 - block additional_styles
     %link{rel: 'stylesheet', href:'{{ STATIC_URL }}forum/css/tulius-forum.css', type: 'text/css'}
     - block plugin_styles
-    
+
 - block additional_scripts
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/js/vue.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/js/axios.min.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/js/vue-common.js'}
+    %script{type: 'module', src: '{{ STATIC_URL }}forum/js/app.js'}
+
     - if not request.user.is_anonymous
         %script{type: 'text/javascript'}
             var delete_thread_options = {
@@ -51,19 +56,20 @@
                     = form.caption|capfirst
 
 - block custom_content
-    - block before_actions
-    
-    - block upper_actions
-        - if parent_thread
-            - include forum_site.templates.actions
-    
-    - block forum_content
-    
-    - block after_actions
-    
-    - block delete_post_form
-        - if parent_thread
-            - include forum_site.templates.delete_thread_form
+    #forum_app
+        - block before_actions
+
+        - block upper_actions
+            - if parent_thread
+                - include forum_site.templates.actions
+
+        - block forum_content
+
+        - block after_actions
+
+        - block delete_post_form
+            - if parent_thread
+                - include forum_site.templates.delete_thread_form
             
 - block footer_content
     - block online_users

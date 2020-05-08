@@ -7,7 +7,7 @@ class ForumConfig(AppConfig):
     site = None
 
     def ready(self):
-        from .site import ForumSite
+        from tulius.forum import site
         from .threads.plugin import ThreadsPlugin
         from .search.plugin import SearchPlugin
         from .comments.plugin import CommentsPlugin
@@ -17,9 +17,8 @@ class ForumConfig(AppConfig):
         from .rights.plugin import RightsPlugin
         from .online_status import OnlineStatusPlugin
         from .sitemap import SitemapPlugin
-        from .collapse_threads import CollapsingThreadsPlugin
 
-        self.site = ForumSite(
+        self.site = site.ForumSite(
             plugins=(
                 RightsPlugin,
                 ThreadsPlugin,
@@ -30,6 +29,6 @@ class ForumConfig(AppConfig):
                 OnlineStatusPlugin,
                 SitemapPlugin,
                 FixesPlugin,
-                CollapsingThreadsPlugin
             )
         )
+        site.site = self.site
