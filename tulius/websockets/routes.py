@@ -26,6 +26,8 @@ class WebsocketHandler:
             logging.exception(e)
             await asyncio.get_event_loop().run_in_executor(
                 sentry_sdk.capture_exception, e)
+        finally:
+            session.close()
         return ws
 
 

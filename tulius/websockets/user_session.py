@@ -77,3 +77,7 @@ class UserSession:
                     'ws connection closed with exception %s',
                     self.ws.exception())
         logger.info('User %s closed', self.user_id)
+
+    def close(self):
+        if self.redis:
+            self.redis.close()
