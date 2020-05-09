@@ -23,6 +23,7 @@ export default LazyComponent('forum_index_page', {
                     {"url": "/forum/", "title": "Форумы", 'old': true}
                 ]);
                 this.loading = false;
+                //this.$parent.update_footer(true, 'online users')
                 axios
                     .get('/api/forum/collapse/')
                     .then(response => {

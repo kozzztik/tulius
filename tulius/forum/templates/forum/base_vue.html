@@ -19,6 +19,7 @@
     <breadcrumbs upper="true" :items="breadcrumb_items" v-if="!loading"></breadcrumbs>
     <forum_app :loading="loading"></forum_app>
     <breadcrumbs :upper="false" :items="breadcrumb_items" v-if="!loading"></breadcrumbs>
+    <footer v-if="show_footer" v-html="footer_content"></footer>
 </div>
 <script type="text/javascript">
     jQuery(document).ready(function() {

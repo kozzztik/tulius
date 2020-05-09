@@ -20,7 +20,13 @@ var forum_app = Vue.component('forum_app', {
     },
     methods : {
         loading_start() {this.$parent.loading_start()},
-        loading_end(items) {this.$parent.loading_end(items)}
+        loading_end(items) {this.$parent.loading_end(items)},
+        update_footer(show, content) {this.$parent.update_footer(show, content)},
+        update_route(route) {
+            this.loading_end([]);
+            this.update_footer(false, '');
+            this.currentRoute = route;
+        }
     }
 })
 
@@ -29,18 +35,22 @@ var app = new Vue({
     data: {
         breadcrumb_items: [],
         loading: true,
-        "forum_app": forum_app,
-        "breadcrumbs": breadcrumbs,
+        show_footer: false,
+        footer_content: '',
     },
     methods : {
         loading_start() {this.loading = true},
         loading_end(items) {
             this.breadcrumb_items = items;
             this.loading = false;
+        },
+        update_footer(show, content) {
+            this.show_footer = show;
+            this.footer_content = content;
         }
     }
 });
 
 window.addEventListener('popstate', () => {
-    app.currentRoute = window.location.pathname
+    forum_app.currentRoute = window.location.pathname
 })
