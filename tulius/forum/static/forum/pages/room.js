@@ -1,5 +1,6 @@
 import room_list from '../snippets/room_list.js'
 import thread_actions from '../snippets/thread_actions.js'
+import online_status from '../snippets/online_status.js'
 
 
 export default LazyComponent('forum_room_page', {

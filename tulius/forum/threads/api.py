@@ -102,8 +102,7 @@ class ThreadView(BaseThreadView):
 
     def get_context_data(self, **kwargs):
         super(ThreadView, self).get_context_data(**kwargs)
-        # todo online users
-        # todo seatch csrf token?
+        # todo search csrf token?
         return {
             'id': self.obj.pk,
             'tree_id': self.obj.tree_id,
