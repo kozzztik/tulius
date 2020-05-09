@@ -1,0 +1,28 @@
+{% extends 'base.haml' %}
+
+{% block additional_styles %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}forum/css/tulius-forum.css" type="text/css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}common/css/vue-loading.css" type="text/css">
+{% endblock %}
+
+{% block additional_scripts %}
+    <script type="text/javascript" src="{{ STATIC_URL }}common/js/vue.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}common/js/axios.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}common/js/vue-loading-overlay.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}common/js/vue-common.js"></script>
+    <script type="module" src="{{ STATIC_URL }}forum/js/app.js"></script>
+{% endblock %}
+
+{% block body_main_area %}
+<div id="content-center" class="container">
+    <loading :active.sync="loading" :is-full-page="true"></loading>
+    <breadcrumbs upper="true" :items="breadcrumb_items" v-if="!loading"></breadcrumbs>
+    <forum_app :loading="loading"></forum_app>
+    <breadcrumbs :upper="false" :items="breadcrumb_items" v-if="!loading"></breadcrumbs>
+</div>
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        $(".rcrumbs").rcrumbs({nbFixedCrumbs: 1, nbUncollapsableCrumbs: 1});
+    });
+</script>
+{% endblock %}

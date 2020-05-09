@@ -3,7 +3,7 @@ import json
 from django import http
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
-
+from django.views import generic
 from tulius.forum.plugins import BasePluginView
 from .forms import PostDeleteForm
 
@@ -45,8 +45,8 @@ class Room(BaseThreadView):
         return context
 
 
-class Index(BaseThreadView):
-    template_name = 'base'
+class Index(generic.TemplateView):
+    template_name = 'forum/base_vue.html'
 
 
 class EditView(BaseThreadView):

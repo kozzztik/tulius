@@ -74,7 +74,7 @@ class ThreadsPlugin(ThreadsCorePlugin):
 
     def get_urls(self):
         return [
-            url(r'^$', views.Index.as_view(plugin=self), name='index'),
+            url(r'^$', views.Index.as_view(), name='index'),
             url(
                 r'^room/(?P<parent_id>\d+)/$',
                 views.Room.as_view(plugin=self), name='room'),

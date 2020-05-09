@@ -10,6 +10,7 @@ export default LazyComponent('forum_index_page', {
         }
     },
     mounted() {
+        this.$parent.loading_start();
         axios
             .get('/api/forum/')
             .then(response => {
@@ -18,6 +19,9 @@ export default LazyComponent('forum_index_page', {
                     api_response.groups[num]['collapsed'] = false;
                 }
                 this.index = api_response;
+                this.$parent.loading_end([
+                    {"url": "/forum/", "title": "Форумы", 'old': true}
+                ]);
                 this.loading = false;
                 axios
                     .get('/api/forum/collapse/')
