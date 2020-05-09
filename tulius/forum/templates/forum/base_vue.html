@@ -9,6 +9,7 @@
     <script type="text/javascript" src="{{ STATIC_URL }}common/js/vue.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}common/js/axios.min.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}common/js/vue-loading-overlay.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}common/js/vue-router.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}common/js/vue-common.js"></script>
     <script type="module" src="{{ STATIC_URL }}forum/js/app.js"></script>
 {% endblock %}
@@ -17,13 +18,8 @@
 <div id="content-center" class="container">
     <loading :active.sync="loading" :is-full-page="true"></loading>
     <breadcrumbs upper="true" :items="breadcrumb_items" v-if="!loading"></breadcrumbs>
-    <forum_app :loading="loading"></forum_app>
+    <router-view></router-view>
     <breadcrumbs :upper="false" :items="breadcrumb_items" v-if="!loading"></breadcrumbs>
     <footer v-if="show_footer" v-html="footer_content"></footer>
 </div>
-<script type="text/javascript">
-    jQuery(document).ready(function() {
-        $(".rcrumbs").rcrumbs({nbFixedCrumbs: 1, nbUncollapsableCrumbs: 1});
-    });
-</script>
 {% endblock %}
