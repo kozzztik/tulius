@@ -7,6 +7,11 @@ export default LazyComponent('forum_online_status', {
             users: [],
         }
     },
+    watch: {
+        thread: function (val, oldVal) {
+          this.load_api(val.id);
+        },
+    },
     methods: {
         load_api(pk) {
             const url = '/api/forum/online_status/' + (pk ? pk + '/' : '');
@@ -18,11 +23,4 @@ export default LazyComponent('forum_online_status', {
             });
         },
     },
-    mounted() {this.load_api(
-        this.$route.params.id
-    )},
-    beforeRouteUpdate (to, from, next) {
-        this.load_api(to.params.id);
-        next();
-    }
 })
