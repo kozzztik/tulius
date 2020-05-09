@@ -18,6 +18,12 @@
 <div id="content-center" class="container">
     <loading :active.sync="loading" :is-full-page="true"></loading>
     <breadcrumbs upper="true" :items="breadcrumb_items" v-if="!loading"></breadcrumbs>
+    <div id="top-center" v-if="messages.length > 0">
+        <div v-for="message in messages" class="alert" :class="'alert-'+ message.tag">
+            <button class="close" type="button" data-dismiss="alert">&times;</button>
+            <span v-html="message.text"></span>
+        </div>
+    </div>
     <router-view></router-view>
     <breadcrumbs :upper="false" :items="breadcrumb_items" v-if="!loading"></breadcrumbs>
     <footer v-if="show_footer" v-html="footer_content"></footer>

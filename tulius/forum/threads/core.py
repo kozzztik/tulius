@@ -99,6 +99,7 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
         return rooms
 
     def paginate_thread(self, thread, base_url):
+        # TODO remove
         class ThreadPage:
             page = 0
             page_link = ""
@@ -129,6 +130,8 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
         threads = [thread for thread in threads if thread.view_right(user)]
 
         for thread in threads:
+            thread.moderators = []
+            thread.accessed_users = None
             if thread.read_right(user):
                 self.paginate_thread(thread, thread.get_absolute_url)
             if thread.access_type == models.THREAD_ACCESS_TYPE_NO_READ:

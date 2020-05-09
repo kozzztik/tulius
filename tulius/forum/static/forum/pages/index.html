@@ -22,9 +22,9 @@
         <div class="caption" align="center">
             <div class="captionleft"></div>
             <div class="captioncontent">
-                <a v-if="index.is_superuser" :href="group.url">
+                <router-link v-if="index.is_superuser" :to="group.url">
                     {{ group.title }}
-                </a>
+                </router-link>
                 <span v-else="index.is_superuser">{{ group.title }}</span>
             </div>
             <div class="captionright"></div>

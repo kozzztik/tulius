@@ -21,7 +21,7 @@
             <td>
                 <div class="forum-post-description">
                     <h4>
-                        <a :href="room.url">{{ room.title }}</a>
+                        <router-link :to="room.url">{{ room.title }}</router-link>
                     </h4>
                     <div class=".hidden-phone" v-if="room.body">
                         {{ room.body }}

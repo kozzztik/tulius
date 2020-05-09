@@ -13,4 +13,7 @@ urlpatterns = [
     urls.url(
         r'^collapse/(?P<pk>\d+)$',
         collapse_views.CollapseAPISave.as_view(), name='collapse_save'),
+    urls.url(
+        r'^thread/(?P<pk>\d+)/$',
+        threads_api.ThreadView.as_view(), name='thread'),
 ]

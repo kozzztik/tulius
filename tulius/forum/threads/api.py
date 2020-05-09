@@ -17,12 +17,16 @@ def room_to_json(thread):
         'body': thread.body,
         'room': thread.room,
         'deleted': thread.deleted,
+        'important': thread.important,
+        'closed': thread.closed,
+        'user': user_to_json(thread.user),
         'moderators': [user_to_json(user) for user in thread.moderators],
         'accessed_users': None if thread.accessed_users is None else [
             user_to_json(user) for user in thread.accessed_users
         ],
-        'threads_count': thread.threads_count,
+        'threads_count': thread.threads_count if thread.room else None,
         'comments_count': thread.comments_count,
+        'pages_count': thread.pages_count,
         'url': thread.get_absolute_url,
         'last_comment': {
             'url': thread.last_comment.get_absolute_url,
@@ -54,8 +58,6 @@ class IndexView(plugins.BaseAPIView):
         site.site.signals.thread_view.send(
             None, context=context, user=self.request.user,
             request=self.request)
-        # TODO online users
-        # TODO deleted class in room list?
         # TODO refactor signals
         # TODO refactor this class
         return {
@@ -70,4 +72,55 @@ class IndexView(plugins.BaseAPIView):
                     'url': group.unreaded.get_absolute_url,
                 } if group.unreaded else None,
             } for group in groups]
+        }
+
+
+class BaseThreadView(plugins.BaseAPIView):
+    obj = None
+    view_mode = True
+    is_room = False
+
+    def get_context_data(self, **kwargs):
+        context = super(BaseThreadView, self).get_context_data(**kwargs)
+        self.get_parent_thread(**kwargs)
+        context['thread'] = self.obj
+        if self.obj and self.view_mode:
+            site.site.signals.thread_view.send(
+                self.obj, context=context,
+                user=self.request.user, request=self.request)
+        return context
+
+    def get_parent_thread(self, **kwargs):
+        core = site.site.core
+        parent_id = kwargs['pk'] if 'pk' in kwargs else None
+        self.obj = core.get_parent_thread(
+            self.user, parent_id, self.is_room) if parent_id else None
+
+
+class ThreadView(BaseThreadView):
+    is_room = True  # TODO remove
+
+    def get_context_data(self, **kwargs):
+        super(ThreadView, self).get_context_data(**kwargs)
+        # todo online users
+        # todo actions & search
+        # todo empty page
+        return {
+            'id': self.obj.pk,
+            'title': self.obj.title,
+            'body': self.obj.body,
+            'room': self.obj.room,
+            'deleted': self.obj.deleted,
+            'url': self.obj.get_absolute_url,
+            'parents': [{
+                'id': parent.id,
+                'title': parent.title,
+                'url': parent.get_absolute_url,
+            } for parent in self.obj.get_ancestors()],
+            'rooms': [
+                room_to_json(room) for room in
+                site.site.core.get_subthreads(self.user, self.obj, True)],
+            'threads': [
+                room_to_json(thread) for thread in
+                site.site.core.get_subthreads(self.user, self.obj, False)],
         }

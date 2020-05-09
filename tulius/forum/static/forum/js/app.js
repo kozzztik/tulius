@@ -16,6 +16,7 @@ var app = new Vue({
         loading: true,
         show_footer: false,
         footer_content: '',
+        messages: []
     },
     methods : {
         loading_start() {this.loading = true},
@@ -26,6 +27,9 @@ var app = new Vue({
         update_footer(show, content) {
             this.show_footer = show;
             this.footer_content = content;
+        },
+        add_message(message, tag) {
+            this.messages.push({'tag': tag, 'text': message})
         }
     }
 });

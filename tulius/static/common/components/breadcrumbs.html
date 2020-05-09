@@ -9,9 +9,9 @@
             </li>
             <li v-for="item in items">
                 <div class="divider"></div>
-                <a v-if="item.old" :href="item.url">
+                <router-link :to="item.url">
                     {{ item.title }}
-                </a>
+                </router-link>
             </li>
         </ul>
     </div>

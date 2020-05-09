@@ -9,36 +9,34 @@ export default LazyComponent('forum_index_page', {
             index: {},
         }
     },
-    mounted() {
-        this.$parent.loading_start();
-        axios
-            .get('/api/forum/')
-            .then(response => {
+    methods: {
+        load_api() {
+            this.$parent.loading_start();
+            axios.get('/api/forum/').then(response => {
                 var api_response = response.data;
                 for (var num in api_response['groups']) {
                     api_response.groups[num]['collapsed'] = false;
                 }
                 this.index = api_response;
-                this.$parent.loading_end([
-                    {"url": "/forum/", "title": "Форумы", 'old': true}
-                ]);
-                this.loading = false;
                 //this.$parent.update_footer(true, 'online users')
-                axios
-                    .get('/api/forum/collapse/')
-                    .then(response => {
-                        for (var key in response.data) {
-                            for (var num in this.index.groups) {
-                                if (this.index.groups[num].id == key) {
-                                    this.index.groups[num].collapsed = response.data[key];
-                                    break;
-                                }
+                axios.get('/api/forum/collapse/').then(response => {
+                    for (var key in response.data) {
+                        for (var num in this.index.groups) {
+                            if (this.index.groups[num].id == key) {
+                                this.index.groups[num].collapsed = response.data[key];
+                                break;
                             }
                         }
-                    });
+                    }
+                });
+            }).catch(error => this.$parent.add_message(error, "error"))
+            .then(() => {
+                this.$parent.loading_end([
+                    {"url": "/forums/", "title": "Форумы", 'old': true}
+                ]);
+                this.loading = false;
             });
-    },
-    methods: {
+        },
         collapse: function (event) {
             var group_id = event.target.attributes.groupid.nodeValue;
             for (var num in this.index.groups) {
@@ -51,5 +49,10 @@ export default LazyComponent('forum_index_page', {
                 }
             }
         }
+    },
+    mounted() {this.load_api()},
+    beforeRouteUpdate (to, from, next) {
+        this.load_api();
+        next();
     }
 })
