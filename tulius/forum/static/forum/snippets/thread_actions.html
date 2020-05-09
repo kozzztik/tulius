@@ -1,0 +1,81 @@
+<div v-if="!user.is_anonymous" class="btn-toolbar forum-menu">
+    <div class="btn-group">
+        <button class="btn dropdown-toggle" data-toggle="dropdown">
+            Действия
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li v-if="!thread.room">
+                <a data-toggle="modal" href="#quoteAnswer">
+                    Ответить с цитатой
+                </a>
+            </li>
+            <li v-if="thread.room">
+                <a :href="'/forums/mark_all_as_readed/' + thread.id + '/'">
+                    Пометить все как прочитанное
+                </a>
+            </li>
+            <li v-if="thread.room && thread.rights.moderate">
+                <a :href="'/forums/add_room/' + thread.id + '/'">
+                    Добавить комнату
+                </a>
+            </li>
+            <li v-if="thread.room && thread.rights.write">
+                <a :href="'/forums/add_thread/' + thread.id + '/'">
+                    Добавить тему
+                </a>
+            </li>
+            <li v-if="thread.room && thread.rights.edit">
+                <a :href="'/forums/edit_room/' + thread.id + '/'">
+                    Редактировать
+                </a>
+            </li>
+            <li v-if="thread.room && thread.rights.move">
+                <a :href="'/forums/thread/' + thread.id + '/move/'">
+                    Переместить комнату
+                </a>
+            </li>
+            <li v-if="thread.room && thread.rights.edit">
+                <a :href="'javascript:delete_room(' + thread.id + ')'">
+                    Удалить комнату
+                </a>
+            </li>
+            <li v-if="thread.room && user.is_superuser">
+                <a :href="'/forums/rebuild_nums/' + thread.id + '/'">
+                    Обновить счетчики
+                </a>
+            </li>
+            <li>
+                <a :href="'/forums/extended_search/' + thread.tree_id + '/'">
+                    Расширенный поиск
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div v-if="!thread.room" id="quoteAnswer" class="modal hide fade in well">
+        <div class="modal-header">
+            <a class="close" data-dismiss="modal">×</a>
+            <h3>Цитирование</h3>
+        </div>
+        <p>
+            Цитировать теперь легко! Просто выделите текст мышкой:
+        </p>
+        <img src="/static/forum/img/quote_help1.png">
+        <p>И нажмите кнопку "Ответить". Под постом появится форма быстрого ответа, а выделенный текст будет вставлен в нее как цитата.</p>
+        <img src="/static/forum/img/quote_help2.png">
+        <div class="modal-footer">
+            <button class="btn btn-primary" data-dismiss="modal">
+                Закрыть
+            </button>
+        </div>
+    </div>
+    <div class="forum-search-form">
+        <form class="inline-form" method="post" :action="'/forums/search/' + thread.tree_id + '/'">
+            <input type="text" name="text" required="" id="id_text">
+            <input id="id_thread" type="hidden" name="thread" :value="thread.id">
+            <button class="submit btn" id="search" type="submit">
+                Поиск
+            </button>
+        </form>
+    </div>
+</div>

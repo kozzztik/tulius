@@ -103,10 +103,10 @@ class ThreadView(BaseThreadView):
     def get_context_data(self, **kwargs):
         super(ThreadView, self).get_context_data(**kwargs)
         # todo online users
-        # todo actions & search
-        # todo empty page
+        # todo seatch csrf token?
         return {
             'id': self.obj.pk,
+            'tree_id': self.obj.tree_id,
             'title': self.obj.title,
             'body': self.obj.body,
             'room': self.obj.room,
@@ -123,4 +123,10 @@ class ThreadView(BaseThreadView):
             'threads': [
                 room_to_json(thread) for thread in
                 site.site.core.get_subthreads(self.user, self.obj, False)],
+            'rights': {
+                'write': self.obj.write_right(),
+                'moderate': self.obj.moderate_right(),
+                'edit': self.obj.edit_right(),
+                'move': self.obj.move_right(),
+            },
         }

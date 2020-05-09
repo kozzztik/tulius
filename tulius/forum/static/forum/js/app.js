@@ -13,16 +13,22 @@ var app = new Vue({
     router: router,
     data: {
         breadcrumb_items: [],
-        loading: true,
+        loading: false,
+        loading_counter: 0,
         show_footer: false,
         footer_content: '',
-        messages: []
+        messages: [],
+        user: {},
     },
-    methods : {
-        loading_start() {this.loading = true},
+    methods: {
+        loading_start() {
+            this.loading_counter = this.loading_counter + 1;
+            this.loading = (this.loading_counter > 0)
+        },
         loading_end(items) {
             this.breadcrumb_items = items;
-            this.loading = false;
+            this.loading_counter = this.loading_counter - 1;
+            this.loading = (this.loading_counter > 0)
         },
         update_footer(show, content) {
             this.show_footer = show;
@@ -31,5 +37,14 @@ var app = new Vue({
         add_message(message, tag) {
             this.messages.push({'tag': tag, 'text': message})
         }
+    },
+    created () {
+        this.loading_start();
+        axios.get('/api/profile').then(response => {
+            this.user = response.data;
+        }).catch(error => this.add_message(error, "error"))
+        .then(() => {
+            this.loading_end(this.breadcrumbs);
+        });
     }
 });

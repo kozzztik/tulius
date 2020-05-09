@@ -1,5 +1,5 @@
 <div>
-    <div>
+    <forum_thread_actions v-if="!loading" :thread="thread" :user="user"></forum_thread_actions>
     <div v-if="!loading && thread.rooms.length > 0" class="content">
         <div class="caption" align="center">
             <div class="captionleft"></div>
@@ -76,5 +76,11 @@
                 </tr>
             </tbody>
         </table>
+    </div>
+    <div v-if="!loading && (thread.rooms.length == 0) && (thread.threads.length == 0)" class="content">
+        <br>
+        Эта комната пока пуста.
+        <br>
+        <br>
     </div>
 </div>

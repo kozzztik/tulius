@@ -232,3 +232,12 @@ class PlayerGamesView(LoginTemplateView):
             'admined_games': admined_games,
             'old_games': old_games,
         }
+
+
+class UserProfileAPIView(generic.View):
+    def get(self, request, **kwargs):
+        return http.JsonResponse({
+            'anonymous': request.user.is_anonymous,
+            'authenticated': request.user.is_authenticated,
+            'superuser': request.user.is_superuser,
+        })
