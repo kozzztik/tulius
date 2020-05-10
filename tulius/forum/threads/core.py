@@ -387,8 +387,6 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
             providing_args=["threads", "is_room"])
         self.thread_prepare_room_signal = dispatch.Signal(
             providing_args=["parent_thread", "threads", "user"])
-        self.thread_prepare_room_group_signal = dispatch.Signal(
-            providing_args=["user"])
         self.thread_before_edit = dispatch.Signal(
             providing_args=["thread", "context"])
         self.thread_after_edit = dispatch.Signal(
@@ -421,5 +419,3 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
         self.signals['thread_on_create'] = self.thread_on_create
         self.signals['thread_on_update'] = self.thread_on_update
         self.signals['thread_prepare_room'] = self.thread_prepare_room_signal
-        self.signals['thread_prepare_room_group'] = \
-            self.thread_prepare_room_group_signal

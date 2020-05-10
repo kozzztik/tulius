@@ -29,10 +29,10 @@
             </div>
             <div class="captionright"></div>
         </div>
-        <a v-if="(!index.is_anonymous) && group.unreaded" :href="group.unreaded.url">
+        <a v-if="(!index.is_anonymous) && group.unreaded_url" :href="group.unreaded_url">
             <div class="room_group_read_mark not_readed"></div>
         </a>
-        <div v-if="(!index.is_anonymous) && (!group.unreaded)" class="room_group_read_mark"></div>
+        <div v-if="(!index.is_anonymous) && (!group.unreaded_url)" class="room_group_read_mark"></div>
         <div v-if="!index.is_anonymous" class="thread_collapse" v-on:click="collapse" :groupid="group.id">
             {{ group.collapsed ? "+" : "-" }}
         </div>

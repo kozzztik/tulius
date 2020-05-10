@@ -1,5 +1,6 @@
 from tulius.forum import site
 from tulius.forum import plugins
+from tulius.forum.readmarks import plugin as readmarks
 from djfw.wysibb.templatetags import bbcodes
 
 # TODO html safe all
@@ -63,9 +64,6 @@ class IndexView(plugins.BaseAPIView):
                 thread.parent = group
             group.rooms = core.prepare_room_list(
                 self.user, None, group.rooms)
-            site.site.signals.thread_prepare_room_group.send(
-                group, user=self.request.user)
-        # TODO refactor signals
         # TODO refactor this class
         return {
             'is_superuser': self.user.is_superuser,
@@ -75,9 +73,7 @@ class IndexView(plugins.BaseAPIView):
                 'title': group.title,
                 'rooms': [room_to_json(thread) for thread in group.rooms],
                 'url': group.get_absolute_url,
-                'unreaded': {
-                    'url': group.unreaded.get_absolute_url,
-                } if group.unreaded else None,
+                'unreaded_url': readmarks.room_group_unreaded_url(group.rooms),
             } for group in groups]
         }
 

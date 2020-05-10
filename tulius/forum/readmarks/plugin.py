@@ -194,14 +194,6 @@ class ReadMarksPlugin(plugins.ForumPlugin):
         thread = kwargs['thread']
         json['unreaded'] = thread.unreaded_comments
 
-    def room_groups_marks(self, sender, **kwargs):
-        unreaded = None
-        for room in sender.rooms:
-            if room.unreaded:
-                if (not unreaded) or (room.unreaded_id < unreaded.id):
-                    unreaded = room.unreaded
-        sender.unreaded = unreaded
-
     def init_core(self):
         self.Comment = self.models.Comment
         self.urlizer['Thread_mark_as_readed'] = self.mark_thread_url
@@ -217,8 +209,6 @@ class ReadMarksPlugin(plugins.ForumPlugin):
         self.site.signals.read_comments.connect(self.view_comments_page)
         self.site.signals.view_comments_page.connect(
             self.view_comments_page_json)
-        self.site.signals.thread_prepare_room_group.connect(
-            self.room_groups_marks)
 
     def post_init(self):
         self.site.signals.thread_prepare_room.connect(self.prepare_room_list)
@@ -234,3 +224,12 @@ class ReadMarksPlugin(plugins.ForumPlugin):
                 views.MarkAsRead.as_view(plugin=self),
                 name='mark_as_readed'),
         ]
+
+
+def room_group_unreaded_url(rooms):
+    unreaded = None
+    for room in rooms:
+        if room.unreaded:
+            if (not unreaded) or (room.unreaded_id < unreaded.id):
+                unreaded = room.unreaded
+    return unreaded.get_absolute_url if unreaded else None
