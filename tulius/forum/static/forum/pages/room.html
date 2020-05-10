@@ -32,25 +32,25 @@
                 <tr v-for="thread in thread.threads" :class="thread.deleted ? 'deleted-thread' : ''">
                     <td class="forum-post-icon">
                         <div v-if="thread.important">
-                            <a :href="thread.unreaded" v-if="thread.unreaded">
+                            <router-link :to="thread.unreaded" v-if="thread.unreaded">
                                 <img src="/static/forum/img/important_not_readed.gif">
-                            </a>
+                            </router-link>
                             <img src="/static/forum/img/important_readed.gif" v-if="!thread.unreaded">
                         </div>
                         <div v-else>
-                            <a :href="thread.url" v-if="thread.closed">
+                            <router-link :to="thread.url" v-if="thread.closed">
                                 <img src="/static/forum/img/closed.gif">
-                            </a>
-                            <a :href="thread.unreaded" v-if="!thread.closed && thread.unreaded">
+                            </router-link>
+                            <router-link :to="thread.unreaded" v-if="!thread.closed && thread.unreaded">
                                 <img src="/static/forum/img/unreadedmark.gif">
-                            </a>
+                            </router-link>
                             <img src="/static/forum/img/readedmark.gif" v-if="!thread.closed && !thread.unreaded">
                         </div>
                     </td>
                     <td>
                         <div class="forum-post-description">
                             <h4>
-                                <a :href="thread.url" v-html="thread.title"></a>
+                                <router-link :to="thread.url" v-html="thread.title"></router-link>
                             </h4>
                             <h6 v-if="thread.accessed_users" class="moderators">Открыта для:</h6>
                             <ul v-if="thread.accessed_users" class="moderators">
@@ -60,9 +60,9 @@
                             </ul>
                             <div v-if="thread.pages_count > 1">
                                 <h6>Страницы:</h6>
-                                <a :href="thread.url + '?page=' + (num+1)" v-for="num in Array(thread.pages_count).keys()">
+                                <router-link :to="thread.url + '?page=' + (num+1)" v-for="num in Array(thread.pages_count).keys()">
                                     {{num + 1 }}
-                                </a>
+                                </router-link>
                             </div>
                         </div>
                     </td>

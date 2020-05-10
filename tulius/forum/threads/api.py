@@ -1,13 +1,24 @@
 from tulius.forum import site
 from tulius.forum import plugins
+from djfw.wysibb.templatetags import bbcodes
 
+# TODO html safe all
 
-def user_to_json(user):
-    return {
+def user_to_json(user, detailed=False):
+    data = {
         'id': user.id,
         'title': str(user),  # TODO
         'url': user.get_absolute_url(),
     }
+    if detailed:
+        data.update({
+            'avatar': user.avatar.url if user.avatar else '',
+            'full_stars': user.full_stars(),
+            'rank': user.rank,
+            'stories_author': user.stories_author(),  # TODO optimize that!
+            'signature': bbcodes.bbcode(user.signature),
+        })
+    return data
 
 
 def room_to_json(thread):
@@ -31,8 +42,7 @@ def room_to_json(thread):
         'last_comment': {
             'url': thread.last_comment.get_absolute_url,
             'user': user_to_json(thread.last_comment.user),
-            'create_time': thread.last_comment.create_time.strftime(
-                "%d.%m.%Y, %H:%M"),
+            'create_time': thread.last_comment.create_time,
         } if thread.last_comment else None,
         'unreaded':
             thread.unreaded.get_absolute_url if thread.unreaded else None,
@@ -55,9 +65,6 @@ class IndexView(plugins.BaseAPIView):
                 self.user, None, group.rooms)
             site.site.signals.thread_prepare_room_group.send(
                 group, user=self.request.user)
-        site.site.signals.thread_view.send(
-            None, context=context, user=self.request.user,
-            request=self.request)
         # TODO refactor signals
         # TODO refactor this class
         return {
@@ -77,29 +84,21 @@ class IndexView(plugins.BaseAPIView):
 
 class BaseThreadView(plugins.BaseAPIView):
     obj = None
-    view_mode = True
-    is_room = False
 
     def get_context_data(self, **kwargs):
         context = super(BaseThreadView, self).get_context_data(**kwargs)
         self.get_parent_thread(**kwargs)
         context['thread'] = self.obj
-        if self.obj and self.view_mode:
-            site.site.signals.thread_view.send(
-                self.obj, context=context,
-                user=self.request.user, request=self.request)
         return context
 
     def get_parent_thread(self, **kwargs):
         core = site.site.core
         parent_id = kwargs['pk'] if 'pk' in kwargs else None
         self.obj = core.get_parent_thread(
-            self.user, parent_id, self.is_room) if parent_id else None
+            self.user, parent_id) if parent_id else None
 
 
 class ThreadView(BaseThreadView):
-    is_room = True  # TODO remove
-
     def get_context_data(self, **kwargs):
         super(ThreadView, self).get_context_data(**kwargs)
         return {

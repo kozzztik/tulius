@@ -253,7 +253,6 @@ class CommentsCore(plugins.ForumPlugin):
             try:
                 comment = self.Comment.objects.select_related('user').get(
                     id=thread.last_comment_id)
-                comment.parent = thread
             except self.Comment.DoesNotExist:
                 comment = None
         else:

@@ -240,4 +240,5 @@ class UserProfileAPIView(generic.View):
             'anonymous': request.user.is_anonymous,
             'authenticated': request.user.is_authenticated,
             'superuser': request.user.is_superuser,
+            'compact_text': request.user.compact_text,
         })

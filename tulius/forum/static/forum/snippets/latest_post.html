@@ -1,7 +1,7 @@
 <div v-if="comment">
-    <a :href="comment.url">
+    <router-link :to="comment.url">
         {{ comment.user.title }}
-    </a>
+    </router-link>
     <br>
-    {{ comment.create_time }}
+    {{ forum_datetime(comment.create_time) }}
 </div>

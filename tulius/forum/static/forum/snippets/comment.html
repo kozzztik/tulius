@@ -1,0 +1,94 @@
+<table class="post-table content" :class="comment.unreaded ? 'unreaded-post': ''">
+    <tbody>
+        <tr>
+            <td class="post-avatar">
+                <user_avatar :user="comment.user" :comment="comment"></user_avatar>
+            </td>
+            <td class="post-body">
+                <table class="wide vertical-center">
+                    <tbody>
+                        <tr class="post-head">
+                            <td class="post-title">
+                                <b v-html="comment.title"></b>
+                            </td>
+                            <td class="post-time hidden-phone" v-html="forum_datetime(comment.create_time)"></td>
+                        </tr>
+                        <tr class="post-body-content" :class="user.compact_text ? 'post-compact': ''">
+                            <td colspan="2">
+                                <span v-html="comment.body"></span>
+                                <forum_voting :comment="comment" v-if="comment.voting"></forum_voting>
+                                <div class="post-signature hidden-phone" v-html="comment.user.signature" v-if="comment.user.signature"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td class="post-url">
+                <a href="#" class="hidden-phone">Наверх</a>
+                <div class="dropup visible-phone" v-if="thread.rights.write || comment.edit_right">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        Действия
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li v-if="thread.rights.write">
+                            <a class="fast-reply-link post-actions-button" :href="'javascript:fast_reply(' + comment.id + ')'">
+                                Ответить
+                            </a>
+                        </li>
+                        <li v-if="comment.edit_right">
+                            <a class="post-actions-button" :href="'/forums/edit_thread/' + thread.id + '/'" v-if="comment.is_thread">
+                                Редактировать
+                            </a>
+                            <a class="post-actions-button" :href="'/forums/edit_comment/' + comment.id + '/'" v-if="!comment.is_thread">
+                                Редактировать
+                            </a>
+                        </li>
+                        <li v-if="comment.edit_right && thread">
+                            <a class="post-actions-delete post-actions-button" :href="'javascript:delete_comment(' + comment.id + ')'">
+                                Удалить
+                            </a>
+                        </li>
+                        <li v-if="comment.is_thread && thread.rights.move">
+                            <a class="post-actions-button" :href="'/forums/thread/' + thread.id + '/move/'">
+                                Переместить
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+            <td class="post-actions">
+                <div class="visible-phone pull-left" v-html="forum_datetime(comment.create_time)"></div>
+                <a v-if="thread.rights.write" class="hidden-phone fast-reply-link post-actions-button" :href="'javascript:fast_reply(' + comment.id + ')'">
+                    <img src="/static/forum/img/replybutton.gif" height="26" width="127">
+                </a>
+                <a v-if="comment.edit_right && (!comment.is_thread)" class="hidden-phone post-actions-button" :href="'/forums/edit_comment/' + comment.id + '/'">
+                    <img src="/static/forum/img/editbutton.gif" height="26" width="168">
+                </a>
+                <a v-if="comment.edit_right && comment.is_thread" class="hidden-phone post-actions-button" :href="'/forums/edit_thread/' + thread.id + '/'">
+                    <img src="/static/forum/img/editbutton.gif" height="26" width="168">
+                </a>
+                <a v-if="comment.edit_right" class="hidden-phone post-actions-delete post-actions-button" :href="'javascript:delete_comment(' + comment.id + ')'">
+                    <img src="/static/forum/img/delete_post.png">
+                </a>
+                <a v-if="comment.is_thread && thread.rights.move" class="hidden-phone post-actions-button" :href="'/forums/thread/' + thread.id + '/move/'">
+                    <img src="/static/forum/img/move.gif">
+                </a>
+                <a v-if="!user.is_anonymous" :href="'javascript:do_like(' + comment.id + ')'">
+                    <img class="post-actions-button likelink" :id="'likebtn' + comment.id" height="26" width="26" :value="comment.is_liked"
+                     :src="'/static/forum/img/' + (comment.is_liked ? 'like.gif' : 'unlike.gif')">
+                </a>
+                <div v-if="comment.edit_time" class="edited">
+                    Отредактировано:
+                    <span v-html="comment.editor.title"></span>,
+                    <span v-html="forum_datetime(comment.edit_time)"></span>
+                </div>
+                <div class="pull-right">
+                    <router-link :to="comment.url"></router-link>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>

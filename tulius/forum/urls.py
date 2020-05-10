@@ -3,6 +3,8 @@ from django.conf import urls
 from tulius.forum.threads import api as threads_api
 from tulius.forum.collapse_threads import views as collapse_views
 from tulius.forum import online_status
+from tulius.forum.comments import api as comments_api
+
 
 app_name = 'tulius.forum'
 
@@ -23,4 +25,7 @@ urlpatterns = [
     urls.url(
         r'^thread/(?P<pk>\d+)/$',
         threads_api.ThreadView.as_view(), name='thread'),
+    urls.url(
+        r'^thread/(?P<pk>\d+)/comments_page/(?P<page_num>\d+)/$',
+        comments_api.CommentsPageAPI.as_view(), name='comments_page'),
 ]

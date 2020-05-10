@@ -25,6 +25,15 @@ function getCookie(name) {
     return cookieValue;
 }
 
+function forum_datetime(d) {
+    return ((
+        '0' + d.getDate()).slice(-2) + '.' +
+        ('0' + (d.getMonth() + 1)).slice(-2) + '.' +
+        d.getFullYear() + ' ' +
+        ('0' + d.getHours()).slice(-2) + ':' +
+        ('0' + d.getMinutes()).slice(-2));
+}
+
 axios.defaults.xsrfCookieName = 'csrftoken';
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 

@@ -98,7 +98,7 @@ class ThreadsPlugin(ThreadsCorePlugin):
                 name='edit_thread'),
             url(
                 r'^thread/(?P<parent_id>\d+)/$',
-                views.Thread.as_view(plugin=self), name='thread'),
+                views.Index.as_view(), name='thread'),
             url(
                 r'^thread/(?P<parent_id>\d+)/move/$',
                 views.MoveThreadSelect.as_view(plugin=self),
