@@ -1,6 +1,7 @@
 import thread_actions from '../snippets/thread_actions.js'
 import online_status from '../snippets/online_status.js'
 import comment_component from '../snippets/comment.js'
+import pagination_component from '../components/pagination.js'
 
 
 export default LazyComponent('forum_thread_page', {
@@ -17,8 +18,9 @@ export default LazyComponent('forum_thread_page', {
         }
     },
     methods: {
-        load_api(pk) {
+        load_api(pk, page) {
             this.$parent.loading_start();
+            this.comments_page = page;
             axios.get('/api/forum/thread/'+ pk).then(response => {
                 const api_response = response.data;
                 this.breadcrumbs = [{"url": "/forums/", "title": "Форумы"}]
@@ -44,9 +46,9 @@ export default LazyComponent('forum_thread_page', {
             });
         },
     },
-    mounted() {this.load_api(this.$route.params.id)},
+    mounted() {this.load_api(this.$route.params.id, this.$route.query['page'] || 1)},
     beforeRouteUpdate (to, from, next) {
-        this.load_api(to.params.id);
+        this.load_api(to.params.id, to.query['page'] || 1);
         next();
     }
 })

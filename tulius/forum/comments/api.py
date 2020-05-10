@@ -5,7 +5,6 @@ from tulius.forum.threads import api
 from tulius.forum.comments import pagination
 
 
-# TODO pagination
 # TODO reply form
 # TODO delete form
 # TODO dynamic updates button
