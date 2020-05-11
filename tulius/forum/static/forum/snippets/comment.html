@@ -16,7 +16,7 @@
                         <tr class="post-body-content" :class="user.compact_text ? 'post-compact': ''">
                             <td colspan="2">
                                 <span v-html="comment.body"></span>
-                                <forum_voting :comment="comment" v-if="comment.voting"></forum_voting>
+                                <forum_voting :comment="comment" :user="user" v-if="comment.voting"></forum_voting>
                                 <div class="post-signature hidden-phone" v-html="comment.user.signature" v-if="comment.user.signature"></div>
                             </td>
                         </tr>

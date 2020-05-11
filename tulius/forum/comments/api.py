@@ -1,23 +1,25 @@
+from django.utils import html
 from djfw.wysibb.templatetags import bbcodes
 
 from tulius.forum import site
 from tulius.forum.threads import api
 from tulius.forum.comments import pagination
 
-
+# TODO unreaded messages
 # TODO reply form
 # TODO delete form
 # TODO dynamic updates button
+
 
 def comment_to_json(c):
     return {
         'id': c.id,
         'url': c.get_absolute_url,
-        'title': c.title,
+        'title': html.escape(c.title),
         'body': bbcodes.bbcode(c.body),
         'user': api.user_to_json(c.user, detailed=True),
         'create_time': c.create_time,
-        'voting': c.voting, # TODO voting
+        'voting': c.voting,
         'edit_right': c.edit_right,
         'is_thread': c.is_thread(),
         'is_liked': False, # TODO

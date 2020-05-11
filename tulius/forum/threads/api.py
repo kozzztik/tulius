@@ -1,21 +1,22 @@
+from django.utils import html
+
 from tulius.forum import site
 from tulius.forum import plugins
 from tulius.forum.readmarks import plugin as readmarks
 from djfw.wysibb.templatetags import bbcodes
 
-# TODO html safe all
 
 def user_to_json(user, detailed=False):
     data = {
         'id': user.id,
-        'title': str(user),  # TODO
+        'title': html.escape(str(user)),  # TODO
         'url': user.get_absolute_url(),
     }
     if detailed:
         data.update({
             'avatar': user.avatar.url if user.avatar else '',
             'full_stars': user.full_stars(),
-            'rank': user.rank,
+            'rank': html.escape(user.rank),
             'stories_author': user.stories_author(),  # TODO optimize that!
             'signature': bbcodes.bbcode(user.signature),
         })
@@ -25,8 +26,8 @@ def user_to_json(user, detailed=False):
 def room_to_json(thread):
     return {
         'id': thread.pk,
-        'title': thread.title,
-        'body': thread.body,
+        'title': html.escape(thread.title),
+        'body': bbcodes.bbcode(thread.body),
         'room': thread.room,
         'deleted': thread.deleted,
         'important': thread.important,

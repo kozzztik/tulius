@@ -4,7 +4,7 @@ from tulius.forum.threads import api as threads_api
 from tulius.forum.collapse_threads import views as collapse_views
 from tulius.forum import online_status
 from tulius.forum.comments import api as comments_api
-
+from tulius.forum.voting import views as voting
 
 app_name = 'tulius.forum'
 
@@ -28,4 +28,7 @@ urlpatterns = [
     urls.url(
         r'^thread/(?P<pk>\d+)/comments_page/(?P<page_num>\d+)/$',
         comments_api.CommentsPageAPI.as_view(), name='comments_page'),
+    urls.url(
+        r'^comment/(?P<pk>\d+)/voting/$',
+        voting.VotingAPI.as_view(), name='voting'),
 ]

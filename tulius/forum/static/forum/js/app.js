@@ -48,3 +48,5 @@ var app = new Vue({
         });
     }
 });
+
+Vue.app_error_handler = (message, tag) => app.add_message(message, tag);

@@ -1,1 +1,44 @@
-<div></div>
+<div class="voting">
+    <img v-if="loading" src="/static/forum/img/loading.gif">
+    <div v-if="!loading">
+        <h4 v-html="voting.name"></h4>
+        <div v-html="voting.body" v-if="voting.body"></div>
+        <br v-if="!voting.body">
+
+        <div v-if="voting.choices.with_results || show_results">
+            <div v-for="item in voting.choices.items" :key="item.id">
+                <br>
+                <span v-html="item.name"></span>
+                <br>
+                <div class="voting-bar" :style="'width: ' + Math.round(Math.max(item.percent*2,1)) + 'px'"></div>
+                {{ item.count }} ({{item.percent}}%)
+                <br>
+            </div>
+        </div>
+        <div v-if="voting.choice && !voting.choices.with_results">
+            <br>
+            <b>Результаты голосования скрыты до его завершения</b>
+        </div>
+        <br>
+        Всего голосов: {{ voting.choices.votes }}
+        <br>
+        <br>
+        <div v-if="voting.choice">
+            <div v-if="voting.choice">
+                Вы проголосовали за: {{ voting.choice.name }}
+            </div>
+            <div v-if="!voting.choice">Вы не можете голосовать.</div>
+        </div>
+        <form v-if="(!voting.choice) && (!voting.choices.with_results) && (!show_results)">
+            <div v-for="item in voting.choices.items" :key="item.id">
+                <input type="radio" :name="'voting-radio-' + item.id" :value="item.id" v-model="choice">
+                {{ item.name }}
+                <br>
+            </div>
+            <br>
+            <input v-if="voting.preview_results && !show_results" type="button" value="Показать результаты" v-on:click="show_results=true">
+            <input v-if="!show_results" type="button" value="Голосовать" v-on:click="do_vote()">
+        </form>
+        <input v-if="show_results" type="button" value="Перейти к голосованию" v-on:click="show_results=false">
+    </div>
+</div>
