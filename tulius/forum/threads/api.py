@@ -84,7 +84,8 @@ class BaseThreadView(plugins.BaseAPIView):
 
     def get_context_data(self, **kwargs):
         context = super(BaseThreadView, self).get_context_data(**kwargs)
-        self.get_parent_thread(**kwargs)
+        if self.obj is None:
+            self.get_parent_thread(**kwargs)
         context['thread'] = self.obj
         return context
 
@@ -123,4 +124,5 @@ class ThreadView(BaseThreadView):
                 'edit': self.obj.edit_right(),
                 'move': self.obj.move_right(),
             },
+            'first_comment_id': self.obj.first_comment_id,
         }

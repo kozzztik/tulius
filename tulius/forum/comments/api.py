@@ -1,12 +1,16 @@
+import json
+
+from django.core import exceptions
 from django.utils import html
 from djfw.wysibb.templatetags import bbcodes
 
 from tulius.forum import site
+from tulius.forum import models
 from tulius.forum.threads import api
 from tulius.forum.comments import pagination
 
 # TODO unreaded messages
-# TODO reply form
+# TODO reply form movement & quoting
 # TODO delete form
 # TODO dynamic updates button
 
@@ -40,3 +44,26 @@ class CommentsPageAPI(api.BaseThreadView):
             'pagination': pagination_context,
             'comments': [comment_to_json(c) for c in comments]
         }
+
+    def post(self, *args, **kwargs):
+        self.get_parent_thread(**kwargs)
+        if not self.obj.write_right(self.user):
+            raise exceptions.PermissionDenied()
+        data = json.loads(self.request.body)
+        text = data['body']
+        preview = data.get('preview', False)
+        if text:
+            comment = models.Comment(plugin_id=self.obj.plugin_id)
+            comment.parent = self.obj
+            comment.user = self.user
+            comment.title = "Re: " + self.obj.title
+            comment.body = text
+            comment.reply_id = self.obj.first_comment_id
+            if preview:
+                return comment_to_json(comment)
+            comment.save()
+            site.site.signals.comment_after_fastreply.send(self)
+            page = comment.page
+        else:
+            page = self.obj.pages_count
+        return self.get_context_data(page_num=page, **kwargs)

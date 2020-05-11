@@ -5,5 +5,37 @@
         <forum_comment :user="user" :thread="thread" :comment="comment" v-for="comment in comments" :key="comment.id"></forum_comment>
         <pagination :pagination="pagination"></pagination>
     </div>
+    <forum_comment :user="user" :thread="thread" :comment="preview_comment" v-if="show_preview"></forum_comment>
+    <div id="replyform_placement" v-if="!loading && thread.rights.write">
+        <div id="replyformroot">
+            <div id="post-preview" style="display: none"></div>
+            <table id="replyformtable" class="post-table content">
+                <tbody>
+                <tr>
+                    <td>
+                        <div id="replyform_container">
+                            <form id="replyform" class="form-horizontal">
+                                <fieldset class="control-group">
+                                    <textarea id="id_body" name="body"></textarea>
+                                </fieldset>
+                                <fieldset>
+                                    <a class="submit btn btn-primary" v-on:click="do_reply">
+                                        Ответить
+                                    </a>
+                                    <a id="extended-link" :href="'/forums/add_comment/' + thread.first_comment_id + '/'">
+                                        Расширенная форма...
+                                    </a>
+                                    <a id="post-preview-link" class="pull-right" v-on:click="do_preview()">
+                                        Предварительный просмотр
+                                    </a>
+                                </fieldset>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
     <forum_online_status :thread="thread"></forum_online_status>
 </div>

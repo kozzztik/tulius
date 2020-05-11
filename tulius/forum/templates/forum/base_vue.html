@@ -3,9 +3,12 @@
 {% block additional_styles %}
     <link rel="stylesheet" href="{{ STATIC_URL }}forum/css/tulius-forum.css" type="text/css">
     <link rel="stylesheet" href="{{ STATIC_URL }}common/css/vue-loading.css" type="text/css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}wysibb/theme/default/wbbtheme.css" type="text/css" />
 {% endblock %}
 
 {% block additional_scripts %}
+    <script src="{{ STATIC_URL }}wysibb/jquery.wysibb.js"></script>
+    <script src="{{ STATIC_URL }}wysibb/init.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}common/js/vue.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}common/js/axios.min.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}common/js/vue-loading-overlay.js"></script>
