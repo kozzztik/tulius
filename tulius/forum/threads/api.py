@@ -14,6 +14,7 @@ def user_to_json(user, detailed=False):
     }
     if detailed:
         data.update({
+            'sex': user.sex,
             'avatar': user.avatar.url if user.avatar else '',
             'full_stars': user.full_stars(),
             'rank': html.escape(user.rank),

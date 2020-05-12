@@ -1,5 +1,6 @@
 import json
 
+from django import shortcuts
 from django.core import exceptions
 from django.utils import html
 from djfw.wysibb.templatetags import bbcodes
@@ -10,7 +11,6 @@ from tulius.forum.threads import api
 from tulius.forum.comments import pagination
 
 # TODO unreaded messages
-# TODO reply form movement & quoting
 # TODO delete form
 # TODO dynamic updates button
 
@@ -51,6 +51,11 @@ class CommentsPageAPI(api.BaseThreadView):
             raise exceptions.PermissionDenied()
         data = json.loads(self.request.body)
         text = data['body']
+        reply_id = data['reply_id']
+        if reply_id != self.obj.first_comment_id:
+            obj = shortcuts.get_object_or_404(models.Comment, pk=reply_id)
+            if obj.parent_id != self.obj.id:
+                raise exceptions.PermissionDenied()
         preview = data.get('preview', False)
         if text:
             comment = models.Comment(plugin_id=self.obj.plugin_id)
@@ -58,7 +63,7 @@ class CommentsPageAPI(api.BaseThreadView):
             comment.user = self.user
             comment.title = "Re: " + self.obj.title
             comment.body = text
-            comment.reply_id = self.obj.first_comment_id
+            comment.reply_id = reply_id
             if preview:
                 return comment_to_json(comment)
             comment.save()

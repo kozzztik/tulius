@@ -34,7 +34,7 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li v-if="thread.rights.write">
-                            <a class="fast-reply-link post-actions-button" :href="'javascript:fast_reply(' + comment.id + ')'">
+                            <a class="fast-reply-link post-actions-button" v-on:click="$parent.fast_reply(comment)" href="#">
                                 Ответить
                             </a>
                         </li>
@@ -61,7 +61,7 @@
             </td>
             <td class="post-actions">
                 <div class="visible-phone pull-left" v-html="forum_datetime(comment.create_time)"></div>
-                <a v-if="thread.rights.write" class="hidden-phone fast-reply-link post-actions-button" :href="'javascript:fast_reply(' + comment.id + ')'">
+                <a v-if="thread.rights.write" class="hidden-phone fast-reply-link post-actions-button" v-on:click="$parent.fast_reply(comment)">
                     <img src="/static/forum/img/replybutton.gif" height="26" width="127">
                 </a>
                 <a v-if="comment.edit_right && (!comment.is_thread)" class="hidden-phone post-actions-button" :href="'/forums/edit_comment/' + comment.id + '/'">

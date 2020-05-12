@@ -2,7 +2,7 @@
     <forum_thread_actions v-if="!loading" :thread="thread" :user="user"></forum_thread_actions>
     <div v-if="!loading">
         <pagination :pagination="pagination"></pagination>
-        <forum_comment :user="user" :thread="thread" :comment="comment" v-for="comment in comments" :key="comment.id"></forum_comment>
+        <forum_comment :user="user" :thread="thread" :comment="comment" v-for="comment in comments" :key="comment.id" :id="comment.id"></forum_comment>
         <pagination :pagination="pagination"></pagination>
     </div>
     <forum_comment :user="user" :thread="thread" :comment="preview_comment" v-if="show_preview"></forum_comment>
@@ -22,7 +22,7 @@
                                     <a class="submit btn btn-primary" v-on:click="do_reply">
                                         Ответить
                                     </a>
-                                    <a id="extended-link" :href="'/forums/add_comment/' + thread.first_comment_id + '/'">
+                                    <a id="extended-link" :href="'/forums/add_comment/' + reply_comment_id + '/'">
                                         Расширенная форма...
                                     </a>
                                     <a id="post-preview-link" class="pull-right" v-on:click="do_preview()">
