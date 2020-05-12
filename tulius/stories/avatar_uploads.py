@@ -28,7 +28,7 @@ def save_upload(request, upload, filename, story, avatar):
             image.size[1] > AVATAR_SAVE_SIZE[1]):
         image.thumbnail(AVATAR_SAVE_SIZE, Image.ANTIALIAS)
     imageformat = getattr(settings, 'IMAGE_FORMAT', 'jpeg')
-    image_content = io.StringIO()
+    image_content = io.BytesIO()
     image.save(image_content, format=imageformat)
     image_file = ContentFile(image_content.getvalue())
     if not avatar:
@@ -44,7 +44,7 @@ def save_upload(request, upload, filename, story, avatar):
         alternative.save()
         small_image = Image.open(avatar.image.path)
         small_image.thumbnail(size, Image.ANTIALIAS)
-        image_content = io.StringIO()
+        image_content = io.BytesIO()
         small_image.save(image_content, format=imageformat)
         image_file = ContentFile(image_content.getvalue())
         filepath = "%s-%sx%s.%s" % (avatar.pk, size[0], size[1], imageformat)
