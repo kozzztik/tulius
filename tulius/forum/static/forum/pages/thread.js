@@ -2,7 +2,6 @@ import thread_actions from '../snippets/thread_actions.js'
 import online_status from '../snippets/online_status.js'
 import comment_component from '../snippets/comment.js'
 import pagination_component from '../components/pagination.js'
-import '../js/jquery.selection.js'
 import ckeditor from '../../ckeditor4/components/tulius_ckeditor.js'
 
 
@@ -33,11 +32,19 @@ export default LazyComponent('forum_thread_page', {
                 return comment.user.title + ' сказал(а):'
             }
         },
+        getSelectionText() {
+            var text = "";
+            if (window.getSelection) {
+                text = window.getSelection().toString();
+            } else if (document.selection && document.selection.type != "Control") {
+                text = document.selection.createRange().text;
+            }
+            return text;
+        },
         fast_reply(comment) {
             this.show_preview = false;
             $("#" + comment.id).after($('#replyformroot'));
-            var selection = $.selection().get();
-            var text = selection.html;
+            var text = this.getSelectionText();
             if (text != "") {
                 this.reply_text = this.reply_text +
                     '<blockquote><font size="1">' +
