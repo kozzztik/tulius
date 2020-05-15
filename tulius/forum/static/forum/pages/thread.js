@@ -2,7 +2,7 @@ import thread_actions from '../snippets/thread_actions.js'
 import online_status from '../snippets/online_status.js'
 import comment_component from '../snippets/comment.js'
 import pagination_component from '../components/pagination.js'
-import ckeditor from '../../ckeditor4/components/tulius_ckeditor.js'
+import reply_form_component from '../components/reply_form.js'
 
 
 export default LazyComponent('forum_thread_page', {
@@ -16,50 +16,20 @@ export default LazyComponent('forum_thread_page', {
             pagination: {},
             comments_page: 1,
             user: {},
-            show_preview: false,
-            preview_comment: {},
-            reply_comment_id: null,
-            reply_text: '',
         }
     },
     methods: {
-        reply_str(comment) {
-            if (comment.user.sex == 1) {
-                return comment.user.title + ' сказал:'
-            } else if (comment.user.sex == 2) {
-                return comment.user.title + ' сказала:'
-            } else {
-                return comment.user.title + ' сказал(а):'
-            }
-        },
-        getSelectionText() {
-            var text = "";
-            if (window.getSelection) {
-                text = window.getSelection().toString();
-            } else if (document.selection && document.selection.type != "Control") {
-                text = document.selection.createRange().text;
-            }
-            return text;
-        },
         fast_reply(comment) {
-            this.show_preview = false;
-            $("#" + comment.id).after($('#replyformroot'));
-            var text = this.getSelectionText();
-            if (text != "") {
-                this.reply_text = this.reply_text +
-                    '<blockquote><font size="1">' +
-                    this.reply_str(comment) +
-                    '</font><br/>' +
-                    text + '</blockquote><p></p>';
+            var component;
+            for (component of this.$refs.comments) {
+                if (component.comment.id == comment.id) {
+                    var el = this.$refs.reply_form.$el;
+                    el.parentNode.removeChild(el);
+                    component.$el.parentNode.appendChild(el);
+                    break;
+                }
             }
-            window.getSelection().removeAllRanges();
-            this.reply_comment_id = comment.id;
-        },
-        cleanup_reply_form() {
-            $('#replyform_placement').append($('#replyformroot')); // park form
-            this.reply_comment_id = this.thread.first_comment_id;
-            this.show_preview = false;
-            this.reply_text = '';
+            this.$refs.reply_form.fast_reply(comment);
         },
         update_comments() {
             this.loading = true;
@@ -85,7 +55,6 @@ export default LazyComponent('forum_thread_page', {
                 this.breadcrumbs.push(
                     {"url": api_response.url, "title": api_response.title});
                 this.thread = api_response;
-                this.reply_comment_id = this.thread.first_comment_id;
                 this.user = this.$parent.user;
                 this.update_comments()
             }).catch(error => this.$parent.add_message(error, "error"))
@@ -93,33 +62,11 @@ export default LazyComponent('forum_thread_page', {
                 this.$parent.loading_end(this.breadcrumbs);
             });
         },
-        do_reply() {
-            this.loading = true;
-            this.$parent.loading_start();
-            axios.post(
-                '/api/forum/thread/'+ this.thread.id + '/comments_page/',
-                {body: this.reply_text, reply_id: this.reply_comment_id}
-            ).then(response => {
-                this.cleanup_reply_form();
-                this.comments = response.data.comments;
-                this.pagination = response.data.pagination;
-            }).catch(error => this.$parent.add_message(error, "error"))
-            .then(() => {
-                this.loading = false;
-                this.$parent.loading_end(this.breadcrumbs);
-            });
-        },
-        do_preview() {
-            axios.post(
-                    '/api/forum/thread/'+ this.thread.id + '/comments_page/',
-                    {body: this.reply_text, reply_id: this.reply_comment_id, preview: true}
-            ).then(response => {
-                this.preview_comment = response.data;
-                this.preview_comment.title = "Предварительный просмотр сообщения";
-                this.show_preview = true;
-            }).catch(error => this.$parent.add_message(error, "error"))
-            .then(() => {
-            });
+        cleanup_reply_form() {
+            var el = this.$refs.reply_form.$el;
+            this.$refs.reply_form.cleanup_reply_form();
+            el.parentNode.removeChild(el);
+            this.$refs.reply_form_parking.appendChild(el);
         }
     },
     mounted() {this.load_api(this.$route.params.id, this.$route.query['page'] || 1)},

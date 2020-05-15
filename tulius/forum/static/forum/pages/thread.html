@@ -2,39 +2,14 @@
     <forum_thread_actions v-if="!loading" :thread="thread" :user="user"></forum_thread_actions>
     <div v-if="!loading">
         <pagination :pagination="pagination"></pagination>
-        <forum_comment :user="user" :thread="thread" :comment="comment" v-for="comment in comments" :key="comment.id" :id="comment.id"></forum_comment>
+        <div v-for="comment in comments" :key="comment.id" :id="comment.id" >
+            <forum_comment :user="user" :thread="thread" :comment="comment" ref="comments"></forum_comment>
+        </div>
         <pagination :pagination="pagination"></pagination>
     </div>
-    <div id="replyform_placement" v-if="!loading && thread.rights.write">
-        <div id="replyformroot">
-            <forum_comment :user="user" :thread="thread" :comment="preview_comment" v-if="show_preview" :preview="true"></forum_comment>
-            <table id="replyformtable" class="post-table content">
-                <tbody>
-                <tr>
-                    <td>
-                        <div id="replyform_container">
-                            <form id="replyform" class="form-horizontal">
-                                <fieldset class="control-group">
-                                    <tulius_ckeditor v-model="reply_text"></tulius_ckeditor>
-                                </fieldset>
-                                <fieldset>
-                                    <a class="submit btn btn-primary" v-on:click="do_reply">
-                                        Ответить
-                                    </a>
-                                    <a id="extended-link" :href="'/forums/add_comment/' + reply_comment_id + '/'">
-                                        Расширенная форма...
-                                    </a>
-                                    <a id="post-preview-link" class="pull-right" v-on:click="do_preview()">
-                                        Предварительный просмотр
-                                    </a>
-                                </fieldset>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+    <div v-if="!loading && thread.rights.write" ref="reply_form_parking">
+        <forum_reply_form :thread="thread" :user="user" ref="reply_form">
+        </forum_reply_form>
     </div>
     <forum_online_status :thread="thread"></forum_online_status>
 </div>
