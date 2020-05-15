@@ -58,7 +58,7 @@ class BrTag(Tag):
 
 class ListItemTag(Tag):
     def convert(self, data_str):
-        yield '[*]'.format(self.tag_name)
+        yield '[*]'
         yield from self.convert_internal(data_str)
         yield '\n'
 
@@ -71,7 +71,7 @@ class ListTag(Tag):
 
 
 class FontTag(Tag):
-       def convert(self, data_str):
+    def convert(self, data_str):
         color = self.attrs.get('color', '')
         if not bb_parser.check_color(color):
             yield from super(FontTag, self).convert(data_str)
@@ -89,7 +89,7 @@ class SpanTag(Tag):
         styles = {}
         entries = self.attrs.get('style', '').split(';')
         for entry in entries:
-            params = entry.split(':',1)
+            params = entry.split(':', 1)
             if len(params) != 2:
                 continue
             key = params[0].strip()

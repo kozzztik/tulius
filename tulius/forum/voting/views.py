@@ -20,7 +20,6 @@ class Like(plugins.BasePluginView):
             raise http.Http404()
         comment_id = request.GET['postid']
         value = request.GET['value'] == 'true'
-        models = self.core.models
         try:
             comment_id = int(comment_id)
         except:
@@ -71,7 +70,6 @@ class Vote(BaseVoting):
     no_revote = False
 
     def get(self, request, *args, **kwargs):
-        models = self.core.models
         choice_id = int(request.GET['choice_id'])
         choice = shortcuts.get_object_or_404(models.VotingChoice, id=choice_id)
         voting = choice.voting
@@ -123,9 +121,9 @@ class VotingAPI(plugins.BaseAPIView):
     def choices_json(self, user_choice):
         force_results = bool(
             self.obj.closed or (user_choice and self.obj.show_results))
-        choices =  models.VotingChoice.objects.filter(
+        choices = models.VotingChoice.objects.filter(
             voting=self.obj).annotate(
-            count=django_models.Count('voting_choices'))
+                count=django_models.Count('voting_choices'))
         items = []
         votes = 0
         include_results = force_results or self.obj.preview_results

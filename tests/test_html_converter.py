@@ -26,7 +26,7 @@ from tulius.core.ckeditor import html_converter
     ],
 ])
 def test_html_convertor(data, value):
-    assert html_converter.HtmlConverter().convert(data) == value
+    assert html_converter.html_to_bb(data) == value
 
 
 @pytest.mark.parametrize('data,value', [
@@ -83,4 +83,34 @@ def test_font(data, value):
     ],
 ])
 def test_span(data, value):
+    assert html_converter.HtmlConverter().convert(data) == value
+
+
+@pytest.mark.parametrize('data,value', [
+    [   # check invalid a tag
+        '11<a>23</a>', '1123'
+    ],
+    [  # check valid tag
+        '11<a href="tulius.com">23</a>', '11[url=tulius.com]23[/url]'
+    ],
+    [  # check removing bad chars
+        '11<a href="tulius.com]bad">23</a>', '11[url=tulius.combad]23[/url]'
+    ],
+])
+def test_a_tag(data, value):
+    assert html_converter.HtmlConverter().convert(data) == value
+
+
+@pytest.mark.parametrize('data,value', [
+    [   # check invalid a tag
+        '11<img>23</img>', '11'
+    ],
+    [  # check valid tag
+        '11<img src="tulius.com" alt="23"/>', '11[img=tulius.com]23[/img]'
+    ],
+    [  # check removing bad chars
+        '11<img src="tulius.com]bad"/>', '11[img=tulius.combad][/img]'
+    ],
+])
+def test_img_tag(data, value):
     assert html_converter.HtmlConverter().convert(data) == value

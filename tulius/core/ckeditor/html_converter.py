@@ -10,6 +10,9 @@ class HtmlConverter(parser.HTMLParser):
     new_tag: typing.Optional[html_tags.Tag] = None
     closed_tag_name: typing.Optional[str] = None
 
+    def error(self, message):
+        pass  # pragma: no cover
+
     def parse_starttag(self, i):
         self.new_tag = None
         k = super(HtmlConverter, self).parse_starttag(i)
