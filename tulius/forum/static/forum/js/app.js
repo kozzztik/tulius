@@ -1,5 +1,8 @@
 import routes from './routes.js'
 import breadcrumbs from '/static/common/components/breadcrumbs.js'
+import CKEditor from '/static/ckeditor4/ckeditor4-vue/index.js';
+
+Vue.use( CKEditor );
 
 const NotFound = { template: '<p>Страница не найдена</p>' }
 
@@ -23,12 +26,18 @@ var app = new Vue({
     methods: {
         loading_start() {
             this.loading_counter = this.loading_counter + 1;
-            this.loading = (this.loading_counter > 0)
+            const new_loading = (this.loading_counter > 0);
+            if (this.loading != new_loading) {
+                this.loading = new_loading;
+            }
         },
         loading_end(items) {
             this.breadcrumb_items = items;
             this.loading_counter = this.loading_counter - 1;
-            this.loading = (this.loading_counter > 0)
+            const new_loading = (this.loading_counter > 0);
+            if (this.loading != new_loading) {
+                this.loading = new_loading;
+            }
         },
         update_footer(show, content) {
             this.show_footer = show;

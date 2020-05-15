@@ -5,6 +5,7 @@ from django.core import exceptions
 from django.utils import html
 from djfw.wysibb.templatetags import bbcodes
 
+from tulius.core.ckeditor import html_converter
 from tulius.forum import site
 from tulius.forum import models
 from tulius.forum.threads import api
@@ -50,7 +51,7 @@ class CommentsPageAPI(api.BaseThreadView):
         if not self.obj.write_right(self.user):
             raise exceptions.PermissionDenied()
         data = json.loads(self.request.body)
-        text = data['body']
+        text = html_converter.html_to_bb(data['body'])
         reply_id = data['reply_id']
         if reply_id != self.obj.first_comment_id:
             obj = shortcuts.get_object_or_404(models.Comment, pk=reply_id)

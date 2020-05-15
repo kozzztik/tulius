@@ -27,7 +27,7 @@
         <tr>
             <td class="post-url">
                 <a href="#" class="hidden-phone">Наверх</a>
-                <div class="dropup visible-phone" v-if="thread.rights.write || comment.edit_right">
+                <div class="dropup visible-phone" v-if="!preview && (thread.rights.write || comment.edit_right)">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                         Действия
                         <span class="caret"></span>
@@ -61,25 +61,27 @@
             </td>
             <td class="post-actions">
                 <div class="visible-phone pull-left" v-html="forum_datetime(comment.create_time)"></div>
-                <a v-if="thread.rights.write" class="hidden-phone fast-reply-link post-actions-button" v-on:click="$parent.fast_reply(comment)">
-                    <img src="/static/forum/img/replybutton.gif" height="26" width="127">
-                </a>
-                <a v-if="comment.edit_right && (!comment.is_thread)" class="hidden-phone post-actions-button" :href="'/forums/edit_comment/' + comment.id + '/'">
-                    <img src="/static/forum/img/editbutton.gif" height="26" width="168">
-                </a>
-                <a v-if="comment.edit_right && comment.is_thread" class="hidden-phone post-actions-button" :href="'/forums/edit_thread/' + thread.id + '/'">
-                    <img src="/static/forum/img/editbutton.gif" height="26" width="168">
-                </a>
-                <a v-if="comment.edit_right" class="hidden-phone post-actions-delete post-actions-button" :href="'javascript:delete_comment(' + comment.id + ')'">
-                    <img src="/static/forum/img/delete_post.png">
-                </a>
-                <a v-if="comment.is_thread && thread.rights.move" class="hidden-phone post-actions-button" :href="'/forums/thread/' + thread.id + '/move/'">
-                    <img src="/static/forum/img/move.gif">
-                </a>
-                <a v-if="!user.is_anonymous" :href="'javascript:do_like(' + comment.id + ')'">
-                    <img class="post-actions-button likelink" :id="'likebtn' + comment.id" height="26" width="26" :value="comment.is_liked"
-                     :src="'/static/forum/img/' + (comment.is_liked ? 'like.gif' : 'unlike.gif')">
-                </a>
+                <span v-if="!preview">
+                    <a v-if="thread.rights.write" class="hidden-phone fast-reply-link post-actions-button" v-on:click="$parent.fast_reply(comment)">
+                        <img src="/static/forum/img/replybutton.gif" height="26" width="127">
+                    </a>
+                    <a v-if="comment.edit_right && (!comment.is_thread)" class="hidden-phone post-actions-button" :href="'/forums/edit_comment/' + comment.id + '/'">
+                        <img src="/static/forum/img/editbutton.gif" height="26" width="168">
+                    </a>
+                    <a v-if="comment.edit_right && comment.is_thread" class="hidden-phone post-actions-button" :href="'/forums/edit_thread/' + thread.id + '/'">
+                        <img src="/static/forum/img/editbutton.gif" height="26" width="168">
+                    </a>
+                    <a v-if="comment.edit_right" class="hidden-phone post-actions-delete post-actions-button" :href="'javascript:delete_comment(' + comment.id + ')'">
+                        <img src="/static/forum/img/delete_post.png">
+                    </a>
+                    <a v-if="comment.is_thread && thread.rights.move" class="hidden-phone post-actions-button" :href="'/forums/thread/' + thread.id + '/move/'">
+                        <img src="/static/forum/img/move.gif">
+                    </a>
+                    <a v-if="!user.is_anonymous" :href="'javascript:do_like(' + comment.id + ')'">
+                        <img class="post-actions-button likelink" :id="'likebtn' + comment.id" height="26" width="26" :value="comment.is_liked"
+                         :src="'/static/forum/img/' + (comment.is_liked ? 'like.gif' : 'unlike.gif')">
+                    </a>
+                </span>
                 <div v-if="comment.edit_time" class="edited">
                     Отредактировано:
                     <span v-html="comment.editor.title"></span>,

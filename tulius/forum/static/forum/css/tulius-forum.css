@@ -302,7 +302,7 @@ ul.comma-list > li:last-child:after { content: '.'; }
     padding-left: 1px;
 }
 
-body .quote { 
+body .quote, blockquote {
     -moz-border-bottom-colors: none; 
     -moz-border-left-colors: none; 
     -moz-border-right-colors: none; 

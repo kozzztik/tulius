@@ -70,6 +70,7 @@ INSTALLED_APPS = (
     'djfw.custom_views',
     'tulius.pm',
     'tulius',
+    'tulius.core.ckeditor',
     'tulius.login',
     'tulius.players',
     'tulius.profile',

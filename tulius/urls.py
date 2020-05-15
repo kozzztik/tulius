@@ -47,6 +47,9 @@ urlpatterns = [
         r'^forums/',
         include(apps.get_app_config('forum').site.urls)),
     url(r'^api/forum/', include('tulius.forum.urls', namespace='forum_api')),
+    url(
+        r'^api/ckeditor/',
+        include('tulius.core.ckeditor.urls', namespace='ckeditor')),
     url(r'^stories/', include('tulius.stories.urls', namespace='stories')),
     url(r'^play/',
         include(apps.get_app_config('gameforum').site.urls)),

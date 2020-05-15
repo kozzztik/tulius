@@ -3,6 +3,7 @@ import online_status from '../snippets/online_status.js'
 import comment_component from '../snippets/comment.js'
 import pagination_component from '../components/pagination.js'
 import '../js/jquery.selection.js'
+import ckeditor from '../../ckeditor4/components/tulius_ckeditor.js'
 
 
 export default LazyComponent('forum_thread_page', {
@@ -16,10 +17,10 @@ export default LazyComponent('forum_thread_page', {
             pagination: {},
             comments_page: 1,
             user: {},
-            wysibb_options: null,
             show_preview: false,
             preview_comment: {},
             reply_comment_id: null,
+            reply_text: '',
         }
     },
     methods: {
@@ -33,17 +34,16 @@ export default LazyComponent('forum_thread_page', {
             }
         },
         fast_reply(comment) {
+            this.show_preview = false;
             $("#" + comment.id).after($('#replyformroot'));
             var selection = $.selection().get();
             var text = selection.html;
             if (text != "") {
-                var data = $("textarea").htmlcode();
-                $("textarea").htmlcode(
-                    $("textarea").htmlcode() +
-                    '<div class="quote"><font size="1">' +
+                this.reply_text = this.reply_text +
+                    '<blockquote><font size="1">' +
                     this.reply_str(comment) +
                     '</font><br/>' +
-                    text + '</div>');
+                    text + '</blockquote><p></p>';
             }
             window.getSelection().removeAllRanges();
             this.reply_comment_id = comment.id;
@@ -52,9 +52,10 @@ export default LazyComponent('forum_thread_page', {
             $('#replyform_placement').append($('#replyformroot')); // park form
             this.reply_comment_id = this.thread.first_comment_id;
             this.show_preview = false;
-            $('#id_body')[0].value = '';
+            this.reply_text = '';
         },
         update_comments() {
+            this.loading = true;
             this.$parent.loading_start();
             axios.get('/api/forum/thread/'+ this.thread.id + '/comments_page/' + this.comments_page + '/').then(response => {
                 this.comments = response.data.comments;
@@ -80,44 +81,31 @@ export default LazyComponent('forum_thread_page', {
                 this.reply_comment_id = this.thread.first_comment_id;
                 this.user = this.$parent.user;
                 this.update_comments()
-                if (this.wysibb_options === null) {
-                    this.$parent.loading_start();
-                    axios.get('/wysibb/options/').then(response => {
-                        this.wysibb_options = response.data;
-                        this.wysibb_options.allButtons.myfile.modal.onSubmit = wysibb_file_load;
-                    }).catch(error => this.$parent.add_message(error, "error")).then(() => {
-                        this.loading = false;
-                        this.$parent.loading_end(this.breadcrumbs);
-                    });
-                }
             }).catch(error => this.$parent.add_message(error, "error"))
             .then(() => {
                 this.$parent.loading_end(this.breadcrumbs);
             });
         },
         do_reply() {
-            $("#replyform textarea").sync();
-            var reply_text = $('#id_body')[0].value;
-            $("#replyform textarea").destroy();
+            this.loading = true;
             this.$parent.loading_start();
             axios.post(
                 '/api/forum/thread/'+ this.thread.id + '/comments_page/',
-                {body: reply_text, reply_id: this.reply_comment_id}
+                {body: this.reply_text, reply_id: this.reply_comment_id}
             ).then(response => {
                 this.cleanup_reply_form();
                 this.comments = response.data.comments;
                 this.pagination = response.data.pagination;
             }).catch(error => this.$parent.add_message(error, "error"))
             .then(() => {
+                this.loading = false;
                 this.$parent.loading_end(this.breadcrumbs);
             });
         },
         do_preview() {
-            $("#replyform textarea").sync();
-            var reply_text = $('#id_body')[0].value;
             axios.post(
                     '/api/forum/thread/'+ this.thread.id + '/comments_page/',
-                    {body: reply_text, reply_id: this.reply_comment_id, preview: true}
+                    {body: this.reply_text, reply_id: this.reply_comment_id, preview: true}
             ).then(response => {
                 this.preview_comment = response.data;
                 this.preview_comment.title = "Предварительный просмотр сообщения";
@@ -133,9 +121,4 @@ export default LazyComponent('forum_thread_page', {
         this.load_api(to.params.id, to.query['page'] || 1);
         next();
     },
-    updated: function () {
-        this.$nextTick(function () {
-            $("textarea").wysibb(this.wysibb_options);
-        });
-    }
 })

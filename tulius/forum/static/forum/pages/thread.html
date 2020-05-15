@@ -5,10 +5,9 @@
         <forum_comment :user="user" :thread="thread" :comment="comment" v-for="comment in comments" :key="comment.id" :id="comment.id"></forum_comment>
         <pagination :pagination="pagination"></pagination>
     </div>
-    <forum_comment :user="user" :thread="thread" :comment="preview_comment" v-if="show_preview"></forum_comment>
     <div id="replyform_placement" v-if="!loading && thread.rights.write">
         <div id="replyformroot">
-            <div id="post-preview" style="display: none"></div>
+            <forum_comment :user="user" :thread="thread" :comment="preview_comment" v-if="show_preview" :preview="true"></forum_comment>
             <table id="replyformtable" class="post-table content">
                 <tbody>
                 <tr>
@@ -16,7 +15,7 @@
                         <div id="replyform_container">
                             <form id="replyform" class="form-horizontal">
                                 <fieldset class="control-group">
-                                    <textarea id="id_body" name="body"></textarea>
+                                    <tulius_ckeditor v-model="reply_text"></tulius_ckeditor>
                                 </fieldset>
                                 <fieldset>
                                     <a class="submit btn btn-primary" v-on:click="do_reply">
