@@ -2,18 +2,12 @@
 {% load i18n %}
 
 {% block breadcrumbs %}
-    <li>
-        <div class="divider"></div>
-        <a href="{% url 'auth:login_choose' %}">
-            {% trans "Choose login type" %}
-        </a>
-    </li>
-    <li>
-        <div class="divider"></div>
-        <a href=''>
-            {% trans "Login" %}
-        </a>
-    </li>
+    <a href="{% url 'auth:login_choose' %}">
+        {% trans "Choose login type" %}
+    </a>
+    <a href=''>
+        {% trans "Login" %}
+    </a>
 {% endblock %}
 
 {% block caption %}

@@ -10,29 +10,21 @@
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}gameforum/trustmarks.js'}
     
 - block breadcrumbs
-    %li
-        .divider
-        - if parent_thread.game
-            %a{href: '{{ parent_thread.game.get_absolute_url }}'}
-                {% trans "Game" %}
-        - else
-            %a{href: '{{ parent_thread.variation.get_absolute_url }}'}
-                {% trans "variation" %}
+    - if parent_thread.game
+        %a{href: '{{ parent_thread.game.get_absolute_url }}'}
+            {% trans "Game" %}
+    - else
+        %a{href: '{{ parent_thread.variation.get_absolute_url }}'}
+            {% trans "variation" %}
     - for ancestor in parent_thread.get_ancestors
-        %li
-            .divider
-            %a{href: "{{ ancestor.get_absolute_url }}"}
-                = ancestor.title
+        %a{href: "{{ ancestor.get_absolute_url }}"}
+            = ancestor.title
     - if parent_thread
-        %li
-            .divider
-            %a{href: "{{ parent_thread.get_absolute_url }}"}
-                = parent_thread.title
+        %a{href: "{{ parent_thread.get_absolute_url }}"}
+            = parent_thread.title
     - if form
-        %li
-            .divider
-            %a{href: "{{ form.url }}"}
-                = form.caption|capfirst
+        %a{href: "{{ form.url }}"}
+            = form.caption|capfirst
 
 - block before_actions
     - if variation.game.top_banner

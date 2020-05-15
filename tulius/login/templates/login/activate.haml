@@ -3,14 +3,10 @@
 - load url from future
 
 - block breadcrumbs
-        %li
-            .divider
-            %a{href: '{% url "auth:registration_register" }'}
-                {% trans 'Register' %}
-        %li
-            .divider
-            %a{href: '{% url "" }'}
-                {% trans 'Activation' %}
+    %a{href: '{% url "auth:registration_register" }'}
+        {% trans 'Register' %}
+    %a{href: '{% url "" }'}
+        {% trans 'Activation' %}
 
 - block caption
     {% trans "Activation" %}

@@ -2,14 +2,10 @@
 - load i18n
 
 - block breadcrumbs
-    %li
-        .divider
-        %a{href: '{% url "auth:registration_register" %}'}
-            {% trans 'Register' %}
-    %li
-        .divider
-        %a{href: ''}
-            {% trans 'Profile activation complete' %}
+    %a{href: '{% url "auth:registration_register" %}'}
+        {% trans 'Register' %}
+    %a{href: ''}
+        {% trans 'Profile activation complete' %}
 
 - block caption
     {% trans 'Activation complete' %}

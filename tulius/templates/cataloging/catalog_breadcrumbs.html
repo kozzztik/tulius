@@ -1,11 +1,8 @@
 {% for item in list %}
     {% if forloop.first %}
     {% else %}
-    <li> 
-        <div class="divider" ></div>
-        <a href='{{ item.url }}'>
-            {{ item.name|capfirst }}
-        </a>
-    </li>
+    <a href='{{ item.url }}'>
+        {{ item.name|capfirst }}
+    </a>
     {% endif %}
 {% endfor %}

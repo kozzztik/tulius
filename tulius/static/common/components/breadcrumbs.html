@@ -1,19 +1,14 @@
 <div>
-    <div class="rcrumbs" :id="upper ? 'top-breadcrumbs' : 'bottom-breadcrumbs'">
+    <div class="" :id="upper ? 'top-breadcrumbs' : 'bottom-breadcrumbs'">
         <div class="breadcrumbs-border" v-if="!upper"></div>
-        <ul class="breadcrumb">
-            <li>
-                <a href="/">
-                    <div class="homelink"></div>
-                </a>
-            </li>
-            <li v-for="item in items">
-                <div class="divider"></div>
-                <router-link :to="item.url">
-                    {{ item.title }}
-                </router-link>
-            </li>
-        </ul>
+        <div class="breadcrumbs">
+            <a href="/" class="breadcrumb">
+                <div class="homelink"></div>
+            </a>
+            <router-link :to="item.url"  v-for="item in items" class="breadcrumb">
+                {{ item.title }}
+            </router-link>
+        </div>
     </div>
     <div class="breadcrumbs-border" v-if="upper"></div>
 </div>

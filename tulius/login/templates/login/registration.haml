@@ -2,14 +2,10 @@
 - load i18n
 
 - block breadcrumbs
-    %li
-        .divider
-        %a{href: '{% url "auth:login_choose" %}'}
-            {% trans "Choose login type" %}
-    %li
-        .divider
-        %a{href: ''}
-            {% trans 'Registration' %}
+    %a{href: '{% url "auth:login_choose" %}'}
+        {% trans "Choose login type" %}
+    %a{href: ''}
+        {% trans 'Registration' %}
 
 - block caption
     {% trans "Registration" %}

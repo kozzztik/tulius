@@ -8,14 +8,10 @@
     {% trans "search results" %}
 
 - block breadcrumbs
-    %li
-        .divider
-        %a{href: '{{ parent_thread.get_absolute_url }}'}
-            = parent_thread.title
-    %li
-        .divider
-        %a{href: '{{ parent_thread.extended_search_url }}'}
-            {% trans "search results" %}
+    %a{href: '{{ parent_thread.get_absolute_url }}'}
+        = parent_thread.title
+    %a{href: '{{ parent_thread.extended_search_url }}'}
+        {% trans "search results" %}
                 
 - block upper_actions
     #search_filter.content.form-horizontal
