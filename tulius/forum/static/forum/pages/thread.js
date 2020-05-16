@@ -31,6 +31,26 @@ export default LazyComponent('forum_thread_page', {
             }
             this.$refs.reply_form.fast_reply(comment);
         },
+        update_likes() {
+            var comment;
+            var comment_ids = []
+            for (comment of this.comments) {
+                comment.is_liked = null;
+                comment_ids.push(comment.id);
+            }
+            if (!this.user.is_anonymous) {
+                axios.get('/api/forum/likes/', {params: {ids: comment_ids.join(',')}}
+                ).then(response => {
+                    var likes = response.data;
+                    for (comment of this.comments) {
+                        comment.is_liked = likes[comment.id];
+                    }
+                    for (comment of this.$refs.comments) {
+                        comment.update_like();
+                    }
+                }).catch(error => this.$parent.add_message(error, "error"));
+            }
+        },
         update_comments() {
             this.loading = true;
             this.$parent.loading_start();
@@ -40,6 +60,7 @@ export default LazyComponent('forum_thread_page', {
             }).catch(error => this.$parent.add_message(error, "error")).then(() => {
                 this.loading = false;
                 this.$parent.loading_end(this.breadcrumbs);
+                this.update_likes();
             });
         },
         load_api(pk, page) {

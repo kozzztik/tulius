@@ -11,6 +11,8 @@ from tulius.forum import models
 from tulius.forum.threads import api
 from tulius.forum.comments import pagination
 
+# TODO editor styles
+# TODO editor smiles
 # TODO unreaded messages
 # TODO delete form
 # TODO dynamic updates button
@@ -27,7 +29,6 @@ def comment_to_json(c):
         'voting': c.voting,
         'edit_right': c.edit_right,
         'is_thread': c.is_thread(),
-        'is_liked': False, # TODO
         'edit_time': c.edit_time,
         'editor': api.user_to_json(c.editor) if c.editor else None
     }

@@ -5,6 +5,7 @@ from tulius.forum.collapse_threads import views as collapse_views
 from tulius.forum import online_status
 from tulius.forum.comments import api as comments_api
 from tulius.forum.voting import views as voting
+from tulius.forum.other import likes
 
 app_name = 'tulius.forum'
 
@@ -34,4 +35,7 @@ urlpatterns = [
     urls.url(
         r'^comment/(?P<pk>\d+)/voting/$',
         voting.VotingAPI.as_view(), name='voting'),
+    urls.url(
+        r'^likes/$',
+        likes.Likes.as_view(), name='likes'),
 ]

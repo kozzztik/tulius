@@ -59,6 +59,7 @@ export default LazyComponent('forum_reply_form', {
                 this.$parent.cleanup_reply_form();
                 this.$parent.comments = response.data.comments;
                 this.$parent.pagination = response.data.pagination;
+                this.$parent.update_likes();
             }).catch(error => {
                 this.$root.add_message(error, "error");
             }).then(() => {
