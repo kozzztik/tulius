@@ -11,7 +11,6 @@ from tulius.forum import models
 from tulius.forum.threads import api
 from tulius.forum.comments import pagination
 
-# TODO editor styles
 # TODO unreaded messages
 # TODO delete form
 # TODO dynamic updates button

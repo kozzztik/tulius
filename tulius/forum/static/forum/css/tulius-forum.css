@@ -1,4 +1,4 @@
-.post-body {
+.post-body, .cke_editable {
     font-family: Arial;
     color: black;
     font-size: 14px;
@@ -438,4 +438,17 @@ body .quote, blockquote {
     margin-right: 10px;
     height: 10px;
     display: inline-block;
+}
+
+.cke_editable ul {
+    list-style: url("../../tulius/img/baselayout/li_star.png") outside;
+}
+
+.cke_editable ul, .cke_editable ol {
+    padding: 0;
+    margin: 0 0 10px 25px;
+}
+
+.cke_editable p {
+    margin: 0 0 0 0;
 }
