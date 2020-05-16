@@ -1,4 +1,5 @@
 from djfw.wysibb.templatetags import bb_parser
+from djfw.wysibb.templatetags import bbcodes
 
 
 class Tag:
@@ -129,11 +130,20 @@ class ATag(Tag):
 
 
 class ImgTag(Tag):
+    def is_smile(self):
+        title = self.attrs.get('title')
+        url = bbcodes.smiles.smile_dict().get(title)
+        return title if url else None
+
     def convert(self, data_str):
-        url = self.attrs.get('src', '').replace(']', '')
-        alt = self.attrs.get('alt', '').replace(']', '')
-        if url:
-            yield '[img={}]{}[/img]'.format(url, alt)
+        smile = self.is_smile()
+        if smile:
+            yield smile
+        else:
+            url = self.attrs.get('src', '').replace(']', '')
+            alt = self.attrs.get('alt', '').replace(']', '')
+            if url:
+                yield '[img={}]{}[/img]'.format(url, alt)
 
 
 tag_types = {

@@ -46,7 +46,7 @@ export default {
 			if ( this.$_destroyed ) {
 				return;
 			}
-            this.build_editor();
+            //this.build_editor();
 	},
 
 	beforeDestroy() {
@@ -72,7 +72,7 @@ export default {
 	},
 
 	methods: {
-	 build_editor() {
+	    build_editor() {
 			const config = this.config || {};
 
 			if ( this.readOnly !== null ) {

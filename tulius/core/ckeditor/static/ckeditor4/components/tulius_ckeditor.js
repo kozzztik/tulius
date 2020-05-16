@@ -1,4 +1,6 @@
 
+var cached_smiley_response = {data: null};
+
 export default LazyComponent('tulius_ckeditor', {
     template: '/static/ckeditor4/components/tulius_ckeditor.html',
     props: ['value'],
@@ -7,7 +9,7 @@ export default LazyComponent('tulius_ckeditor', {
             editorData: '',
             editorConfig: {
                 language: 'ru',
-                extraPlugins: 'autogrow,font,colorbutton,image,uploadimage,filebrowser',
+                extraPlugins: 'autogrow,font,colorbutton,image,uploadimage,filebrowser,smiley',
                 removePlugins: 'elementspath,stylescombo',
                 removeButtons: 'Anchor,BGColor,Font,Format,Subscript,Superscript,HorizontalRule,Table',
                 resize_enabled: false,
@@ -29,12 +31,35 @@ export default LazyComponent('tulius_ckeditor', {
             }
         }
     },
+    methods: {
+        build_editor() {
+            //this.editorData = this.value;
+            this.editorConfig.smiley_path = cached_smiley_response.data.base_url;
+            var file_names = [];
+            var texts = [];
+            var smile;
+            for (smile of cached_smiley_response.data.smiles) {
+                file_names.push(smile.file_name)
+                texts.push(smile.text);
+            }
+            this.editorConfig.smiley_images = file_names;
+            this.editorConfig.smiley_descriptions = texts;
+            this.$refs.editor.build_editor();
+            this.$refs.editor.instance.on('fileUploadRequest', function( evt ) {
+                var xhr = evt.data.fileLoader.xhr;
+                xhr.setRequestHeader("X-CSRFTOKEN", getCookie('csrftoken'));
+            });
+        }
+    },
     mounted() {
-        this.editorData = this.value;
-        this.$refs.editor.instance.on('fileUploadRequest', function( evt ) {
-            var xhr = evt.data.fileLoader.xhr;
-            xhr.setRequestHeader("X-CSRFTOKEN", getCookie('csrftoken'));
-        });
+        if (cached_smiley_response.data === null) {
+            axios.get('/api/ckeditor/smiles/').then(response => {
+                cached_smiley_response.data = response.data;
+                this.build_editor();
+            }).catch(error => this.$root.add_message(error, "error"));
+        } else {
+            this.build_editor();
+        }
     },
     watch: {
 		value(val) {

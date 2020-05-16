@@ -25,7 +25,7 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'colors' },
 		{ name: 'about' }
 	];
-	config.extraPlugins = 'autogrow,font,colorbutton,image';
+	config.extraPlugins = 'autogrow,font,colorbutton,image,smiley';
 
 	// Remove some buttons provided by the standard plugins, which are
 	// not needed in the Standard(s) toolbar.

@@ -30,7 +30,7 @@ class Smile(models.Model):
             return None
         return '<img src="' + str(self.image.url) + '"/>'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     preview_image.allow_tags = True

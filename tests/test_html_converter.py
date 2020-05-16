@@ -1,6 +1,10 @@
+from unittest import mock
+
 import pytest
 
 from tulius.core.ckeditor import html_converter
+from djfw.wysibb import models
+from djfw.wysibb.templatetags import bbcodes
 
 
 @pytest.mark.parametrize('data,value', [
@@ -113,4 +117,19 @@ def test_a_tag(data, value):
     ],
 ])
 def test_img_tag(data, value):
-    assert html_converter.HtmlConverter().convert(data) == value
+    with mock.patch.object(bbcodes.smiles, 'smile_dict', return_value={}):
+        assert html_converter.HtmlConverter().convert(data) == value
+
+
+def test_smiles():
+    obj = models.Smile(name='angel', text=':angel:')
+    obj.image.name = 'wysibb/smiles/angel.gif'
+    smiles = {':angel:': '/media/wysibb/smiles/angel.gif'}
+    original = '<p><img alt=":angel:" src="/media/wysibb/smiles/angel.gif"'\
+        ' style="height:26px; width:27px" title=":angel:" /></p>'
+    with mock.patch.object(bbcodes.smiles, 'smile_dict', return_value=smiles):
+        converted = html_converter.html_to_bb(original)
+    with mock.patch.object(bbcodes.smiles, 'get_list', return_value=[obj]):
+        result = bbcodes.bbcode(converted)
+    assert result == '<img class="sm" src="/media/wysibb/smiles/angel.gif"' \
+                     ' title="angel" />'
