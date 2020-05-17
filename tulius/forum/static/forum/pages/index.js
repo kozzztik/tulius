@@ -19,16 +19,18 @@ export default LazyComponent('forum_index_page', {
                 }
                 this.index = api_response;
                 //this.$parent.update_footer(true, 'online users')
-                axios.get('/api/forum/collapse/').then(response => {
-                    for (var key in response.data) {
-                        for (var num in this.index.groups) {
-                            if (this.index.groups[num].id == key) {
-                                this.index.groups[num].collapsed = response.data[key];
-                                break;
+                if (this.$parent.user.authenticated) {
+                    axios.get('/api/forum/collapse/').then(response => {
+                        for (var key in response.data) {
+                            for (var num in this.index.groups) {
+                                if (this.index.groups[num].id == key) {
+                                    this.index.groups[num].collapsed = response.data[key];
+                                    break;
+                                }
                             }
                         }
-                    }
-                });
+                    });
+                }
             }).catch(error => this.$parent.add_message(error, "error"))
             .then(() => {
                 this.$parent.loading_end([

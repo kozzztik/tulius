@@ -46,7 +46,7 @@ class Room(BaseThreadView):
 
 
 class Index(generic.TemplateView):
-    template_name = 'forum/base_vue.html'
+    template_name = 'base_vue.html'
 
 
 class EditView(BaseThreadView):

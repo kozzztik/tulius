@@ -1,5 +1,6 @@
 import datetime
 
+from django import http
 from django.utils.translation import ugettext_lazy as _
 from django.template import response
 from django.views import generic
@@ -7,6 +8,7 @@ from django.utils import timezone
 
 from djfw.news import models as news
 from djfw.profiler import graphs
+from djfw.flatpages import models as flatpage_models
 
 from tulius import forms
 from tulius.games import models as games
@@ -37,6 +39,16 @@ def error404(request, template_name='404.html', **kwargs):
 
 def error500(request, template_name='500.haml'):
     return response.TemplateResponse(request, template_name, status=500)
+
+
+class ArticlesAPI(generic.View):
+    def get(self, *args, **kwargs):
+        pages = flatpage_models.FlatPage.objects.filter(
+            is_enabled=True, show_on_home=True)
+        return http.JsonResponse({'pages': [{
+            'title': page.title,
+            'url': page.url,
+        } for page in pages]})
 
 
 def logic_time(x):

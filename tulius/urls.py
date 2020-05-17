@@ -33,6 +33,8 @@ urlpatterns = [
     url(r'^installer/', include('djfw.installer.urls', namespace='installer')),
 
     url(r'^$', views.HomeView.as_view(), name='home'),
+    url(r'^api/flatpages/$',views.ArticlesAPI.as_view(), name='flatpages_api'),
+
     url(r'^statistics/$', views.StatisticsView.as_view(), name='stats'),
 
     url(r'^accounts/', include('tulius.login.urls', namespace='auth')),

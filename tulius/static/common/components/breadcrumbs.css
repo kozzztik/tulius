@@ -87,23 +87,3 @@
 .breadcrumbs a:hover {
     color: black;
 }
-body .menu {
-    width: 48px;
-}
-
-.menu > * {
-    padding-left: 0px;
-}
-
-@media (max-width: 768px) {
-    body .menu {
-        width: 100%;
-    }
-    .menu .menu-notif-list {
-        width: 70px;
-    }
-}
-
-.online-users ul {
-    padding-left: 0px;
-}

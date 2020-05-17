@@ -1,5 +1,6 @@
 import routes from './routes.js'
 import breadcrumbs from '/static/common/components/breadcrumbs.js'
+import main_menu from '/static/common/components/main_menu.js'
 import CKEditor from '/static/ckeditor4/ckeditor4-vue/index.js';
 
 Vue.use( CKEditor );
@@ -12,7 +13,7 @@ const router = new VueRouter({
 })
 
 var app = new Vue({
-    el: '#content-center',
+    el: '#vue_app',
     router: router,
     data: {
         breadcrumb_items: [],
@@ -21,7 +22,11 @@ var app = new Vue({
         show_footer: false,
         footer_content: '',
         messages: [],
-        user: {},
+        user: {
+            'authenticated': false,
+            'anonymous': true,
+            'superuser': false,
+        },
     },
     methods: {
         loading_start() {
@@ -32,6 +37,9 @@ var app = new Vue({
             }
         },
         loading_end(items) {
+            if (items && items.length > 0) {
+                document.title = items[items.length - 1].title;
+            }
             this.breadcrumb_items = items;
             this.loading_counter = this.loading_counter - 1;
             const new_loading = (this.loading_counter > 0);
