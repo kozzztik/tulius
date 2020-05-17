@@ -25,10 +25,11 @@
     background: none;
     box-shadow: none;
     border: none;
-    height: 20px;
+    height: 40px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    display: flow-root list-item;
 }
 
 .breadcrumbs > ::before {
@@ -67,10 +68,6 @@
     height: 45px
 }
 
-#bottom-breadcrumbs .breadcrumbs {
-    padding-top: 5px;
-}
-
 #bottom-breadcrumbs .breadcrumbs-border{
     height: 10px;
     margin-left: 0px;
@@ -89,4 +86,24 @@
 
 .breadcrumbs a:hover {
     color: black;
+}
+body .menu {
+    width: 48px;
+}
+
+.menu > * {
+    padding-left: 0px;
+}
+
+@media (max-width: 768px) {
+    body .menu {
+        width: 100%;
+    }
+    .menu .menu-notif-list {
+        width: 70px;
+    }
+}
+
+.online-users ul {
+    padding-left: 0px;
 }

@@ -1,13 +1,42 @@
 {% extends 'base.haml' %}
 
+{% block meta_viewport %}width=device-width, initial-scale=1, shrink-to-fit=no{% endblock %}
+{% block body_class %}bootstrap4{% endblock %}
+
 {% block additional_styles %}
     <link rel="stylesheet" href="{{ STATIC_URL }}forum/css/tulius-forum.css" type="text/css">
     <link rel="stylesheet" href="{{ STATIC_URL }}common/css/vue-loading.css" type="text/css">
     <link rel="stylesheet" href="{{ STATIC_URL }}wysibb/theme/default/wbbtheme.css" type="text/css" />
 {% endblock %}
 
+{% block jquery_scripts %}
+{% endblock %}
+
+{% block bootstrap_scripts %}
+{% endblock %}
+
+{% block ajax_scripts %}
+{% endblock %}
+
+{% block jquery_styles %}
+{% endblock %}
+
+{% block sitewide_scripts %}
+{% endblock %}
+
+{% block bootstrap_styles %}
+    <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}common/bootstrap4/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}common/bootstrap-vue/bootstrap-vue.min.css" />
+    <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}common/css/bootstrap-fix.css" />
+
+{% endblock %}
+
 {% block additional_scripts %}
     <script type="text/javascript" src="{{ STATIC_URL }}common/js/vue.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}common/bootstrap-vue/bootstrap-vue.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}common/bootstrap-vue/bootstrap-vue-icons.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}common/bootstrap-vue/popper.min.js"></script>
+
     <script type="text/javascript" src="{{ STATIC_URL }}ckeditor4/ckeditor.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}common/js/axios.min.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}common/js/vue-loading-overlay.js"></script>

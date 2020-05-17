@@ -10,13 +10,13 @@
                             <tulius_ckeditor v-model="reply_text"></tulius_ckeditor>
                         </fieldset>
                         <fieldset>
-                            <a class="btn btn-primary" v-on:click="do_reply" v-if="!loading">
+                            <a class="btn btn-primary" v-on:click="do_reply" v-if="!loading" href="javascript:void(0)">
                                 Ответить
                             </a>
                             <a id="extended-link" :href="'/forums/add_comment/' + reply_comment_id + '/'" v-if="!loading">
                                 Расширенная форма...
                             </a>
-                            <a id="post-preview-link" class="pull-right" v-on:click="do_preview()" v-if="!loading">
+                            <a id="post-preview-link" class="float-right" v-on:click="do_preview()" v-if="!loading" href="javascript:void(0)">
                                 Предварительный просмотр
                             </a>
                             <div class="progress progress-striped active" style="height: 24px;margin-bottom: 0px;" v-if="loading">

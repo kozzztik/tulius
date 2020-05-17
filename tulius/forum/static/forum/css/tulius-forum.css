@@ -440,6 +440,15 @@ body .quote, blockquote {
     display: inline-block;
 }
 
+.moderators {
+    padding-left: 0px;
+}
+.moderators li ::after {
+    content: ' ';
+    width: 0.3em;
+    display: inline-block;
+}
+
 .cke_editable ul {
     list-style: url("../../tulius/img/baselayout/li_star.png") outside;
 }

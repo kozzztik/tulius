@@ -1,57 +1,33 @@
-<div v-if="!user.is_anonymous" class="btn-toolbar forum-menu">
-    <div class="btn-group">
-        <button class="btn dropdown-toggle" data-toggle="dropdown">
-            Действия
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            <li v-if="!thread.room">
-                <a data-toggle="modal" href="#quoteAnswer">
-                    Ответить с цитатой
-                </a>
-            </li>
-            <li v-if="thread.room">
-                <a :href="'/forums/mark_all_as_readed/' + thread.id + '/'">
-                    Пометить все как прочитанное
-                </a>
-            </li>
-            <li v-if="thread.room && thread.rights.moderate">
-                <a :href="'/forums/add_room/' + thread.id + '/'">
-                    Добавить комнату
-                </a>
-            </li>
-            <li v-if="thread.room && thread.rights.write">
-                <a :href="'/forums/add_thread/' + thread.id + '/'">
-                    Добавить тему
-                </a>
-            </li>
-            <li v-if="thread.room && thread.rights.edit">
-                <a :href="'/forums/edit_room/' + thread.id + '/'">
-                    Редактировать
-                </a>
-            </li>
-            <li v-if="thread.room && thread.rights.move">
-                <a :href="'/forums/thread/' + thread.id + '/move/'">
-                    Переместить комнату
-                </a>
-            </li>
-            <li v-if="thread.room && thread.rights.edit">
-                <a :href="'javascript:delete_room(' + thread.id + ')'">
-                    Удалить комнату
-                </a>
-            </li>
-            <li v-if="thread.room && user.is_superuser">
-                <a :href="'/forums/rebuild_nums/' + thread.id + '/'">
-                    Обновить счетчики
-                </a>
-            </li>
-            <li>
-                <a :href="'/forums/extended_search/' + thread.tree_id + '/'">
-                    Расширенный поиск
-                </a>
-            </li>
-        </ul>
-    </div>
+<div v-if="!user.is_anonymous" class="btn-toolbar justify-content-between forum-menu" role="toolbar" aria-label="Toolbar">
+    <b-dropdown id="dropdown-1" text="Действия" class="btn-group-sm" variant="light">
+        <b-dropdown-item data-toggle="modal" href="#quoteAnswer" v-if="!thread.room">
+            Ответить с цитатой
+        </b-dropdown-item>
+        <b-dropdown-item :href="'/forums/mark_all_as_readed/' + thread.id + '/'" v-if="thread.room">
+            Пометить все как прочитанное
+        </b-dropdown-item>
+        <b-dropdown-item :href="'/forums/add_room/' + thread.id + '/'" v-if="thread.room && thread.rights.moderate">
+            Добавить комнату
+        </b-dropdown-item>
+        <b-dropdown-item :href="'/forums/add_thread/' + thread.id + '/'" v-if="thread.room && thread.rights.write">
+            Добавить тему
+        </b-dropdown-item>
+        <b-dropdown-item :href="'/forums/edit_room/' + thread.id + '/'" v-if="thread.room && thread.rights.edit">
+            Редактировать
+        </b-dropdown-item>
+        <b-dropdown-item :href="'/forums/thread/' + thread.id + '/move/'" v-if="thread.room && thread.rights.move">
+            Переместить комнату
+        </b-dropdown-item>
+        <b-dropdown-item :href="'javascript:delete_room(' + thread.id + ')'" v-if="thread.room && thread.rights.edit">
+            Удалить комнату
+        </b-dropdown-item>
+        <b-dropdown-item :href="'/forums/rebuild_nums/' + thread.id + '/'" v-if="thread.room && user.is_superuser">
+            Обновить счетчики
+        </b-dropdown-item>
+        <b-dropdown-item :href="'/forums/extended_search/' + thread.tree_id + '/'">
+            Расширенный поиск
+        </b-dropdown-item>
+    </b-dropdown>
     <div v-if="!thread.room" id="quoteAnswer" class="modal hide fade in well">
         <div class="modal-header">
             <a class="close" data-dismiss="modal">×</a>
@@ -69,14 +45,12 @@
             </button>
         </div>
     </div>
-    <div class="forum-search-form">
-        <form class="inline-form" method="post" :action="'/forums/search/' + thread.tree_id + '/'">
-            <input type="hidden" name="csrfmiddlewaretoken" :value="csrftoken">
-            <input type="text" name="text" required="" id="id_text">
-            <input id="id_thread" type="hidden" name="thread" :value="thread.id">
-            <button class="submit btn" id="search" type="submit">
-                Поиск
-            </button>
-        </form>
-    </div>
+    <form class="input-group btn-group-sm" method="post" :action="'/forums/search/' + thread.tree_id + '/'">
+        <input type="text" name="text" required="" id="id_text" class="form-control">
+        <input type="hidden" name="csrfmiddlewaretoken" :value="csrftoken">
+        <input id="id_thread" type="hidden" name="thread" :value="thread.id">
+        <button class="btn btn-light" id="search" type="submit">
+            Поиск
+        </button>
+    </form>
 </div>

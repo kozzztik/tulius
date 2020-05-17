@@ -60,7 +60,7 @@
                             </ul>
                             <div v-if="thread.pages_count > 1">
                                 <h6>Страницы:</h6>
-                                <router-link :to="thread.url + '?page=' + (num+1)" v-for="num in Array(thread.pages_count).keys()">
+                                <router-link :to="thread.url + '?page=' + (num+1)" v-for="num in Array(thread.pages_count).keys()" :key="num">
                                     {{num + 1 }}
                                 </router-link>
                             </div>

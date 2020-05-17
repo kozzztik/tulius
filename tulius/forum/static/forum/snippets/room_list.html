@@ -29,7 +29,7 @@
                     <h6 v-if="room.moderators.length > 0" class="moderators">Модераторы:</h6>
                     <ul v-if="room.moderators" class="moderators">
                         <li v-for="moderator in room.moderators">
-                            <a :href="moderator.url">{{ moderator.title }}</a>&nbsp;
+                            <a :href="moderator.url">{{ moderator.title }}</a>
                         </li>
                     </ul>
                     <h6 v-if="room.accessed_users" class="moderators">Открыта для:</h6>
