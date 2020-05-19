@@ -11,5 +11,5 @@
         <forum_reply_form :thread="thread" :user="user" ref="reply_form">
         </forum_reply_form>
     </div>
-    <forum_online_status :thread="thread"></forum_online_status>
+    <forum_online_status :thread="thread" v-on:ids_loaded="on_online_ids_loaded"></forum_online_status>
 </div>

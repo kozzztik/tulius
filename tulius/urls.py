@@ -33,7 +33,8 @@ urlpatterns = [
     url(r'^installer/', include('djfw.installer.urls', namespace='installer')),
 
     url(r'^$', views.HomeView.as_view(), name='home'),
-    url(r'^api/flatpages/$',views.ArticlesAPI.as_view(), name='flatpages_api'),
+    url(r'^api/flatpages/$', views.ArticlesAPI.as_view(),
+        name='flatpages_api'),
     url(r'^api/app_settings/$', views.AppSettingsAPI.as_view(),
         name='app_settings'),
 

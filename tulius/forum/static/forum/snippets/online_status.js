@@ -17,6 +17,12 @@ export default LazyComponent('forum_online_status', {
             const url = '/api/forum/online_status/' + (pk ? pk + '/' : '');
             axios.get(url).then(response => {
                 this.users = response.data.users;
+                var user_ids = [];
+                var user;
+                for(user of this.users) {
+                    user_ids.push(user.id);
+                }
+                this.$emit('ids_loaded', user_ids);
             }).catch(error => this.$parent.$parent.add_message(error, "error"))
             .then(() => {
                 this.loading = false;

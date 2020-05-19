@@ -7,9 +7,9 @@
     <table class="online-table">
         <tr>
             <td>
-                <div class="online-icon-here-online" v-if="comment.online=='here'"></div>
-                <div class="online-icon-online" v-if="comment.online=='on'"></div>
-                <div class="online-icon-offline" v-if="comment.online=='off'"></div>
+                <div class="online-icon-here-online" v-if="user.online_status=='here'"></div>
+                <div class="online-icon-online" v-if="user.online_status===true"></div>
+                <div class="online-icon-offline" v-if="user.online_status===false"></div>
             </td>
             <td>
                 <a :href="user.url" v-html="user.title"></a>

@@ -16,6 +16,7 @@ export default LazyComponent('forum_thread_page', {
             pagination: {},
             comments_page: 1,
             user: {},
+            online_ids: null,
         }
     },
     methods: {
@@ -57,6 +58,7 @@ export default LazyComponent('forum_thread_page', {
             axios.get('/api/forum/thread/'+ this.thread.id + '/comments_page/' + this.comments_page + '/').then(response => {
                 this.comments = response.data.comments;
                 this.pagination = response.data.pagination;
+                this.update_online_users()
             }).catch(error => this.$parent.add_message(error, "error")).then(() => {
                 this.loading = false;
                 this.$parent.loading_end(this.breadcrumbs);
@@ -88,6 +90,16 @@ export default LazyComponent('forum_thread_page', {
             this.$refs.reply_form.cleanup_reply_form();
             el.parentNode.removeChild(el);
             this.$refs.reply_form_parking.appendChild(el);
+        },
+        on_online_ids_loaded(user_ids) {
+            this.online_ids = user_ids;
+            this.update_online_users();
+        },
+        update_online_users() {
+            var comment;
+            for (comment of this.comments) {
+                if (this.online_ids.indexOf(comment.user.id) != -1) comment.user.online_status = 'here';
+            }
         }
     },
     mounted() {this.load_api(this.$route.params.id, this.$route.query['page'] || 1)},

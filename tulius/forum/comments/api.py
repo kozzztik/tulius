@@ -12,9 +12,11 @@ from tulius.forum.threads import api
 from tulius.forum.comments import pagination
 
 
-# TODO users online status
 # TODO unreaded messages
 # TODO dynamic updates button
+# TODO comment actions on mobile version, hide elements
+# TODO reponsive design on forum
+# TODO breadcrumbs arrows on chrome
 
 
 def comment_to_json(c):

@@ -2,6 +2,7 @@ from django.utils import html
 
 from tulius.forum import site
 from tulius.forum import plugins
+from tulius.forum import online_status as online_status_plugin
 from tulius.forum.readmarks import plugin as readmarks
 from djfw.wysibb.templatetags import bbcodes
 
@@ -13,6 +14,10 @@ def user_to_json(user, detailed=False):
         'url': user.get_absolute_url(),
     }
     if detailed:
+        if user.show_online_status:
+            online_status = online_status_plugin.get_user_status(user.id)
+        else:
+            online_status = False
         data.update({
             'sex': user.sex,
             'avatar': user.avatar.url if user.avatar else '',
@@ -20,6 +25,7 @@ def user_to_json(user, detailed=False):
             'rank': html.escape(user.rank),
             'stories_author': user.stories_author(),  # TODO optimize that!
             'signature': bbcodes.bbcode(user.signature),
+            'online_status': bool(online_status)
         })
     return data
 

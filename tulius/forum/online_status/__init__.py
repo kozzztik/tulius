@@ -1,10 +1,22 @@
 from datetime import timedelta
 
+from django.core.cache import cache
 from django.utils.timezone import now
 
 from tulius.forum import site
 from tulius.forum import plugins
 from tulius.forum import models
+from tulius.forum import const
+
+
+def set_user_status(user_id, thread_id):
+    cache.set(
+        const.USER_ONLINE_CACHE_KEY.format(user_id),
+        thread_id or True, const.USER_ONLINE_PERIOD * 60)
+
+
+def get_user_status(user_id):
+    return cache.get(const.USER_ONLINE_CACHE_KEY.format(user_id), False)
 
 
 class OnlineStatusPlugin(plugins.ForumPlugin):
@@ -16,6 +28,7 @@ class OnlineStatusPlugin(plugins.ForumPlugin):
                 user=user, thread=thread)[0]
             online_mark.visit_time = now()
             online_mark.save()
+            set_user_status(user.id, thread.id)
 
     def get_online_users(self, user, thread, do_update=True):
         if do_update:
