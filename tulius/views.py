@@ -1,6 +1,7 @@
 import datetime
 
 from django import http
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.template import response
 from django.views import generic
@@ -11,7 +12,9 @@ from djfw.profiler import graphs
 from djfw.flatpages import models as flatpage_models
 
 from tulius import forms
+from tulius.profile import views as profile_views
 from tulius.games import models as games
+from tulius.websockets import context_processors as websock_context
 
 
 class HomeView(generic.TemplateView):
@@ -49,6 +52,16 @@ class ArticlesAPI(generic.View):
             'title': page.title,
             'url': page.url,
         } for page in pages]})
+
+
+class AppSettingsAPI(generic.View):
+    def get(self, request, **kwargs):
+        return http.JsonResponse({
+            'debug': settings.DEBUG,
+            'websockets_url': websock_context.default(
+                request)['WEBSOCKET_URI'],
+            'user': profile_views.request_user_json(request),
+        })
 
 
 def logic_time(x):

@@ -29,5 +29,11 @@ export default LazyComponent('main_menu', {
             this.articles = response.data.pages;
         }).catch(error => this.$parent.add_message(error, "error"))
         .then(() => {});
+        this.$options.sockets.onmessage = (msg) => {
+            var kind = msg.data.split(' ', 1)[0];
+            if (kind == 'new_pm') {
+                this.$root.user.not_readed_messages = true;
+            }
+        }
     }
 })

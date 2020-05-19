@@ -234,21 +234,20 @@ class PlayerGamesView(LoginTemplateView):
         }
 
 
-class UserProfileAPIView(generic.View):
-    def get(self, request, **kwargs):
-        auth = request.user.is_authenticated
-        return http.JsonResponse({
-            'is_anonymous': request.user.is_anonymous,
-            'authenticated': request.user.is_authenticated,
-            'superuser': request.user.is_superuser,
-            'compact_text': request.user.compact_text if auth else '',
-            'username': request.user.username if auth else None,
-            'rank': request.user.rank if auth else None,
-            'full_stars': request.user.full_stars() if auth else [],
-            'not_readed_messages':
-                request.user.not_readed_messages if auth else None,
-            'new_invites': len(request.user.new_invites()) if auth else None,
-            'avatar':
-                request.user.avatar.url if auth and request.user.avatar else
-                '/static/tulius/img/blank_avatar.jpg'
-        })
+def request_user_json(request):
+    auth = request.user.is_authenticated
+    return {
+        'is_anonymous': request.user.is_anonymous,
+        'authenticated': request.user.is_authenticated,
+        'superuser': request.user.is_superuser,
+        'compact_text': request.user.compact_text if auth else '',
+        'username': request.user.username if auth else None,
+        'rank': request.user.rank if auth else None,
+        'full_stars': request.user.full_stars() if auth else [],
+        'not_readed_messages':
+            request.user.not_readed_messages if auth else None,
+        'new_invites': len(request.user.new_invites()) if auth else None,
+        'avatar':
+            request.user.avatar.url if auth and request.user.avatar else
+            '/static/tulius/img/blank_avatar.jpg'
+        }

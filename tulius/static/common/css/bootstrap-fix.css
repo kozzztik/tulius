@@ -65,3 +65,9 @@ body.bootstrap4 .room_group_read_mark {
     width: 20px;
     height: 20px;
 }
+
+.menu a.brand_icon.debug_icon {
+    width: 33px;
+    height: 33px;
+    border: solid red 1px;
+}

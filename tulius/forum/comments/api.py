@@ -13,7 +13,6 @@ from tulius.forum.comments import pagination
 
 
 # TODO users online status
-# TODO websockets
 # TODO unreaded messages
 # TODO dynamic updates button
 
