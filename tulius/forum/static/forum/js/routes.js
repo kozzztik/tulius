@@ -4,7 +4,7 @@ import thread from '../pages/thread.js'
 
 
 export default [
-    {path: '/forums/', component: index},
-    {path: '/forums/room/:id(\\d+)/', component: room},
-    {path: '/forums/thread/:id(\\d+)/', component: thread},
+    {path: '/forums/', component: index, name: 'forum_root'},
+    {path: '/forums/room/:id(\\d+)/', component: room, name: 'forum_room'},
+    {path: '/forums/thread/:id(\\d+)/', component: thread, name: 'forum_thread'},
 ]

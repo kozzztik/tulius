@@ -12,12 +12,9 @@ from tulius.forum.threads import api
 from tulius.forum.comments import pagination
 
 
-# TODO message errors
-# TODO quoting popup
 # TODO users online status
 # TODO websockets
 # TODO unreaded messages
-# TODO delete form
 # TODO dynamic updates button
 
 

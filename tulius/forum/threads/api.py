@@ -127,3 +127,13 @@ class ThreadView(BaseThreadView):
             },
             'first_comment_id': self.obj.first_comment_id,
         }
+
+    def delete(self, request, *args, **kwargs):
+        self.get_parent_thread(**kwargs)
+        (success, error_text, _, text) = site.site.core.delete_thread(
+            request.user, self.obj.id, request.GET['comment'])
+        return {
+            'result': success,
+            'error_text': str(error_text),
+            'text': str(text)
+        }

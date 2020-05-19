@@ -1,6 +1,6 @@
 <div v-if="!user.is_anonymous" class="btn-toolbar justify-content-between forum-menu" role="toolbar" aria-label="Toolbar">
     <b-dropdown id="dropdown-1" text="Действия" class="btn-group-sm" variant="light">
-        <b-dropdown-item data-toggle="modal" href="#quoteAnswer" v-if="!thread.room">
+        <b-dropdown-item data-toggle="modal" href="javascript:void(0);" v-if="!thread.room" v-on:click="$bvModal.show('quoteAnswer')">
             Ответить с цитатой
         </b-dropdown-item>
         <b-dropdown-item :href="'/forums/mark_all_as_readed/' + thread.id + '/'" v-if="thread.room">
@@ -18,7 +18,7 @@
         <b-dropdown-item :href="'/forums/thread/' + thread.id + '/move/'" v-if="thread.room && thread.rights.move">
             Переместить комнату
         </b-dropdown-item>
-        <b-dropdown-item :href="'javascript:delete_room(' + thread.id + ')'" v-if="thread.room && thread.rights.edit">
+        <b-dropdown-item href="javascript:void(0);" v-if="thread.room && thread.rights.edit" v-on:click="$bvModal.show('roomDelete')">
             Удалить комнату
         </b-dropdown-item>
         <b-dropdown-item :href="'/forums/rebuild_nums/' + thread.id + '/'" v-if="thread.room && user.is_superuser">
@@ -28,23 +28,28 @@
             Расширенный поиск
         </b-dropdown-item>
     </b-dropdown>
-    <div v-if="!thread.room" id="quoteAnswer" class="modal hide fade in well">
-        <div class="modal-header">
-            <a class="close" data-dismiss="modal">×</a>
-            <h3>Цитирование</h3>
-        </div>
+    <b-modal id="quoteAnswer" title="Цитирование" ok-only v-if="!thread.room" >
         <p>
             Цитировать теперь легко! Просто выделите текст мышкой:
         </p>
-        <img src="/static/forum/img/quote_help1.png">
+        <img src="/static/forum/img/quote_help1.png" style="width: 450px;">
         <p>И нажмите кнопку "Ответить". Под постом появится форма быстрого ответа, а выделенный текст будет вставлен в нее как цитата.</p>
-        <img src="/static/forum/img/quote_help2.png">
-        <div class="modal-footer">
-            <button class="btn btn-primary" data-dismiss="modal">
-                Закрыть
-            </button>
+        <img src="/static/forum/img/quote_help2.png" style="width: 450px;">
+    </b-modal>
+    <b-modal id="roomDelete"
+             title="Удалить комнату" ok-title="Удалить" ok-variant="danger"
+             cancel-title="Отменить" @ok="deleteRoom">
+        <div class="form-horizontal">
+        <fieldset class="control-group">
+            <div class="control-label">
+                <label for="delete_comment">Комментарий:</label>
+            </div>
+            <div class="controls">
+                <input id="delete_comment" type="text" v-model="delete_comment">
+            </div>
+        </fieldset>
         </div>
-    </div>
+    </b-modal>
     <form class="input-group btn-group-sm" method="post" :action="'/forums/search/' + thread.tree_id + '/'">
         <input type="text" name="text" required="" id="id_text" class="form-control">
         <input type="hidden" name="csrfmiddlewaretoken" :value="csrftoken">

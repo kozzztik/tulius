@@ -52,6 +52,7 @@ var app = new Vue({
             this.footer_content = content;
         },
         add_message(message, tag) {
+            if (tag == 'error') tag = 'danger';
             this.messages.push({'tag': tag, 'text': message})
         }
     },

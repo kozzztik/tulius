@@ -40,11 +40,10 @@
             <loading :active="loading" :is-full-page="true"></loading>
             <div id="content-center" class="container">
                 <breadcrumbs upper="true" :items="breadcrumb_items" v-if="!loading"></breadcrumbs>
-                <div id="top-center" v-if="messages.length > 0">
-                    <div v-for="message in messages" class="alert" :class="'alert-'+ message.tag">
-                        <button class="close" type="button" data-dismiss="alert">&times;</button>
+                <div id="notification_messages">
+                    <b-alert v-for="(message, index) in messages" :variant="message.tag" dismissible show :key="index">
                         <span v-html="message.text"></span>
-                    </div>
+                    </b-alert>
                 </div>
                 <router-view></router-view>
                 <breadcrumbs :upper="false" :items="breadcrumb_items" v-if="!loading"></breadcrumbs>
