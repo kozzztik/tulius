@@ -20,6 +20,21 @@ export default LazyComponent('forum_thread_page', {
         }
     },
     methods: {
+        subscribe_comments() {
+            if (this.thread.id)
+                this.$socket.sendObj({action: 'subscribe_comments', id: this.thread.id});
+        },
+        unsubscribe_comments() {
+            if (this.thread.id) {
+                this.$socket.sendObj({action: 'unsubscribe_comments', id: this.thread.id})
+            }
+            delete this.$options.sockets.onmessage
+        },
+        websock_message(msg) {
+            var data = JSON.parse(msg.data);
+            if ((data['.namespaced'] != 'thread_comments') || (data.thread_id != this.thread.id)) return;
+            console.log(msg);
+        },
         fast_reply(comment) {
             var component;
             for (component of this.$refs.comments) {
@@ -57,6 +72,8 @@ export default LazyComponent('forum_thread_page', {
             this.$parent.loading_start();
             axios.get('/api/forum/thread/'+ this.thread.id + '/comments_page/' + this.comments_page + '/').then(response => {
                 this.comments = response.data.comments;
+                this.$options.sockets.onmessage = this.websock_message;
+                this.subscribe_comments();
                 this.pagination = response.data.pagination;
                 this.update_online_users()
             }).catch(error => this.$parent.add_message(error, "error")).then(() => {
@@ -66,6 +83,7 @@ export default LazyComponent('forum_thread_page', {
             });
         },
         load_api(pk, page) {
+            this.unsubscribe_comments();
             this.$parent.loading_start();
             this.comments_page = page;
             axios.get('/api/forum/thread/'+ pk).then(response => {
@@ -102,10 +120,16 @@ export default LazyComponent('forum_thread_page', {
             }
         }
     },
-    mounted() {this.load_api(this.$route.params.id, this.$route.query['page'] || 1)},
+    mounted() {
+        this.$options.sockets.onopen = this.subscribe_comments;
+        this.load_api(this.$route.params.id, this.$route.query['page'] || 1)
+    },
     beforeRouteUpdate (to, from, next) {
         this.cleanup_reply_form();
         this.load_api(to.params.id, to.query['page'] || 1);
         next();
+    },
+    beforeDestroy() {
+        this.unsubscribe_comments();
     },
 })

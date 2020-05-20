@@ -1,7 +1,9 @@
+from django.core.cache import cache
 from django.utils import html
 
 from tulius.forum import site
 from tulius.forum import plugins
+from tulius.forum import const
 from tulius.forum import online_status as online_status_plugin
 from tulius.forum.readmarks import plugin as readmarks
 from djfw.wysibb.templatetags import bbcodes
@@ -106,6 +108,12 @@ class BaseThreadView(plugins.BaseAPIView):
 class ThreadView(BaseThreadView):
     def get_context_data(self, **kwargs):
         super(ThreadView, self).get_context_data(**kwargs)
+        # cache rights for async app
+        cache.set(
+            const.USER_THREAD_RIGHTS.format(
+                user_id=self.user.id, thread_id=self.obj.id),
+            'r', const.USER_THREAD_RIGHTS_PERIOD * 60
+        )
         return {
             'id': self.obj.pk,
             'tree_id': self.obj.tree_id,

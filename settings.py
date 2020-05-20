@@ -260,6 +260,7 @@ ASYNC_SERVER = {
 }
 
 WEBSOCKET_URL = '/ws/'
+WEBSOCKET_URL_NEW = '/ws_new/'
 
 # Actual credentials are hold in settings_production.py file.
 DATABASES = {

@@ -10,11 +10,13 @@ from tulius.forum import site
 from tulius.forum import models
 from tulius.forum.threads import api
 from tulius.forum.comments import pagination
+from tulius.websockets import publisher
 
 
 # TODO unreaded messages
 # TODO dynamic updates button
-# TODO cancel error in sentry
+# TODO write error in sentry
+# TODO likes update async error
 
 def comment_to_json(c):
     return {
@@ -68,6 +70,8 @@ class CommentsPageAPI(api.BaseThreadView):
                 return comment_to_json(comment)
             comment.save()
             site.site.signals.comment_after_fastreply.send(self)
+            publisher.notify_thread_about_new_comment(
+                self.obj.id, comment.id, comment.page)
             page = comment.page
         else:
             page = self.obj.pages_count

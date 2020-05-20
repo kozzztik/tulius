@@ -59,7 +59,7 @@ class AppSettingsAPI(generic.View):
         return http.JsonResponse({
             'debug': settings.DEBUG,
             'websockets_url': websock_context.default(
-                request)['WEBSOCKET_URI'],
+                request, True)['WEBSOCKET_URI'],
             'user': profile_views.request_user_json(request),
         })
 

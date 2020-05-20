@@ -30,8 +30,8 @@ export default LazyComponent('main_menu', {
         }).catch(error => this.$parent.add_message(error, "error"))
         .then(() => {});
         this.$options.sockets.onmessage = (msg) => {
-            var kind = msg.data.split(' ', 1)[0];
-            if (kind == 'new_pm') {
+            var data = JSON.parse(msg.data)
+            if (data['.namespaced'] == 'pm') {
                 this.$root.user.not_readed_messages = true;
             }
         }
