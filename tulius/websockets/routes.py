@@ -22,6 +22,8 @@ class WebsocketHandler:
         session = user_session.UserSession(request, ws, self.redis_cache)
         try:
             await session.process()
+        except asyncio.CancelledError:
+            pass
         except Exception as e:
             logging.exception(e)
             await asyncio.get_event_loop().run_in_executor(

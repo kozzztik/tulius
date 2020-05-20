@@ -2,6 +2,7 @@
 import os
 
 from django.utils.translation import ugettext_lazy as _
+from sentry_sdk.integrations.django import DjangoIntegration
 
 branch = os.environ.get("TULIUS_BRANCH", '')
 env = {
@@ -308,3 +309,8 @@ elif env == 'qa':
         'test.tulius.com',
         'test.tulius.co-de.org',
     ]
+
+RAVEN_CONFIG = {
+    'integrations': [DjangoIntegration()],
+    'send_default_pii': True,
+}
