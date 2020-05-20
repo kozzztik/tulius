@@ -2,6 +2,7 @@
 import os
 
 from django.utils.translation import ugettext_lazy as _
+from sentry_sdk.integrations.django import DjangoIntegration
 
 branch = os.environ.get("TULIUS_BRANCH", '')
 env = {
@@ -195,10 +196,6 @@ LOGGING = {
             'class': 'logging.handlers.WatchedFileHandler',
             'filename': BASE_DIR + 'logfile.txt',
         },
-        'db': {
-            'level': 'DEBUG',
-            'class': 'djfw.logger.DBLogHandler',
-        },
         'sqllogfile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.WatchedFileHandler',
@@ -212,12 +209,12 @@ LOGGING = {
             'propagate': False,
         },
         'django.request': {
-            'handlers': ['logfile', 'db', 'mail_admins'],
+            'handlers': ['logfile', 'mail_admins'],
             'level': 'WARNING',
             'propagate': True,
         },
         'installer': {
-            'handlers': ['db'],
+            'handlers': ['null'],
             'level': 'DEBUG',
             'propagate': True,
         },
@@ -308,3 +305,8 @@ elif env == 'qa':
         'test.tulius.com',
         'test.tulius.co-de.org',
     ]
+
+RAVEN_CONFIG = {
+    'integrations': [DjangoIntegration()],
+    'send_default_pii': True,
+}
