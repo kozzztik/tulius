@@ -33,7 +33,23 @@ export default LazyComponent('forum_thread_page', {
         websock_message(msg) {
             var data = JSON.parse(msg.data);
             if ((data['.namespaced'] != 'thread_comments') || (data.thread_id != this.thread.id)) return;
-            console.log(msg);
+            if (data.page > this.pagination.pages.length) {
+                this.pagination.pages_count = this.pagination.pages_count + 1;
+                this.pagination.pages.push(this.pagination.pages.length + 1);
+                this.pagination.is_paginated = true;
+            }
+            if (data.page != this.comments_page)
+                return;
+            axios.get('/api/forum/comment/'+ data.comment_id + '/').then(response => {
+                var new_comment = response.data;
+                var comment;
+                for (comment of this.comments)
+                    if (comment.id == new_comment.id)
+                        return;
+                this.comments.push(new_comment);
+                this.update_online_users()
+                this.update_likes();
+            }).catch(error => this.$parent.add_message(error, "error")).then(() => {});
         },
         fast_reply(comment) {
             var component;

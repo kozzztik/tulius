@@ -33,6 +33,9 @@ urlpatterns = [
         r'^thread/(?P<pk>\d+)/comments_page/(?P<page_num>\d+)/$',
         comments_api.CommentsPageAPI.as_view(), name='comments_page'),
     urls.url(
+        r'^comment/(?P<pk>\d+)/$',
+        comments_api.CommentAPI.as_view(), name='comment'),
+    urls.url(
         r'^comment/(?P<pk>\d+)/voting/$',
         voting.VotingAPI.as_view(), name='voting'),
     urls.url(

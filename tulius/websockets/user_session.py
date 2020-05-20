@@ -80,7 +80,7 @@ class UserSession:
                 '.action': 'new_comment',
                 'thread_id': thread_id,
                 'comment_id': int(comment_id),
-                'page': page_num,
+                'page': int(page_num),
             })
 
     async def action_subscribe_comments(self, data):

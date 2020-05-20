@@ -2,20 +2,20 @@ import json
 
 from django import shortcuts
 from django.core import exceptions
+from django.db import transaction
 from django.utils import html
 from djfw.wysibb.templatetags import bbcodes
 
 from tulius.core.ckeditor import html_converter
 from tulius.forum import site
 from tulius.forum import models
+from tulius.forum import plugins
 from tulius.forum.threads import api
 from tulius.forum.comments import pagination
 from tulius.websockets import publisher
 
 
 # TODO unreaded messages
-# TODO dynamic updates button
-# TODO write error in sentry
 # TODO likes update async error
 
 def comment_to_json(c):
@@ -47,7 +47,13 @@ class CommentsPageAPI(api.BaseThreadView):
             'comments': [comment_to_json(c) for c in comments]
         }
 
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super(CommentsPageAPI, cls).as_view(**initkwargs)
+        return transaction.non_atomic_requests(view)
+
     def post(self, *args, **kwargs):
+        transaction.set_autocommit(False)
         self.get_parent_thread(**kwargs)
         if not self.obj.write_right(self.user):
             raise exceptions.PermissionDenied()
@@ -70,9 +76,24 @@ class CommentsPageAPI(api.BaseThreadView):
                 return comment_to_json(comment)
             comment.save()
             site.site.signals.comment_after_fastreply.send(self)
+            # commit transaction to be sure that clients wouldn't be notified
+            # before comment will be accessable in DB/
+            transaction.commit()
             publisher.notify_thread_about_new_comment(
                 self.obj.id, comment.id, comment.page)
             page = comment.page
         else:
             page = self.obj.pages_count
         return self.get_context_data(page_num=page, **kwargs)
+
+
+class CommentAPI(plugins.BaseAPIView):
+    obj = None
+
+    def get_comment(self, **kwargs):
+        core = site.site.core
+        self.obj = core.get_parent_comment(self.user, kwargs['pk'], False)[1]
+
+    def get_context_data(self, **kwargs):
+        self.get_comment(**kwargs)
+        return comment_to_json(self.obj)
