@@ -14,10 +14,8 @@ from tulius.forum.comments import pagination
 
 # TODO unreaded messages
 # TODO dynamic updates button
-# TODO comment actions on mobile version, hide elements
 # TODO reponsive design on forum
-# TODO breadcrumbs arrows on chrome
-
+# TODO cancel error in sentry
 
 def comment_to_json(c):
     return {

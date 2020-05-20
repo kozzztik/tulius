@@ -29,7 +29,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    display: flow-root list-item;
+    display: inline;
 }
 
 .breadcrumbs > ::before {
@@ -43,6 +43,7 @@
     margin-left: 5px;
     margin-right: 5px;
     flex: 1 0 auto;
+    margin-top: 6px;
 }
 
 .breadcrumbs > :first-child::before {
