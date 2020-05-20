@@ -12,6 +12,7 @@ CMD [ "uwsgi", "--socket", "0.0.0.0:7000", \
                "--threads", "4", \
                "--processes", "2", \
                "--master", \
+               "--disable-write-exception", \
                "--wsgi", "wsgi:application" ]
 
 ## install requirements, so they can be cached by Docker
