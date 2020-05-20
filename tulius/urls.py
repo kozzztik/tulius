@@ -1,6 +1,6 @@
 from django.apps import apps
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import include, url, re_path
 from django.contrib.sitemaps import views as sitemaps_views
 from django.contrib import admin
 from django.conf.urls.static import static
@@ -11,7 +11,13 @@ from .sitemap import sitemaps
 
 admin.autodiscover()
 
+
+def trigger_error(request):
+    raise ZeroDivisionError()
+
+
 urlpatterns = [
+    re_path(r'^sentry-debug/$', trigger_error),
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', admin.site.urls),
