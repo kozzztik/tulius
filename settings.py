@@ -196,10 +196,6 @@ LOGGING = {
             'class': 'logging.handlers.WatchedFileHandler',
             'filename': BASE_DIR + 'logfile.txt',
         },
-        'db': {
-            'level': 'DEBUG',
-            'class': 'djfw.logger.DBLogHandler',
-        },
         'sqllogfile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.WatchedFileHandler',
@@ -213,12 +209,12 @@ LOGGING = {
             'propagate': False,
         },
         'django.request': {
-            'handlers': ['logfile', 'db', 'mail_admins'],
+            'handlers': ['logfile', 'mail_admins'],
             'level': 'WARNING',
             'propagate': True,
         },
         'installer': {
-            'handlers': ['db'],
+            'handlers': ['null'],
             'level': 'DEBUG',
             'propagate': True,
         },
