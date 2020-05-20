@@ -3,9 +3,9 @@
         <tr>
             <th width="40">&nbsp;</th>
             <th>Комната</th>
-            <th class="hidden-phone" width="80">Тем</th>
-            <th class="miniphone-hidden" width="80">сообщ.</th>
-            <th class="miniphone-hidden" width="200">последнее сообщ.</th>
+            <th class="d-none d-md-table-cell" width="80">Тем</th>
+            <th class="d-none d-sm-table-cell" width="80">сообщ.</th>
+            <th class="d-none d-sm-table-cell" width="200">последнее сообщ.</th>
         </tr>
     </thead>
     <tbody>
@@ -40,9 +40,9 @@
                     </ul>
                 </div>
             </td>
-            <td class="hidden-phone">{{ room.threads_count }}</td>
-            <td class="miniphone-hidden">{{ room.comments_count }}</td>
-            <td class="miniphone-hidden">
+            <td class="d-none d-md-table-cell">{{ room.threads_count }}</td>
+            <td class="d-none d-sm-table-cell">{{ room.comments_count }}</td>
+            <td class="d-none d-sm-table-cell">
                 <forum_latest_post :comment="room.last_comment"></forum_latest_post>
             </td>
         </tr>

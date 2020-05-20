@@ -23,9 +23,9 @@
                 <tr>
                     <th width="40">&nbsp;</th>
                     <th>Тема</th>
-                    <th class="hidden-phone" width="100">Автор</th>
-                    <th class="miniphone-hidden" width="80">сообщ.</th>
-                    <th class="miniphone-hidden" width="200">последнее сообщ.</th>
+                    <th class="d-none d-md-table-cell" width="100">Автор</th>
+                    <th class="d-none d-sm-table-cell" width="80">сообщ.</th>
+                    <th class="d-none d-sm-table-cell" width="200">последнее сообщ.</th>
                 </tr>
             </thead>
             <tbody>
@@ -66,11 +66,11 @@
                             </div>
                         </div>
                     </td>
-                    <td class="hidden-phone">
+                    <td class="d-none d-md-table-cell">
                         <a :href="thread.user.url" v-html="thread.user.title"></a>
                     </td>
-                    <td class="miniphone-hidden" v-html="thread.comments_count"></td>
-                    <td class="miniphone-hidden">
+                    <td class="d-none d-sm-table-cell" v-html="thread.comments_count"></td>
+                    <td class="d-none d-sm-table-cell">
                         <forum_latest_post :comment="thread.last_comment"></forum_latest_post>
                     </td>
                 </tr>

@@ -14,7 +14,6 @@ from tulius.forum.comments import pagination
 
 # TODO unreaded messages
 # TODO dynamic updates button
-# TODO reponsive design on forum
 # TODO cancel error in sentry
 
 def comment_to_json(c):
