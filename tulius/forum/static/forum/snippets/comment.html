@@ -63,9 +63,8 @@
                     <a v-if="comment.is_thread && thread.rights.move" class="d-none d-md-inline post-actions-button" :href="'/forums/thread/' + thread.id + '/move/'">
                         <img src="/static/forum/img/move.gif">
                     </a>
-                    <a v-if="show_like" v-on:click="do_like()" href="javascript:void(0);">
-                        <img class="post-actions-button likelink" :id="'likebtn' + comment.id" height="26" width="26" :value="comment.is_liked"
-                         :src="like_img">
+                    <a v-if="like_img" v-on:click="do_like()" href="javascript:void(0);">
+                        <img class="post-actions-button likelink" :id="'likebtn' + comment.id" height="26" width="26" :src="like_img">
                     </a>
                 </span>
                 <div v-if="comment.edit_time" class="edited">

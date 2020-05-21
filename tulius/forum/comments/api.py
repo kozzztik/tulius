@@ -16,7 +16,6 @@ from tulius.websockets import publisher
 
 
 # TODO unreaded messages
-# TODO likes update async error
 
 def comment_to_json(c):
     return {

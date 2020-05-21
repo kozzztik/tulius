@@ -19,10 +19,11 @@ export default LazyComponent('forum_comment', {
             default: false,
         }
     },
-    data: function () {
-        return {
-            show_like: false,
-            like_img: '',
+    computed: {
+        like_img: function() {
+            if (this.comment.is_liked === null) return null;
+            return '/static/forum/img/' +
+                (this.comment.is_liked ? 'like.gif' : 'unlike.gif');
         }
     },
     methods: {
@@ -36,15 +37,7 @@ export default LazyComponent('forum_comment', {
                 {id: this.comment.id, value: new_value}
             ).then(response => {
                 this.comment.is_liked = response.data.value;
-                this.update_like();
             }).catch(error => this.$parent.add_message(error, "error"));
         },
-        update_like() {
-            if (!(this.comment.is_liked === null)) {
-                this.like_img = '/static/forum/img/' +
-                    (this.comment.is_liked ? 'like.gif' : 'unlike.gif');
-                this.show_like = true;
-            }
-        }
     }
 })

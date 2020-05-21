@@ -42,13 +42,13 @@ export default LazyComponent('forum_thread_page', {
                 return;
             axios.get('/api/forum/comment/'+ data.comment_id + '/').then(response => {
                 var new_comment = response.data;
+                new_comment.is_liked = false;
                 var comment;
                 for (comment of this.comments)
                     if (comment.id == new_comment.id)
                         return;
                 this.comments.push(new_comment);
                 this.update_online_users()
-                this.update_likes();
             }).catch(error => this.$parent.add_message(error, "error")).then(() => {});
         },
         fast_reply(comment) {
@@ -66,36 +66,35 @@ export default LazyComponent('forum_thread_page', {
         update_likes() {
             var comment;
             var comment_ids = []
-            for (comment of this.comments) {
-                comment.is_liked = null;
+            for (comment of this.comments)
                 comment_ids.push(comment.id);
-            }
             if (!this.user.is_anonymous) {
                 axios.get('/api/forum/likes/', {params: {ids: comment_ids.join(',')}}
                 ).then(response => {
-                    var likes = response.data;
-                    for (comment of this.comments) {
-                        comment.is_liked = likes[comment.id];
-                    }
-                    for (comment of this.$refs.comments) {
-                        comment.update_like();
-                    }
+                    for (comment of this.comments)
+                        comment.is_liked = response.data[comment.id];
                 }).catch(error => this.$parent.add_message(error, "error"));
             }
+        },
+        set_new_comments(comments) {
+            var comment;
+            for (comment of comments)
+                comment.is_liked = null;
+            this.comments = comments;
+            this.update_online_users();
+            this.update_likes();
         },
         update_comments() {
             this.loading = true;
             this.$parent.loading_start();
             axios.get('/api/forum/thread/'+ this.thread.id + '/comments_page/' + this.comments_page + '/').then(response => {
-                this.comments = response.data.comments;
+                this.set_new_comments(response.data.comments);
                 this.$options.sockets.onmessage = this.websock_message;
                 this.subscribe_comments();
                 this.pagination = response.data.pagination;
-                this.update_online_users()
             }).catch(error => this.$parent.add_message(error, "error")).then(() => {
                 this.loading = false;
                 this.$parent.loading_end(this.breadcrumbs);
-                this.update_likes();
             });
         },
         load_api(pk, page) {
