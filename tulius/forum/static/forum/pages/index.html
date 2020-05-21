@@ -1,5 +1,5 @@
 <div>
-    <div v-if="!loading && !index.is_anonymous" class="btn-toolbar justify-content-between forum-menu" role="toolbar" aria-label="Toolbar">
+    <div v-if="!user.is_anonymous" class="btn-toolbar justify-content-between forum-menu" role="toolbar" aria-label="Toolbar">
         <b-dropdown id="dropdown-1" text="Действия" class="btn-group-sm" variant="light">
             <b-dropdown-item href="/forums/mark_all_as_readed/">
                 Пометить все как прочитанное
@@ -20,11 +20,11 @@
             </div>
             <div class="captionright"></div>
         </div>
-        <a v-if="(!index.is_anonymous) && group.unreaded_url" :href="group.unreaded_url">
+        <a v-if="(!user.is_anonymous) && group.unreaded_url" :href="group.unreaded_url">
             <div class="room_group_read_mark not_readed"></div>
         </a>
-        <div v-if="(!index.is_anonymous) && (!group.unreaded_url)" class="room_group_read_mark"></div>
-        <div v-if="!index.is_anonymous" class="thread_collapse" v-on:click="collapse" :groupid="group.id">
+        <div v-if="(!user.is_anonymous) && (!group.unreaded_url)" class="room_group_read_mark"></div>
+        <div v-if="!user.is_anonymous" class="thread_collapse" v-on:click="collapse" :groupid="group.id">
             {{ group.collapsed ? "+" : "-" }}
         </div>
 

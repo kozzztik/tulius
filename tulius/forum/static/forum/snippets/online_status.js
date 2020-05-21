@@ -22,7 +22,8 @@ export default LazyComponent('forum_online_status', {
                 for(user of this.users) {
                     user_ids.push(user.id);
                 }
-                this.$emit('ids_loaded', user_ids);
+                if (this.thread)
+                    this.thread.online_ids = user_ids;
             }).catch(error => this.$parent.$parent.add_message(error, "error"))
             .then(() => {
                 this.loading = false;

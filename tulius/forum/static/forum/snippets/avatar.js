@@ -1,6 +1,6 @@
 export default LazyComponent('user_avatar', {
     template: '/static/forum/snippets/avatar.html',
-    props: ['user', 'comment'],
+    props: ['user', 'thread'],
     methods: {
         star_to_img(star) {
             if (star == 'b') {
@@ -10,6 +10,17 @@ export default LazyComponent('user_avatar', {
             } else if (star == 'e') {
                 return 'star.gif'
             }
+        }
+    },
+    computed: {
+        online_icon_class: function() {
+            if (this.thread.online_ids.indexOf(this.user.id) != -1)
+                return "online-icon-here-online";
+            if (this.user.online_status === true)
+                return "online-icon-online";
+            if (this.user.online_status === false)
+                return "online-icon-offline";
+            return "";
         }
     },
 })

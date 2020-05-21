@@ -6,7 +6,8 @@ export default LazyComponent('forum_index_page', {
     data: function () {
         return {
             loading: true,
-            index: {},
+            index: {groups: []},
+            user: {is_anonymous: true},
         }
     },
     methods: {
@@ -52,7 +53,10 @@ export default LazyComponent('forum_index_page', {
             }
         }
     },
-    mounted() {this.load_api()},
+    mounted() {
+        this.user = this.$parent.user;
+        this.load_api()
+    },
     beforeRouteUpdate (to, from, next) {
         this.load_api();
         next();

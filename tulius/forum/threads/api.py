@@ -76,8 +76,6 @@ class IndexView(plugins.BaseAPIView):
                 self.user, None, group.rooms)
         # TODO refactor this class
         return {
-            'is_superuser': self.user.is_superuser,
-            'is_anonymous' : self.user.is_anonymous,
             'groups': [{
                 'id': group.id,
                 'title': group.title,

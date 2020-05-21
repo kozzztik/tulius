@@ -11,12 +11,11 @@ export default LazyComponent('forum_thread_page', {
         return {
             breadcrumbs: [],
             loading: true,
-            thread: {},
+            thread: {online_ids: [], id: null},
             comments: [],
             pagination: {},
             comments_page: 1,
             user: {},
-            online_ids: null,
         }
     },
     methods: {
@@ -81,7 +80,6 @@ export default LazyComponent('forum_thread_page', {
             for (comment of comments)
                 comment.is_liked = null;
             this.comments = comments;
-            this.update_online_users();
             this.update_likes();
         },
         update_comments() {
@@ -98,9 +96,13 @@ export default LazyComponent('forum_thread_page', {
             });
         },
         load_api(pk, page) {
+            this.comments_page = page;
+            if (this.thread.id == pk) {
+                this.update_comments();
+                return;
+            }
             this.unsubscribe_comments();
             this.$parent.loading_start();
-            this.comments_page = page;
             axios.get('/api/forum/thread/'+ pk).then(response => {
                 const api_response = response.data;
                 this.breadcrumbs = [{"url": "/forums/", "title": "Форумы"}]
@@ -110,6 +112,7 @@ export default LazyComponent('forum_thread_page', {
                     ));
                 this.breadcrumbs.push(
                     {"url": api_response.url, "title": api_response.title});
+                api_response.online_ids = this.thread.online_ids;
                 this.thread = api_response;
                 this.user = this.$parent.user;
                 this.update_comments()
@@ -124,16 +127,6 @@ export default LazyComponent('forum_thread_page', {
             el.parentNode.removeChild(el);
             this.$refs.reply_form_parking.appendChild(el);
         },
-        on_online_ids_loaded(user_ids) {
-            this.online_ids = user_ids;
-            this.update_online_users();
-        },
-        update_online_users() {
-            var comment;
-            for (comment of this.comments) {
-                if (this.online_ids.indexOf(comment.user.id) != -1) comment.user.online_status = 'here';
-            }
-        }
     },
     mounted() {
         this.$options.sockets.onopen = this.subscribe_comments;
