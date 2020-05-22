@@ -5,10 +5,8 @@
     {% trans "Flatpages" %}
 
 - block breadcrumbs
-    %li
-        .divider
-        %a{href: '{% url "flatpages" %}'}
-            {% trans "Flatpages" %}
+    %a{href: '{% url "flatpages" %}'}
+        {% trans "Flatpages" %}
 
 - block content
     %ul.unstyled.flatpages

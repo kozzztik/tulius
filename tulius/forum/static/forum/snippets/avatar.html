@@ -1,0 +1,22 @@
+<div>
+    <div class="player-avatar">
+        <div class="player-avatar-image">
+            <img :src="user.avatar ? user.avatar : '/static/tulius/img/blank_avatar.jpg'" :id="'avatar' + user.id">
+        </div>
+    </div>
+    <table class="online-table">
+        <tr>
+            <td>
+                <div :class="online_icon_class" v-if="online_icon_class"></div>
+            </td>
+            <td>
+                <a :href="user.url" v-html="user.title"></a>
+            </td>
+        </tr>
+    </table>
+    <div class="stars">
+        <img :src="'/static/players/' + star_to_img(star)" v-for="star in user.full_stars">
+    </div>
+    <span v-if="user.rank"> {{user.rank}} <br></span>
+    <span v-if="user.stories_author">Автор сюжетов</span>
+</div>

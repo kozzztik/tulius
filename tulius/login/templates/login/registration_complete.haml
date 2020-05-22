@@ -2,14 +2,10 @@
 - load i18n
 
 - block breadcrumbs
-        %li
-            .divider
-            %a{href: '{% url "registration_register" }'}
-                {% trans 'Register' %}
-        %li
-            .divider
-            %a{href: '{% url "registration_complete" }'}
-                {% trans 'Successful registration completion' %}
+    %a{href: '{% url "registration_register" }'}
+        {% trans 'Register' %}
+    %a{href: '{% url "registration_complete" }'}
+        {% trans 'Successful registration completion' %}
 
 - block content
     %br

@@ -132,10 +132,9 @@
       #content-center.container.game-content
         - block breadcrumbs_block
             #top-breadcrumbs
-                %ul.breadcrumb
-                    %li
-                        %a{href: '/'}
-                            .homelink
+                .breadcrumbs
+                    %a{href: '/'}
+                        .homelink
                     - block breadcrumbs
             .breadcrumbs-border
         #top-center
@@ -155,10 +154,9 @@
         - block bottom_breadcrumbs
             #bottom-breadcrumbs
                 .breadcrumbs-border
-                %ul.breadcrumb
-                    %li
-                        %a{href: '/'}
-                            .homelink
+                .breadcrumbs
+                    %a{href: '/'}
+                        .homelink
                     - repeat breadcrumbs
     - block footer
         %footer.footer

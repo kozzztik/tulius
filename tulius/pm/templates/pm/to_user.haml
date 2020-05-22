@@ -7,14 +7,10 @@
     <link rel="stylesheet" href="{{ STATIC_URL }}wysibb/theme/default/wbbtheme.css" type="text/css" />
 
 - block breadcrumbs
-    %li
-        .divider
-        %a{href: '{% url "pm:messages" %}'}
-            {% trans "Messages" %}
-    %li
-        .divider
-        %a{href: ''}
-            = player.username
+    %a{href: '{% url "pm:messages" %}'}
+        {% trans "Messages" %}
+    %a{href: ''}
+        = player.username
 
 - block caption
     {% trans "Messages" %}

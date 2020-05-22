@@ -12,7 +12,7 @@ before_script:
 script:
   - docker run tulius_test python3 -m pylint djfw tulius tests
   - mkdir $PWD/coverage
-  - docker run -e TULIUS_BRANCH=test --net="host" -v $PWD/coverage:/opt/tulius/coverage tulius_test python3 -m pytest tests
+  - docker run -e TULIUS_BRANCH=test --net="host" -v $PWD/coverage:/opt/tulius/coverage tulius_test python3 -m pytest tests --cov=tulius --cov-report term-missing --cov-report term:skip-covered
 addons:
   ssh_known_hosts: tulius.co-de.org:22
 before_deploy:

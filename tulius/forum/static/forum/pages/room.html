@@ -1,0 +1,87 @@
+<div>
+    <forum_thread_actions v-if="!loading" :thread="thread" :user="user"></forum_thread_actions>
+    <div v-if="thread.rooms.length > 0" class="content">
+        <div class="caption" align="center">
+            <div class="captionleft"></div>
+            <div class="captioncontent">
+                Комнаты
+            </div>
+            <div class="captionright"></div>
+        </div>
+        <forum_room_list :rooms="thread.rooms"></forum_room_list>
+    </div>
+    <div v-if="thread.threads.length > 0" class="content">
+        <div class="caption" align="center">
+            <div class="captionleft"></div>
+            <div class="captioncontent">
+                Темы
+            </div>
+            <div class="captionright"></div>
+        </div>
+        <table class="table forum-thread-list">
+            <thead>
+                <tr>
+                    <th width="40">&nbsp;</th>
+                    <th>Тема</th>
+                    <th class="d-none d-md-table-cell" width="100">Автор</th>
+                    <th class="d-none d-sm-table-cell" width="80">сообщ.</th>
+                    <th class="d-none d-sm-table-cell" width="200">последнее сообщ.</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="thread in thread.threads" :class="thread.deleted ? 'deleted-thread' : ''">
+                    <td class="forum-post-icon">
+                        <div v-if="thread.important">
+                            <router-link :to="thread.unreaded" v-if="thread.unreaded">
+                                <img src="/static/forum/img/important_not_readed.gif">
+                            </router-link>
+                            <img src="/static/forum/img/important_readed.gif" v-if="!thread.unreaded">
+                        </div>
+                        <div v-else>
+                            <router-link :to="thread.url" v-if="thread.closed">
+                                <img src="/static/forum/img/closed.gif">
+                            </router-link>
+                            <router-link :to="thread.unreaded" v-if="!thread.closed && thread.unreaded">
+                                <img src="/static/forum/img/unreadedmark.gif">
+                            </router-link>
+                            <img src="/static/forum/img/readedmark.gif" v-if="!thread.closed && !thread.unreaded">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="forum-post-description">
+                            <h4>
+                                <router-link :to="thread.url" v-html="thread.title"></router-link>
+                            </h4>
+                            <h6 v-if="thread.accessed_users" class="moderators">Открыта для:</h6>
+                            <ul v-if="thread.accessed_users" class="moderators">
+                                <li v-for="accessed_user in thread.accessed_users">
+                                    <a :href="accessed_user.url">{{ accessed_user.title }}</a>
+                                </li>
+                            </ul>
+                            <div v-if="thread.pages_count > 1">
+                                <h6>Страницы:</h6>
+                                <router-link :to="thread.url + '?page=' + (num+1)" v-for="num in Array(thread.pages_count).keys()" :key="num">
+                                    {{num + 1 }}
+                                </router-link>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="d-none d-md-table-cell">
+                        <a :href="thread.user.url" v-html="thread.user.title"></a>
+                    </td>
+                    <td class="d-none d-sm-table-cell" v-html="thread.comments_count"></td>
+                    <td class="d-none d-sm-table-cell">
+                        <forum_latest_post :comment="thread.last_comment"></forum_latest_post>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div v-if="!loading && (thread.rooms.length == 0) && (thread.threads.length == 0)" class="content">
+        <br>
+        Эта комната пока пуста.
+        <br>
+        <br>
+    </div>
+    <forum_online_status :thread="thread"></forum_online_status>
+</div>

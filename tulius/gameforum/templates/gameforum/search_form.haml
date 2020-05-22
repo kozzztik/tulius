@@ -16,19 +16,15 @@
     {% trans "Search" %}
 
 - block breadcrumbs
-        %li
-            .divider
-            - if variation.game
-                %a{'href': '{{ variation.game.get_absolute_url }}'}
-                    = variation.game
-            - else
-                %a{'href': '{{ variation.get_absolute_url }}'}
-                    {% trans "variation" %}
-                    = variation
-        %li
-            .divider
-            %a{href: ''}
-                {% trans "Search" %}
+    - if variation.game
+        %a{'href': '{{ variation.game.get_absolute_url }}'}
+            = variation.game
+    - else
+        %a{'href': '{{ variation.get_absolute_url }}'}
+            {% trans "variation" %}
+            = variation
+    %a{href: ''}
+        {% trans "Search" %}
     
 - block content
     - include 'snippets/form.haml'

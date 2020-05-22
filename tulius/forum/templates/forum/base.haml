@@ -3,8 +3,9 @@
 
 - block additional_styles
     %link{rel: 'stylesheet', href:'{{ STATIC_URL }}forum/css/tulius-forum.css', type: 'text/css'}
+
     - block plugin_styles
-    
+
 - block additional_scripts
     - if not request.user.is_anonymous
         %script{type: 'text/javascript'}
@@ -30,40 +31,32 @@
         {% trans "forums" %}
 
 - block breadcrumbs
-        %li
-            .divider
-            %a{href: "{{ forum_site.urlizer.index }}"}
-                {% trans "forums" %}
-        - for ancestor in parent_thread.get_ancestors
-            %li
-                .divider
-                %a{href: "{{ ancestor.get_absolute_url }}"}
-                    = ancestor.title|capfirst
-        - if parent_thread
-            %li
-                .divider
-                %a{href: "{{ parent_thread.get_absolute_url }}"}
-                    = parent_thread.title|capfirst
-        - if form    
-            %li
-                .divider
-                %a{href: "{{ form.url }}"}
-                    = form.caption|capfirst
+    %a{href: "{{ forum_site.urlizer.index }}"}
+        {% trans "forums" %}
+    - for ancestor in parent_thread.get_ancestors
+        %a{href: "{{ ancestor.get_absolute_url }}"}
+            = ancestor.title|capfirst
+    - if parent_thread
+        %a{href: "{{ parent_thread.get_absolute_url }}"}
+            = parent_thread.title|capfirst
+    - if form
+        %a{href: "{{ form.url }}"}
+            = form.caption|capfirst
 
 - block custom_content
-    - block before_actions
-    
-    - block upper_actions
-        - if parent_thread
-            - include forum_site.templates.actions
-    
-    - block forum_content
-    
-    - block after_actions
-    
-    - block delete_post_form
-        - if parent_thread
-            - include forum_site.templates.delete_thread_form
+        - block before_actions
+
+        - block upper_actions
+            - if parent_thread
+                - include forum_site.templates.actions
+
+        - block forum_content
+
+        - block after_actions
+
+        - block delete_post_form
+            - if parent_thread
+                - include forum_site.templates.delete_thread_form
             
 - block footer_content
     - block online_users

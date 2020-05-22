@@ -1,0 +1,73 @@
+body.bootstrap4 {
+    font-size: 14px;
+    line-height: 20px;
+}
+
+body .h4, body h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+body .h6, body h6 {
+    font-size: 0.7rem;
+}
+
+body h1, body h2, body h3, body h4, body h5, body h6 {
+    margin-top: 10px;
+    font-weight: 700;
+}
+
+.pagination  li:first-child > a, .pagination li:first-child > span {
+    border-bottom-left-radius: 4px;
+    border-top-left-radius: 4px;
+}
+
+.pagination li:last-child > a, .pagination li:last-child > span {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+body .menu {
+    width: 48px;
+}
+
+.menu > * {
+    padding-left: 0px;
+}
+
+body.bootstrap4 ul.sub-menu {
+    display: block;
+    width: 255px;
+}
+
+body.bootstrap4 .menu-background {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    body .menu {
+        width: 100%;
+    }
+    .menu .menu-notif-list {
+        width: 70px;
+    }
+}
+
+.online-users ul {
+    padding-left: 0px;
+}
+
+body.bootstrap4 .thread_collapse {
+    width: 26px;
+}
+
+body.bootstrap4 .room_group_read_mark {
+    width: 20px;
+    height: 20px;
+}
+
+.menu a.brand_icon.debug_icon {
+    width: 33px;
+    height: 33px;
+    border: solid red 1px;
+}

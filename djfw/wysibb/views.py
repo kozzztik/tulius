@@ -44,7 +44,8 @@ def save_uploaded_image(request, upload, filename):
     )
 
     uploaded_file.save()
-    uploaded_file.image.save(str(uploaded_file.pk) + '_' + filename, upload)
+    file_name = str(uploaded_file.pk) + '_' + filename
+    uploaded_file.image.save(file_name, upload)
     uploaded_file.save()
     uploaded_file.image.open('rb')
     image = Image.open(uploaded_file.image)
@@ -56,10 +57,10 @@ def save_uploaded_image(request, upload, filename):
     image_content = BytesIO()
     image.save(image_content, format=thumb_format)
     image_file = ContentFile(image_content.getvalue())
-    uploaded_file.thumb.save(
-        str(uploaded_file.pk) + '_' + filename, image_file)
+    uploaded_file.thumb.save(file_name, image_file)
     return {'status': 1,
             'msg': "OK",
+            'file_name': file_name,
             'image_link': uploaded_file.image.url,
             'thumb_link': uploaded_file.thumb.url}
 

@@ -5,14 +5,10 @@
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}tulius/css/tulius-players.css'}
 
 - block breadcrumbs
-    %li
-        .divider
-        %a{href: '{% url "players:index" %}'}
-            {% trans "Players" %}
-    %li
-        .divider
-        %a{href: ''}
-            = player.username|capfirst
+    %a{href: '{% url "players:index" %}'}
+        {% trans "Players" %}
+    %a{href: ''}
+        = player.username|capfirst
                 
 - block caption
     = player.username

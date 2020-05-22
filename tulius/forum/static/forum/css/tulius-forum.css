@@ -1,4 +1,4 @@
-.post-body {
+.post-body, .cke_editable {
     font-family: Arial;
     color: black;
     font-size: 14px;
@@ -302,7 +302,7 @@ ul.comma-list > li:last-child:after { content: '.'; }
     padding-left: 1px;
 }
 
-body .quote { 
+body .quote, blockquote {
     -moz-border-bottom-colors: none; 
     -moz-border-left-colors: none; 
     -moz-border-right-colors: none; 
@@ -420,3 +420,44 @@ body .quote {
 }
 
 .pagination .progress .bar{ background-color: #53381a; }
+
+.voting {
+    background-image: url("../img/quote.gif");
+    border-color: #8E7F60;
+    border-style: solid;
+    border-width: 1px 1px 1px 1px;
+    margin-top: 20px;
+    padding: 15px;
+}
+
+.voting-bar {
+    background-color: blue;
+    border-style: solid;
+    border-width: 1px;
+    border-color: blue;
+    margin-right: 10px;
+    height: 10px;
+    display: inline-block;
+}
+
+.moderators {
+    padding-left: 0px;
+}
+.moderators li ::after {
+    content: ' ';
+    width: 0.3em;
+    display: inline-block;
+}
+
+.cke_editable ul {
+    list-style: url("../../tulius/img/baselayout/li_star.png") outside;
+}
+
+.cke_editable ul, .cke_editable ol {
+    padding: 0;
+    margin: 0 0 10px 25px;
+}
+
+.cke_editable p {
+    margin: 0 0 0 0;
+}

@@ -52,14 +52,14 @@ table.vertical-center td { vertical-align: middle; }
 
 .qq-uploader .qq-upload-button:hover { background: none repeat scroll 0% 0% rgb(60, 171, 0); }
 
-.pagination ul li a {
+.pagination li a {
      border-color: #A97441; 
      color: #E4D396; 
 }
 
-.pagination ul li a:hover { color: rgb(182, 152, 73); }
+.pagination li a:hover { color: rgb(182, 152, 73); }
 
-.pagination ul > li > a, .pagination ul > li > span { 
+.pagination a, .pagination span {
     -moz-border-bottom-colors: none; 
     -moz-border-left-colors: none; 
     -moz-border-right-colors: none; 
@@ -77,17 +77,17 @@ table.vertical-center td { vertical-align: middle; }
     text-decoration: none; 
 }
 
-.pagination ul > .disabled > span, 
-.pagination ul > .disabled > a, 
-.pagination ul > .disabled > a:hover, 
-.pagination ul > .disabled > a:focus { 
+.pagination .disabled span,
+.pagination .disabled a,
+.pagination .disabled a:hover,
+.pagination .disabled a:focus {
     background-color: rgba(0, 0, 0, 0); 
     color: #BBBBBB; 
     cursor: default; 
 } 
 
-.pagination ul > .active > a, 
-.pagination ul > .active > span { 
+.pagination .active a,
+.pagination .active span {
     color: #BBBBBB; 
     cursor: default; 
 } 

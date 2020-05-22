@@ -9,14 +9,10 @@
     {% trans "Confirm deletion" %}
 
 - block breadcrumbs
-    %li
-        .divider
-        %a{href: '{% url "games:index" %}'}
-            {% trans "Games" %}
-    %li
-        .divider
-        %a{href: ''}
-            {% trans "Confirm deletion" %}
+    %a{href: '{% url "games:index" %}'}
+        {% trans "Games" %}
+    %a{href: ''}
+        {% trans "Confirm deletion" %}
 
 - block content
     %form.form-horizontal{method: 'POST'}

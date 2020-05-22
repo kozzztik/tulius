@@ -5,3 +5,6 @@ from . import models
 
 class ForumSite(BaseForumSite):
     _models = models
+
+
+site = None

@@ -5,18 +5,12 @@
     %link{rel: 'stylesheet', href: '{{ STATIC_URL }}tulius/css/tulius-players.css', type: 'text/css'}
 
 - block breadcrumbs
-    %li
-        .divider
-        %a{href: '{% url "players:index" %}'}
-            {% trans "players" %}
-    %li
-        .divider
-        %a{href: '{% url "players:player_details" player.id %}'}
-            = player.username
-    %li
-        .divider
-        %a{href: ''}
-            {% trans "Message history" %}
+    %a{href: '{% url "players:index" %}'}
+        {% trans "players" %}
+    %a{href: '{% url "players:player_details" player.id %}'}
+        = player.username
+    %a{href: ''}
+        {% trans "Message history" %}
                 
 - block caption
     {% trans "Message history with "%}

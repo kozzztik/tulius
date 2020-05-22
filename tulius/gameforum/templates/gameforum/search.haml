@@ -8,18 +8,14 @@
     {% trans "search results" %}
 
 - block breadcrumbs
-        %li
-            .divider
-            %a{href: '{{ parent_thread.get_absolute_url }}'}
-                - if variation.game
-                    = variation.game
-                - else
-                    {% trans "variation" %}
-                    = variation
-        %li
-            .divider
-            %a{href: '{{ parent_thread.extended_search_url }}'}
-                {% trans "search results" %}
+    %a{href: '{{ parent_thread.get_absolute_url }}'}
+        - if variation.game
+            = variation.game
+        - else
+            {% trans "variation" %}
+            = variation
+    %a{href: '{{ parent_thread.extended_search_url }}'}
+        {% trans "search results" %}
                 
 - block upper_actions
     #search_filter.content.form-horizontal

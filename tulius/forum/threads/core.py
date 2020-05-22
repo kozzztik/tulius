@@ -85,6 +85,7 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
         for thread in rooms:
             thread.parent = parent_room
             thread._site = site
+        # TODO not sure this is needed
         rooms = [thread for thread in rooms if thread.view_right(user)]
         for room in rooms:
             threads = self.room_descendants(user, room)[1]
@@ -98,6 +99,7 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
         return rooms
 
     def paginate_thread(self, thread, base_url):
+        # TODO remove
         class ThreadPage:
             page = 0
             page_link = ""
@@ -128,6 +130,8 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
         threads = [thread for thread in threads if thread.view_right(user)]
 
         for thread in threads:
+            thread.moderators = []
+            thread.accessed_users = None
             if thread.read_right(user):
                 self.paginate_thread(thread, thread.get_absolute_url)
             if thread.access_type == models.THREAD_ACCESS_TYPE_NO_READ:
@@ -383,8 +387,6 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
             providing_args=["threads", "is_room"])
         self.thread_prepare_room_signal = dispatch.Signal(
             providing_args=["parent_thread", "threads", "user"])
-        self.thread_prepare_room_group_signal = dispatch.Signal(
-            providing_args=["user"])
         self.thread_before_edit = dispatch.Signal(
             providing_args=["thread", "context"])
         self.thread_after_edit = dispatch.Signal(
@@ -417,5 +419,3 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
         self.signals['thread_on_create'] = self.thread_on_create
         self.signals['thread_on_update'] = self.thread_on_update
         self.signals['thread_prepare_room'] = self.thread_prepare_room_signal
-        self.signals['thread_prepare_room_group'] = \
-            self.thread_prepare_room_group_signal

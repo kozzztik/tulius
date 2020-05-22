@@ -1,0 +1,164 @@
+<div>
+    <div class="menu">
+        <a class="brand_icon" href="/" :class="$root.debug ? 'debug_icon' : ''">
+            <img src="/static/tulius/img/logo_small.png">
+        </a>
+        <div class="menu-notif-list">
+            <a v-if="user.authenticated" href="/pm/messages/">
+                <div class="new_messages active" v-if="user.not_readed_messages" title="Есть непрочитанные сообщения!"></div>
+                <div class="new_messages" v-if="!user.not_readed_messages" title="Нет непрочитанных сообщений"></div>
+            </a>
+            <a v-if="user.authenticated" href="/profile/invites/">
+                <div class="new_invites active" v-if="user.new_invites" title="Есть новые приглашения!"></div>
+                <div class="new_invites" v-if="!user.new_invites" title="Нет новых приглашений"></div>
+            </a>
+        </div>
+        <ul class="menu-list">
+            <li>
+                <a class="catalog" href="javascript:void(0)" title="Разделы" v-on:click="toggle('catalog')" :class="(show=='catalog') ? 'active':''"></a>
+            </li>
+            <li v-if="user.authenticated">
+                <a class="profile" href="javascript:void(0)" title="Профиль" v-on:click="toggle('profile')" :class="(show=='profile') ? 'active':''"></a>
+            </li>
+            <li>
+                <a class="articles" href="javascript:void(0)" title="Статьи" v-on:click="toggle('articles')" :class="(show=='articles') ? 'active':''"></a>
+            </li>
+            <li v-if="user.superuser">
+                <a class="admin" href="javascript:void(0)" title="Админка" v-on:click="toggle('admin')" :class="(show=='admin') ? 'active':''"></a>
+            </li>
+        </ul>
+        <ul class="menu-scroll">
+            <li>
+                <a class="scroll-up small" href="javascript:void(0)" title="Наверх страницы" v-on:click="scroll_up()"></a>
+            </li>
+            <li>
+                <a class="scroll-down small" href="javascript:void(0)" title="Вниз страницы" v-on:click="scroll_down()"></a>
+            </li>
+        </ul>
+        <ul class="menu-login">
+            <li v-if="user.authenticated">
+                <a class="logout" href="/accounts/logout/" title="Выйти из учетной записи"></a>
+            </li>
+            <li v-if="user.is_anonymous">
+                <a class="login d-none d-md-block" title="Войти" v-on:click="$bvModal.show('loginModal')" href="javascript:void(0)"></a>
+                <a class="login d-md-none" href="/accounts/login_choose/" title="Войти"></a>
+            </li>
+        </ul>
+    </div>
+    <ul id="catalog-menu" class="sub-menu" v-show="show=='catalog'">
+        <li class="header">Разделы</li>
+        <li>
+            <a href="/games/">Игры</a>
+            <ul>
+                <li>
+                    <a href="/games/announced/">Анонсы игр</a>
+                </li>
+                <li>
+                    <a href="/games/accepting/">Прием заявок</a>
+                </li>
+                <li>
+                    <a href="/games/awaiting_start/">Ожидают старта</a>
+                </li>
+                <li>
+                    <a href="/games/current/">Текущие игры</a>
+                </li>
+                <li>
+                    <a href="/games/completed/">Завершенные и открытые</a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a href="/players/">Игроки</a>
+        </li>
+        <li>
+            <a href="/stories/">Сюжеты</a>
+        </li>
+        <li>
+            <a href="/forums/">Форумы</a>
+        </li>
+        <li>
+            <a href="/news/">Новости</a>
+        </li>
+    </ul>
+    <ul class="sub-menu" id="profile-menu" v-if="user.authenticated" v-show="show=='profile'">
+        <li class="header">
+            Профиль
+        </li>
+        <li>
+            <div class="player-avatar">
+                <div class="player-avatar-image">
+                    <img :src="user.avatar">
+                </div>
+            </div>
+        </li>
+        <li class="player-info">
+            <span v-html="user.username"></span>
+            <div class="stars">
+                <img :src="'/static/players/' + star_to_img(star)" v-for="star in user.full_stars">
+            </div>
+            <span v-html="user.rank"></span>
+        </li>
+        <li>
+            <a href="/players/profile/">Профиль</a>
+        </li>
+        <li>
+            <a href="/pm/messages/">Сообщения</a>
+        </li>
+        <li>
+            <a href="/profile/favorites/">Избранное</a>
+        </li>
+        <li>
+            <a href="/profile/stories/">Сюжеты</a>
+        </li>
+        <li>
+            <a href="/profile/games/">Игры</a>
+        </li>
+        <li>
+            <a href="/profile/settings/">Настройки</a>
+        </li>
+        <li>
+            <a href="/profile/subscriptions/">Подписки</a>
+        </li>
+        <li>
+            <a href="/accounts/logout/">Выйти</a>
+        </li>
+    </ul>
+    <ul id="articles-menu" class="sub-menu" v-show="show=='articles'">
+        <li class="header">Статьи</li>
+        <li>
+            <a href="/flatpages/">Все статьи</a>
+        </li>
+        <li class="divider"></li>
+        <li v-for="article in articles" :key="article.url">
+            <a :href="article.url" v-html="article.title"></a>
+        </li>
+    </ul>
+    <ul id="admin-menu" class="sub-menu" v-if="user.superuser" v-show="show=='admin'">
+        <li class="header">Админка</li>
+        <li>
+            <a href="/counters/">Счетчики</a>
+        </li>
+        <li>
+            <a href="/admin/">Джанго админка</a>
+        </li>
+        <li>
+            <a href="/accounts/relogin/">Сменить пользователя</a>
+        </li>
+    </ul>
+    <div class="menu-background" v-on:click="toggle('')" v-show="show"></div>
+    <b-modal id="loginModal" title="Войти" ok-only>
+        <h4>Войти через:</h4>
+        <div id="login_types">
+            <a href="/vk/login_vk_oauth/">
+                <img src="/static/tulius/img/vk.png">
+            </a>
+            <a href="/accounts/login/">
+                <img src="/static/tulius/img/logo.png">
+            </a>
+        </div>
+        Вы также можете воспользоваться старой формой
+        <a href="/accounts/registration/register/">
+            регистрации
+        </a>.
+    </b-modal>
+</div>

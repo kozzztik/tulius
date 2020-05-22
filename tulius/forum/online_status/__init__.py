@@ -1,12 +1,25 @@
 from datetime import timedelta
 
+from django.core.cache import cache
 from django.utils.timezone import now
 
-# TODO: fix this when module moved
-from tulius.forum.plugins import ForumPlugin
+from tulius.forum import site
+from tulius.forum import plugins
+from tulius.forum import models
+from tulius.forum import const
 
 
-class OnlineStatusPlugin(ForumPlugin):
+def set_user_status(user_id, thread_id):
+    cache.set(
+        const.USER_ONLINE_CACHE_KEY.format(user_id),
+        thread_id or True, const.USER_ONLINE_PERIOD * 60)
+
+
+def get_user_status(user_id):
+    return cache.get(const.USER_ONLINE_CACHE_KEY.format(user_id), False)
+
+
+class OnlineStatusPlugin(plugins.ForumPlugin):
     online_list_template = 'forum/snippets/online_users.haml'
 
     def update_online_status(self, user, thread):
@@ -15,6 +28,7 @@ class OnlineStatusPlugin(ForumPlugin):
                 user=user, thread=thread)[0]
             online_mark.visit_time = now()
             online_mark.save()
+            set_user_status(user.id, thread.id)
 
     def get_online_users(self, user, thread, do_update=True):
         if do_update:
@@ -29,7 +43,7 @@ class OnlineStatusPlugin(ForumPlugin):
         return users_list.values()
 
     def get_all_online_users(self):
-        users = self.site.models.OnlineUser.objects.select_related(
+        users = models.OnlineUser.objects.select_related(
             'user'
         ).filter(
             visit_time__gte=now() - timedelta(minutes=3),
@@ -38,14 +52,6 @@ class OnlineStatusPlugin(ForumPlugin):
         for user in users:
             users_list[user.user.id] = user.user
         return users_list.values()
-
-    def thread_view(self, sender, **kwargs):
-        context = kwargs['context']
-        if sender:
-            user = kwargs["user"]
-            context['online_users'] = self.get_online_users(user, sender)
-        else:
-            context['online_users'] = self.get_all_online_users()
 
     def comments_page(self, sender, **kwargs):
         user = kwargs["user"]
@@ -61,5 +67,21 @@ class OnlineStatusPlugin(ForumPlugin):
         self.core['get_online_users'] = self.get_online_users
         self.core['get_all_online_users'] = self.get_all_online_users
         self.templates['online_users'] = self.online_list_template
-        self.site.signals.thread_view.connect(self.thread_view)
         self.site.signals.read_comments.connect(self.comments_page)
+
+
+class OnlineStatusAPI(plugins.BaseAPIView):
+    def get(self, request, *args, **kwargs):
+        pk = kwargs['pk'] if 'pk' in kwargs else None
+        if pk:
+            thread = models.Thread.objects.get(pk=pk)
+            users = site.site.core.get_online_users(self.user, thread)
+        else:
+            users = site.site.core.get_all_online_users()
+        return {
+            'users': [{
+                'id': user.pk,
+                'title': str(user),
+                'url': user.get_absolute_url(),
+            } for user in users]
+        }

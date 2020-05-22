@@ -16,10 +16,11 @@ class WebsocketHandler:
         redis_location = params.pop('LOCATION')
         self.redis_cache = RedisCache(redis_location, params)
 
-    async def handler(self, request):
+    async def handler(self, request, json_format=False):
         ws = web.WebSocketResponse()
         await ws.prepare(request)
-        session = user_session.UserSession(request, ws, self.redis_cache)
+        session = user_session.UserSession(
+            request, ws, self.redis_cache, json_format)
         try:
             await session.process()
         except asyncio.CancelledError:
@@ -32,7 +33,13 @@ class WebsocketHandler:
             session.close()
         return ws
 
+    async def json_handler(self, request):
+        return await self.handler(request, json_format=True)
+
 
 def setup_routes(app):
+    websock_handler = WebsocketHandler()
     app.add_routes([
-        web.get(settings.WEBSOCKET_URL, WebsocketHandler().handler)])
+        web.get(settings.WEBSOCKET_URL, websock_handler.handler),
+        web.get(settings.WEBSOCKET_URL_NEW, websock_handler.json_handler),
+    ])

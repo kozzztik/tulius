@@ -727,6 +727,7 @@ class OnlineUser(models.Model):
     class Meta:
         verbose_name = _(u'online user')
         verbose_name_plural = _(u'online users')
+        unique_together = ['user', 'thread']
 
     user = models.ForeignKey(
         User, models.PROTECT,
@@ -747,7 +748,7 @@ class OnlineUser(models.Model):
         related_name='visit_marks',
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return str(self.user)
 
 
