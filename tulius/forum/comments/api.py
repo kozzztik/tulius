@@ -37,8 +37,12 @@ class CommentsPageAPI(api.BaseThreadView):
     def get_context_data(self, **kwargs):
         super(CommentsPageAPI, self).get_context_data(**kwargs)
         page_num = int(kwargs['page_num'])
-        comments = site.site.core.get_comments_page(
-            self.user, self.obj, page_num)
+        comments = models.Comment.objects.select_related('user')
+        comments = comments.filter(
+            parent=self.obj, page=page_num).exclude(deleted=True)
+        for comment in comments:
+            comment.view_user = self.user
+            comment.parent = self.obj
         pagination_context = pagination.get_pagination_context(
             self.request, page_num, self.obj.pages_count)
         return {

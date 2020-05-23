@@ -4,6 +4,7 @@ from django.utils import html
 from tulius.forum import site
 from tulius.forum import plugins
 from tulius.forum import const
+from tulius.forum import signals
 from tulius.forum import online_status as online_status_plugin
 from tulius.forum.readmarks import plugin as readmarks
 from djfw.wysibb.templatetags import bbcodes
@@ -112,7 +113,7 @@ class ThreadView(BaseThreadView):
                 user_id=self.user.id, thread_id=self.obj.id),
             'r', const.USER_THREAD_RIGHTS_PERIOD * 60
         )
-        return {
+        response = {
             'id': self.obj.pk,
             'tree_id': self.obj.tree_id,
             'title': self.obj.title,
@@ -139,6 +140,8 @@ class ThreadView(BaseThreadView):
             },
             'first_comment_id': self.obj.first_comment_id,
         }
+        signals.thread_view.send(self, response=response)
+        return response
 
     def delete(self, request, *args, **kwargs):
         self.get_parent_thread(**kwargs)

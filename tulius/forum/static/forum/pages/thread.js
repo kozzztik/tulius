@@ -16,6 +16,8 @@ export default LazyComponent('forum_thread_page', {
             pagination: {},
             comments_page: 1,
             user: {},
+            mark_read_func: null,
+            mark_read_id: null,
         }
     },
     methods: {
@@ -122,11 +124,38 @@ export default LazyComponent('forum_thread_page', {
             });
         },
         cleanup_reply_form() {
-            var el = this.$refs.reply_form.$el;
-            this.$refs.reply_form.cleanup_reply_form();
+            var form = this.$refs.reply_form;
+            if (form === undefined) return;
+            var el = form.$el;
+            form.cleanup_reply_form();
             el.parentNode.removeChild(el);
             this.$refs.reply_form_parking.appendChild(el);
         },
+        mark_as_read(comment_id) {
+            if (comment_id <= this.thread.last_read_id)
+                return;
+            if (this.mark_read_id)
+                return;
+            // console.log('поставили таймер')
+            this.mark_read_id = comment_id;
+            this.mark_read_func = setTimeout(this.do_mark_mark_as_read, 1000, comment_id);
+        },
+        cancel_mark_as_read(comment_id) {
+            if (this.mark_read_id == comment_id) {
+                // console.log('отменили таймер');
+                clearTimeout(this.mark_read_func);
+                this.mark_read_id = null;
+            }
+        },
+        do_mark_mark_as_read(comment_id) {
+            // console.log('пошел запрос');
+            axios.post('/api/forum/thread/'+ this.thread.id + '/read_mark/', {'comment_id': comment_id}).then(response => {
+                this.thread.last_read_id = response.data.last_read_id;
+            }).catch(error => this.$parent.add_message(error, "error")).then(() => {
+                this.mark_read_id = null;
+                this.mark_read_func = null;
+            });
+        }
     },
     mounted() {
         this.$options.sockets.onopen = this.subscribe_comments;

@@ -1,5 +1,5 @@
-<table class="post-table content" :class="comment.unreaded ? 'unreaded-post': ''">
-    <tbody>
+<table class="post-table content" :class="is_read ? '': 'unreaded-post'">
+    <tbody v-on:mouseover="mouse_over" v-on:mouseleave="mouse_leave">
         <tr>
             <td class="post-avatar">
                 <user_avatar :user="comment.user" :thread="thread"></user_avatar>
