@@ -28,8 +28,8 @@ class ReadmarkAPI(api.BaseThreadView):
         read_mark = models.ThreadReadMark.objects.filter(
             thread_id=thread_id, user=self.user).first()
         if not read_mark:
-            thread = self.get_parent_thread(**kwargs)
-            read_mark = models.ThreadReadMark(thread=thread, user=self.user)
+            self.get_parent_thread(**kwargs)
+            read_mark = models.ThreadReadMark(thread=self.obj, user=self.user)
         not_read = models.Comment.objects.filter(
             parent_id=thread_id, id__gt=read_id, deleted=False
         ).exclude(user=self.user).order_by('id').first()

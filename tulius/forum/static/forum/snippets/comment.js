@@ -26,10 +26,12 @@ export default LazyComponent('forum_comment', {
                 (this.comment.is_liked ? 'like.gif' : 'unlike.gif');
         },
         is_read: function() {
-            if ((!this.thread.last_read_id)||this.user.is_anonymous)
+            if (this.user.is_anonymous)
                 return true;
             if (this.comment.user.id == this.user.id)
                 return true;
+            if (!this.thread.last_read_id)
+                return false;
             return (this.thread.last_read_id >= this.comment.id);
         },
     },
