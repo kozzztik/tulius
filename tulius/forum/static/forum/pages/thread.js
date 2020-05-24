@@ -51,6 +51,10 @@ export default LazyComponent('forum_thread_page', {
                     if (comment.id == new_comment.id)
                         return;
                 this.comments.push(new_comment);
+                if (!this.thread.not_read_comment)
+                    this.thread.not_read_comment = {
+                        id: new_comment.id, page_num: new_comment.page, count: 0}
+                this.thread.not_read_comment.count += 1;
             }).catch(error => this.$parent.add_message(error, "error")).then(() => {});
         },
         fast_reply(comment) {
