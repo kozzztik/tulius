@@ -118,8 +118,11 @@ class GameThreadsPlugin(ThreadsPlugin):
         return [
             url(r'^$', views.Index.as_view(), name='index'),
             url(
+                r'^(?P<variation_id>\d+)/',
+                views.Index.as_view(), name='game_forum_variation'),
+            url(
                 r'^room/(?P<parent_id>\d+)/$',
-                views.Room.as_view(plugin=self), name='room'),
+                views.Index.as_view(), name='room'),
             url(
                 r'^add_room/$',
                 views.EditView.as_view(plugin=self, self_is_room=True),
