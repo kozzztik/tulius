@@ -23,6 +23,7 @@ def comment_to_json(c):
         'url': c.get_absolute_url,
         'title': html.escape(c.title),
         'body': bbcodes.bbcode(c.body),
+        'page': c.page,
         'user': api.user_to_json(c.user, detailed=True),
         'create_time': c.create_time,
         'voting': c.voting,
