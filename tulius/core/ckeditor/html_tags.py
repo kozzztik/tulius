@@ -146,6 +146,12 @@ class ImgTag(Tag):
                 yield '[img={}]{}[/img]'.format(url, alt)
 
 
+class PTag(Tag):
+    def convert(self, data_str):
+        yield from self.convert_internal(data_str)
+        yield '\n'
+
+
 tag_types = {
     'em': ItalicTag,
     'i': ItalicTag,
@@ -167,4 +173,5 @@ tag_types = {
     'blockquote': BlockquoteTag,
     'a': ATag,
     'img': ImgTag,
+    'p': PTag,
 }

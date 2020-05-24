@@ -18,25 +18,27 @@ export default LazyComponent('forum_thread_page', {
             user: {},
             mark_read_func: null,
             mark_read_id: null,
+            delete_comment_id: null,
+            delete_comment_message: '',
         }
     },
     methods: {
         subscribe_comments() {
             if (this.thread.id)
-                this.$socket.sendObj({action: 'subscribe_comments', id: this.thread.id});
+                this.$root.$socket.sendObj({action: 'subscribe_comments', id: this.thread.id});
         },
         unsubscribe_comments() {
             if (this.thread.id) {
-                this.$socket.sendObj({action: 'unsubscribe_comments', id: this.thread.id})
+                this.$root.$socket.sendObj({action: 'unsubscribe_comments', id: this.thread.id})
             }
             delete this.$options.sockets.onmessage
         },
         websock_message(msg) {
             var data = JSON.parse(msg.data);
             if ((data['.namespaced'] != 'thread_comments') || (data.thread_id != this.thread.id)) return;
-            if (data.page > this.pagination.pages.length) {
+            if (data.page > this.pagination.pages_count) {
                 this.pagination.pages_count = this.pagination.pages_count + 1;
-                this.pagination.pages.push(this.pagination.pages.length + 1);
+                this.pagination.pages.push(this.pagination.pages_count);
                 this.pagination.is_paginated = true;
             }
             if (data.page != this.comments_page)
@@ -49,7 +51,6 @@ export default LazyComponent('forum_thread_page', {
                     if (comment.id == new_comment.id)
                         return;
                 this.comments.push(new_comment);
-                this.update_online_users()
             }).catch(error => this.$parent.add_message(error, "error")).then(() => {});
         },
         fast_reply(comment) {
@@ -69,7 +70,7 @@ export default LazyComponent('forum_thread_page', {
             var comment_ids = []
             for (comment of this.comments)
                 comment_ids.push(comment.id);
-            if (!this.user.is_anonymous) {
+            if (!this.user.is_anonymous && (comment_ids.length > 0)) {
                 axios.get('/api/forum/likes/', {params: {ids: comment_ids.join(',')}}
                 ).then(response => {
                     for (comment of this.comments)
@@ -154,6 +155,28 @@ export default LazyComponent('forum_thread_page', {
             }).catch(error => this.$parent.add_message(error, "error")).then(() => {
                 this.mark_read_id = null;
                 this.mark_read_func = null;
+            });
+        },
+        mark_all_not_readed() {
+            axios.delete('/api/forum/thread/'+ this.thread.id + '/read_mark/').then(response => {
+                this.thread.last_read_id = response.data.last_read_id;
+            }).catch(error => this.$parent.add_message(error, "error"));
+        },
+        delete_comment(comment_id) {
+            this.delete_comment_id = comment_id;
+            this.$bvModal.show('commentDelete');
+        },
+        do_delete_comment() {
+            this.$parent.loading_start();
+            axios.delete(
+                '/api/forum/comment/'+ this.delete_comment_id + '/',
+                {params: {comment: this.delete_comment_message}}
+            ).then(response => {
+                if (response.data.pages_count < this.comments_page)
+                    this.comments_page = response.data.pages_count;
+                this.update_comments();
+            }).catch(error => this.$parent.add_message(error, "error")).then(() => {
+                 this.$parent.loading_end(this.breadcrumbs);
             });
         }
     },

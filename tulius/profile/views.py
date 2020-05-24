@@ -240,6 +240,7 @@ def request_user_json(request):
         'is_anonymous': request.user.is_anonymous,
         'authenticated': request.user.is_authenticated,
         'superuser': request.user.is_superuser,
+        'id': request.user.pk if auth else None,
         'compact_text': request.user.compact_text if auth else '',
         'username': request.user.username if auth else None,
         'rank': request.user.rank if auth else None,

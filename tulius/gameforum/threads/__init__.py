@@ -1,6 +1,8 @@
 from django.db.models.query_utils import Q
+from django.conf.urls import url
 
 # TODO: fix this when module moved
+from tulius.forum.threads import views
 from tulius.forum.threads.plugin import ThreadsPlugin
 from tulius.stories.models import Avatar, Role, AdditionalMaterial, \
     Illustration
@@ -111,3 +113,49 @@ class GameThreadsPlugin(ThreadsPlugin):
         queryset = self.models.Thread.objects.filter(
             plugin_id=self.site_id, level=0, tree_id=thread.tree_id)
         return self.expand_move_list(queryset, thread, user)
+
+    def get_urls(self):
+        return [
+            url(r'^$', views.Index.as_view(), name='index'),
+            url(
+                r'^room/(?P<parent_id>\d+)/$',
+                views.Room.as_view(plugin=self), name='room'),
+            url(
+                r'^add_room/$',
+                views.EditView.as_view(plugin=self, self_is_room=True),
+                name='add_room'),
+            url(
+                r'^add_room/(?P<parent_id>\d+)/$',
+                views.EditView.as_view(plugin=self, self_is_room=True),
+                name='add_room'),
+            url(
+                r'^edit_room/(?P<thread_id>\d+)/$',
+                views.EditView.as_view(plugin=self, self_is_room=True),
+                name='edit_room'),
+            url(
+                r'^add_thread/(?P<parent_id>\d+)/$',
+                views.EditView.as_view(plugin=self, self_is_room=False),
+                name='add_thread'),
+            url(
+                r'^edit_thread/(?P<thread_id>\d+)/$',
+                views.EditView.as_view(plugin=self, self_is_room=False),
+                name='edit_thread'),
+            url(
+                r'^thread/(?P<parent_id>\d+)/$',
+                views.Thread.as_view(plugin=self), name='thread'),
+            url(
+                r'^thread/(?P<parent_id>\d+)/move/$',
+                views.MoveThreadSelect.as_view(plugin=self),
+                name='thread_move'),
+            url(
+                r'^thread/(?P<parent_id>\d+)/move/(?P<thread_id>\d+)/$',
+                views.MoveThreadConfirm.as_view(plugin=self),
+                name='thread_move_confirm'),
+            url(r'^thread/(?P<parent_id>\d+)/move/root/$',
+                views.MoveThreadConfirm.as_view(plugin=self),
+                name='thread_move_confirm'),
+            url(
+                r'^delete_thread/$',
+                views.DeleteThread.as_view(plugin=self),
+                name='delete_thread'),
+        ]

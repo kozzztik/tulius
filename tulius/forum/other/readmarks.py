@@ -37,3 +37,9 @@ class ReadmarkAPI(api.BaseThreadView):
         read_mark.not_readed_comment = not_read
         read_mark.save()
         return {'last_read_id': read_id}
+
+    def delete(self, *args, **kwargs):
+        thread_id = int(kwargs['pk'])
+        models.ThreadReadMark.objects.filter(
+            thread_id=thread_id, user=self.user).delete()
+        return {'last_read_id': None}

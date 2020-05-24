@@ -100,3 +100,13 @@ class CommentAPI(plugins.BaseAPIView):
     def get_context_data(self, **kwargs):
         self.get_comment(**kwargs)
         return comment_to_json(self.obj)
+
+    def delete(self, *args, **kwargs):
+        self.get_comment(**kwargs)
+        if self.obj.is_thread():
+            raise models.Comment.DoesNotExist()
+        site.site.core.delete_comment(
+            self.user, self.obj.id, self.request.GET['comment'])
+        thread = models.Thread.objects.get(pk=self.obj.parent.id)
+        # TODO clients notification
+        return {'pages_count': thread.pages_count}
