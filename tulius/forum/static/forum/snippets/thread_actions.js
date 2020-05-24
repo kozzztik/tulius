@@ -7,17 +7,28 @@ export default LazyComponent('forum_thread_actions', {
             delete_comment: '',
         }
     },
+    computed: {
+        delete_title: function() {
+            if (this.thread.room)
+                return 'Удалить эту комнату?'
+            else
+                return 'Удалить эту тему?';
+        }
+    },
     methods: {
         mark_not_readed() {
             this.$parent.mark_all_not_readed();
         },
-        deleteRoom(bvModalEvt) {
+        delete_thread(bvModalEvt) {
             axios.delete(
                     '/api/forum/thread/' + this.thread.id+ '/',
                     {params: {comment: this.delete_comment}}
             ).then(response => {
                 if (response.data['result'] == 'success') {
-                    this.$root.add_message("Комната успешно удалена", "warning");
+                    if (this.thread.room)
+                        this.$root.add_message("Комната успешно удалена", "warning");
+                    else
+                        this.$root.add_message("Тема успешно удалена", "warning");
                     if (this.thread.parents.length > 0) {
                         this.$router.push({
                             name: 'forum_room',
