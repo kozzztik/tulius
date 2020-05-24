@@ -73,5 +73,5 @@ body.bootstrap4 .room_group_read_mark {
 }
 
 .post-body-content img {
-    max-width: 100;
+    max-width: 100%;
 }
