@@ -3,6 +3,9 @@
         <b-dropdown-item data-toggle="modal" href="javascript:void(0);" v-if="!thread.room" v-on:click="$bvModal.show('quoteAnswer')">
             Ответить с цитатой
         </b-dropdown-item>
+        <b-dropdown-item data-toggle="modal" href="javascript:void(0);" v-if="!thread.room" v-on:click="mark_not_readed()">
+            Пометить все как не прочитанное
+        </b-dropdown-item>
         <b-dropdown-item :href="'/forums/mark_all_as_readed/' + thread.id + '/'" v-if="thread.room">
             Пометить все как прочитанное
         </b-dropdown-item>

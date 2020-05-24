@@ -154,7 +154,12 @@ export default LazyComponent('forum_thread_page', {
                 this.mark_read_id = null;
                 this.mark_read_func = null;
             });
-        }
+        },
+        mark_all_not_readed() {
+            axios.delete('/api/forum/thread/'+ this.thread.id + '/read_mark/').then(response => {
+                this.thread.last_read_id = response.data.last_read_id;
+            }).catch(error => this.$parent.add_message(error, "error"));
+        },
     },
     mounted() {
         this.$options.sockets.onopen = this.subscribe_comments;

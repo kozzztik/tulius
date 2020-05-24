@@ -8,6 +8,9 @@ export default LazyComponent('forum_thread_actions', {
         }
     },
     methods: {
+        mark_not_readed() {
+            this.$parent.mark_all_not_readed();
+        },
         deleteRoom(bvModalEvt) {
             axios.delete(
                     '/api/forum/thread/' + this.thread.id+ '/',
