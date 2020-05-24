@@ -57,6 +57,9 @@ export default LazyComponent('forum_comment', {
             if (this.is_read || this.preview)
                 return;
             this.$parent.cancel_mark_as_read(this.comment.id);
-        }
+        },
+        delete_comment() {
+            this.$parent.delete_comment(this.comment.id);
+        },
     }
 })

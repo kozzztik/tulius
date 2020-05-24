@@ -10,4 +10,18 @@
         </forum_reply_form>
     </div>
     <forum_online_status :thread="thread"></forum_online_status>
+    <b-modal id="commentDelete"
+             title="Удалить комнентарий" ok-title="Удалить" ok-variant="danger"
+             cancel-title="Отменить" @ok="do_delete_comment">
+        <div class="form-horizontal">
+        <fieldset class="control-group">
+            <div class="control-label">
+                <label for="delete_comment">Пояснение:</label>
+            </div>
+            <div class="controls">
+                <input id="delete_comment" type="text" v-model="delete_comment_message">
+            </div>
+        </fieldset>
+        </div>
+    </b-modal>
 </div>

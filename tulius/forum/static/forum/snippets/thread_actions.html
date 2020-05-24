@@ -18,8 +18,9 @@
         <b-dropdown-item :href="'/forums/edit_room/' + thread.id + '/'" v-if="thread.room && thread.rights.edit">
             Редактировать
         </b-dropdown-item>
-        <b-dropdown-item :href="'/forums/thread/' + thread.id + '/move/'" v-if="thread.room && thread.rights.move">
-            Переместить комнату
+        <b-dropdown-item :href="'/forums/thread/' + thread.id + '/move/'" v-if="thread.rights.move">
+            <span v-if="thread.room">Переместить комнату</span>
+            <span v-if="!thread.room">Переместить тему</span>
         </b-dropdown-item>
         <b-dropdown-item href="javascript:void(0);" v-if="thread.room && thread.rights.edit" v-on:click="$bvModal.show('roomDelete')">
             Удалить комнату
