@@ -121,8 +121,8 @@ def test_img_tag(data, value):
         assert html_converter.HtmlConverter().convert(data) == value
 
 
-@pytest.fixture
-def smiles():
+@pytest.fixture(name='smiles')
+def smiles_fixture():
     obj = models.Smile(name='angel', text=':angel:')
     obj.image.name = 'wysibb/smiles/angel.gif'
     smiles = {':angel:': '/media/wysibb/smiles/angel.gif'}
