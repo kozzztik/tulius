@@ -139,6 +139,9 @@ h3 {
     padding: 15px;
     text-align: justify;
     vertical-align: middle;
+    overflow: hidden;
+    text-overflow: clip;
+    word-break: break-all;
 }
 
 .post-url {
@@ -460,4 +463,8 @@ body .quote, blockquote {
 
 .cke_editable p {
     margin: 0 0 0 0;
+}
+
+.cke_editable {
+    word-break: break-all;
 }

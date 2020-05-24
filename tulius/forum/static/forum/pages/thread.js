@@ -23,20 +23,20 @@ export default LazyComponent('forum_thread_page', {
     methods: {
         subscribe_comments() {
             if (this.thread.id)
-                this.$socket.sendObj({action: 'subscribe_comments', id: this.thread.id});
+                this.$root.$socket.sendObj({action: 'subscribe_comments', id: this.thread.id});
         },
         unsubscribe_comments() {
             if (this.thread.id) {
-                this.$socket.sendObj({action: 'unsubscribe_comments', id: this.thread.id})
+                this.$root.$socket.sendObj({action: 'unsubscribe_comments', id: this.thread.id})
             }
             delete this.$options.sockets.onmessage
         },
         websock_message(msg) {
             var data = JSON.parse(msg.data);
             if ((data['.namespaced'] != 'thread_comments') || (data.thread_id != this.thread.id)) return;
-            if (data.page > this.pagination.pages.length) {
+            if (data.page > this.pagination.pages_count) {
                 this.pagination.pages_count = this.pagination.pages_count + 1;
-                this.pagination.pages.push(this.pagination.pages.length + 1);
+                this.pagination.pages.push(this.pagination.pages_count);
                 this.pagination.is_paginated = true;
             }
             if (data.page != this.comments_page)
@@ -49,7 +49,6 @@ export default LazyComponent('forum_thread_page', {
                     if (comment.id == new_comment.id)
                         return;
                 this.comments.push(new_comment);
-                this.update_online_users()
             }).catch(error => this.$parent.add_message(error, "error")).then(() => {});
         },
         fast_reply(comment) {
