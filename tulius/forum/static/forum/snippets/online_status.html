@@ -1,0 +1,13 @@
+<div class="content">
+    <span v-if="loading">...</span>
+    <div v-if="!loading" class="online-users">
+        <span v-if="thread && thread.room">В этой комнате:</span>
+        <span v-if="thread && !thread.room">В этой теме:</span>
+        <span v-if="!thread">Онлайн:</span>
+        <ul class="comma-list">
+            <li v-for="user in users">
+                <a :href="user.url" v-html="user.title"></a>
+            </li>
+        </ul>
+    </div>
+</div>

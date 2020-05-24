@@ -16,14 +16,10 @@
     {% trans "Search" %}
 
 - block breadcrumbs
-    %li
-        .divider
-        %a{href: '{{ parent_thread.get_absolute_url }}'}
-            = parent_thread.title
-    %li
-        .divider
-        %a{href: ''}
-            {% trans "Search" %}
+    %a{href: '{{ parent_thread.get_absolute_url }}'}
+        = parent_thread.title
+    %a{href: ''}
+        {% trans "Search" %}
     
 - block content
     - include 'snippets/form.haml'

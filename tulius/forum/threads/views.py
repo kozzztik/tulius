@@ -3,7 +3,7 @@ import json
 from django import http
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
-
+from django.views import generic
 from tulius.forum.plugins import BasePluginView
 from .forms import PostDeleteForm
 
@@ -45,27 +45,8 @@ class Room(BaseThreadView):
         return context
 
 
-class Index(BaseThreadView):
-    template_name = 'index'
-
-    def get_context_data(self, **kwargs):
-        context = super(Index, self).get_context_data(**kwargs)
-        all_rooms = [thread for thread in self.core.get_index(self.user, 1)]
-        groups = self.core.get_index(self.user, 0)
-        context['groups'] = groups
-        for group in groups:
-            group.rooms = [
-                thread for thread in all_rooms if thread.parent_id == group.id]
-            for thread in group.rooms:
-                thread.parent = group
-            group.rooms = self.core.prepare_room_list(
-                self.user, None, group.rooms)
-            self.site.signals.thread_prepare_room_group.send(
-                group, user=self.request.user)
-        self.site.signals.thread_view.send(
-            None, context=context, user=self.request.user,
-            request=self.request)
-        return context
+class Index(generic.TemplateView):
+    template_name = 'base_vue.html'
 
 
 class EditView(BaseThreadView):

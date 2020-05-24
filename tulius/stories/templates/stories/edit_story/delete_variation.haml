@@ -9,14 +9,10 @@
     {% trans "Confirm deletion" %}
 
 - block breadcrumbs
-    %li
-        .divider
-        %a{href: '{% url "stories:edit_story_variations" object.story.id %}'}
-            = object.story
-    %li
-        .divider
-        %a{href: ''}
-            {% trans "Confirm deletion" %}
+    %a{href: '{% url "stories:edit_story_variations" object.story.id %}'}
+        = object.story
+    %a{href: ''}
+        {% trans "Confirm deletion" %}
 
 - block content
     %form.form-horizontal{method: 'POST'}

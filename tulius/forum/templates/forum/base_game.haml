@@ -29,25 +29,17 @@
         {% trans "forums" %}
 
 - block breadcrumbs
-        %li
-            .divider
-            %a{href: "{{ forum_site.urlizer.index }}"}
-                {% trans "forums" %}
-        - for ancestor in parent_thread.get_ancestors
-            %li
-                .divider
-                %a{href: "{{ ancestor.get_absolute_url }}"}
-                    = ancestor.title|capfirst
-        - if parent_thread
-            %li
-                .divider
-                %a{href: "{{ parent_thread.get_absolute_url }}"}
-                    = parent_thread.title|capfirst
-        - if form    
-            %li
-                .divider
-                %a{href: "{{ form.url }}"}
-                    = form.caption|capfirst
+    %a{href: "{{ forum_site.urlizer.index }}"}
+        {% trans "forums" %}
+    - for ancestor in parent_thread.get_ancestors
+        %a{href: "{{ ancestor.get_absolute_url }}"}
+            = ancestor.title|capfirst
+    - if parent_thread
+        %a{href: "{{ parent_thread.get_absolute_url }}"}
+            = parent_thread.title|capfirst
+    - if form
+        %a{href: "{{ form.url }}"}
+            = form.caption|capfirst
 
 - block custom_content
     - block before_actions

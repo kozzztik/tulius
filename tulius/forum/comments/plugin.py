@@ -12,10 +12,12 @@ class CommentsPlugin(CommentsCore):
 
     def get_paged_url(self, comment):
         return "%s?page=%s#%s" % (
-            comment.parent.get_absolute_url, comment.page, comment.id)
+            self.reverse('thread', comment.parent_id),
+            comment.page, comment.id)
 
     def comment_url(self, comment):
-        return self.reverse('comment', comment.id)
+        # TODO hope this wouldn't crush nothing. refactor all of that.
+        return self.get_paged_url(comment)
 
     def delete_comment_url(self):
         return self.reverse('delete_comment')

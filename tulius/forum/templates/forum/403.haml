@@ -3,10 +3,8 @@
 - load url from future
 
 - block breadcrumbs
-    %ul.breadcrumb
-        <li>{% include 'home_link.haml' %}</li>
-        <li><a href="{% url "forum:index" %}">{% trans "forums" %}</a></li>
-        <li>{% trans "Access denied" %}</li>
+    <a href="{% url "forum:index" %}">{% trans "forums" %}</a>
+    {% trans "Access denied" %}
         
 - block caption
         {% trans "Access denied" %}

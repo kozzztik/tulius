@@ -9,14 +9,13 @@
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}tulius/css/tulius.css'}
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}tulius/css/baselayout.css'}
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}tulius/css/tulius-main.css'}
-    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}common/rcrumbs/jquery.rcrumbs.min.css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}common/components/breadcrumbs.css'}
 
 - block sitewide_scripts
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/js/jquery.cookie.js'}
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/js/jquery.history.js'}
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/jquery-lightbox/js/lightbox.js'}
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/js/autocomplete-select.js'}
-    %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/rcrumbs/jquery.rcrumbs.min.js'}
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}websockets/ws4redis.js'}
     <script type='text/javascript'>
         var websocket_uri = '{{ WEBSOCKET_URI }}';
@@ -39,11 +38,10 @@
         - block body_main_area
             #content-center.container
                 - block breadcrumbs_block
-                    #top-breadcrumbs.rcrumbs
-                        %ul.breadcrumb
-                            %li
-                                %a{href: '/'}
-                                    .homelink
+                    #top-breadcrumbs
+                        .breadcrumbs
+                            %a{href: '/'}
+                                .homelink
                             - block breadcrumbs
                     .breadcrumbs-border
                 #top-center
@@ -63,11 +61,10 @@
                 - block bottom_breadcrumbs
                     #bottom-breadcrumbs.rcrumbs
                         .breadcrumbs-border
-                        %ul.breadcrumb
-                            %li
+                            .breadcrumbs
                                 %a{href: '/'}
                                     .homelink
-                            - repeat breadcrumbs
+                                - repeat breadcrumbs
                 - block footer
                   %footer.footer
                     .container.newcontainer
@@ -95,10 +92,5 @@
                             {% trans "Login" %}
                     .modal-body
                         - include "login/snippets/login.haml"
-    <script type="text/javascript">
-        jQuery(document).ready(function() {
-            $(".rcrumbs").rcrumbs({nbFixedCrumbs: 1, nbUncollapsableCrumbs: 1});
-        });
-    </script>
 - block title
     - repeat caption

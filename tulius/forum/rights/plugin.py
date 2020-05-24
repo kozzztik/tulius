@@ -152,7 +152,7 @@ class RightsPlugin(ForumPlugin):
         else:
             query = (Q(
                 access_type__lt=self.models.THREAD_ACCESS_TYPE_NO_READ
-            ) | Q(user=user))
+            ) | Q(user=user))  # TODO: move it to protected #97
         return threads.filter(query)
 
     def get_readeable_protected_childs(self, thread):
@@ -252,6 +252,8 @@ class RightsPlugin(ForumPlugin):
         sender.moderators = sender.get_moderators
         if sender.access_type == self.models.THREAD_ACCESS_TYPE_NO_READ:
             sender.accessed_users = sender.get_accessed_users
+        else:
+            sender.accessed_users = None
 
     def init_core(self):
         super(RightsPlugin, self).init_core()

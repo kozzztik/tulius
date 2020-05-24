@@ -1,0 +1,34 @@
+<div>
+    <div v-if="!user.is_anonymous" class="btn-toolbar justify-content-between forum-menu" role="toolbar" aria-label="Toolbar">
+        <b-dropdown id="dropdown-1" text="Действия" class="btn-group-sm" variant="light">
+            <b-dropdown-item href="/forums/mark_all_as_readed/">
+                Пометить все как прочитанное
+            </b-dropdown-item>
+            <b-dropdown-item href="/forums/add_room/" v-if="index.is_superuser">
+                Добавить комнату
+            </b-dropdown-item>
+        </b-dropdown>
+    </div>
+    <div class="content" v-for="group in index.groups" v-if="!loading">
+        <div class="caption" align="center">
+            <div class="captionleft"></div>
+            <div class="captioncontent">
+                <router-link v-if="index.is_superuser" :to="group.url">
+                    {{ group.title }}
+                </router-link>
+                <span v-else="index.is_superuser">{{ group.title }}</span>
+            </div>
+            <div class="captionright"></div>
+        </div>
+        <a v-if="(!user.is_anonymous) && group.unreaded_url" :href="group.unreaded_url">
+            <div class="room_group_read_mark not_readed"></div>
+        </a>
+        <div v-if="(!user.is_anonymous) && (!group.unreaded_url)" class="room_group_read_mark"></div>
+        <div v-if="!user.is_anonymous" class="thread_collapse" v-on:click="collapse" :groupid="group.id">
+            {{ group.collapsed ? "+" : "-" }}
+        </div>
+
+        <forum_room_list :rooms="group.rooms" v-if="!group.collapsed"></forum_room_list>
+    </div>
+    <forum_online_status></forum_online_status>
+</div>

@@ -1,5 +1,7 @@
 import datetime
 
+from django import http
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.template import response
 from django.views import generic
@@ -7,9 +9,12 @@ from django.utils import timezone
 
 from djfw.news import models as news
 from djfw.profiler import graphs
+from djfw.flatpages import models as flatpage_models
 
 from tulius import forms
+from tulius.profile import views as profile_views
 from tulius.games import models as games
+from tulius.websockets import context_processors as websock_context
 
 
 class HomeView(generic.TemplateView):
@@ -37,6 +42,26 @@ def error404(request, template_name='404.html', **kwargs):
 
 def error500(request, template_name='500.haml'):
     return response.TemplateResponse(request, template_name, status=500)
+
+
+class ArticlesAPI(generic.View):
+    def get(self, *args, **kwargs):
+        pages = flatpage_models.FlatPage.objects.filter(
+            is_enabled=True, show_on_home=True)
+        return http.JsonResponse({'pages': [{
+            'title': page.title,
+            'url': page.url,
+        } for page in pages]})
+
+
+class AppSettingsAPI(generic.View):
+    def get(self, request, **kwargs):
+        return http.JsonResponse({
+            'debug': settings.DEBUG,
+            'websockets_url': websock_context.default(
+                request, True)['WEBSOCKET_URI'],
+            'user': profile_views.request_user_json(request),
+        })
 
 
 def logic_time(x):

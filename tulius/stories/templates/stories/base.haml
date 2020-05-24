@@ -2,10 +2,8 @@
 - load i18n
 
 - block breadcrumbs
-    %li
-        .divider
-        %a{href: '{% url "stories:index" %}'}
-            {% trans "Story catalog" %}
+    %a{href: '{% url "stories:index" %}'}
+        {% trans "Story catalog" %}
     - block story_breadcrumbs
     
 - block caption

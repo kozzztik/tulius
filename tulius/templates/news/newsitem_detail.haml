@@ -2,14 +2,10 @@
 - load i18n
 
 - block breadcrumbs
-    %li
-        .divider
-        %a{href: '{% url "news:list" %}'}
-            {% trans "News" %}
-    %li
-        .divider
-        %a{href: '{% url "news:detail" object.id %}'}
-            = object.caption
+    %a{href: '{% url "news:list" %}'}
+        {% trans "News" %}
+    %a{href: '{% url "news:detail" object.id %}'}
+        = object.caption
 
 - block caption
     = object.caption

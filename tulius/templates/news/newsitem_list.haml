@@ -2,10 +2,8 @@
 - load i18n
 
 - block breadcrumbs
-    %li
-        .divider
-        %a{href: '{% url "news:list" %}'}
-            {% trans "News" %}
+    %a{href: '{% url "news:list" %}'}
+        {% trans "News" %}
 
 - block title
     {% trans "News" %}

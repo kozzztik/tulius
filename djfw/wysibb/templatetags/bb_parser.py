@@ -110,6 +110,13 @@ VALID_BB_COLORS = [
 
 @register_bb_code('list')
 def bb_list(tagname, param, text):
+    if '<li>' not in text:
+        if text.startswith('\n'):
+            text = text[1:]
+        items = text.split('[*]')
+        text = ''.join([
+            '<li>{}</li>'.format(item.strip()) if item else ''
+            for item in items])
     if param:
         return '<ol>%s</ol>' % (text,)
     return '<ul>%s</ul>' % (text,)
@@ -120,19 +127,21 @@ def bb_li(tagname, param, text):
     return '<li>%s</li>' % (text,)
 
 
+def check_color(param):
+    if param in VALID_BB_COLORS:
+        return True
+    if (param[0] != '#') or (len(param) != 7):
+        return False
+    for c in param[1:7]:
+        if c not in 'abcdef0123456789':
+            return False
+    return True
+
+
 @register_bb_code('color')
 def bb_color(tagname, param, text):
     param = param.lower().strip()
-    param_checked = False
-    if param in VALID_BB_COLORS:
-        param_checked = True
-    if (not param_checked) and (len(param) == 7):
-        param_checked = True
-        for c in param[1:7]:
-            if c not in 'abcdef0123456789':
-                param_checked = False
-                break
-    if not param_checked:
+    if not check_color(param):
         raise Exception('Invalid color')
     return '<font color="%s">%s</font>' % (param, text)
 

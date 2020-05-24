@@ -1,0 +1,23 @@
+<ul v-if="pagination.is_paginated" class="pagination justify-content-center">
+    <li :class="page_class(pagination.page_num - 1)">
+        <a v-on:click="set_page(Number.parseInt(page_num) - 1)" href="javascript:void(0)" v-if="page_num > 1">
+            &lsaquo;&lsaquo; назад
+        </a>
+        <a v-if="page_num <= 1">
+            &lsaquo;&lsaquo; назад
+        </a>
+    </li>
+    <li :class="page_class(page)" v-for="page in pagination.pages" :key="page">
+        <a v-on:click="set_page(Number.parseInt(page))" v-html="page" v-if="page && (page != page_num)" href="javascript:void(0)"></a>
+        <a v-html="page" v-if="page == page_num"></a>
+        <a v-if="!page">...</a>
+    </li>
+    <li :class="page_class(page_num + 1)">
+        <a v-on:click="set_page(Number.parseInt(page_num) + 1)" v-if="page_num < pagination.pages_count" href="javascript:void(0)">
+            вперед &rsaquo;&rsaquo;
+        </a>
+        <a v-if="page_num >= pagination.pages_count">
+            вперед &rsaquo;&rsaquo;
+        </a>
+    </li>
+</ul>

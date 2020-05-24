@@ -1,9 +1,6 @@
 - extends forum_site.templates.base
 - load i18n
 
-- block page_scripts
-    %script{type: 'text/javascript', src: '{{ STATIC_URL }}forum/js/collapse_threads.js'}
-    
 - block forum_content
     - if rooms
         .content

@@ -18,3 +18,9 @@ def publish_message(channel, message, *params):
 
 def publish_message_to_user(user_id, message, *params):
     publish_message(consts.CHANNEL_USER.format(user_id), message, *params)
+
+
+def notify_thread_about_new_comment(thread_id, comment_id, page_id):
+    publish_message(
+        consts.THREAD_COMMENTS_CHANNEL.format(thread_id=thread_id),
+        consts.THREAD_COMMENTS_NEW_COMMENT, comment_id, page_id)

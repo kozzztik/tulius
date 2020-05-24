@@ -2,14 +2,10 @@
 - load i18n
 
 - block story_breadcrumbs
-    %li
-        .divider
-        %a{href: '{{ story.get_absolute_url }}'}
-            = story
-    %li
-        .divider
-        %a{href: ''}
-            = character
+    %a{href: '{{ story.get_absolute_url }}'}
+        = story
+    %a{href: ''}
+        = character
             
 - block caption
     = character

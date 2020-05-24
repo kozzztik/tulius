@@ -4,7 +4,6 @@ from tulius.forum.voting import core
 from tulius.forum.voting import views
 
 
-
 class VotingPlugin(core.VotingCore):
     def comment_voting(self, comment):
         votings = self.models.Voting.objects.filter(comment=comment)

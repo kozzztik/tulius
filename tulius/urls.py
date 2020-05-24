@@ -39,16 +39,28 @@ urlpatterns = [
     url(r'^installer/', include('djfw.installer.urls', namespace='installer')),
 
     url(r'^$', views.HomeView.as_view(), name='home'),
+    url(r'^api/flatpages/$', views.ArticlesAPI.as_view(),
+        name='flatpages_api'),
+    url(r'^api/app_settings/$', views.AppSettingsAPI.as_view(),
+        name='app_settings'),
+
     url(r'^statistics/$', views.StatisticsView.as_view(), name='stats'),
 
     url(r'^accounts/', include('tulius.login.urls', namespace='auth')),
     url(r'^players/', include('tulius.players.urls', namespace='players')),
     url(r'^profile/', include('tulius.profile.urls', namespace='profile')),
+    url(
+        r'^api/profile/',
+        include('tulius.profile.api_urls', namespace='profile_api')),
     url(r'^pm/', include('tulius.pm.urls', namespace='pm')),
     url(r'^games/', include('tulius.games.urls', namespace='games')),
     url(
         r'^forums/',
         include(apps.get_app_config('forum').site.urls)),
+    url(r'^api/forum/', include('tulius.forum.urls', namespace='forum_api')),
+    url(
+        r'^api/ckeditor/',
+        include('tulius.core.ckeditor.urls', namespace='ckeditor')),
     url(r'^stories/', include('tulius.stories.urls', namespace='stories')),
     url(r'^play/',
         include(apps.get_app_config('gameforum').site.urls)),

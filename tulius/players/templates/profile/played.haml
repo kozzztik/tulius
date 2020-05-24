@@ -5,14 +5,10 @@
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}tulius/css/tulius-players.css'}
 
 - block breadcrumbs
-    %li
-        .divider
-        %a{href: '{% url "players:profile" %}'}
-           {% trans "Personal cabinet" %}
-    %li
-        .divider
-        %a{href: ''}
-            {% trans "Played games and characters" %}
+    %a{href: '{% url "players:profile" %}'}
+       {% trans "Personal cabinet" %}
+    %a{href: ''}
+        {% trans "Played games and characters" %}
                 
 - block caption
     {% trans "Played games and characters"%}

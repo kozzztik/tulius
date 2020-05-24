@@ -3,10 +3,8 @@
 
 
 - block story_breadcrumbs
-    %li
-        .divider
-        %a{href: '{{ story.get_absolute_url }}'}
-            = story
+    %a{href: '{{ story.get_absolute_url }}'}
+        = story
             
 - block caption
     = story

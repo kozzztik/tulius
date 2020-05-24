@@ -2,9 +2,7 @@
 - load i18n
 
 - block breadcrumbs
-    %ul.breadcrumb
-        %li
-            - include 'home_link.haml'
+    - include 'home_link.haml'
 
 - block page_styles
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}tulius/home/home.css'}

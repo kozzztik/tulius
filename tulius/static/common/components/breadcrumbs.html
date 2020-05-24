@@ -1,0 +1,13 @@
+<div>
+    <div class="" :id="upper ? 'top-breadcrumbs' : 'bottom-breadcrumbs'">
+        <div class="breadcrumbs-border" v-if="!upper"></div>
+        <div class="breadcrumbs">
+            <a href="/" class="breadcrumb">
+                <div class="homelink"></div>
+            </a>
+            <router-link :to="item.url"  v-for="item in items" class="breadcrumb" :key="item.url" v-html="item.title">
+            </router-link>
+        </div>
+    </div>
+    <div class="breadcrumbs-border" v-if="upper"></div>
+</div>
