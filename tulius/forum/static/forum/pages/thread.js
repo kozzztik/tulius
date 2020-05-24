@@ -91,8 +91,12 @@ export default LazyComponent('forum_thread_page', {
             axios.get('/api/forum/thread/'+ this.thread.id + '/comments_page/' + this.comments_page + '/').then(response => {
                 this.set_new_comments(response.data.comments);
                 this.$options.sockets.onmessage = this.websock_message;
-                this.subscribe_comments();
                 this.pagination = response.data.pagination;
+                this.subscribe_comments();
+                if (this.$route.hash)
+                    Vue.nextTick( () => {
+                        this.scroll_to_comment(this.$route.hash.replace('#', ''));
+                    });
             }).catch(error => this.$parent.add_message(error, "error")).then(() => {
                 this.loading = false;
                 this.$parent.loading_end(this.breadcrumbs);
@@ -152,6 +156,7 @@ export default LazyComponent('forum_thread_page', {
             // console.log('пошел запрос');
             axios.post('/api/forum/thread/'+ this.thread.id + '/read_mark/', {'comment_id': comment_id}).then(response => {
                 this.thread.last_read_id = response.data.last_read_id;
+                this.thread.not_read_comment = response.data.not_read_comment;
             }).catch(error => this.$parent.add_message(error, "error")).then(() => {
                 this.mark_read_id = null;
                 this.mark_read_func = null;
@@ -160,6 +165,7 @@ export default LazyComponent('forum_thread_page', {
         mark_all_not_readed() {
             axios.delete('/api/forum/thread/'+ this.thread.id + '/read_mark/').then(response => {
                 this.thread.last_read_id = response.data.last_read_id;
+                this.thread.not_read_comment = response.data.not_read_comment;
             }).catch(error => this.$parent.add_message(error, "error"));
         },
         delete_comment(comment_id) {
@@ -178,7 +184,21 @@ export default LazyComponent('forum_thread_page', {
             }).catch(error => this.$parent.add_message(error, "error")).then(() => {
                  this.$parent.loading_end(this.breadcrumbs);
             });
-        }
+        },
+        to_not_read_comment() {
+            if (!this.thread.not_read_comment)
+                return;
+            if (this.thread.not_read_comment.page_num != this.comments_page)
+                this.$router.push({
+                    path: this.$router.path,
+                    query: {page: this.thread.not_read_comment.page_num},
+                    hash: '#' + this.thread.not_read_comment.id})
+            else
+                this.scroll_to_comment(this.thread.not_read_comment.id);
+        },
+        scroll_to_comment(comment_id) {
+            document.getElementById(comment_id).scrollIntoView(false);
+        },
     },
     mounted() {
         this.$options.sockets.onopen = this.subscribe_comments;

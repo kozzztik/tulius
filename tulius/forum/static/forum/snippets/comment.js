@@ -61,5 +61,8 @@ export default LazyComponent('forum_comment', {
         delete_comment() {
             this.$parent.delete_comment(this.comment.id);
         },
+        scroll_up() {
+            window.scrollTo({left: 0, top: 0, behavior: 'smooth'});
+        },
     }
 })

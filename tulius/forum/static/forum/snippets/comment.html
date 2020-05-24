@@ -26,7 +26,7 @@
         </tr>
         <tr>
             <td class="post-url">
-                <a href="#" class="d-none d-md-block">Наверх</a>
+                <a href="javascript:void(0)" class="d-none d-md-block" @click="scroll_up()">Наверх</a>
                 <b-dropdown variant="light" class="d-md-none btn-group-sm" v-if="!preview && (thread.rights.write || comment.edit_right)" text="Действия">
                     <b-dropdown-item class="fast-reply-link post-actions-button" v-on:click="$parent.fast_reply(comment)" href="javascript:void(0)" v-if="thread.rights.write">
                         Ответить
@@ -66,8 +66,8 @@
                     <span v-html="comment.editor.title"></span>,
                     <span v-html="forum_datetime(comment.edit_time)"></span>
                 </div>
-                <div class="pull-right">
-                    <router-link :to="comment.url"></router-link>
+                <div class="float-right" v-if="!preview">
+                    <router-link :to="comment.url">#</router-link>
                 </div>
             </td>
         </tr>
