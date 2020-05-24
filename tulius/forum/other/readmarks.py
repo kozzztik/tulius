@@ -30,7 +30,7 @@ def thread_view(sender, **kwargs):
             if readmark.not_readed_comment:
                 not_read_comment = not_read_comment_json(
                     readmark.not_readed_comment, sender.user)
-        else:
+        elif sender.obj.first_comment_id:
             comment = models.Comment.objects.get(
                 pk=sender.obj.first_comment_id)
             not_read_comment = not_read_comment_json(
@@ -66,8 +66,11 @@ class ReadmarkAPI(api.BaseThreadView):
         self.get_parent_thread(**kwargs)
         models.ThreadReadMark.objects.filter(
             thread=self.obj, user=self.user).delete()
-        comment = models.Comment.objects.get(pk=self.obj.first_comment_id)
+        comment = None
+        if self.obj.first_comment_id:
+            comment = models.Comment.objects.get(pk=self.obj.first_comment_id)
         return {
             'last_read_id': None,
-            'not_read_comment': not_read_comment_json(comment, self.user)
+            'not_read_comment':
+                not_read_comment_json(comment, self.user) if comment else None
         }
