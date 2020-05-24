@@ -137,10 +137,15 @@ def test_smiles(smiles):
     converted = html_converter.html_to_bb(original)
     result = bbcodes.bbcode(converted)
     assert result == '<img class="sm" src="/media/wysibb/smiles/angel.gif"' \
-                     ' title="angel" />'
+                     ' title="angel" /><br/>'
 
 
 def test_special_symbols(smiles):
     original = '&Iuml;'
     converted = html_converter.html_to_bb(original)
     assert bbcodes.bbcode(converted) == original
+
+
+def test_paragraph_line_breaks():
+    original = '<p>1</p>\n\n<p>2</p>\n\n<p>3</p>\n'
+    assert html_converter.html_to_bb(original) == '1\n2\n3\n'
