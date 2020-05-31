@@ -16,7 +16,9 @@ export default LazyComponent('game_room_page', {
     methods: {
         load_api(pk) {
             this.$parent.loading_start();
-            axios.get('/api/forum/thread/'+ pk).then(response => {
+            const variation = this.$parent.variation
+            axios.get('/api/game_forum/variation/'+ variation.id + '/thread/' + pk + '/'
+            ).then(response => {
                 const api_response = response.data;
                 this.breadcrumbs = [{"url": "/forums/", "title": "Форумы"}]
                 api_response.parents.forEach(

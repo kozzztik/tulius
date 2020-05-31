@@ -161,7 +161,7 @@ class VotingAPI(plugins.BaseAPIView):
         comment_id = int(kwargs['pk'])
         comment = shortcuts.get_object_or_404(models.Comment, id=comment_id)
         thread = comment.parent
-        thread.view_right = self.user
+        thread.view_right = self.user  # TODO oooh
         if not thread.read_right:
             raise exceptions.PermissionDenied()
         self.obj = shortcuts.get_object_or_404(models.Voting, comment=comment)

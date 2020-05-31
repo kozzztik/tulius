@@ -1,5 +1,6 @@
 import json
 
+from django import dispatch
 from django import shortcuts
 from django.core import exceptions
 from django.db import transaction
@@ -10,12 +11,22 @@ from tulius.core.ckeditor import html_converter
 from tulius.forum import site
 from tulius.forum import models
 from tulius.forum import plugins
+from tulius.forum import signals
 from tulius.forum.threads import api
 from tulius.forum.comments import pagination
 from tulius.websockets import publisher
 
 
-# TODO unreaded messages
+@dispatch.receiver(signals.thread_prepare_room)
+def prepare_room_list(sender, room, threads, **kwargs):
+    room.comments_count = 0
+    room.last_comment_id = None
+    for thread in threads:
+        room.comments_count += thread.comments_count
+        if (not room.last_comment_id) or (
+                room.last_comment_id < thread.last_comment_id):
+            room.last_comment_id = thread.last_comment_id
+
 
 def comment_to_json(c):
     return {

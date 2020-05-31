@@ -1,12 +1,17 @@
+from django import shortcuts
 from django.db.models.query_utils import Q
 from django.conf.urls import url
 
+from tulius.stories import models as stories_models
 # TODO: fix this when module moved
 from tulius.forum.threads import views
+from tulius.forum.threads import api
 from tulius.forum.threads.plugin import ThreadsPlugin
 from tulius.stories.models import Avatar, Role, AdditionalMaterial, \
     Illustration
 from tulius.gameforum.models import Trustmark
+from tulius.gameforum import consts
+from tulius.gameforum import rights
 
 
 class GameThreadsPlugin(ThreadsPlugin):
@@ -162,3 +167,17 @@ class GameThreadsPlugin(ThreadsPlugin):
                 views.DeleteThread.as_view(plugin=self),
                 name='delete_thread'),
         ]
+
+
+class ThreadAPI(api.ThreadView):
+    plugin_id = consts.GAME_FORUM_SITE_ID
+    variation = None
+
+    def get_parent_thread(self, variation_id, **kwargs):
+        self.variation = shortcuts.get_object_or_404(
+            stories_models.Variation, pk=variation_id)
+        return super(ThreadAPI, self).get_parent_thread(**kwargs)
+
+    def _get_rights_checker(self, thread, parent_rights=None):
+        return rights.RightsChecker(
+            self.variation, thread, self.user, parent_rights=parent_rights)

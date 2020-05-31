@@ -1,10 +1,15 @@
+from django import http
+from django import shortcuts
+from django.core import exceptions
 from django.core.cache import cache
 from django.utils import html
 
 from tulius.forum import site
 from tulius.forum import plugins
 from tulius.forum import const
+from tulius.forum import models
 from tulius.forum import signals
+from tulius.forum import rights as forum_rights
 from tulius.forum import online_status as online_status_plugin
 from tulius.forum.readmarks import plugin as readmarks
 from djfw.wysibb.templatetags import bbcodes
@@ -89,6 +94,8 @@ class IndexView(plugins.BaseAPIView):
 
 class BaseThreadView(plugins.BaseAPIView):
     obj = None
+    rights = None
+    plugin_id = None
 
     def get_context_data(self, **kwargs):
         context = super(BaseThreadView, self).get_context_data(**kwargs)
@@ -97,11 +104,104 @@ class BaseThreadView(plugins.BaseAPIView):
         context['thread'] = self.obj
         return context
 
+    def _get_rights_checker(self, thread, parent_rights=None):
+        return forum_rights.default.DefaultRightsChecker(
+            thread, self.user, parent_rights=parent_rights)
+
     def get_parent_thread(self, **kwargs):
-        core = site.site.core
-        parent_id = kwargs['pk'] if 'pk' in kwargs else None
-        self.obj = core.get_parent_thread(
-            self.user, parent_id) if parent_id else None
+        thread_id = kwargs['pk'] if 'pk' in kwargs else None
+        try:
+            thread_id = int(thread_id)
+        except:
+            raise http.Http404()
+        self.obj = shortcuts.get_object_or_404(
+            models.Thread, id=thread_id, plugin_id=self.plugin_id)
+        # TODO delete all sub threads and rooms on room delete so it will be
+        # TODO not needed to do parent check here
+        if self.obj.check_deleted():
+            raise http.Http404('Post was deleted')
+        self.rights = self._get_rights_checker(self.obj).get_rights()
+        if not self.rights.read:
+            raise exceptions.PermissionDenied()
+
+    def _thread_list_apply_rights(self, thread_list):
+        for thread in thread_list:
+            thread.rights_checker = self._get_rights_checker(
+                thread, parent_rights=self.rights)
+            thread.rights = thread.rights_checker.get_rights()
+        return [thread for thread in thread_list if thread.rights.read]
+
+    @staticmethod
+    def room_descendants(room):
+        if room.rght - room.lft <= 1:
+            return [], []
+        readable = room.rights_checker.get_readable_descendants()
+        room_list = [thread for thread in readable if thread.room]
+        threads = [thread for thread in readable if not thread.room]
+        new_room_list = []
+        # TODO remove: looks like all this magic is needed just for case
+        # TODO of filtering children of deleted rooms
+        while room_list:
+            tested_room = room_list.pop(0)
+            parent_id = tested_room.parent_id
+            found_parent = (parent_id == room.id)
+            if not found_parent:
+                for tmp in room_list:
+                    if tmp.id == parent_id:
+                        found_parent = True
+                        break
+            if not found_parent:
+                for tmp in new_room_list:
+                    if tmp.id == parent_id:
+                        found_parent = True
+                        break
+            if not found_parent:
+                lft = tested_room.lft
+                rght = tested_room.rght
+                room_list = [
+                    tmp for tmp in room_list if
+                    not ((tmp.lft > lft) and (tmp.rght < rght))]
+                new_room_list = [
+                    tmp for tmp in new_room_list if
+                    not ((tmp.lft > lft) and (tmp.rght < rght))]
+            else:
+                new_room_list += [tested_room]
+        room_ids = [tmp.id for tmp in new_room_list]
+        threads = [
+            thread for thread in threads if
+            (thread.parent_id == room.id) or (thread.parent_id in room_ids)]
+        return new_room_list, threads
+
+    def prepare_room_list(self, rooms):
+        rooms = self._thread_list_apply_rights(rooms)
+        for room in rooms:
+            threads = self.room_descendants(room)[1]
+            threads = self._thread_list_apply_rights(threads)
+            room.threads_count = len(threads)
+            room.moderators, room.accessed_users = room.rights_checker\
+                .get_moderators_and_accessed_users()
+            signals.thread_prepare_room.send(
+                self, room=room, threads=threads)
+        return rooms
+
+    def get_subthreads(self, is_room=False):
+        threads = models.Thread.objects.filter(
+            parent=self.obj, room=is_room).exclude(deleted=True)
+        if not self.obj:
+            threads = threads.filter(plugin_id=self.plugin_id)
+        if is_room:
+            return self.prepare_room_list(threads)
+        threads = threads.order_by('-last_comment_id')
+        threads = self._thread_list_apply_rights(threads)
+
+        for thread in threads:
+            thread.moderators = []
+            thread.accessed_users = None
+            if thread.access_type == models.THREAD_ACCESS_TYPE_NO_READ:
+                thread.accessed_users = thread.rights_checker\
+                    .get_moderators_and_accessed_users()[1]
+        signals.thread_prepare_threads.send(self, threads=threads)
+        return threads
 
 
 class ThreadView(BaseThreadView):
@@ -126,17 +226,13 @@ class ThreadView(BaseThreadView):
                 'title': parent.title,
                 'url': parent.get_absolute_url,
             } for parent in self.obj.get_ancestors()],
-            'rooms': [
-                room_to_json(room) for room in
-                site.site.core.get_subthreads(self.user, self.obj, True)],
-            'threads': [
-                room_to_json(thread) for thread in
-                site.site.core.get_subthreads(self.user, self.obj, False)],
+            'rooms': [room_to_json(t) for t in self.get_subthreads(True)],
+            'threads': [room_to_json(t) for t in self.get_subthreads(False)],
             'rights': {
-                'write': self.obj.write_right(),
-                'moderate': self.obj.moderate_right(),
-                'edit': self.obj.edit_right(),
-                'move': self.obj.move_right(),
+                'write': self.rights.write,
+                'moderate': self.rights.moderate,
+                'edit': self.rights.edit,
+                'move': self.rights.move,
             },
             'first_comment_id': self.obj.first_comment_id,
         }

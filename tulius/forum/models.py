@@ -362,7 +362,7 @@ class ThreadAccessRight(models.Model):
         Thread, models.PROTECT,
         null=False,
         blank=False,
-        related_name='rights',
+        related_name='granted_rights',
         verbose_name=_('thread')
     )
     user = models.ForeignKey(
