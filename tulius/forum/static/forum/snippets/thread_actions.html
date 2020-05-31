@@ -26,7 +26,7 @@
             <span v-if="thread.room">Удалить комнату</span>
             <span v-if="!thread.room">Удалить тему</span>
         </b-dropdown-item>
-        <b-dropdown-item :href="'/forums/rebuild_nums/' + thread.id + '/'" v-if="thread.room && user.is_superuser">
+        <b-dropdown-item :href="'/forums/rebuild_nums/' + thread.id + '/'" v-if="thread.room && user.superuser">
             Обновить счетчики
         </b-dropdown-item>
         <b-dropdown-item :href="'/forums/extended_search/' + thread.tree_id + '/'">

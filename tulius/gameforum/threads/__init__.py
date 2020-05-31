@@ -168,12 +168,22 @@ class GameThreadsPlugin(ThreadsPlugin):
                 name='delete_thread'),
         ]
 
+# TODO mark all as read action
+# TODO forum actions chars css+modal
+# TODO forum actions trustmarks
+# TODO forum actions illustration lightbox
+# TODO forum actions buttons grouping
+# TODO adaptive banners
+# TODO forum actions delete thread/room
+# TODO breadcrumbs this room url
+
 
 class ThreadAPI(api.ThreadView):
     plugin_id = consts.GAME_FORUM_SITE_ID
     variation = None
 
-    def get_parent_thread(self, variation_id, **kwargs):
+    def get_parent_thread(self, **kwargs):
+        variation_id = kwargs['variation_id']
         self.variation = shortcuts.get_object_or_404(
             stories_models.Variation, pk=variation_id)
         return super(ThreadAPI, self).get_parent_thread(**kwargs)

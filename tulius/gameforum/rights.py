@@ -264,9 +264,12 @@ class GameRights(base.RightsDescriptor):
     moderator_roles = None
     admin = False
     guest = False
+    user_roles = None
 
 
 class RightsChecker(default.DefaultRightsChecker):
+    _base_rights_class = GameRights
+    _rights: GameRights = None
     variation = None
 
     def __init__(self, variation, thread, user, parent_rights=None):
@@ -278,40 +281,41 @@ class RightsChecker(default.DefaultRightsChecker):
         return self.__class__(
             self.variation, thread, self.user, parent_rights=self)
 
+    def _get_rights_for_root(self):
+        rights = GameRights()
+        if self.thread.id != self.variation.thread_id:
+            return rights
+        rights.admin = self.variation.edit_right(self.user)
+        rights.guest = False
+        self.strict_roles(rights)
+        if not self.user.is_anonymous:
+            if (not rights.admin) and self.variation.game:
+                guests = game_models.GameGuest.objects.filter(
+                    game=self.variation.game, user=self.user)
+                if guests:
+                    rights.guest = True
+            rights.user_roles = stories_models.Role.objects.filter(
+                variation=self.variation, user=self.user).values('id')
+            rights.user_roles = [role['id'] for role in
+                                 rights.user_roles]
+        else:
+            rights.user_roles = []
+            rights.user_accessed_roles = []
+        if rights.admin:
+            rights.read = True
+            rights.write = True
+            rights.moderate = True
+            return rights
+        if not self.variation.game:
+            return rights
+        # TODO optimize it. roles loaded twice
+        rights.read = self.variation.game.read_right(self.user)
+        rights.write = self.variation.game.write_right(self.user)
+        return rights
+
     def _get_rights(self):
         if self.thread.parent is None:
-            rights = GameRights()
-            if self.thread.id != self.variation.thread_id:
-                return
-            rights.admin = self.variation.edit_right(self.user)
-            rights.guest = False
-            self.strict_roles(rights)
-            if not self.user.is_anonymous:
-                if (not rights.admin) and self.variation.game:
-                    guests = game_models.GameGuest.objects.filter(
-                        game=self.variation.game, user=self.user)
-                    if guests:
-                        rights.guest = True
-                rights.user_roles = stories_models.Role.objects.filter(
-                    variation=self.variation, user=self.user).values('id')
-                rights.user_roles = [role['id'] for role in
-                                     rights.user_roles]
-            else:
-                rights.user_roles = []
-                rights.user_accessed_roles = []
-            if rights.admin:
-                rights.read = True
-                rights.write = True
-                rights.edit = True
-                rights.move = True
-                rights.moderate = True
-                return rights
-            if not self.variation.game:
-                return rights
-            # TODO optimize it. roles loaded twice
-            rights.read = self.variation.game.read_right(self.user)
-            rights.write = self.variation.game.write_right(self.user)
-            return rights
+            return self._get_rights_for_root()
         rights = super(RightsChecker, self)._get_rights()
         parent_rights = self.get_parent_rights()
         rights.admin = parent_rights.admin
@@ -321,7 +325,6 @@ class RightsChecker(default.DefaultRightsChecker):
             rights.read = True
             rights.write = True
             rights.edit = True
-        # TODO only public rooms?
         if rights.guest:
             rights.read = True
         if self.variation.game:
@@ -352,10 +355,14 @@ class RightsChecker(default.DefaultRightsChecker):
             rights.strict_write = parent_rights.strict_write.copy() \
                 if parent_rights.strict_write is not None else None
             if (self.thread.access_type >=
-                forum_models.THREAD_ACCESS_TYPE_NO_WRITE) and (
-                    rights.strict_write is None):
+                    forum_models.THREAD_ACCESS_TYPE_NO_WRITE) and (
+                        rights.strict_write is None):
                 rights.strict_write = []
             rights.moderator_roles = parent_rights.moderator_roles.copy()
+        self._process_granted_rights(rights)
+        self._process_author_rights(rights)
+
+    def _process_granted_rights(self, rights: GameRights):
         granted_rights = models.GameThreadRight.objects.filter(
             thread_id=self.thread.id).distinct()
         read_roles = [
@@ -365,9 +372,9 @@ class RightsChecker(default.DefaultRightsChecker):
             right.role_id for right in granted_rights
             if right.access_level & forum_models.THREAD_ACCESS_WRITE]
         for right in granted_rights:
-            if right.access_level & forum_models.THREAD_ACCESS_MODERATE:
-                if right.role_id not in rights.moderator_roles:
-                    rights.moderator_roles.append(right.role_id)
+            if (right.access_level & forum_models.THREAD_ACCESS_MODERATE) and (
+                    right.role_id not in rights.moderator_roles):
+                rights.moderator_roles.append(right.role_id)
         if self.thread.access_type == forum_models.THREAD_ACCESS_TYPE_NO_READ:
             if rights.strict_read is None:
                 rights.strict_read = read_roles
@@ -375,8 +382,8 @@ class RightsChecker(default.DefaultRightsChecker):
                 rights.strict_read = [
                     role for role in rights.strict_read if role in read_roles]
         if (self.thread.access_type ==
-            forum_models.THREAD_ACCESS_TYPE_NOT_SET) and (
-                rights.strict_write is not None):
+                forum_models.THREAD_ACCESS_TYPE_NOT_SET) and (
+                    rights.strict_write is not None):
             for role in write_roles:
                 if role not in rights.strict_write:
                     rights.strict_write += [role]
@@ -386,15 +393,18 @@ class RightsChecker(default.DefaultRightsChecker):
             for role in write_roles:
                 if role not in rights.strict_write:
                     rights.strict_write += [role]
-        # fix:thread author can write and read
-        if self.thread.data1:
-            role = self.thread.data1
-            if rights.strict_read is not None:
-                if role not in rights.strict_read:
-                    rights.strict_read += [role]
-            if rights.strict_write is not None:
-                if role not in rights.strict_write:
-                    rights.strict_write += [role]
+
+    def _process_author_rights(self, rights: GameRights):
+        # thread author can write and read
+        if not self.thread.data1:
+            return
+        role = self.thread.data1
+        if (rights.strict_read is not None) and (
+                role not in rights.strict_read):
+            rights.strict_read += [role]
+        if (rights.strict_write is not None) and (
+                role not in rights.strict_write):
+            rights.strict_write += [role]
 
     def get_granted_rights(self):
         rights = self._rights
@@ -416,3 +426,44 @@ class RightsChecker(default.DefaultRightsChecker):
             if rights.strict_read and (role.id in rights.strict_read):
                 read = True
         return read, write, moderate
+
+    def get_moderators_and_accessed_users(self):
+        return self._rights.moderator_roles or [], self._rights.strict_read
+
+    def limited_read_list(self):
+        return self._rights.strict_read
+
+    def _get_free_descendants(self):
+        query = Q(access_type__lt=forum_models.THREAD_ACCESS_TYPE_NO_READ)
+        if self.thread and self._rights.user_roles:
+            query = query | Q(data1__in=self._rights.user_roles)
+        return forum_models.Thread.objects.get_descendants(self.thread).filter(
+            deleted=False).filter(query)
+
+    def _read_all(self):
+        return self.variation.game and self.thread.game.status >= \
+            GAME_STATUS_FINISHING
+
+    def _get_readable_protected_descendants(self):
+        user = self.user
+        r = self._rights
+        if user.is_superuser or r.admin or r.guest or self._read_all():
+            threads = forum_models.Thread.objects.get_descendants(
+                self.thread
+            ).filter(
+                deleted=False,
+                access_type=forum_models.THREAD_ACCESS_TYPE_NO_READ)
+            if self.thread and r.user_roles:
+                threads = threads.exclude(data1__in=r.user_roles)
+            return threads
+        rights = models.GameThreadRight.objects.filter(
+            role_id__in=r.user_roles,
+            thread__tree_id=self.thread.tree_id,
+            thread__lft__gt=self.thread.lft,
+            thread__rght__lt=self.thread.rght,
+            access_level__gte=forum_models.THREAD_ACCESS_READ,
+            thread__deleted=False)
+        if r.user_roles:
+            rights = rights.exclude(thread__data1__in=r.user_roles)
+        rights = rights.select_related('thread')
+        return [right.thread for right in rights]

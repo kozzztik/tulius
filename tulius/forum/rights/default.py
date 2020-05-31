@@ -5,6 +5,8 @@ from tulius.forum.rights import base
 
 
 class DefaultRightsChecker(base.BaseThreadRightsChecker):
+    _base_rights_class = base.RightsDescriptor
+
     def get_limited_read_list(self, parent_rights):
         persons = [
             right.user for right in
@@ -35,7 +37,7 @@ class DefaultRightsChecker(base.BaseThreadRightsChecker):
         return read, write, moderate
 
     def _get_rights(self):
-        rights = self._rights = base.RightsDescriptor()
+        rights = self._rights = self._rights or self._base_rights_class()
         if self.thread.parent is None:
             rights.read = True
             rights.write = True

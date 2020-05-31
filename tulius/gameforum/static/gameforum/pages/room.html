@@ -1,3 +1,11 @@
-<div>
+<div v-if="!loading">
+    <div class="story-banner hidden-phone" v-if="variation.game">
+        <img :src="variation.game.top_banner_url"  v-if="variation.game.top_banner_url">
+    </div>
+    <game_forum_thread_actions :variation="variation" :user="user" :thread="thread"></game_forum_thread_actions>
 
+    <game_forum_thread_actions :variation="variation" :user="user" :thread="thread"></game_forum_thread_actions>
+    <div class="story-banner hidden-phone" v-if="variation.game">
+        <img :src="variation.game.bottom_banner_url"  v-if="variation.game.bottom_banner_url">
+    </div>
 </div>

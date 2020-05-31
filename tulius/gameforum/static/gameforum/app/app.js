@@ -24,8 +24,18 @@ export default LazyComponent('gameforum_app', {
         },
         loading_start() {this.$root.loading_start()},
         loading_end(breadcrumbs) {
-            // TODO breadcrumbs injection
-            this.$root.loading_end(breadcrumbs);
+            const updated_breadcrumbs = [];
+            if (this.variation.game)
+                updated_breadcrumbs.push({
+                    'title': 'Игра',
+                    'url': '/games/game/' + this.variation.game.id + '/',
+                })
+            else
+                updated_breadcrumbs.push({
+                    'title': 'Вариация',
+                    'url': '/stories/variation/' + this.variation.id + '/main/',
+                })
+            this.$root.loading_end([...updated_breadcrumbs, ...breadcrumbs]);
         }
     },
     mounted() {this.load_api(this.$route.params.variation_id)},
