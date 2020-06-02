@@ -140,14 +140,6 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
             parent_thread, threads=threads, is_room=is_room)
         return threads
 
-    def get_index(self, user, level):
-        core = self.site.core
-        childs = [child for child in core.get_free_index(user, level)]
-        childs = childs + [
-            child for child in core.get_readeable_protected_index(user, level)]
-        childs = [thread for thread in childs if thread.room]
-        return sorted(childs, key=lambda x: x.id)
-
     def process_edit_room(
             self, request, parent_thread, thread, formset_params=None):
         formset_params = formset_params or {}
@@ -403,7 +395,6 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
         self.core['process_edit_room'] = self.process_edit_room
         self.core['process_edit_thread'] = self.process_edit_thread
         self.core['delete_thread'] = self.delete_thread
-        self.core['get_index'] = self.get_index
         self.core['room_descendants'] = self.room_descendants
         self.core['move_thread'] = self.move_thread
         self.core['thread_move_list'] = self.move_list

@@ -4,6 +4,55 @@
     </div>
     <game_forum_thread_actions :variation="variation" :user="user" :thread="thread"></game_forum_thread_actions>
 
+    <div v-if="thread.rooms.length > 0" class="content">
+        <div class="caption" align="center">
+            <div class="captionleft"></div>
+            <div class="captioncontent">
+                Комнаты
+            </div>
+            <div class="captionright"></div>
+        </div>
+        <forum_room_list :rooms="thread.rooms">
+            <template v-slot:moderators="slotProps">
+                <h6 v-if="slotProps.room.moderators.length > 0" class="moderators">Модераторы:</h6>
+                <ul v-if="slotProps.room.moderators" class="moderators">
+                    <li v-for="moderator in slotProps.room.moderators">
+                        <span>{{ moderator.title }}</span>
+                    </li>
+                </ul>
+            </template>
+            <template v-slot:accessed_users="slotProps">
+                <h6 v-if="slotProps.room.accessed_users" class="moderators">Открыта для:</h6>
+                <ul v-if="slotProps.room.accessed_users" class="moderators">
+                    <li v-for="accessed_user in slotProps.room.accessed_users">
+                        <span>{{ accessed_user.title }}</span>
+                    </li>
+                </ul>
+            </template>
+        </forum_room_list>
+    </div>
+    <div v-if="thread.threads.length > 0" class="content">
+        <div class="caption" align="center">
+            <div class="captionleft"></div>
+            <div class="captioncontent">
+                Темы
+            </div>
+            <div class="captionright"></div>
+        </div>
+        <forum_thread_list :threads="thread.threads">
+            <template v-slot:author="slotProps">
+                <span v-html="slotProps.thread.user.title" v-if="slotProps.thread.user"></span>
+            </template>
+            <template v-slot:accessed_users="slotProps">
+                <h6 v-if="slotProps.thread.accessed_users" class="moderators">Открыта для:</h6>
+                <ul v-if="slotProps.thread.accessed_users" class="moderators">
+                    <li v-for="accessed_user in slotProps.thread.accessed_users">
+                        <span>{{ accessed_user.title }}</span>
+                    </li>
+                </ul>
+            </template>
+        </forum_thread_list>
+    </div>
     <game_forum_thread_actions :variation="variation" :user="user" :thread="thread"></game_forum_thread_actions>
     <div class="story-banner hidden-phone" v-if="variation.game">
         <img :src="variation.game.bottom_banner_url"  v-if="variation.game.bottom_banner_url">

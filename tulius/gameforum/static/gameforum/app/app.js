@@ -40,7 +40,7 @@ export default LazyComponent('gameforum_app', {
     },
     mounted() {this.load_api(this.$route.params.variation_id)},
     beforeRouteUpdate (to, from, next) {
-        this.load_api(to.params.id);
+        this.load_api(to.params.variation_id);
         next();
     }
 })

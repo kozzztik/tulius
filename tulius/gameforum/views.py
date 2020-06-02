@@ -33,7 +33,7 @@ class VariationAPI(plugins.BaseAPIView):
     obj = None
 
     def get_variation(self, **kwargs):
-        self.obj = stories_models.Variation.objects.get(pk=kwargs['pk'])
+        self.obj = stories_models.Variation.objects.get(pk=int(kwargs['pk']))
 
     def check_rights(self):
         if self.obj.game:

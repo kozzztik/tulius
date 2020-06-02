@@ -281,7 +281,7 @@ class RightsChecker(default.DefaultRightsChecker):
         return self.__class__(
             self.variation, thread, self.user, parent_rights=self)
 
-    def _get_rights_for_root(self):
+    def get_rights_for_root(self):
         rights = GameRights()
         if self.thread.id != self.variation.thread_id:
             return rights
@@ -314,8 +314,10 @@ class RightsChecker(default.DefaultRightsChecker):
         return rights
 
     def _get_rights(self):
-        if self.thread.parent is None:
-            return self._get_rights_for_root()
+        if self.thread.parent_id is None:
+            return self.get_rights_for_root()
+        self._rights = GameRights()
+        self.strict_roles(self._rights)
         rights = super(RightsChecker, self)._get_rights()
         parent_rights = self.get_parent_rights()
         rights.admin = parent_rights.admin

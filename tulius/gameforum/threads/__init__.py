@@ -1,6 +1,8 @@
 from django import shortcuts
 from django.db.models.query_utils import Q
 from django.conf.urls import url
+from django.utils import html
+from django import urls
 
 from tulius.stories import models as stories_models
 # TODO: fix this when module moved
@@ -12,6 +14,7 @@ from tulius.stories.models import Avatar, Role, AdditionalMaterial, \
 from tulius.gameforum.models import Trustmark
 from tulius.gameforum import consts
 from tulius.gameforum import rights
+from djfw.wysibb.templatetags import bbcodes
 
 
 class GameThreadsPlugin(ThreadsPlugin):
@@ -126,6 +129,12 @@ class GameThreadsPlugin(ThreadsPlugin):
                 r'^(?P<variation_id>\d+)/',
                 views.Index.as_view(), name='game_forum_variation'),
             url(
+                r'^(?P<variation_id>\d+)/room/(?P<pk>\d+)/',
+                views.Index.as_view(), name='room_new'),
+            url(
+                r'^(?P<variation_id>\d+)/thread/(?P<pk>\d+)/',
+                views.Index.as_view(), name='thread_new'),
+            url(
                 r'^room/(?P<parent_id>\d+)/$',
                 views.Index.as_view(), name='room'),
             url(
@@ -175,19 +184,70 @@ class GameThreadsPlugin(ThreadsPlugin):
 # TODO forum actions buttons grouping
 # TODO adaptive banners
 # TODO forum actions delete thread/room
-# TODO breadcrumbs this room url
+# TODO acc/moderator/author links to popup
+# TODO online status
+# TODO rights superuser equal
+# TODO cleanup not used items
 
 
 class ThreadAPI(api.ThreadView):
     plugin_id = consts.GAME_FORUM_SITE_ID
     variation = None
+    all_roles: dict = None
 
     def get_parent_thread(self, **kwargs):
         variation_id = kwargs['variation_id']
         self.variation = shortcuts.get_object_or_404(
             stories_models.Variation, pk=variation_id)
-        return super(ThreadAPI, self).get_parent_thread(**kwargs)
+        super(ThreadAPI, self).get_parent_thread(**kwargs)
+        roles = stories_models.Role.objects.filter(
+            variation=self.variation)
+        self.all_roles = {role.id: role for role in roles}
 
     def _get_rights_checker(self, thread, parent_rights=None):
         return rights.RightsChecker(
             self.variation, thread, self.user, parent_rights=parent_rights)
+
+    def role_to_json(self, role_id):
+        if role_id is None:
+            return None
+        role = self.all_roles[role_id]
+        return {
+            'id': role.id,
+            'title': html.escape(role.name),
+            'url': role.get_absolute_url(),
+        }
+
+    def thread_url(self, thread):
+        return urls.reverse(
+            'gameforum:room_new' if thread.room else 'gameforum:thread_new',
+            kwargs={
+                'variation_id': self.variation.id, 'pk': thread.id})
+
+    def room_to_json(self, thread):
+        return {
+            'id': thread.pk,
+            'title': html.escape(thread.title),
+            'body': bbcodes.bbcode(thread.body),
+            'room': thread.room,
+            'deleted': thread.deleted,
+            'important': thread.important,
+            'closed': thread.closed,
+            'user': self.role_to_json(thread.data1),
+            'moderators': [
+                self.role_to_json(user) for user in thread.moderators],
+            'accessed_users': None if thread.accessed_users is None else [
+                self.role_to_json(user) for user in thread.accessed_users
+            ],
+            'threads_count': thread.threads_count if thread.room else None,
+            'comments_count': thread.comments_count,
+            'pages_count': thread.pages_count,
+            'url': self.thread_url(thread),
+            'last_comment': {
+                'url': thread.last_comment.get_absolute_url,
+                'user': self.role_to_json(thread.last_comment.data1),
+                'create_time': thread.last_comment.create_time,
+            } if thread.last_comment else None,
+            'unreaded':
+                thread.unreaded.get_absolute_url if thread.unreaded else None,
+        }
