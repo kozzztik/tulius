@@ -178,13 +178,10 @@ class GameThreadsPlugin(ThreadsPlugin):
         ]
 
 # TODO mark all as read action
-# TODO forum actions chars css+modal
-# TODO forum actions trustmarks
+# TODO forum actions trustmarks (also in char modal)
 # TODO forum actions illustration lightbox
-# TODO forum actions buttons grouping
-# TODO adaptive banners
 # TODO forum actions delete thread/room
-# TODO acc/moderator/author links to popup
+# TODO search action
 # TODO online status
 # TODO rights superuser equal
 # TODO cleanup not used items

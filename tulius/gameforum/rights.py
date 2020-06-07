@@ -277,9 +277,9 @@ class RightsChecker(default.DefaultRightsChecker):
         super(RightsChecker, self).__init__(
             thread, user, parent_rights=parent_rights)
 
-    def _create_checker(self, thread):
+    def _create_checker(self, thread, parent_rights=None):
         return self.__class__(
-            self.variation, thread, self.user, parent_rights=self)
+            self.variation, thread, self.user, parent_rights=parent_rights)
 
     def get_rights_for_root(self):
         rights = GameRights()
@@ -316,13 +316,13 @@ class RightsChecker(default.DefaultRightsChecker):
     def _get_rights(self):
         if self.thread.parent_id is None:
             return self.get_rights_for_root()
-        self._rights = GameRights()
-        self.strict_roles(self._rights)
-        rights = super(RightsChecker, self)._get_rights()
+        rights = self._rights = GameRights()
         parent_rights = self.get_parent_rights()
         rights.admin = parent_rights.admin
         rights.guest = parent_rights.guest
         rights.user_roles = parent_rights.user_roles
+        self.strict_roles(self._rights)
+        rights = super(RightsChecker, self)._get_rights()
         if self.thread.data1 in rights.user_roles:
             rights.read = True
             rights.write = True
@@ -421,11 +421,11 @@ class RightsChecker(default.DefaultRightsChecker):
                 forum_models.THREAD_ACCESS_TYPE_NOT_SET):
             return read, write, moderate
         for role in rights.user_roles:
-            if rights.moderator_roles and (role.id in rights.moderator_roles):
+            if rights.moderator_roles and (role in rights.moderator_roles):
                 moderate = True
-            if rights.strict_write and (role.id in rights.strict_write):
+            if rights.strict_write and (role in rights.strict_write):
                 write = True
-            if rights.strict_read and (role.id in rights.strict_read):
+            if rights.strict_read and (role in rights.strict_read):
                 read = True
         return read, write, moderate
 
@@ -443,7 +443,7 @@ class RightsChecker(default.DefaultRightsChecker):
             deleted=False).filter(query)
 
     def _read_all(self):
-        return self.variation.game and self.thread.game.status >= \
+        return self.variation.game and self.variation.game.status >= \
             GAME_STATUS_FINISHING
 
     def _get_readable_protected_descendants(self):

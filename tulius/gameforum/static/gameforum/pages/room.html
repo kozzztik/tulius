@@ -1,8 +1,8 @@
 <div v-if="!loading">
-    <div class="story-banner hidden-phone" v-if="variation.game">
-        <img :src="variation.game.top_banner_url"  v-if="variation.game.top_banner_url">
+    <div class="story-banner d-none d-md-block" v-if="variation.game">
+        <img :src="variation.game.top_banner_url"  v-if="variation.game.top_banner_url" style="width: 100%">
     </div>
-    <game_forum_thread_actions :variation="variation" :user="user" :thread="thread"></game_forum_thread_actions>
+    <game_forum_thread_actions :variation="variation" :user="user" :thread="thread" :upper="true" ref="thread_actions"></game_forum_thread_actions>
 
     <div v-if="thread.rooms.length > 0" class="content">
         <div class="caption" align="center">
@@ -17,7 +17,8 @@
                 <h6 v-if="slotProps.room.moderators.length > 0" class="moderators">Модераторы:</h6>
                 <ul v-if="slotProps.room.moderators" class="moderators">
                     <li v-for="moderator in slotProps.room.moderators">
-                        <span>{{ moderator.title }}</span>
+                        <a href="javascript:void(0)" @click="show_role_modal(moderator.id)" v-if="role_with_link(moderator.id)">{{ moderator.title }}</a>
+                        <span v-else>{{ moderator.title }}</span>
                     </li>
                 </ul>
             </template>
@@ -25,7 +26,8 @@
                 <h6 v-if="slotProps.room.accessed_users" class="moderators">Открыта для:</h6>
                 <ul v-if="slotProps.room.accessed_users" class="moderators">
                     <li v-for="accessed_user in slotProps.room.accessed_users">
-                        <span>{{ accessed_user.title }}</span>
+                        <a href="javascript:void(0)" @click="show_role_modal(accessed_user.id)" v-if="role_with_link(accessed_user.id)">{{ accessed_user.title }}</a>
+                        <span v-else>{{ accessed_user.title }}</span>
                     </li>
                 </ul>
             </template>
@@ -41,20 +43,30 @@
         </div>
         <forum_thread_list :threads="thread.threads">
             <template v-slot:author="slotProps">
-                <span v-html="slotProps.thread.user.title" v-if="slotProps.thread.user"></span>
+                <div v-if="slotProps.thread.user">
+                    <a href="javascript:void(0)" @click="show_role_modal(slotProps.thread.user.id)" v-if="role_with_link(slotProps.thread.user.id)">{{ slotProps.thread.user.title }}</a>
+                    <span v-else>{{ slotProps.thread.user.title }}</span>
+                </div>
             </template>
             <template v-slot:accessed_users="slotProps">
                 <h6 v-if="slotProps.thread.accessed_users" class="moderators">Открыта для:</h6>
                 <ul v-if="slotProps.thread.accessed_users" class="moderators">
                     <li v-for="accessed_user in slotProps.thread.accessed_users">
-                        <span>{{ accessed_user.title }}</span>
+                        <a href="javascript:void(0)" @click="show_role_modal(accessed_user.id)" v-if="role_with_link(accessed_user.id)">{{ accessed_user.title }}</a>
+                        <span v-else>{{ accessed_user.title }}</span>
                     </li>
                 </ul>
             </template>
         </forum_thread_list>
     </div>
-    <game_forum_thread_actions :variation="variation" :user="user" :thread="thread"></game_forum_thread_actions>
-    <div class="story-banner hidden-phone" v-if="variation.game">
-        <img :src="variation.game.bottom_banner_url"  v-if="variation.game.bottom_banner_url">
+    <div v-if="(thread.rooms.length == 0) && (thread.threads.length == 0)" class="content">
+        <br>
+        Эта комната пока пуста.
+        <br>
+        <br>
+    </div>
+    <game_forum_thread_actions :variation="variation" :user="user" :thread="thread" :upper="false"></game_forum_thread_actions>
+    <div class="story-banner d-none d-md-block" v-if="variation.game">
+        <img :src="variation.game.bottom_banner_url"  v-if="variation.game.bottom_banner_url" style="width: 100%">
     </div>
 </div>

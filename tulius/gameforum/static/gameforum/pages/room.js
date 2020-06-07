@@ -40,6 +40,17 @@ export default LazyComponent('game_room_page', {
                 this.loading = false;
             });
         },
+        role_with_link(role_id) {
+            var role;
+            for (role of this.variation.characters) {
+                if (role.id == role_id)
+                    return true;
+            }
+            return false;
+        },
+        show_role_modal(role_id) {
+            this.$refs.thread_actions.show_char_modal(role_id);
+        },
     },
     mounted() {this.load_api(this.$route.params.id)},
     beforeRouteUpdate (to, from, next) {

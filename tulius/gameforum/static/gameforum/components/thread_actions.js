@@ -1,10 +1,11 @@
 export default LazyComponent('game_forum_thread_actions', {
     template: '/static/gameforum/components/thread_actions.html',
-    props: ['variation', 'thread', 'user'],
+    props: ['variation', 'thread', 'user', 'upper'],
     data: function () {
         return {
             csrftoken: getCookie('csrftoken'),
             delete_comment: '',
+            modal_role: {},
         }
     },
     computed: {
@@ -43,5 +44,15 @@ export default LazyComponent('game_forum_thread_actions', {
             }).catch(error => this.$root.add_message(error, "error"))
             .then(() => {});
         },
+        show_char_modal(char_id) {
+            var char;
+            for (char of this.variation.characters) {
+                if (char.id == char_id) {
+                    this.modal_role = char;
+                       this.$bvModal.show('characterModal' + this.upper);
+                    break;
+                }
+            }
+        }
     }
 })
