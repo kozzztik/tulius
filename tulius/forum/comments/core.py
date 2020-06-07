@@ -263,16 +263,6 @@ class CommentsCore(plugins.ForumPlugin):
         thread.last_comment_cache = comment
         return comment
 
-    def prepare_room_list(self, sender, **kwargs):
-        threads = kwargs['threads']
-        sender.comments_count = 0
-        sender.last_comment_id = None
-        for thread in threads:
-            sender.comments_count += thread.comments_count
-            if (not sender.last_comment_id) or (
-                    sender.last_comment_id < thread.last_comment_id):
-                sender.last_comment_id = thread.last_comment_id
-
     def thread_view(self, sender, **kwargs):
         if sender:
             context = kwargs['context']
@@ -335,5 +325,4 @@ class CommentsCore(plugins.ForumPlugin):
     def post_init(self):
         self.site.signals.thread_repair_counters.connect(
             self.repair_thread_counters)
-        self.site.signals.thread_prepare_room.connect(self.prepare_room_list)
         self.site.signals.thread_view.connect(self.thread_view)

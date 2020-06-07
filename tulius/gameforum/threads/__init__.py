@@ -101,15 +101,6 @@ class GameThreadsPlugin(ThreadsPlugin):
                         post.last_comment.data1 in roles_list) else None
         return posts
 
-    def get_subthreads(self, user, parent_thread, is_room=False):
-        threads = super(GameThreadsPlugin, self).get_subthreads(
-            user, parent_thread, is_room)
-        threads = self.rolize(
-            threads, parent_thread.variation, parent_thread.rolize_list)
-        threads = self.rolize_lastest(
-            threads, parent_thread.variation, parent_thread.rolize_list)
-        return threads
-
     def rolize_comments(self, sender, **kwargs):
         comments = kwargs["comments"]
         self.rolize(comments, sender.variation, sender.rolize_list)
@@ -185,6 +176,7 @@ class GameThreadsPlugin(ThreadsPlugin):
 # TODO online status
 # TODO rights superuser equal
 # TODO cleanup not used items
+# TODO threads page
 
 
 class ThreadAPI(api.ThreadView):

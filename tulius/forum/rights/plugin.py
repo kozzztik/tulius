@@ -217,13 +217,6 @@ class RightsPlugin(ForumPlugin):
         if pr_threads:
             sender.protected_threads += THREAD_HAVE_PR_THREADS
 
-    def prepare_room_list(self, sender, **kwargs):
-        sender.moderators = sender.get_moderators
-        if sender.access_type == self.models.THREAD_ACCESS_TYPE_NO_READ:
-            sender.accessed_users = sender.get_accessed_users
-        else:
-            sender.accessed_users = None
-
     def init_core(self):
         super(RightsPlugin, self).init_core()
         self.core['Comment_edit_right'] = self.comment_edit_right
@@ -248,4 +241,3 @@ class RightsPlugin(ForumPlugin):
         self.site.signals.thread_on_update.connect(self.thread_on_update)
         self.site.signals.thread_repair_counters.connect(
             self.thread_repair_counters)
-        self.site.signals.thread_prepare_room.connect(self.prepare_room_list)

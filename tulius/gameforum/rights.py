@@ -277,9 +277,8 @@ class RightsChecker(default.DefaultRightsChecker):
         super(RightsChecker, self).__init__(
             thread, user, parent_rights=parent_rights)
 
-    def _create_checker(self, thread, parent_rights=None):
-        return self.__class__(
-            self.variation, thread, self.user, parent_rights=parent_rights)
+    def _create_checker(self, thread):
+        return self.__class__(self.variation, thread, self.user)
 
     def get_rights_for_root(self):
         rights = GameRights()
