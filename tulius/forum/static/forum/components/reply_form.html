@@ -1,32 +1,34 @@
-<div>
-    <forum_comment :user="user" :thread="thread" :comment="preview_comment" v-if="show_preview" :preview="true"></forum_comment>
-    <table id="replyformtable" class="post-table content">
-        <tbody>
-        <tr>
-            <td>
-                <div id="replyform_container">
-                    <form id="replyform" class="form-horizontal">
-                        <fieldset class="control-group">
-                            <tulius_ckeditor v-model="reply_text"></tulius_ckeditor>
-                        </fieldset>
-                        <fieldset>
-                            <a class="btn btn-primary" v-on:click="do_reply" v-if="!loading" href="javascript:void(0)">
-                                Ответить
-                            </a>
-                            <a id="extended-link" :href="'/forums/add_comment/' + reply_comment_id + '/'" v-if="!loading">
-                                Расширенная форма...
-                            </a>
-                            <a id="post-preview-link" class="float-right" v-on:click="do_preview()" v-if="!loading" href="javascript:void(0)">
-                                Предварительный просмотр
-                            </a>
-                            <div class="progress progress-striped active" style="height: 24px;margin-bottom: 0px;" v-if="loading">
-                                <div class="bar" style="width: 100%;"></div>
-                            </div>
-                        </fieldset>
-                    </form>
-                </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+<div ref="reply_form_parking">
+    <div ref="reply_form" v-if="show_form">
+        <forum_comment :user="user" :thread="thread" :comment="preview_comment" v-if="show_preview" :preview="true"></forum_comment>
+        <table id="replyformtable" class="post-table content">
+            <tbody>
+            <tr>
+                <td>
+                    <div id="replyform_container">
+                        <form id="replyform" class="form-horizontal">
+                            <fieldset class="control-group">
+                                <tulius_ckeditor v-model="reply_text"></tulius_ckeditor>
+                            </fieldset>
+                            <fieldset>
+                                <a class="btn btn-primary" v-on:click="do_reply" v-if="!loading" href="javascript:void(0)">
+                                    Ответить
+                                </a>
+                                <a id="extended-link" :href="'/forums/add_comment/' + reply_comment_id + '/'" v-if="!loading">
+                                    Расширенная форма...
+                                </a>
+                                <a id="post-preview-link" class="float-right" v-on:click="do_preview()" v-if="!loading" href="javascript:void(0)">
+                                    Предварительный просмотр
+                                </a>
+                                <div class="progress progress-striped active" style="height: 24px;margin-bottom: 0px;" v-if="loading">
+                                    <div class="bar" style="width: 100%;"></div>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>

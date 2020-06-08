@@ -1,0 +1,22 @@
+<div>
+    <pagination :pagination="pagination" :page_num="value"></pagination>
+    <div v-for="comment in comments" :key="comment.id" :id="comment.id" >
+        <forum_comment :user="user" :thread="thread" :comment="comment" ref="comments"></forum_comment>
+    </div>
+    <pagination :pagination="pagination" :page_num="value"></pagination>
+    <a v-if="thread.not_read_comment" v-html="thread.not_read_comment.count" id="not_read_counter" href="javascript:void(0)" @click="to_not_read_comment()"></a>
+    <b-modal id="commentDelete"
+         title="Удалить комнентарий" ok-title="Удалить" ok-variant="danger"
+         cancel-title="Отменить" @ok="do_delete_comment">
+        <div class="form-horizontal">
+        <fieldset class="control-group">
+            <div class="control-label">
+                <label for="delete_comment">Пояснение:</label>
+            </div>
+            <div class="controls">
+                <input id="delete_comment" type="text" v-model="delete_comment_message">
+            </div>
+        </fieldset>
+        </div>
+    </b-modal>
+</div>

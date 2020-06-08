@@ -41,10 +41,11 @@ axios.get('/api/app_settings/').then(response => {
                 }
             },
             loading_end(items) {
-                if (items && items.length > 0) {
-                    document.title = items[items.length - 1].title;
+                if (!(items === null)) {
+                    if (items.length > 0)
+                        document.title = items[items.length - 1].title;
+                    this.breadcrumb_items = items;
                 }
-                this.breadcrumb_items = items;
                 this.loading_counter = this.loading_counter - 1;
                 const new_loading = (this.loading_counter > 0);
                 if (this.loading != new_loading) {
