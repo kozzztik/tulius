@@ -25,8 +25,8 @@ export default LazyComponent('game_forum_thread_actions', {
         },
         delete_thread(bvModalEvt) {
             axios.delete(
-                    '/api/forum/thread/' + this.thread.id+ '/',
-                    {params: {comment: this.delete_comment}}
+                '/api/game_forum/variation/'+ this.variation.id + '/thread/' + this.thread.id + '/',
+                {params: {comment: this.delete_comment}}
             ).then(response => {
                 if (response.data['result'] == 'success') {
                     if (this.thread.room)
@@ -35,8 +35,11 @@ export default LazyComponent('game_forum_thread_actions', {
                         this.$root.add_message("Тема успешно удалена", "warning");
                     if (this.thread.parents.length > 0) {
                         this.$router.push({
-                            name: 'forum_room',
-                            params: { id: this.thread.parents[this.thread.parents.length - 1].id }
+                            name: 'game_room',
+                            params: {
+                                id: this.thread.parents[this.thread.parents.length - 1].id,
+                                variation_id: this.variation.id,
+                            }
                         })
                     } else {
                         this.$router.push({ name: 'forum_root'})

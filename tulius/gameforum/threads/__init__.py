@@ -168,10 +168,8 @@ class GameThreadsPlugin(ThreadsPlugin):
 
 # TODO forum actions trustmarks (also in char modal)
 # TODO forum actions illustration lightbox
-# TODO forum actions delete thread/room
 # TODO search action
 # TODO online status
-# TODO rights superuser equal
 # TODO cleanup not used items
 # TODO threads page
 

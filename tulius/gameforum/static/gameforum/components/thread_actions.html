@@ -21,7 +21,7 @@
                 <span v-if="thread.room">Переместить комнату</span>
                 <span v-if="!thread.room">Переместить тему</span>
             </b-dropdown-item>
-            <b-dropdown-item href="javascript:void(0);" v-if="thread.rights.edit" v-on:click="$bvModal.show('roomDelete')">
+            <b-dropdown-item href="javascript:void(0);" v-if="thread.rights.edit" v-on:click="$bvModal.show('roomDelete' + upper)">
                 <span v-if="thread.room">Удалить комнату</span>
                 <span v-if="!thread.room">Удалить тему</span>
             </b-dropdown-item>
@@ -99,7 +99,7 @@
         <p>И нажмите кнопку "Ответить". Под постом появится форма быстрого ответа, а выделенный текст будет вставлен в нее как цитата.</p>
         <img src="/static/forum/img/quote_help2.png" style="width: 450px;">
     </b-modal>
-    <b-modal id="roomDelete"
+    <b-modal :id="'roomDelete' + upper"
              :title="delete_title" ok-title="Удалить" ok-variant="danger"
              cancel-title="Отменить" @ok="delete_thread">
         <div class="form-horizontal">
