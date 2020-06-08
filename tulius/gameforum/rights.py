@@ -266,6 +266,11 @@ class GameRights(base.RightsDescriptor):
     guest = False
     user_roles = None
 
+    def to_json(self):
+        result = super(GameRights, self).to_json()
+        result['strict_read'] = self.strict_read
+        return result
+
 
 class RightsChecker(default.DefaultRightsChecker):
     _base_rights_class = GameRights

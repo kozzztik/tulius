@@ -203,12 +203,7 @@ class ThreadView(BaseThreadView):
             'rooms': [self.room_to_json(t) for t in self.get_subthreads(True)],
             'threads': [
                 self.room_to_json(t) for t in self.get_subthreads(False)],
-            'rights': {
-                'write': self.rights.write,
-                'moderate': self.rights.moderate,
-                'edit': self.rights.edit,
-                'move': self.rights.move,
-            },
+            'rights': self.rights.to_json(),
             'first_comment_id': self.obj.first_comment_id,
         }
 

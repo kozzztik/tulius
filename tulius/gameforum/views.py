@@ -29,16 +29,22 @@ class RedirrectAPI(generic.View):
         })
 
 
-class VariationAPI(plugins.BaseAPIView):
+class VariationMixin(plugins.BaseAPIView):
+    variation = None
+
+    def dispatch(self, request, *args, **kwargs):
+        self.variation = stories_models.Variation.objects.get(
+            pk=int(kwargs['variation_id']))
+        return super(VariationMixin, self).dispatch(request, *args, **kwargs)
+
+
+class VariationAPI(VariationMixin):
     obj = None
 
-    def get_variation(self, **kwargs):
-        self.obj = stories_models.Variation.objects.get(pk=int(kwargs['pk']))
-
     def check_rights(self):
-        if self.obj.game:
-            return self.obj.game.read_right(self.user)
-        return self.obj.edit_right(self.user)
+        if self.variation.game:
+            return self.variation.game.read_right(self.user)
+        return self.variation.edit_right(self.user)
 
     @staticmethod
     def game_to_json(game):
@@ -50,7 +56,7 @@ class VariationAPI(plugins.BaseAPIView):
         }
 
     def get_context_data(self, **kwargs):
-        self.get_variation(**kwargs)
+        self.obj = self.variation
         if not self.check_rights():
             raise exceptions.PermissionDenied()
         admin = (not self.obj.game) or self.obj.game.edit_right(self.user)

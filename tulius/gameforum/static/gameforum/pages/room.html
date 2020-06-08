@@ -65,6 +65,7 @@
         <br>
         <br>
     </div>
+    <game_forum_online_status :variation="variation" :thread="thread"></game_forum_online_status>
     <game_forum_thread_actions :variation="variation" :user="user" :thread="thread" :upper="false"></game_forum_thread_actions>
     <div class="story-banner d-none d-md-block" v-if="variation.game">
         <img :src="variation.game.bottom_banner_url"  v-if="variation.game.bottom_banner_url" style="width: 100%">

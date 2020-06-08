@@ -9,6 +9,14 @@ class RightsDescriptor:
     # TODO refactor limited read to unify with game strict roles and get rid
     # TODO of accessed users&moderators as separate func
 
+    def to_json(self):
+        return {
+            'write': self.write,
+            'moderate': self.moderate,
+            'edit': self.edit,
+            'move': self.move,
+        }
+
 
 class BaseThreadRightsChecker:
     thread = None

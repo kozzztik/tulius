@@ -1,4 +1,3 @@
-from django import shortcuts
 from django.db.models.query_utils import Q
 from django.conf.urls import url
 from django.utils import html
@@ -14,6 +13,7 @@ from tulius.stories.models import Avatar, Role, AdditionalMaterial, \
 from tulius.gameforum.models import Trustmark
 from tulius.gameforum import consts
 from tulius.gameforum import rights
+from tulius.gameforum import views as gameforum_views
 from djfw.wysibb.templatetags import bbcodes
 
 
@@ -169,20 +169,15 @@ class GameThreadsPlugin(ThreadsPlugin):
 # TODO forum actions trustmarks (also in char modal)
 # TODO forum actions illustration lightbox
 # TODO search action
-# TODO online status
 # TODO cleanup not used items
 # TODO threads page
 
 
-class BaseThreadAPI(api.BaseThreadView):
+class BaseThreadAPI(api.BaseThreadView, gameforum_views.VariationMixin):
     plugin_id = consts.GAME_FORUM_SITE_ID
-    variation = None
     all_roles: dict = None
 
     def get_parent_thread(self, **kwargs):
-        variation_id = kwargs['variation_id']
-        self.variation = shortcuts.get_object_or_404(
-            stories_models.Variation, pk=variation_id)
         super(BaseThreadAPI, self).get_parent_thread(**kwargs)
         roles = stories_models.Role.objects.filter(
             variation=self.variation)
