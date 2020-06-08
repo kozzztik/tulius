@@ -6,6 +6,7 @@ export default LazyComponent('game_forum_thread_actions', {
             csrftoken: getCookie('csrftoken'),
             delete_comment: '',
             modal_role: {},
+            image_index: null,
         }
     },
     computed: {
@@ -14,6 +15,16 @@ export default LazyComponent('game_forum_thread_actions', {
                 return 'Удалить эту комнату?'
             else
                 return 'Удалить эту тему?';
+        },
+        images: function() {
+            var result = [];
+            for (var image of this.variation.illustrations)
+                result.push({
+                    src: image.url,
+                    thumbnail: image.thumb,
+                    caption: image.title,
+                });
+            return result;
         }
     },
     methods: {
@@ -59,6 +70,6 @@ export default LazyComponent('game_forum_thread_actions', {
                     break;
                 }
             }
-        }
-    }
+        },
+    },
 })

@@ -111,5 +111,6 @@ class VariationAPI(VariationMixin):
                 'id': m.id,
                 'title': m.name,
                 'url': m.image.url if m.image else None,
+                'thumb': m.thumb.url if m.thumb else None,
             } for m in illustrations],
         }

@@ -66,7 +66,7 @@
                 <img src="/static/games/img/document_blank.png" style="height: 25px">
                 <span v-html="material.title"></span>
             </b-dropdown-item>
-            <b-dropdown-item :href="illustration.url" v-for="illustration in variation.illustrations" :key="illustration.id">
+            <b-dropdown-item href="javascript:void(0)" v-for="(illustration, index) in variation.illustrations" :key="illustration.id" @click="image_index = index">
                 <img src="/static/games/img/chart.png" style="height: 25px">
                 <span v-html="illustration.title"></span>
             </b-dropdown-item>
@@ -146,4 +146,5 @@
             Поиск
         </button>
     </form>
+    <Tinybox v-model="image_index" :images="images"></Tinybox>
 </div>
