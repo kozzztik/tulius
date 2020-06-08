@@ -13,6 +13,9 @@ app_name = 'tulius.forum'
 urlpatterns = [
     urls.url(r'^$', threads_api.IndexView.as_view(), name='index'),
     urls.url(
+        r'^read_mark/$',
+        readmarks.ReadmarkAPI.as_view(), name='index_readmark'),
+    urls.url(
         r'^collapse/$',
         collapse_views.CollapseAPIList.as_view(), name='collapse_list'),
     urls.url(

@@ -118,24 +118,55 @@ def thread_view(sender, **kwargs):
 class ReadmarkAPI(api.BaseThreadView):
     require_user = True
 
-    def post(self, *args, **kwargs):
-        thread_id = int(kwargs['pk'])
-        read_id = json.loads(self.request.body)['comment_id']
+    def mark_room_as_read(self, room, room_rights):
+        if room:
+            threads = room.get_children()
+        else:
+            threads = models.Thread.objects.filter(
+                parent=None, plugin_id=self.plugin_id)
+        threads = {
+            thread: self._get_rights_checker(
+                thread, parent_rights=room_rights).get_rights()
+            for thread in threads}
+        for thread, rights in threads.items():
+            if not rights.read:
+                continue
+            if thread.room:
+                self.mark_room_as_read(thread, rights)
+            else:
+                self.mark_thread_as_read(thread, None)
+
+    def mark_thread_as_read(self, thread, read_id):
         read_mark = models.ThreadReadMark.objects.filter(
-            thread_id=thread_id, user=self.user).first()
+            thread=thread, user=self.user).first()
         if not read_mark:
-            self.get_parent_thread(**kwargs)
-            read_mark = models.ThreadReadMark(thread=self.obj, user=self.user)
-        not_read = models.Comment.objects.filter(
-            parent_id=thread_id, id__gt=read_id, deleted=False
-        ).exclude(user=self.user).order_by('id').first()
+            read_mark = models.ThreadReadMark(thread=thread, user=self.user)
+        if read_id:
+            not_read = models.Comment.objects.filter(
+                parent=thread, id__gt=read_id, deleted=False
+            ).exclude(user=self.user).order_by('id').first()
+        else:
+            not_read = None
+            read_id = thread.last_comment_id
         read_mark.readed_comment_id = read_id
         read_mark.not_readed_comment = not_read
         read_mark.save()
+        return read_mark
+
+    def post(self, *args, **kwargs):
+        if 'pk' in kwargs:
+            self.get_parent_thread(**kwargs)
+        read_id = json.loads(self.request.body)['comment_id']
+        read_mark = None
+        if (not self.obj) or self.obj.room:
+            self.mark_room_as_read(self.obj, self.rights)
+        else:
+            read_mark = self.mark_thread_as_read(self.obj, read_id)
         return {
             'last_read_id': read_id,
             'not_read_comment': not_read_comment_json(
-                not_read, self.user) if not_read else None
+                read_mark.not_readed_comment, self.user
+            ) if read_mark and read_mark.not_readed_comment else None
         }
 
     def delete(self, *args, **kwargs):

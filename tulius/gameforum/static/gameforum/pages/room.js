@@ -51,6 +51,18 @@ export default LazyComponent('game_room_page', {
         show_role_modal(role_id) {
             this.$refs.thread_actions.show_char_modal(role_id);
         },
+        mark_all_as_read() {
+            this.$parent.loading_start();
+            axios.post(
+                '/api/game_forum/variation/'+ this.variation.id + '/thread/' + this.thread.id + '/read_mark/',
+                {'comment_id': null}
+            ).then(response => {
+            }).catch(error => this.$root.add_message(error, "error"))
+            .then(() => {
+                this.$parent.loading_end(this.breadcrumbs);
+                this.load_api(this.thread.id);
+            });
+        },
     },
     mounted() {this.load_api(this.$route.params.id)},
     beforeRouteUpdate (to, from, next) {

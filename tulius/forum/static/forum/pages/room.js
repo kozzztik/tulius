@@ -35,6 +35,18 @@ export default LazyComponent('forum_room_page', {
                 this.loading = false;
             });
         },
+        mark_all_as_readed() {
+            this.$parent.loading_start();
+            axios.post(
+                '/api/forum/thread/'+ this.thread.id + '/read_mark/',
+                {'comment_id': null}
+            ).then(response => {
+            }).catch(error => this.$parent.add_message(error, "error"))
+            .then(() => {
+                this.$parent.loading_end(this.breadcrumbs);
+                this.load_api(this.thread.id);
+            });
+        },
     },
     mounted() {this.load_api(this.$route.params.id)},
     beforeRouteUpdate (to, from, next) {

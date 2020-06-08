@@ -17,6 +17,9 @@ export default LazyComponent('game_forum_thread_actions', {
         }
     },
     methods: {
+        mark_all_as_read() {
+            this.$parent.mark_all_as_read();
+        },
         mark_not_readed() {
             this.$parent.mark_all_not_readed();
         },

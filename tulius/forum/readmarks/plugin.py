@@ -1,16 +1,7 @@
-from django.conf import urls
-
 from tulius.forum import plugins
-from tulius.forum.readmarks import views
 
 
 class ReadMarksPlugin(plugins.ForumPlugin):
-    def mark_thread_url(self, thread):
-        return self.reverse('mark_as_readed', thread.id)
-
-    def mark_all_url(self):
-        return self.reverse('mark_as_readed')
-
     def mark_as_readed(self, thread, read_mark=None, readed_id=None):
         models = self.site.core.models
         if not thread.last_comment:
@@ -119,10 +110,6 @@ class ReadMarksPlugin(plugins.ForumPlugin):
 
     def init_core(self):
         self.Comment = self.models.Comment
-        self.urlizer['Thread_mark_as_readed'] = self.mark_thread_url
-        self.urlizer['Thread_get_mark_all_as_readed_url'] = \
-            self.mark_thread_url
-        self.urlizer['mark_as_readed'] = self.mark_all_url
         self.core['Thread_mark_as_readed'] = self.mark_as_readed
         self.core['Thread_get_read_mark'] = self.get_read_mark
         self.site.signals.after_add_comment.connect(self.after_add_comment)
@@ -131,18 +118,6 @@ class ReadMarksPlugin(plugins.ForumPlugin):
         self.site.signals.read_comments.connect(self.view_comments_page)
         self.site.signals.view_comments_page.connect(
             self.view_comments_page_json)
-
-    def get_urls(self):
-        return [
-            urls.url(
-                r'^mark_all_as_readed/$',
-                views.MarkAsRead.as_view(plugin=self),
-                name='mark_as_readed'),
-            urls.url(
-                r'^mark_all_as_readed/(?P<thread_id>\d+)/$',
-                views.MarkAsRead.as_view(plugin=self),
-                name='mark_as_readed'),
-        ]
 
 
 def room_group_unreaded_url(rooms):

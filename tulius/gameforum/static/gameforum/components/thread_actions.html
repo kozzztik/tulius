@@ -25,7 +25,7 @@
                 <span v-if="thread.room">Удалить комнату</span>
                 <span v-if="!thread.room">Удалить тему</span>
             </b-dropdown-item>
-            <b-dropdown-item :href="'/forums/mark_all_as_readed/' + thread.id + '/'" v-if="thread.room">
+            <b-dropdown-item href="javascript:void(0)" v-if="thread.room" @click="mark_all_as_read()">
                 <img src="/static/games/img/check.png" style="height: 25px">
                 Пометить все как прочитанное
             </b-dropdown-item>

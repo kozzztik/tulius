@@ -168,7 +168,6 @@ class GameThreadsPlugin(ThreadsPlugin):
                 name='delete_thread'),
         ]
 
-# TODO mark all as read action
 # TODO forum actions trustmarks (also in char modal)
 # TODO forum actions illustration lightbox
 # TODO forum actions delete thread/room
@@ -179,7 +178,7 @@ class GameThreadsPlugin(ThreadsPlugin):
 # TODO threads page
 
 
-class ThreadAPI(api.ThreadView):
+class BaseThreadAPI(api.BaseThreadView):
     plugin_id = consts.GAME_FORUM_SITE_ID
     variation = None
     all_roles: dict = None
@@ -188,7 +187,7 @@ class ThreadAPI(api.ThreadView):
         variation_id = kwargs['variation_id']
         self.variation = shortcuts.get_object_or_404(
             stories_models.Variation, pk=variation_id)
-        super(ThreadAPI, self).get_parent_thread(**kwargs)
+        super(BaseThreadAPI, self).get_parent_thread(**kwargs)
         roles = stories_models.Role.objects.filter(
             variation=self.variation)
         self.all_roles = {role.id: role for role in roles}
@@ -240,3 +239,7 @@ class ThreadAPI(api.ThreadView):
             'unreaded':
                 thread.unreaded.get_absolute_url if thread.unreaded else None,
         }
+
+
+class ThreadAPI(api.ThreadView, BaseThreadAPI):
+    pass

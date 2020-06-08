@@ -19,6 +19,9 @@ export default LazyComponent('forum_thread_actions', {
         mark_not_readed() {
             this.$parent.mark_all_not_readed();
         },
+        mark_all_as_readed() {
+            this.$parent.mark_all_as_readed();
+        },
         delete_thread(bvModalEvt) {
             axios.delete(
                     '/api/forum/thread/' + this.thread.id+ '/',
