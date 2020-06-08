@@ -4,8 +4,6 @@ from . import views
 
 
 class ThreadsPlugin(ThreadsCorePlugin):
-    room_list_template = 'forum/snippets/room_list.haml'
-    thread_list_template = 'forum/snippets/thread_list.haml'
     thread_edit_template = 'forum/add_post.haml'
 
     def thread_url(self, thread):
@@ -49,10 +47,7 @@ class ThreadsPlugin(ThreadsCorePlugin):
         self.urlizer['index'] = self.index_url
         self.urlizer['delete_thread'] = self.delete_thread_url
         self.urlizer['add_root_room'] = self.add_root_room_url
-        self.templates['room'] = 'forum/room.haml'
         self.templates['edit_thread'] = self.thread_edit_template
-        self.templates['room_list'] = self.room_list_template
-        self.templates['thread_list'] = self.thread_list_template
         self.templates['thread'] = 'forum/thread.haml'
         self.templates['delete_thread_form'] = \
             'forum/snippets/delete_post.haml'

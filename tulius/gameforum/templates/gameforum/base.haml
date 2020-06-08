@@ -27,16 +27,10 @@
             = form.caption|capfirst
 
 - block before_actions
-    - if variation.game.top_banner
-        - if parent_thread.room
-            .story-banner.hidden-phone
-                %img{src: '{{ variation.game.top_banner.url }}'}
+
                 
 - block after_actions
     - if parent_thread
         - with dropupmenu=1
             - include forum_site.templates.actions
-    - if variation.game.bottom_banner
-        - if parent_thread.room
-            .story-banner.hidden-phone
-                %img{src: '{{ variation.game.bottom_banner.url }}'}
+

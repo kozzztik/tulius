@@ -18,8 +18,6 @@ from djfw.wysibb.templatetags import bbcodes
 
 
 class GameThreadsPlugin(ThreadsPlugin):
-    room_list_template = 'gameforum/snippets/room_list.haml'
-    thread_list_template = 'gameforum/snippets/thread_list.haml'
     thread_edit_template = 'gameforum/add_post.haml'
 
     # pylint: disable=too-many-branches

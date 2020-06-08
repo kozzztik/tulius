@@ -30,21 +30,6 @@ class BaseThreadView(BasePluginView):
             self.user, parent_id, self.parent_is_room) if parent_id else None
 
 
-class Room(BaseThreadView):
-    template_name = 'room'
-    parent_is_room = True
-
-    def get_context_data(self, **kwargs):
-        context = super(Room, self).get_context_data(**kwargs)
-        context['rooms'] = self.core.get_subthreads(
-            self.user, self.parent_thread, True)
-        context['threads'] = self.core.get_subthreads(
-            self.user, self.parent_thread, False)
-        if not self.user.is_anonymous:
-            context['delete_post_form'] = PostDeleteForm()
-        return context
-
-
 class Index(generic.TemplateView):
     template_name = 'base_vue.html'
 
