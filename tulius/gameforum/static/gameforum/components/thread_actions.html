@@ -125,7 +125,7 @@
                         <small>
                             <div class="trustmark" v-if="!user.hide_trustmarks">
                                 Общее доверие:
-                                <span class="trust_value"></span>
+                                <span v-html="modal_role.trust_value"></span>%
                             </div>
                             Сообщений:
                             <span v-html="modal_role.comments_count"></span>
@@ -138,7 +138,7 @@
             </tbody>
         </table>
     </b-modal>
-    <form class="input-group btn-group-sm" method="post" :action="'/play/search/' + thread.tree_id + '/'">
+    <form class="input-group btn-group-sm" method="post" :action="'/play/search/' + variation.id + '/'">
         <input type="text" name="text" required="" id="id_text" class="form-control">
         <input type="hidden" name="csrfmiddlewaretoken" :value="csrftoken">
         <input id="id_thread" type="hidden" name="thread" :value="thread.id">

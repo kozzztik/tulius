@@ -166,9 +166,7 @@ class GameThreadsPlugin(ThreadsPlugin):
                 name='delete_thread'),
         ]
 
-# TODO forum actions trustmarks (also in char modal)
 # TODO forum actions illustration lightbox
-# TODO search action
 # TODO cleanup not used items
 # TODO threads page
 

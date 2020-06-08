@@ -4,6 +4,7 @@ from tulius.gameforum import views
 from tulius.gameforum import threads
 from tulius.gameforum import other
 from tulius.gameforum import online_status
+from tulius.gameforum.other import trust_marks
 
 
 app_name = 'tulius.gameforum'
@@ -15,6 +16,9 @@ urlpatterns = [
     urls.url(
         r'^variation/(?P<variation_id>\d+)/$',
         views.VariationAPI.as_view(), name='variation'),
+    urls.url(
+        r'^variation/(?P<variation_id>\d+)/trust_mark/(?P<role_id>\d+)/$',
+        trust_marks.TrustMarkAPI.as_view(), name='trust_mark'),
     urls.url(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/$',
         threads.ThreadAPI.as_view(), name='thread'),

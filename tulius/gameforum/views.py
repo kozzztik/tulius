@@ -93,6 +93,7 @@ class VariationAPI(VariationMixin):
                 'title': html.escape(role.name),
                 'avatar': role.avatar.image.url if role.avatar else None,
                 'comments_count': role.comments_count,
+                'trust_value': role.trust_value,
                 'description': role.description,
             } for role in character_list],
             'roles': [{
