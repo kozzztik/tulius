@@ -1,5 +1,6 @@
 import app from './app.js'
 import room from '../pages/room.js'
+import thread from '../pages/thread.js'
 import redirect from './redirect.js'
 
 
@@ -9,7 +10,7 @@ export default [
     {path: '/play/:variation_id(\\d+)', component: app,
         children: [
             {path: 'room/:id(\\d+)/', component: room, name: 'game_room'},
-            {path: 'thread/:id(\\d+)/', component: room, name: 'game_thread'},
+            {path: 'thread/:id(\\d+)/', component: thread, name: 'game_thread'},
       ]
     },
 ]

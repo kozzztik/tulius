@@ -11,17 +11,16 @@ export default LazyComponent('game_room_page', {
             breadcrumbs: [],
             loading: true,
             thread: { rooms: [], threads: []},
-            user: this.$root.user,
-            variation: null,
         }
+    },
+    computed: {
+        user: function() {return this.$root.user;},
+        variation: function() {return this.$parent.variation},
     },
     methods: {
         load_api(pk) {
-            this.variation = this.$parent.variation;
-            this.user = this.$root.user;
             this.$parent.loading_start();
-            const variation = this.$parent.variation
-            axios.get('/api/game_forum/variation/'+ variation.id + '/thread/' + pk + '/'
+            axios.get('/api/game_forum/variation/'+ this.variation.id + '/thread/' + pk + '/'
             ).then(response => {
                 const api_response = response.data;
                 this.breadcrumbs = []
@@ -32,7 +31,6 @@ export default LazyComponent('game_room_page', {
                 this.breadcrumbs.push(
                     {"url": api_response.url, "title": api_response.title});
                 this.thread = api_response;
-                this.user = this.$parent.user;
                 this.loading = false;
             }).catch(error => this.$root.add_message(error, "error"))
             .then(() => {

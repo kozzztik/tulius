@@ -1,6 +1,6 @@
 export default LazyComponent('game_forum_thread_actions', {
     template: '/static/gameforum/components/thread_actions.html',
-    props: ['variation', 'thread', 'user', 'upper'],
+    props: ['variation', 'thread', 'upper'],
     data: function () {
         return {
             csrftoken: getCookie('csrftoken'),
@@ -10,6 +10,7 @@ export default LazyComponent('game_forum_thread_actions', {
         }
     },
     computed: {
+        user: function() {return this.$root.user;},
         delete_title: function() {
             if (this.thread.room)
                 return 'Удалить эту комнату?'

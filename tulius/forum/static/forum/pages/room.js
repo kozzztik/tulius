@@ -11,8 +11,10 @@ export default LazyComponent('forum_room_page', {
             breadcrumbs: [],
             loading: true,
             thread: { rooms: [], threads: []},
-            user: {},
         }
+    },
+    computed: {
+        user: function() {return this.$root.user;}
     },
     methods: {
         load_api(pk) {
@@ -27,7 +29,6 @@ export default LazyComponent('forum_room_page', {
                 this.breadcrumbs.push(
                     {"url": api_response.url, "title": api_response.title});
                 this.thread = api_response;
-                this.user = this.$parent.user;
                 this.loading = false;
             }).catch(error => this.$parent.add_message(error, "error"))
             .then(() => {

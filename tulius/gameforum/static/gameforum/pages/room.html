@@ -2,7 +2,7 @@
     <div class="story-banner d-none d-md-block" v-if="variation.game">
         <img :src="variation.game.top_banner_url"  v-if="variation.game.top_banner_url" style="width: 100%">
     </div>
-    <game_forum_thread_actions :variation="variation" :user="user" :thread="thread" :upper="true" ref="thread_actions"></game_forum_thread_actions>
+    <game_forum_thread_actions :variation="variation" :thread="thread" :upper="true" ref="thread_actions"></game_forum_thread_actions>
 
     <div v-if="thread.rooms.length > 0" class="content">
         <div class="caption" align="center">
@@ -66,7 +66,7 @@
         <br>
     </div>
     <game_forum_online_status :variation="variation" :thread="thread"></game_forum_online_status>
-    <game_forum_thread_actions :variation="variation" :user="user" :thread="thread" :upper="false"></game_forum_thread_actions>
+    <game_forum_thread_actions :variation="variation" :thread="thread" :upper="false"></game_forum_thread_actions>
     <div class="story-banner d-none d-md-block" v-if="variation.game">
         <img :src="variation.game.bottom_banner_url"  v-if="variation.game.bottom_banner_url" style="width: 100%">
     </div>

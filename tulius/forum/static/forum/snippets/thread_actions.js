@@ -1,6 +1,6 @@
 export default LazyComponent('forum_thread_actions', {
     template: '/static/forum/snippets/thread_actions.html',
-    props: ['thread', 'user'],
+    props: ['thread'],
     data: function () {
         return {
             csrftoken: getCookie('csrftoken'),
@@ -8,6 +8,7 @@ export default LazyComponent('forum_thread_actions', {
         }
     },
     computed: {
+        user: function() {return this.$root.user;},
         delete_title: function() {
             if (this.thread.room)
                 return 'Удалить эту комнату?'
