@@ -24,16 +24,24 @@ export default LazyComponent('gameforum_thread_page', {
             if (this.thread.id == pk)
                 return;
             this.$root.loading_start();
-            axios.get(
-                '/api/game_forum/variation/'+ this.variation.id + '/thread/' + pk + '/'
-            ).then(response => {
+            axios.get(this.variation.url + 'thread/' + pk + '/').then(response => {
                 this.thread = response.data;
                 this.breadcrumbs = []
                 for (var item of this.thread.parents)
-                    this.breadcrumbs.push(
-                        {"url": item.url, "title": item.title});
-                this.breadcrumbs.push(
-                    {"url": this.thread.url, "title": this.thread.title});
+                    this.breadcrumbs.push({
+                        title: item.title,
+                        url: {
+                            name: 'game_room',
+                            params: {id: item.id, variation_id: this.variation.id},
+                        }
+                    });
+                this.breadcrumbs.push({
+                    title: this.thread.title,
+                    url: {
+                        name: 'game_thread',
+                        params: {id: this.thread.id, variation_id: this.variation.id},
+                    },
+                });
                 this.loading = false;
             }).catch(error => this.$root.add_message(error, "error"))
             .then(() => {
@@ -41,7 +49,7 @@ export default LazyComponent('gameforum_thread_page', {
             });
         },
         mark_all_not_readed() {
-            axios.delete('/api/game_forum/variation/'+ this.variation.id + '/thread/'+ this.thread.id + '/read_mark/').then(response => {
+            axios.delete(this.thread.url + 'read_mark/').then(response => {
                 this.thread.last_read_id = response.data.last_read_id;
                 this.thread.not_read_comment = response.data.not_read_comment;
             }).catch(error => this.$parent.add_message(error, "error"));

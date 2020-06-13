@@ -95,7 +95,7 @@ export default LazyComponent('forum_thread_comments', {
             if (this.$parent.$refs.reply_form)
                 this.$parent.$refs.reply_form.hide();
             this.$root.loading_start();
-            axios.get('/api/forum/thread/'+ this.thread.id + '/comments_page/' + this.value + '/').then(response => {
+            axios.get(this.thread.url + 'comments_page/' + this.value + '/').then(response => {
                 this.set_new_comments(response.data.comments);
                 this.pagination = response.data.pagination;
                 this.subscribe_comments();
@@ -131,7 +131,7 @@ export default LazyComponent('forum_thread_comments', {
         },
         do_mark_mark_as_read(comment_id) {
             // console.log('пошел запрос');
-            axios.post('/api/forum/thread/'+ this.thread.id + '/read_mark/', {'comment_id': comment_id}).then(response => {
+            axios.post(this.thread.url + 'read_mark/', {'comment_id': comment_id}).then(response => {
                 this.thread.last_read_id = response.data.last_read_id;
                 this.thread.not_read_comment = response.data.not_read_comment;
             }).catch(error => this.$root.add_message(error, "error")).then(() => {

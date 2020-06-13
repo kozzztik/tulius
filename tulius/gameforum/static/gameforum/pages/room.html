@@ -13,6 +13,9 @@
             <div class="captionright"></div>
         </div>
         <forum_room_list :rooms="thread.rooms">
+            <template v-slot:title="slotProps">
+                <router-link :to="{ name: 'game_room', params: { id: slotProps.room.id, variation_id: variation.id }}">{{ slotProps.room.title }}</router-link>
+            </template>
             <template v-slot:moderators="slotProps">
                 <h6 v-if="slotProps.room.moderators.length > 0" class="moderators">Модераторы:</h6>
                 <ul v-if="slotProps.room.moderators" class="moderators">
@@ -42,6 +45,15 @@
             <div class="captionright"></div>
         </div>
         <forum_thread_list :threads="thread.threads">
+            <template v-slot:title="slotProps">
+                <router-link :to="{ name: 'game_thread', params: { id: slotProps.thread.id }}" v-html="slotProps.thread.title"></router-link>
+            </template>
+            <template v-slot:pages="slotProps">
+                <router-link :to="{ name: 'game_thread', params: { id: slotProps.thread.id }, query: {page: num + 1}}"
+                             v-for="num in Array(slotProps.thread.pages_count).keys()" :key="num">
+                                {{num + 1 }}
+                </router-link>
+            </template>
             <template v-slot:author="slotProps">
                 <div v-if="slotProps.thread.user">
                     <a href="javascript:void(0)" @click="show_role_modal(slotProps.thread.user.id)" v-if="role_with_link(slotProps.thread.user.id)">{{ slotProps.thread.user.title }}</a>

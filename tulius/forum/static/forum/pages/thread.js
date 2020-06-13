@@ -27,10 +27,20 @@ export default LazyComponent('forum_thread_page', {
                 this.thread = response.data;
                 this.breadcrumbs = [{"url": "/forums/", "title": "Форумы"}]
                 for (var item of this.thread.parents)
-                    this.breadcrumbs.push(
-                        {"url": item.url, "title": item.title});
-                this.breadcrumbs.push(
-                    {"url": this.thread.url, "title": this.thread.title});
+                    this.breadcrumbs.push({
+                        title: item.title,
+                        url: {
+                            name: 'forum_room',
+                            params: {id: item.id},
+                        },
+                    });
+                this.breadcrumbs.push({
+                    title: this.thread.title,
+                    url: {
+                        name: 'forum_thread',
+                        params: {id: this.thread.id},
+                    },
+                });
                 this.loading = false;
             }).catch(error => this.$root.add_message(error, "error"))
             .then(() => {
@@ -38,7 +48,7 @@ export default LazyComponent('forum_thread_page', {
             });
         },
         mark_all_not_readed() {
-            axios.delete('/api/forum/thread/'+ this.thread.id + '/read_mark/').then(response => {
+            axios.delete(this.thread.url + 'read_mark/').then(response => {
                 this.thread.last_read_id = response.data.last_read_id;
                 this.thread.not_read_comment = response.data.not_read_comment;
             }).catch(error => this.$parent.add_message(error, "error"));

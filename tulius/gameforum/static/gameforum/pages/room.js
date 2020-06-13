@@ -20,16 +20,25 @@ export default LazyComponent('game_room_page', {
     methods: {
         load_api(pk) {
             this.$parent.loading_start();
-            axios.get('/api/game_forum/variation/'+ this.variation.id + '/thread/' + pk + '/'
+            axios.get(this.variation.url + 'thread/' + pk + '/'
             ).then(response => {
                 const api_response = response.data;
                 this.breadcrumbs = []
                 api_response.parents.forEach(
-                    (item, i, arr) => this.breadcrumbs.push(
-                        {"url": item.url, "title": item.title}
-                    ));
-                this.breadcrumbs.push(
-                    {"url": api_response.url, "title": api_response.title});
+                    (item, i, arr) => this.breadcrumbs.push({
+                        title: item.title,
+                        url: {
+                            name: 'game_room',
+                            params: {id: item.id, variation_id: this.variation.id}
+                        }
+                    }));
+                this.breadcrumbs.push({
+                    title: api_response.title,
+                    url: {
+                        name: 'game_room',
+                        params: {id: api_response.id, variation_id: this.variation.id}
+                    }
+                });
                 this.thread = api_response;
                 this.loading = false;
             }).catch(error => this.$root.add_message(error, "error"))

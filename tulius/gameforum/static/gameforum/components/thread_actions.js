@@ -36,9 +36,7 @@ export default LazyComponent('game_forum_thread_actions', {
             this.$parent.mark_all_not_readed();
         },
         delete_thread(bvModalEvt) {
-            axios.delete(
-                '/api/game_forum/variation/'+ this.variation.id + '/thread/' + this.thread.id + '/',
-                {params: {comment: this.delete_comment}}
+            axios.delete(this.thread.url, {params: {comment: this.delete_comment}}
             ).then(response => {
                 if (response.data['result'] == 'success') {
                     if (this.thread.room)

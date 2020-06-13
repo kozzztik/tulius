@@ -153,9 +153,7 @@ class BaseThreadView(plugins.BaseAPIView):
 
     @staticmethod
     def thread_url(thread):
-        return urls.reverse(
-            'forum:room' if thread.room else 'forum:thread',
-            kwargs={'parent_id': thread.id})
+        return urls.reverse('forum_api:thread', kwargs={'pk': thread.id})
 
     def room_to_json(self, thread):
         return {

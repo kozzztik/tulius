@@ -168,6 +168,8 @@ class GameThreadsPlugin(ThreadsPlugin):
 
 # TODO cleanup not used items
 # TODO threads page
+# TODO unreaded url and last comment url
+# TODO move mouse_over out of comment snippet
 
 
 class BaseThreadAPI(api.BaseThreadView, gameforum_views.VariationMixin):
@@ -196,7 +198,7 @@ class BaseThreadAPI(api.BaseThreadView, gameforum_views.VariationMixin):
 
     def thread_url(self, thread):
         return urls.reverse(
-            'gameforum:room_new' if thread.room else 'gameforum:thread_new',
+            'game_forum_api:thread',
             kwargs={
                 'variation_id': self.variation.id, 'pk': thread.id})
 

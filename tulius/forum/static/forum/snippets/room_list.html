@@ -21,7 +21,9 @@
             <td>
                 <div class="forum-post-description">
                     <h4>
-                        <router-link :to="room.url">{{ room.title }}</router-link>
+                        <slot v-bind:room="room" name="title">
+                            <router-link :to="{ name: 'forum_room', params: { id: room.id }}">{{ room.title }}</router-link>
+                        </slot>
                     </h4>
                     <div class=".hidden-phone" v-if="room.body">
                         {{ room.body }}

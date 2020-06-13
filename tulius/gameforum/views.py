@@ -1,4 +1,5 @@
 from django import http
+from django import urls
 from django.views import generic
 from django.core import exceptions
 from django.utils import html
@@ -86,6 +87,9 @@ class VariationAPI(VariationMixin):
         illustrations = stories_models.Illustration.objects.filter(query)
         return {
             'id': self.obj.id,
+            'url': urls.reverse(
+                'game_forum_api:variation',
+                kwargs={'variation_id': self.variation.id}),
             'game':
                 self.game_to_json(self.obj.game) if self.obj.game_id else None,
             'characters': [{

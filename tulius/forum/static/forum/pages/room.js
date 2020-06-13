@@ -23,11 +23,20 @@ export default LazyComponent('forum_room_page', {
                 const api_response = response.data;
                 this.breadcrumbs = [{"url": "/forums/", "title": "Форумы"}]
                 api_response.parents.forEach(
-                    (item, i, arr) => this.breadcrumbs.push(
-                        {"url": item.url, "title": item.title}
-                    ));
-                this.breadcrumbs.push(
-                    {"url": api_response.url, "title": api_response.title});
+                    (item, i, arr) => this.breadcrumbs.push({
+                        title: item.title,
+                        url: {
+                            name: 'forum_room',
+                            params: {id: item.id},
+                        },
+                    }));
+                this.breadcrumbs.push({
+                    title: api_response.title,
+                    url: {
+                        name: 'forum_room',
+                        params: {id: api_response.id},
+                    },
+                });
                 this.thread = api_response;
                 this.loading = false;
             }).catch(error => this.$parent.add_message(error, "error"))
