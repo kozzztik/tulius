@@ -1,11 +1,8 @@
-import json
-
 from django import http
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
 from tulius.forum.plugins import BasePluginView
-from .forms import PostDeleteForm
 
 
 class BaseThreadView(BasePluginView):
@@ -97,45 +94,6 @@ class EditView(BaseThreadView):
         if self.thread:
             return http.HttpResponseRedirect(self.thread.get_absolute_url)
         return self.render_to_response(context)
-
-
-class Thread(BaseThreadView):
-    template_name = 'thread'
-    parent_is_room = False
-
-    def get_context_data(self, **kwargs):
-        context = super(Thread, self).get_context_data(**kwargs)
-        page = int(self.request.GET['page']) if \
-            'page' in self.request.GET else 1
-        context['page'] = page
-        context.update(self.core.get_comments_pagination(
-            self.request, self.parent_thread, page))
-
-        if not self.user.is_anonymous:
-            context['delete_post_form'] = PostDeleteForm()
-        return context
-
-
-class DeleteThread(BasePluginView):
-    def post(self, request):
-        form = PostDeleteForm(data=request.POST or None)
-        success = 'error'
-        error_text = ''
-        redirect = ''
-        if not form.is_valid():
-            error_text = _('Form not valid')
-        else:
-            thread_id = form.cleaned_data['post']
-            message = form.cleaned_data['message']
-            (success, error_text, redirect, text) = self.core.delete_thread(
-                request.user, thread_id, message)
-        return HttpResponse(
-            json.dumps({
-                'result': success,
-                'error_text': str(error_text),
-                'redirect': redirect,
-                'text': str(text)
-            }))
 
 
 class MoveThreadSelect(BaseThreadView):

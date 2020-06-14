@@ -211,40 +211,6 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
             thread = None
         return form, formset, thread, comment
 
-    def delete_thread(self, user, thread_id, message):
-        models = self.site.models
-        success = 'error'
-        error_text = ''
-        redirect = ''
-        text = ''
-        thread = None
-        try:
-            thread_id = int(thread_id)
-            thread = models.Thread.objects.select_for_update().get(
-                id=thread_id)
-        except:
-            error_text = _('Thread not found %(post_id)s.') % {
-                'post_id': thread_id}
-        if thread:
-            if not thread.edit_right(user):
-                error_text = _(
-                    'You have no rights to delete thread %(post_id)s.') % {
-                        'post_id': thread_id}
-            else:
-                thread.deleted = True
-                delete_mark = models.ThreadDeleteMark(
-                    thread=thread, user=user, description=message)
-                thread.save()
-                delete_mark.save()
-                if thread.parent:
-                    redirect = thread.parent.get_absolute_url
-                else:
-                    redirect = self.reverse('index')
-            success = 'success'
-            text = _('Room successfully deleted!') if thread.room else _(
-                'Thread successfully deleted!')
-        return success, error_text, redirect, text
-
     def search_list(self, user, parent, **kwargs):
         queryset = self.models.Thread.objects.filter(
             plugin_id=self.site_id, deleted=False, parent=parent, **kwargs)
@@ -346,7 +312,6 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
         self.core['get_parent_thread'] = self.get_parent_thread
         self.core['process_edit_room'] = self.process_edit_room
         self.core['process_edit_thread'] = self.process_edit_thread
-        self.core['delete_thread'] = self.delete_thread
         self.core['room_descendants'] = self.room_descendants
         self.core['move_thread'] = self.move_thread
         self.core['thread_move_list'] = self.move_list

@@ -38,24 +38,20 @@ export default LazyComponent('game_forum_thread_actions', {
         delete_thread(bvModalEvt) {
             axios.delete(this.thread.url, {params: {comment: this.delete_comment}}
             ).then(response => {
-                if (response.data['result'] == 'success') {
-                    if (this.thread.room)
-                        this.$root.add_message("Комната успешно удалена", "warning");
-                    else
-                        this.$root.add_message("Тема успешно удалена", "warning");
-                    if (this.thread.parents.length > 0) {
-                        this.$router.push({
-                            name: 'game_room',
-                            params: {
-                                id: this.thread.parents[this.thread.parents.length - 1].id,
-                                variation_id: this.variation.id,
-                            }
-                        })
-                    } else {
-                        this.$router.push({ name: 'forum_root'})
-                    }
+                if (this.thread.room)
+                    this.$root.add_message("Комната успешно удалена", "warning");
+                else
+                    this.$root.add_message("Тема успешно удалена", "warning");
+                if (this.thread.parents.length > 0) {
+                    this.$router.push({
+                        name: 'game_room',
+                        params: {
+                            id: this.thread.parents[this.thread.parents.length - 1].id,
+                            variation_id: this.variation.id,
+                        }
+                    })
                 } else {
-                    this.$root.add_message(response.data['error_text'], "error");
+                    this.$router.push({ name: 'forum_root'})
                 }
             }).catch(error => this.$root.add_message(error, "error"))
             .then(() => {});

@@ -10,7 +10,6 @@ from djfw.wysibb.templatetags import bbcodes
 from tulius.core.ckeditor import html_converter
 from tulius.forum import site
 from tulius.forum import models
-from tulius.forum import plugins
 from tulius.forum import signals
 from tulius.forum.threads import api
 from tulius.forum.comments import pagination
@@ -126,23 +125,35 @@ class CommentsPageAPI(CommentsBase):
         return self.get_context_data(page_num=page, **kwargs)
 
 
-class CommentAPI(plugins.BaseAPIView):
-    obj = None
+class CommentAPI(CommentsBase):
+    comment = None
 
-    def get_comment(self, **kwargs):
-        core = site.site.core
-        self.obj = core.get_parent_comment(self.user, kwargs['pk'], False)[1]
+    def get_comment(self, pk, for_update=False, **kwargs):
+        query = models.Comment.objects.filter(deleted=False)
+        if for_update:
+            query = query.select_for_update()
+        self.comment = shortcuts.get_object_or_404(
+            query, id=int(pk), plugin_id=self.plugin_id)
+        self.get_parent_thread(
+            pk=self.comment.parent_id, for_update=for_update, **kwargs)
 
     def get_context_data(self, **kwargs):
         self.get_comment(**kwargs)
-        return comment_to_json(self.obj)
+        return comment_to_json(self.comment)
 
+    @transaction.atomic
     def delete(self, *args, **kwargs):
-        self.get_comment(**kwargs)
-        if self.obj.is_thread():
-            raise models.Comment.DoesNotExist()
-        site.site.core.delete_comment(
-            self.user, self.obj.id, self.request.GET['comment'])
-        thread = models.Thread.objects.get(pk=self.obj.parent.id)
+        self.get_comment(for_update=True, **kwargs)
+        if self.comment.is_thread():
+            raise exceptions.PermissionDenied()
+        if not self.comment_edit_right(self.comment):
+            raise exceptions.PermissionDenied()
+        self.comment.deleted = True
+        delete_mark = models.CommentDeleteMark(
+            comment=self.comment,
+            user=self.user,
+            description=self.request.GET['comment'])
+        self.comment.save()
+        delete_mark.save()
         # TODO clients notification
-        return {'pages_count': thread.pages_count}
+        return {'pages_count': self.obj.pages_count}

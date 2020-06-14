@@ -109,41 +109,6 @@ class CommentsCore(plugins.ForumPlugin):
             parent_thread, user=user, comments=comments)
         return comments
 
-    def delete_comment(self, user, comment_id, message):
-        models = self.site.models
-        success = 'error'
-        error_text = ''
-        redirect = ''
-        text = ''
-        comment = None
-        try:
-            comment_id = int(comment_id)
-            comment = models.Comment.objects.select_for_update(
-
-            ).select_related('parent').get(id=comment_id)
-        except:
-            error_text = _(
-                'Comment not found %(post_id)s.') % {'post_id': comment_id}
-        if comment:
-            if comment.is_thread():
-                return self.site.core.delete_thread(
-                    user, comment.parent_id, message)
-            if not ((comment.user_id == user.id) or
-                    comment.parent.moderate_right(user)):
-                error_text = _(
-                    'You have no rights to delete comment %(post_id)s.'
-                ) % {'post_id': comment_id}
-            else:
-                comment.deleted = True
-                delete_mark = models.CommentDeleteMark(
-                    comment=comment, user=user, description=message)
-                comment.save()
-                delete_mark.save()
-                redirect = comment.parent.get_absolute_url
-            success = 'success'
-            text = _('Comment successfully deleted!')
-        return success, error_text, redirect, text
-
     def thread_pages_count(self, thread):
         return int(
             (thread.comments_count - 1) / self.COMMENTS_ON_PAGE + 1) or 1
@@ -298,7 +263,6 @@ class CommentsCore(plugins.ForumPlugin):
         self.core['get_parent_comment'] = self.get_parent_comment
         self.core['process_edit_comment'] = self.process_edit_comment
         self.core['get_comments_page'] = self.get_comments_page
-        self.core['delete_comment'] = self.delete_comment
         self.core['get_comments_pagination'] = self.get_comments_pagination
         self.core['Thread_get_first_comment'] = self.get_thread_first_comment
         self.core['Thread_pages_count'] = self.thread_pages_count

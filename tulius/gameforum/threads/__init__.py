@@ -160,10 +160,6 @@ class GameThreadsPlugin(ThreadsPlugin):
             url(r'^thread/(?P<parent_id>\d+)/move/root/$',
                 views.MoveThreadConfirm.as_view(plugin=self),
                 name='thread_move_confirm'),
-            url(
-                r'^delete_thread/$',
-                views.DeleteThread.as_view(plugin=self),
-                name='delete_thread'),
         ]
 
 # TODO cleanup not used items
@@ -172,14 +168,16 @@ class GameThreadsPlugin(ThreadsPlugin):
 # TODO move mouse_over out of comment snippet
 # TODO move transaction control to BaseAPI
 # TODO change comment url
+# TODO last comment user in rooms?
 
 
 class BaseThreadAPI(api.BaseThreadView, gameforum_views.VariationMixin):
     plugin_id = consts.GAME_FORUM_SITE_ID
     all_roles: dict = None
 
-    def get_parent_thread(self, **kwargs):
-        super(BaseThreadAPI, self).get_parent_thread(**kwargs)
+    def get_parent_thread(self, pk=None, for_update=False, **kwargs):
+        super(BaseThreadAPI, self).get_parent_thread(
+            pk=pk, for_update=for_update, **kwargs)
         roles = stories_models.Role.objects.filter(
             variation=self.variation)
         self.all_roles = {role.id: role for role in roles}

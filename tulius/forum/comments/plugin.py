@@ -2,7 +2,7 @@ from django.conf.urls import url
 
 from .core import CommentsCore
 from .views import EditComment, FastReply, CommentsPage, \
-    CommentRedirrect, Preview, DeleteComment
+    CommentRedirrect, Preview
 
 
 class CommentsPlugin(CommentsCore):
@@ -18,9 +18,6 @@ class CommentsPlugin(CommentsCore):
     def comment_url(self, comment):
         # TODO hope this wouldn't crush nothing. refactor all of that.
         return self.get_paged_url(comment)
-
-    def delete_comment_url(self):
-        return self.reverse('delete_comment')
 
     def thread_comments_page_url(self, thread):
         return self.reverse('comments_page', thread.id)
@@ -58,13 +55,11 @@ class CommentsPlugin(CommentsCore):
         self.urlizer['comment_paged'] = self.get_paged_url
         self.urlizer['Comment_get_paged_url'] = self.get_paged_url
         self.urlizer['Comment_get_absolute_url'] = self.comment_url
-        self.urlizer['Comment_get_delete_url'] = self.delete_comment_url
         self.urlizer['Comment_get_reply_url'] = self.reply_url
         self.urlizer['Comment_get_fast_reply_url'] = self.fast_reply_url
         self.urlizer['Comment_get_edit_url'] = self.get_edit_url
         self.urlizer['Comment_reply_str'] = self.reply_str
 
-        self.urlizer['delete_comment'] = self.delete_comment_url
         self.urlizer['Thread_comments_page_url'] = \
             self.thread_comments_page_url
         self.core['Comment_get_page_num'] = self.get_page_num
@@ -91,9 +86,5 @@ class CommentsPlugin(CommentsCore):
                 r'^comments_page/(?P<thread_id>\d+)/$',
                 CommentsPage.as_view(plugin=self),
                 name='comments_page'),
-            url(
-                r'^delete_comment/$',
-                DeleteComment.as_view(plugin=self),
-                name='delete_comment'),
             url(r'^preview/$', Preview.as_view(plugin=self), name='preview'),
         ]

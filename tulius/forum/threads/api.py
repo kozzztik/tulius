@@ -4,9 +4,9 @@ from django import urls
 from django.core import exceptions
 from django.core.cache import cache
 from django.utils import html
+from django.db import transaction
 from django.db.models import query_utils
 
-from tulius.forum import site
 from tulius.forum import plugins
 from tulius.forum import const
 from tulius.forum import models
@@ -49,14 +49,13 @@ class BaseThreadView(plugins.BaseAPIView):
         return forum_rights.default.DefaultRightsChecker(
             thread, self.user, parent_rights=parent_rights)
 
-    def get_parent_thread(self, **kwargs):
-        thread_id = kwargs['pk'] if 'pk' in kwargs else None
-        try:
-            thread_id = int(thread_id)
-        except:
-            raise http.Http404()
+    def get_parent_thread(self, pk=None, for_update=False, **kwargs):
+        thread_id = int(pk)
+        query = models.Thread.objects.filter(deleted=False)
+        if for_update:
+            query = query.select_for_update()
         self.obj = shortcuts.get_object_or_404(
-            models.Thread, id=thread_id, plugin_id=self.plugin_id)
+            query, id=thread_id, plugin_id=self.plugin_id)
         # TODO delete all sub threads and rooms on room delete so it will be
         # TODO not needed to do parent check here
         if self.obj.check_deleted():
@@ -212,15 +211,19 @@ class ThreadView(BaseThreadView):
         signals.thread_view.send(self, response=response)
         return response
 
-    def delete(self, request, *args, **kwargs):
-        self.get_parent_thread(**kwargs)
-        (success, error_text, _, text) = site.site.core.delete_thread(
-            request.user, self.obj.id, request.GET['comment'])
-        return {
-            'result': success,
-            'error_text': str(error_text),
-            'text': str(text)
-        }
+    @transaction.atomic
+    def delete(self, request, **kwargs):
+        self.get_parent_thread(for_update=True, **kwargs)
+        if not self.rights.edit:
+            raise exceptions.PermissionDenied()
+        self.obj.deleted = True
+        delete_mark = models.ThreadDeleteMark(
+            thread=self.obj,
+            user=self.user,
+            description=request.GET['comment'])
+        self.obj.save()
+        delete_mark.save()
+        return {'result': True}
 
 
 class IndexView(BaseThreadView):
