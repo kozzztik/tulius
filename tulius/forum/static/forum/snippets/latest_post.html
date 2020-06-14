@@ -1,7 +1,6 @@
 <div v-if="comment">
-    <router-link :to="comment.url">
-        <span v-html="comment.user.title" v-if="comment.user"></span>
-        <span v-if="!comment.user">---</span>
+    <router-link :to="comment_url(comment)">
+        <span v-html="comment.user.title"></span>
     </router-link>
     <br>
     {{ forum_datetime(comment.create_time) }}

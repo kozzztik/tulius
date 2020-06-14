@@ -148,7 +148,7 @@ class BaseThreadView(plugins.BaseAPIView):
         return urls.reverse('forum_api:thread', kwargs={'pk': thread.id})
 
     def room_to_json(self, thread):
-        return {
+        data = {
             'id': thread.pk,
             'title': html.escape(thread.title),
             'body': bbcodes.bbcode(thread.body),
@@ -165,14 +165,9 @@ class BaseThreadView(plugins.BaseAPIView):
             'comments_count': thread.comments_count,
             'pages_count': thread.pages_count,
             'url': self.thread_url(thread),
-            'last_comment': {
-                'url': thread.last_comment.get_absolute_url,
-                'user': user_to_json(thread.last_comment.user),
-                'create_time': thread.last_comment.create_time,
-            } if thread.last_comment else None,
-            'unreaded':
-                thread.unreaded.get_absolute_url if thread.unreaded else None,
         }
+        signals.thread_room_to_json.send(self, thread=thread, response=data)
+        return data
 
 
 class ThreadView(BaseThreadView):

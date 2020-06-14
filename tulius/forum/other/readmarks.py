@@ -93,6 +93,15 @@ def thread_prepare_thread(sender, threads, **kwargs):
     threads += important_threads + unreaded_threads + readed_threads
 
 
+@dispatch.receiver(signals.thread_room_to_json)
+def room_to_json(sender, thread, response, **kwargs):
+    response['unreaded'] = {
+        'id': thread.unreaded.id,
+        'parent_id': thread.unreaded.parent_id,
+        'page': thread.unreaded.page
+    } if thread.unreaded else None
+
+
 @dispatch.receiver(signals.thread_view)
 def thread_view(sender, **kwargs):
     response = kwargs['response']

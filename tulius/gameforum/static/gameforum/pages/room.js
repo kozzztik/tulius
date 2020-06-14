@@ -70,6 +70,36 @@ export default LazyComponent('game_room_page', {
                 this.load_api(this.thread.id);
             });
         },
+        comment_url(comment) {
+            return {
+                name: 'game_thread',
+                params: {
+                    id: comment.parent_id,
+                    variation_id: this.variation.id
+                },
+                query: { page: comment.page },
+                hash: '#' + comment.id,
+            }
+        },
+        room_url(thread) {
+            return {
+                name: 'game_room',
+                params: {
+                    id: thread.id,
+                    variation_id: this.variation.id
+                },
+            }
+        },
+        thread_url(thread, page) {
+            return {
+                name: 'game_thread',
+                params: {
+                    id: thread.id,
+                    variation_id: this.variation.id
+                },
+                query: { page: page },
+            }
+        },
     },
     mounted() {this.load_api(this.$route.params.id)},
     beforeRouteUpdate (to, from, next) {

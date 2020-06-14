@@ -27,19 +27,18 @@ def prepare_room_list(sender, room, threads, **kwargs):
             room.last_comment_id = thread.last_comment_id
 
 
-def comment_to_json(c):
-    return {
-        'id': c.id,
-        'url': c.get_absolute_url,
-        'title': html.escape(c.title),
-        'body': bbcodes.bbcode(c.body),
-        'user': api.user_to_json(c.user, detailed=True),
-        'create_time': c.create_time,
-        'voting': c.voting,
-        'edit_right': c.edit_right,
-        'is_thread': c.is_thread(),
-        'edit_time': c.edit_time,
-        'editor': api.user_to_json(c.editor) if c.editor else None
+@dispatch.receiver(signals.thread_room_to_json)
+def room_to_json(sender, thread, response, **kwargs):
+    if thread.plugin_id is not None:
+        return
+    if thread.last_comment is None:
+        return
+    response['last_comment'] = {
+        'id': thread.last_comment.id,
+        'parent_id': thread.last_comment.parent_id,
+        'page': thread.last_comment.page,
+        'user': api.user_to_json(thread.last_comment.user),
+        'create_time': thread.last_comment.create_time,
     }
 
 
@@ -111,7 +110,7 @@ class CommentsPageAPI(CommentsBase):
         if text:
             comment = self.create_comment(text, reply_id)
             if preview:
-                return comment_to_json(comment)
+                return self.comment_to_json(comment)
             comment.save()
             site.site.signals.comment_after_fastreply.send(self)
             # commit transaction to be sure that clients wouldn't be notified
@@ -139,7 +138,7 @@ class CommentAPI(CommentsBase):
 
     def get_context_data(self, **kwargs):
         self.get_comment(**kwargs)
-        return comment_to_json(self.comment)
+        return self.comment_to_json(self.comment)
 
     @transaction.atomic
     def delete(self, *args, **kwargs):

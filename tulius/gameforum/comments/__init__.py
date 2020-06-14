@@ -1,7 +1,10 @@
+from django import dispatch
 from django.utils.translation import ugettext_lazy as _, pgettext
 from django.utils import html
 from djfw.wysibb.templatetags import bbcodes
 
+from tulius.forum import signals
+from tulius.gameforum import consts
 from tulius.gameforum import threads
 from tulius.forum.comments import api as comments
 from tulius.forum.comments import plugin
@@ -61,6 +64,21 @@ class GameCommentsPlugin(plugin.CommentsPlugin):
         super(GameCommentsPlugin, self).init_core()
         self.before_save_comment_signal.connect(self.before_save_comment)
         self.after_add_comment_signal.connect(self.after_add_comment)
+
+
+@dispatch.receiver(signals.thread_room_to_json)
+def room_to_json(sender, thread, response, **kwargs):
+    if thread.plugin_id != consts.GAME_FORUM_SITE_ID:
+        return
+    if thread.last_comment is None:
+        return
+    response['last_comment'] = {
+        'id': thread.last_comment.id,
+        'parent_id': thread.last_comment.parent_id,
+        'page': thread.last_comment.page,
+        'user': sender.role_to_json(thread.last_comment.data1),
+        'create_time': thread.last_comment.create_time,
+    }
 
 
 class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):

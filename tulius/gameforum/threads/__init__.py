@@ -4,7 +4,7 @@ from django.utils import html
 from django import urls
 
 from tulius.stories import models as stories_models
-# TODO: fix this when module moved
+from tulius.forum import signals
 from tulius.forum.threads import views
 from tulius.forum.threads import api
 from tulius.forum.threads.plugin import ThreadsPlugin
@@ -164,11 +164,9 @@ class GameThreadsPlugin(ThreadsPlugin):
 
 # TODO cleanup not used items
 # TODO threads page
-# TODO unreaded url and last comment url
 # TODO move mouse_over out of comment snippet
 # TODO move transaction control to BaseAPI
 # TODO change comment url
-# TODO last comment user in rooms?
 
 
 class BaseThreadAPI(api.BaseThreadView, gameforum_views.VariationMixin):
@@ -221,7 +219,7 @@ class BaseThreadAPI(api.BaseThreadView, gameforum_views.VariationMixin):
                 'variation_id': self.variation.id, 'pk': thread.id})
 
     def room_to_json(self, thread):
-        return {
+        data = {
             'id': thread.pk,
             'title': html.escape(thread.title),
             'body': bbcodes.bbcode(thread.body),
@@ -239,14 +237,9 @@ class BaseThreadAPI(api.BaseThreadView, gameforum_views.VariationMixin):
             'comments_count': thread.comments_count,
             'pages_count': thread.pages_count,
             'url': self.thread_url(thread),
-            'last_comment': {
-                'url': thread.last_comment.get_absolute_url,
-                'user': self.role_to_json(thread.last_comment.data1),
-                'create_time': thread.last_comment.create_time,
-            } if thread.last_comment else None,
-            'unreaded':
-                thread.unreaded.get_absolute_url if thread.unreaded else None,
         }
+        signals.thread_room_to_json.send(self, thread=thread, response=data)
+        return data
 
 
 class ThreadAPI(api.ThreadView, BaseThreadAPI):
