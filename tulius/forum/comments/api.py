@@ -44,27 +44,57 @@ def comment_to_json(c):
     }
 
 
-class CommentsPageAPI(api.BaseThreadView):
-    def get_context_data(self, **kwargs):
-        super(CommentsPageAPI, self).get_context_data(**kwargs)
-        page_num = int(kwargs['page_num'])
-        comments = models.Comment.objects.select_related('user')
-        comments = comments.filter(
-            parent=self.obj, page=page_num).exclude(deleted=True)
-        for comment in comments:
-            comment.view_user = self.user
-            comment.parent = self.obj
-        pagination_context = pagination.get_pagination_context(
-            self.request, page_num, self.obj.pages_count)
+class CommentsBase(api.BaseThreadView):
+    def comment_edit_right(self, comment):
+        return (comment.user == self.user) or self.rights.moderate
+
+    def comment_to_json(self, c):
         return {
-            'pagination': pagination_context,
-            'comments': [comment_to_json(c) for c in comments]
+            'id': c.id,
+            'url': c.get_absolute_url,
+            'title': html.escape(c.title),
+            'body': bbcodes.bbcode(c.body),
+            'user': api.user_to_json(c.user, detailed=True),
+            'create_time': c.create_time,
+            'voting': c.voting,
+            'edit_right': self.comment_edit_right(c),
+            'is_thread': c.is_thread(),
+            'edit_time': c.edit_time,
+            'editor': api.user_to_json(c.editor) if c.editor else None
         }
 
     @classmethod
     def as_view(cls, **initkwargs):
-        view = super(CommentsPageAPI, cls).as_view(**initkwargs)
+        view = super(CommentsBase, cls).as_view(**initkwargs)
         return transaction.non_atomic_requests(view)
+
+
+class CommentsPageAPI(CommentsBase):
+    def get_context_data(self, **kwargs):
+        self.get_parent_thread(**kwargs)
+        page_num = int(self.request.GET.get('page', 1))
+        comments = models.Comment.objects.select_related('user')
+        comments = comments.filter(
+            parent=self.obj, page=page_num).exclude(deleted=True)
+        for comment in comments:
+            # TODO remove it. needed only for c.is_thread() call
+            comment.parent = self.obj
+        # TODO move pagination to frontend
+        pagination_context = pagination.get_pagination_context(
+            self.request, page_num, self.obj.pages_count)
+        return {
+            'pagination': pagination_context,
+            'comments': [self.comment_to_json(c) for c in comments]
+        }
+
+    def create_comment(self, text, reply_id):
+        comment = models.Comment(plugin_id=self.obj.plugin_id)
+        comment.parent = self.obj
+        comment.user = self.user
+        comment.title = "Re: " + self.obj.title
+        comment.body = text
+        comment.reply_id = reply_id
+        return comment
 
     def post(self, *args, **kwargs):
         transaction.set_autocommit(False)
@@ -80,12 +110,7 @@ class CommentsPageAPI(api.BaseThreadView):
                 raise exceptions.PermissionDenied()
         preview = data.get('preview', False)
         if text:
-            comment = models.Comment(plugin_id=self.obj.plugin_id)
-            comment.parent = self.obj
-            comment.user = self.user
-            comment.title = "Re: " + self.obj.title
-            comment.body = text
-            comment.reply_id = reply_id
+            comment = self.create_comment(text, reply_id)
             if preview:
                 return comment_to_json(comment)
             comment.save()

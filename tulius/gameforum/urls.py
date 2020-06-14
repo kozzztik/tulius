@@ -4,6 +4,7 @@ from tulius.gameforum import views
 from tulius.gameforum import threads
 from tulius.gameforum import other
 from tulius.gameforum import online_status
+from tulius.gameforum import comments
 from tulius.gameforum.other import trust_marks
 
 
@@ -22,6 +23,9 @@ urlpatterns = [
     urls.url(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/$',
         threads.ThreadAPI.as_view(), name='thread'),
+    urls.url(
+        r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/comments_page/$',
+        comments.CommentsPageAPI.as_view(), name='comments_page'),
     urls.url(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/read_mark/$',
         other.ReadmarkAPI.as_view(), name='thread_readmark'),

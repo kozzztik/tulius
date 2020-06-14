@@ -95,7 +95,7 @@ export default LazyComponent('forum_thread_comments', {
             if (this.$parent.$refs.reply_form)
                 this.$parent.$refs.reply_form.hide();
             this.$root.loading_start();
-            axios.get(this.thread.url + 'comments_page/' + this.value + '/').then(response => {
+            axios.get(this.thread.url + 'comments_page/', {params: {page: this.value}}).then(response => {
                 this.set_new_comments(response.data.comments);
                 this.pagination = response.data.pagination;
                 this.subscribe_comments();

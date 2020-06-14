@@ -45,13 +45,6 @@ class BaseThreadView(plugins.BaseAPIView):
     rights = None
     plugin_id = None
 
-    def get_context_data(self, **kwargs):
-        context = super(BaseThreadView, self).get_context_data(**kwargs)
-        if self.obj is None:
-            self.get_parent_thread(**kwargs)
-        context['thread'] = self.obj
-        return context
-
     def _get_rights_checker(self, thread, parent_rights=None):
         return forum_rights.default.DefaultRightsChecker(
             thread, self.user, parent_rights=parent_rights)
@@ -207,6 +200,8 @@ class ThreadView(BaseThreadView):
 
     def get_context_data(self, **kwargs):
         super(ThreadView, self).get_context_data(**kwargs)
+        if self.obj is None:
+            self.get_parent_thread(**kwargs)
         # cache rights for async app
         cache.set(
             const.USER_THREAD_RIGHTS.format(

@@ -32,9 +32,6 @@ urlpatterns = [
         threads_api.ThreadView.as_view(), name='thread'),
     urls.url(
         r'^thread/(?P<pk>\d+)/comments_page/$',
-        comments_api.CommentsPageAPI.as_view(), name='comments_page_root'),
-    urls.url(
-        r'^thread/(?P<pk>\d+)/comments_page/(?P<page_num>\d+)/$',
         comments_api.CommentsPageAPI.as_view(), name='comments_page'),
     urls.url(
         r'^thread/(?P<pk>\d+)/read_mark/$',

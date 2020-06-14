@@ -1,5 +1,9 @@
 from django.utils.translation import ugettext_lazy as _, pgettext
+from django.utils import html
+from djfw.wysibb.templatetags import bbcodes
 
+from tulius.gameforum import threads
+from tulius.forum.comments import api as comments
 from tulius.forum.comments import plugin
 from tulius.stories import models
 
@@ -57,3 +61,24 @@ class GameCommentsPlugin(plugin.CommentsPlugin):
         super(GameCommentsPlugin, self).init_core()
         self.before_save_comment_signal.connect(self.before_save_comment)
         self.after_add_comment_signal.connect(self.after_add_comment)
+
+
+class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
+    def comment_to_json(self, c):
+        return {
+            'id': c.id,
+            'url': c.get_absolute_url,
+            'title': html.escape(c.title),
+            'body': bbcodes.bbcode(c.body),
+            'user': self.role_to_json(c.data1, detailed=True),
+            'create_time': c.create_time,
+            'voting': c.voting,
+            'edit_right': self.comment_edit_right(c),
+            'is_thread': c.is_thread(),
+            'edit_time': c.edit_time,
+            'editor': self.role_to_json(c.data2) if c.editor else None
+        }
+
+
+class CommentsPageAPI(comments.CommentsPageAPI, CommentsBase):
+    pass

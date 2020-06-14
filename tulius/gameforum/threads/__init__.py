@@ -148,7 +148,7 @@ class GameThreadsPlugin(ThreadsPlugin):
                 name='edit_thread'),
             url(
                 r'^thread/(?P<parent_id>\d+)/$',
-                views.Thread.as_view(plugin=self), name='thread'),
+                views.Index.as_view(), name='thread'),
             url(
                 r'^thread/(?P<parent_id>\d+)/move/$',
                 views.MoveThreadSelect.as_view(plugin=self),
@@ -170,6 +170,8 @@ class GameThreadsPlugin(ThreadsPlugin):
 # TODO threads page
 # TODO unreaded url and last comment url
 # TODO move mouse_over out of comment snippet
+# TODO move transaction control to BaseAPI
+# TODO change comment url
 
 
 class BaseThreadAPI(api.BaseThreadView, gameforum_views.VariationMixin):
@@ -186,15 +188,33 @@ class BaseThreadAPI(api.BaseThreadView, gameforum_views.VariationMixin):
         return rights.RightsChecker(
             self.variation, thread, self.user, parent_rights=parent_rights)
 
-    def role_to_json(self, role_id):
+    def role_to_json(self, role_id, detailed=False):
         if role_id is None:
-            return None
+            return {
+                'id': None,
+                'title': 'Ведущий',
+                'url': None,
+                'sex': None,
+                'avatar': None,
+                'online_status': None,
+                'trust': None,
+            }
         role = self.all_roles[role_id]
-        return {
+        data = {
             'id': role.id,
             'title': html.escape(role.name),
             'url': role.get_absolute_url(),
         }
+        if detailed:
+            on = role.is_online() if role.show_in_online_character else False
+            data.update({
+                'sex': role.sex,
+                'avatar': role.avatar.image.url if (
+                    role.avatar and role.avatar.image) else '',
+                'online_status': on,
+                'trust': role.trust_value if role.show_trust_marks else None,
+            })
+        return data
 
     def thread_url(self, thread):
         return urls.reverse(
