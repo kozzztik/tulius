@@ -45,8 +45,6 @@ class ThreadsPlugin(ThreadsCorePlugin):
         self.urlizer['add_root_room'] = self.add_root_room_url
         self.templates['edit_thread'] = self.thread_edit_template
         self.templates['thread'] = 'forum/thread.haml'
-        self.templates['delete_thread_form'] = \
-            'forum/snippets/delete_post.haml'
         self.templates['thread_move_select'] = \
             'forum/threads/move_select.haml'
         self.templates['thread_move_confirm'] = \

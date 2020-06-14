@@ -57,11 +57,14 @@ export default LazyComponent('forum_thread_comments', {
             }).catch(error => this.$root.add_message(error, "error")).then(() => {});
         },
         fast_reply(comment) {
-            for (var component of this.$refs.comments)
+            var component;
+            for (var ref of this.$refs.comments) {
+                component = ref.childNodes[0].__vue__;
                 if (component.comment.id == comment.id) {
                     this.$parent.$refs.reply_form.fast_reply(comment, component);
                     break;
                 }
+            }
         },
         update_likes() {
             var comment_ids = []
@@ -113,17 +116,23 @@ export default LazyComponent('forum_thread_comments', {
             if (this.$parent.$refs.reply_form)
                 this.$parent.$refs.reply_form.cleanup_reply_form();
         },
-        mark_as_read(comment_id) {
-            if (comment_id <= this.thread.last_read_id)
+        mark_as_read(comment) {
+            if (this.user.is_anonymous)
+                return;
+            if (comment.user.id == this.user.id)
+                return;
+            if (!this.thread.last_read_id)
+                return;
+            if (comment.id <= this.thread.last_read_id)
                 return;
             if (this.mark_read_id)
                 return;
             // console.log('поставили таймер')
-            this.mark_read_id = comment_id;
-            this.mark_read_func = setTimeout(this.do_mark_mark_as_read, 1000, comment_id);
+            this.mark_read_id = comment.id;
+            this.mark_read_func = setTimeout(this.do_mark_mark_as_read, 1000, comment.id);
         },
-        cancel_mark_as_read(comment_id) {
-            if (this.mark_read_id == comment_id) {
+        cancel_mark_as_read(comment) {
+            if (this.mark_read_id == comment.id) {
                 // console.log('отменили таймер');
                 clearTimeout(this.mark_read_func);
                 this.mark_read_id = null;

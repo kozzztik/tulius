@@ -8,18 +8,39 @@ export default LazyComponent('forum_comment', {
         comment: {
             type: Object,
         },
-        user: {
-            type: Object,
-        },
         thread: {
             type: Object,
         },
         preview: {
             type: Boolean,
             default: false,
-        }
+        },
+        comment_url: {
+			type: Function,
+			default: function(comment) {
+			    return {
+                    name: 'forum_thread',
+                    params: { id: this.thread.id },
+                    query: { page: comment.page },
+                    hash: '#' + comment.id,
+                }
+			}
+		},
+		edit_thread_url: {
+			type: Function,
+			default: function(thread) {
+			    return '/forums/edit_thread/' + thread.id + '/';
+			}
+		},
+		edit_comment_url: {
+			type: Function,
+			default: function(comment) {
+			    return '/forums/edit_comment/' + comment.id + '/';
+			}
+		},
     },
     computed: {
+        user: function() {return this.$root.user;},
         like_img: function() {
             if (this.comment.is_liked === null) return null;
             return '/static/forum/img/' +
@@ -47,16 +68,6 @@ export default LazyComponent('forum_comment', {
             ).then(response => {
                 this.comment.is_liked = response.data.value;
             }).catch(error => this.$parent.add_message(error, "error"));
-        },
-        mouse_over() {
-            if (this.is_read || this.preview)
-                return;
-            this.$parent.mark_as_read(this.comment.id);
-        },
-        mouse_leave() {
-            if (this.is_read || this.preview)
-                return;
-            this.$parent.cancel_mark_as_read(this.comment.id);
         },
         delete_comment() {
             this.$parent.delete_comment(this.comment.id);

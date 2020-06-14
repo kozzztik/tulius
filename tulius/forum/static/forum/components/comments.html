@@ -1,7 +1,11 @@
 <div>
     <pagination :pagination="pagination" :page_num="value"></pagination>
     <div v-for="comment in comments" :key="comment.id" :id="comment.id" >
-        <forum_comment :user="user" :thread="thread" :comment="comment" ref="comments"></forum_comment>
+        <div ref="comments" v-on:mouseover="mark_as_read(comment)" v-on:mouseleave="cancel_mark_as_read(comment)">
+            <slot v-bind:comment="comment" name="comment" ref="comments">
+                <forum_comment :thread="thread" :comment="comment"></forum_comment>
+            </slot>
+        </div>
     </div>
     <pagination :pagination="pagination" :page_num="value"></pagination>
     <a v-if="thread.not_read_comment" v-html="thread.not_read_comment.count" id="not_read_counter" href="javascript:void(0)" @click="to_not_read_comment()"></a>

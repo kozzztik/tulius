@@ -1,6 +1,15 @@
 <div v-if="!loading">
     <game_forum_thread_actions :variation="variation" :thread="thread" :upper="true" ref="thread_actions"></game_forum_thread_actions>
-    <forum_thread_comments :thread="thread" v-model="comments_page" v-if="!loading" ref="comments"></forum_thread_comments>
+    <forum_thread_comments :thread="thread" v-model="comments_page" v-if="!loading" ref="comments">
+        <template v-slot:comment="slotProps">
+            <forum_comment :thread="thread" :comment="slotProps.comment"
+                           :comment_url="comment_url"
+                           :edit_thread_url="edit_thread_url"
+                           :edit_comment_url="edit_comment_url">
+
+            </forum_comment>
+        </template>
+    </forum_thread_comments>
     <forum_reply_form :thread="thread" ref="reply_form" v-if="!loading && thread.rights.write"></forum_reply_form>
     <game_forum_online_status :variation="variation" :thread="thread"></game_forum_online_status>
     <game_forum_thread_actions :variation="variation" :thread="thread" :upper="false"></game_forum_thread_actions>

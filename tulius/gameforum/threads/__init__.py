@@ -163,10 +163,11 @@ class GameThreadsPlugin(ThreadsPlugin):
         ]
 
 # TODO cleanup not used items
-# TODO threads page
-# TODO move mouse_over out of comment snippet
 # TODO move transaction control to BaseAPI
-# TODO change comment url
+# TODO change comment url & delete comment url
+# TODO comment avatar & trust marks
+# TODO fast reply form
+# TODO fast reply too long >2s
 
 
 class BaseThreadAPI(api.BaseThreadView, gameforum_views.VariationMixin):

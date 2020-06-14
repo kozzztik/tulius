@@ -49,6 +49,7 @@ class CommentsBase(api.BaseThreadView):
     def comment_to_json(self, c):
         return {
             'id': c.id,
+            'page': c.page,
             'url': c.get_absolute_url,
             'title': html.escape(c.title),
             'body': bbcodes.bbcode(c.body),
@@ -70,7 +71,7 @@ class CommentsBase(api.BaseThreadView):
 class CommentsPageAPI(CommentsBase):
     def get_context_data(self, **kwargs):
         self.get_parent_thread(**kwargs)
-        page_num = int(self.request.GET.get('page', 1))
+        page_num = kwargs.get('page') or int(self.request.GET.get('page', 1))
         comments = models.Comment.objects.select_related('user')
         comments = comments.filter(
             parent=self.obj, page=page_num).exclude(deleted=True)
@@ -97,7 +98,7 @@ class CommentsPageAPI(CommentsBase):
     def post(self, *args, **kwargs):
         transaction.set_autocommit(False)
         self.get_parent_thread(**kwargs)
-        if not self.obj.write_right(self.user):
+        if not self.rights.write:
             raise exceptions.PermissionDenied()
         data = json.loads(self.request.body)
         text = html_converter.html_to_bb(data['body'])
@@ -121,7 +122,7 @@ class CommentsPageAPI(CommentsBase):
             page = comment.page
         else:
             page = self.obj.pages_count
-        return self.get_context_data(page_num=page, **kwargs)
+        return self.get_context_data(page=page, **kwargs)
 
 
 class CommentAPI(CommentsBase):

@@ -54,6 +54,23 @@ export default LazyComponent('gameforum_thread_page', {
                 this.thread.not_read_comment = response.data.not_read_comment;
             }).catch(error => this.$parent.add_message(error, "error"));
         },
+        comment_url(comment) {
+            return {
+                name: 'game_thread',
+                params: {
+                    id: this.thread.id,
+                    variation_id: this.variation.id
+                },
+                query: { page: comment.page },
+                hash: '#' + comment.id,
+            }
+        },
+        edit_thread_url(thread) {
+            return '/play/edit_thread/' + thread.id + '/';
+        },
+        edit_comment_url(comment) {
+            return '/play/edit_comment/' + comment.id + '/';
+        },
     },
     mounted() {
         this.load_api(this.$route.params.id, this.$route.query['page'] || 1)
