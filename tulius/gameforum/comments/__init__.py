@@ -1,4 +1,5 @@
 from django import dispatch
+from django import urls
 from django.utils.translation import ugettext_lazy as _, pgettext
 from django.utils import html
 from djfw.wysibb.templatetags import bbcodes
@@ -82,10 +83,17 @@ def room_to_json(sender, thread, response, **kwargs):
 
 
 class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
+    def comment_url(self, comment):
+        return urls.reverse(
+            'game_forum_api:comment', kwargs={
+                'pk': comment.id,
+                'variation_id': self.variation.id,
+            })
+
     def comment_to_json(self, c):
         return {
             'id': c.id,
-            'url': c.get_absolute_url,
+            'url': self.comment_url(c),
             'title': html.escape(c.title),
             'body': bbcodes.bbcode(c.body),
             'user': self.role_to_json(c.data1, detailed=True),
@@ -99,4 +107,8 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
 
 
 class CommentsPageAPI(comments.CommentsPageAPI, CommentsBase):
+    pass
+
+
+class CommentAPI(comments.CommentAPI, CommentsBase):
     pass

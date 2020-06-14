@@ -32,4 +32,7 @@ urlpatterns = [
     urls.url(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/online_status/$',
         online_status.OnlineStatusAPI.as_view(), name='online_status'),
+    urls.url(
+        r'^variation/(?P<variation_id>\d+)/comment/(?P<pk>\d+)/$',
+        comments.CommentAPI.as_view(), name='comment'),
 ]

@@ -70,7 +70,7 @@ export default LazyComponent('forum_comment', {
             }).catch(error => this.$parent.add_message(error, "error"));
         },
         delete_comment() {
-            this.$parent.delete_comment(this.comment.id);
+            this.$parent.delete_comment(this.comment);
         },
         scroll_up() {
             window.scrollTo({left: 0, top: 0, behavior: 'smooth'});

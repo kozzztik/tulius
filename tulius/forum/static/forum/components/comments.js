@@ -11,7 +11,7 @@ export default LazyComponent('forum_thread_comments', {
             comments: [],
             mark_read_func: null,
             mark_read_id: null,
-            delete_comment_id: null,
+            delete_comment_obj: null,
             delete_comment_message: '',
         }
     },
@@ -148,14 +148,14 @@ export default LazyComponent('forum_thread_comments', {
                 this.mark_read_func = null;
             });
         },
-        delete_comment(comment_id) {
-            this.delete_comment_id = comment_id;
+        delete_comment(comment) {
+            this.delete_comment_obj = comment;
             this.$bvModal.show('commentDelete');
         },
         do_delete_comment() {
             this.$root.loading_start();
             axios.delete(
-                '/api/forum/comment/'+ this.delete_comment_id + '/',
+                this.delete_comment_obj.url,
                 {params: {comment: this.delete_comment_message}}
             ).then(response => {
                 if (response.data.pages_count < this.comments_page)

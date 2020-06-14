@@ -2,6 +2,7 @@ import json
 
 from django import dispatch
 from django import shortcuts
+from django import urls
 from django.core import exceptions
 from django.db import transaction
 from django.utils import html
@@ -43,6 +44,10 @@ def room_to_json(sender, thread, response, **kwargs):
 
 
 class CommentsBase(api.BaseThreadView):
+    @staticmethod
+    def comment_url(comment):
+        return urls.reverse('forum_api:comment', kwargs={'pk': comment.id})
+
     def comment_edit_right(self, comment):
         return (comment.user == self.user) or self.rights.moderate
 
@@ -50,7 +55,7 @@ class CommentsBase(api.BaseThreadView):
         return {
             'id': c.id,
             'page': c.page,
-            'url': c.get_absolute_url,
+            'url': self.comment_url(c),
             'title': html.escape(c.title),
             'body': bbcodes.bbcode(c.body),
             'user': api.user_to_json(c.user, detailed=True),
