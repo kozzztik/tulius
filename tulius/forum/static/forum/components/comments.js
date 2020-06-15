@@ -39,7 +39,7 @@ export default LazyComponent('forum_thread_comments', {
         },
         websock_message(msg) {
             var data = JSON.parse(msg.data);
-            if ((data['.namespaced'] != 'thread_comments') || (data.thread_id != this.thread.id)) return;
+            if ((data['.namespaced'] != 'thread_comments') || (data.parent_id != this.thread.id)) return;
             if (data.page > this.pagination.pages_count) {
                 this.pagination.pages_count = this.pagination.pages_count + 1;
                 this.pagination.pages.push(this.pagination.pages_count);
@@ -47,7 +47,7 @@ export default LazyComponent('forum_thread_comments', {
             }
             if (data.page != this.value)
                 return;
-            axios.get('/api/forum/comment/'+ data.comment_id + '/').then(response => {
+            axios.get(data.url).then(response => {
                 var new_comment = response.data;
                 new_comment.is_liked = false;
                 for (var comment of this.comments)

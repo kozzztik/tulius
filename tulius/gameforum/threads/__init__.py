@@ -164,7 +164,6 @@ class GameThreadsPlugin(ThreadsPlugin):
 
 # TODO cleanup not used items
 # TODO move transaction control to BaseAPI
-# TODO URL of comments by websock
 # TODO comment avatar & trust marks
 # TODO fast reply form
 

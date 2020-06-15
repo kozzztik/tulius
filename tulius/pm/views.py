@@ -64,6 +64,6 @@ class PlayerSendMessageView(generic.DetailView):
         if form.is_valid():
             m = form.save()
             publisher.publish_message_to_user(
-                self.object.pk, publisher.consts.USER_NEW_PM, m.pk)
+                self.object, publisher.consts.USER_NEW_PM, m.pk)
         return http.HttpResponseRedirect(
             urls.reverse('pm:to_user', args=(self.object.pk,)))

@@ -122,8 +122,7 @@ class CommentsPageAPI(CommentsBase):
             # commit transaction to be sure that clients wouldn't be notified
             # before comment will be accessable in DB/
             transaction.commit()
-            publisher.notify_thread_about_new_comment(
-                self.obj.id, comment.id, comment.page)
+            publisher.notify_thread_about_new_comment(self, self.obj, comment)
             page = comment.page
         else:
             page = self.obj.pages_count
