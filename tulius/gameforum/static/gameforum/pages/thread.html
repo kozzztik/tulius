@@ -10,7 +10,15 @@
             </forum_comment>
         </template>
     </forum_thread_comments>
-    <forum_reply_form :thread="thread" ref="reply_form" v-if="!loading && thread.rights.write"></forum_reply_form>
+    <forum_reply_form :thread="thread" ref="reply_form" v-if="!loading && thread.rights.write"
+                      :extended_form_url="extended_form_url" :reply_str="reply_str">
+        <template v-slot:form="slotProps">
+            <game_forum_role_selector :variation="variation" :thread="thread" :form="slotProps.form"></game_forum_role_selector>
+            <fieldset class="control-group">
+                <tulius_ckeditor v-model="slotProps.form.body"></tulius_ckeditor>
+            </fieldset>
+        </template>
+    </forum_reply_form>
     <game_forum_online_status :variation="variation" :thread="thread"></game_forum_online_status>
     <game_forum_thread_actions :variation="variation" :thread="thread" :upper="false"></game_forum_thread_actions>
 </div>

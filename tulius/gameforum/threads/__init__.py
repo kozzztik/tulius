@@ -165,19 +165,11 @@ class GameThreadsPlugin(ThreadsPlugin):
 # TODO cleanup not used items
 # TODO move transaction control to BaseAPI
 # TODO comment avatar & trust marks
-# TODO fast reply form
+# TODO check how all of that works in variation
 
 
 class BaseThreadAPI(api.BaseThreadView, gameforum_views.VariationMixin):
     plugin_id = consts.GAME_FORUM_SITE_ID
-    all_roles: dict = None
-
-    def get_parent_thread(self, pk=None, for_update=False, **kwargs):
-        super(BaseThreadAPI, self).get_parent_thread(
-            pk=pk, for_update=for_update, **kwargs)
-        roles = stories_models.Role.objects.filter(
-            variation=self.variation)
-        self.all_roles = {role.id: role for role in roles}
 
     def _get_rights_checker(self, thread, parent_rights=None):
         return rights.RightsChecker(
@@ -194,7 +186,7 @@ class BaseThreadAPI(api.BaseThreadView, gameforum_views.VariationMixin):
                 'online_status': None,
                 'trust': None,
             }
-        role = self.all_roles[role_id]
+        role = self.rights.all_roles[role_id]
         data = {
             'id': role.id,
             'title': html.escape(role.name),

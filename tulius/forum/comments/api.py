@@ -91,7 +91,12 @@ class CommentsPageAPI(CommentsBase):
             'comments': [self.comment_to_json(c) for c in comments]
         }
 
-    def create_comment(self, text, reply_id):
+    def create_comment(self, text, data):
+        reply_id = data['reply_id']
+        if reply_id != self.obj.first_comment_id:
+            obj = shortcuts.get_object_or_404(models.Comment, pk=reply_id)
+            if obj.parent_id != self.obj.id:
+                raise exceptions.PermissionDenied()
         comment = models.Comment(plugin_id=self.obj.plugin_id)
         comment.parent = self.obj
         comment.user = self.user
@@ -106,15 +111,10 @@ class CommentsPageAPI(CommentsBase):
         if not self.rights.write:
             raise exceptions.PermissionDenied()
         data = json.loads(self.request.body)
-        text = html_converter.html_to_bb(data['body'])
-        reply_id = data['reply_id']
-        if reply_id != self.obj.first_comment_id:
-            obj = shortcuts.get_object_or_404(models.Comment, pk=reply_id)
-            if obj.parent_id != self.obj.id:
-                raise exceptions.PermissionDenied()
-        preview = data.get('preview', False)
+        text = html_converter.html_to_bb(data.pop('body'))
+        preview = data.pop('preview', False)
         if text:
-            comment = self.create_comment(text, reply_id)
+            comment = self.create_comment(text, data)
             if preview:
                 return self.comment_to_json(comment)
             comment.save()

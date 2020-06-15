@@ -1,3 +1,4 @@
+import role_selector from '../components/role_selector.js'
 import thread_actions from '../components/thread_actions.js'
 import online_status from '../components/online_status.js'
 import comments_component from '../../forum/components/comments.js'
@@ -71,6 +72,21 @@ export default LazyComponent('gameforum_thread_page', {
         edit_comment_url(comment) {
             return '/play/edit_comment/' + comment.id + '/';
         },
+        extended_form_url(reply_comment_id) {
+            return '/play/add_comment/' + reply_comment_id + '/';
+        },
+        reply_str(comment) {
+            if (comment.user.sex == 1) {
+                return comment.user.title + ' сказал:'
+            } else if (comment.user.sex == 2) {
+                return comment.user.title + ' сказала:'
+            } else if (comment.user.sex == 3) {
+                return comment.user.title + ' сказало:'
+            } else if (comment.user.sex == 4) {
+                return comment.user.title + ' сказали:'
+            }
+            return comment.user.title + ' сказал(а):';
+		},
     },
     mounted() {
         this.load_api(this.$route.params.id, this.$route.query['page'] || 1)

@@ -119,10 +119,6 @@ export default LazyComponent('forum_thread_comments', {
         mark_as_read(comment) {
             if (this.user.is_anonymous)
                 return;
-            if (comment.user.id == this.user.id)
-                return;
-            if (!this.thread.last_read_id)
-                return;
             if (comment.id <= this.thread.last_read_id)
                 return;
             if (this.mark_read_id)

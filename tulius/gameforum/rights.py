@@ -265,10 +265,13 @@ class GameRights(base.RightsDescriptor):
     admin = False
     guest = False
     user_roles = None
+    user_write_roles = None
+    all_roles = {}
 
     def to_json(self):
         result = super(GameRights, self).to_json()
         result['strict_read'] = self.strict_read
+        result['user_write_roles'] = self.user_write_roles
         return result
 
 
@@ -291,20 +294,20 @@ class RightsChecker(default.DefaultRightsChecker):
             return rights
         rights.admin = self.variation.edit_right(self.user)
         rights.guest = False
-        self.strict_roles(rights)
+        rights.all_roles = {
+            role.id: role for role in stories_models.Role.objects.filter(
+                variation=self.variation)}
         if not self.user.is_anonymous:
             if (not rights.admin) and self.variation.game:
                 guests = game_models.GameGuest.objects.filter(
                     game=self.variation.game, user=self.user)
                 if guests:
                     rights.guest = True
-            rights.user_roles = stories_models.Role.objects.filter(
-                variation=self.variation, user=self.user).values('id')
-            rights.user_roles = [role['id'] for role in
-                                 rights.user_roles]
+            rights.user_roles = [
+                k for k, v in rights.all_roles.items() if v.user == self.user]
         else:
             rights.user_roles = []
-            rights.user_accessed_roles = []
+        self.strict_roles(rights)
         if rights.admin:
             rights.read = True
             rights.write = True
@@ -325,6 +328,7 @@ class RightsChecker(default.DefaultRightsChecker):
         rights.admin = parent_rights.admin
         rights.guest = parent_rights.guest
         rights.user_roles = parent_rights.user_roles
+        rights.all_roles = parent_rights.all_roles
         self.strict_roles(self._rights)
         rights = super(RightsChecker, self)._get_rights()
         if self.thread.data1 in rights.user_roles:
@@ -367,6 +371,7 @@ class RightsChecker(default.DefaultRightsChecker):
             rights.moderator_roles = parent_rights.moderator_roles.copy()
         self._process_granted_rights(rights)
         self._process_author_rights(rights)
+        rights.user_write_roles = self._process_user_write_roles(rights)
 
     def _process_granted_rights(self, rights: GameRights):
         granted_rights = models.GameThreadRight.objects.filter(
@@ -411,6 +416,13 @@ class RightsChecker(default.DefaultRightsChecker):
         if (rights.strict_write is not None) and (
                 role not in rights.strict_write):
             rights.strict_write += [role]
+
+    def _process_user_write_roles(self, rights):
+        if rights.admin or not self.variation.game:
+            return [None] + list(rights.all_roles.keys())
+        if rights.strict_write is None:
+            return rights.user_roles
+        return [pk for pk in rights.user_roles if pk in rights.strict_write]
 
     def get_granted_rights(self):
         rights = self._rights

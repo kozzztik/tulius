@@ -1,5 +1,6 @@
 from django import dispatch
 from django import urls
+from django.core import exceptions
 from django.utils.translation import ugettext_lazy as _, pgettext
 from django.utils import html
 from djfw.wysibb.templatetags import bbcodes
@@ -93,7 +94,7 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
     def comment_to_json(self, c):
         return {
             'id': c.id,
-            'url': self.comment_url(c),
+            'url': self.comment_url(c) if c.id else None,
             'title': html.escape(c.title),
             'body': bbcodes.bbcode(c.body),
             'user': self.role_to_json(c.data1, detailed=True),
@@ -107,7 +108,21 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
 
 
 class CommentsPageAPI(comments.CommentsPageAPI, CommentsBase):
-    pass
+    def process_role(self,  init_role_id, data):
+        role_id = data.get('role_id')
+        if role_id:
+            if role_id not in self.rights.all_roles:
+                raise exceptions.PermissionDenied('Role does not exist')
+            if role_id == init_role_id:
+                return role_id
+        if role_id not in self.rights.user_write_roles:
+            raise exceptions.PermissionDenied('Role is not accessible here')
+        return role_id
+
+    def create_comment(self, text, data):
+        comment = super(CommentsPageAPI, self).create_comment(text, data)
+        comment.data1 = self.process_role(None, data)
+        return comment
 
 
 class CommentAPI(comments.CommentAPI, CommentsBase):
