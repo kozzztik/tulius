@@ -108,7 +108,7 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
 
 
 class CommentsPageAPI(comments.CommentsPageAPI, CommentsBase):
-    def process_role(self,  init_role_id, data):
+    def process_role(self, init_role_id, data):
         role_id = data.get('role_id')
         if role_id:
             if role_id not in self.rights.all_roles:

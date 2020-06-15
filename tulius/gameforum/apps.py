@@ -20,7 +20,6 @@ class GameForumConfig(AppConfig):
         from .search import GameSearchPlugin
         from .threads import GameThreadsPlugin
         from .comments import GameCommentsPlugin
-        from .online_status import GameOnlineStatusPlugin
         from .sitemap import GameSitemapPlugin
 
         self.site = GameForumSite(
@@ -35,7 +34,6 @@ class GameForumConfig(AppConfig):
                 VotingPlugin,
                 GameSearchPlugin,
                 ReadMarksPlugin,
-                GameOnlineStatusPlugin,
                 GamePlugin,
                 GameSitemapPlugin,
                 FixesPlugin
