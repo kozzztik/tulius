@@ -163,7 +163,6 @@ class GameThreadsPlugin(ThreadsPlugin):
         ]
 
 # TODO cleanup not used items
-# TODO move transaction control to BaseAPI
 # TODO comment avatar & trust marks
 # TODO check how all of that works in variation
 

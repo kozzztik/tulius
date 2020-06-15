@@ -67,11 +67,6 @@ class CommentsBase(api.BaseThreadView):
             'editor': api.user_to_json(c.editor) if c.editor else None
         }
 
-    @classmethod
-    def as_view(cls, **initkwargs):
-        view = super(CommentsBase, cls).as_view(**initkwargs)
-        return transaction.non_atomic_requests(view)
-
 
 class CommentsPageAPI(CommentsBase):
     def get_context_data(self, **kwargs):
