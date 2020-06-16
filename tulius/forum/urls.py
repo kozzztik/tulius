@@ -13,6 +13,9 @@ app_name = 'tulius.forum'
 urlpatterns = [
     urls.url(r'^$', threads_api.IndexView.as_view(), name='index'),
     urls.url(
+        r'^read_mark/$',
+        readmarks.ReadmarkAPI.as_view(), name='index_readmark'),
+    urls.url(
         r'^collapse/$',
         collapse_views.CollapseAPIList.as_view(), name='collapse_list'),
     urls.url(
@@ -29,9 +32,6 @@ urlpatterns = [
         threads_api.ThreadView.as_view(), name='thread'),
     urls.url(
         r'^thread/(?P<pk>\d+)/comments_page/$',
-        comments_api.CommentsPageAPI.as_view(), name='comments_page_root'),
-    urls.url(
-        r'^thread/(?P<pk>\d+)/comments_page/(?P<page_num>\d+)/$',
         comments_api.CommentsPageAPI.as_view(), name='comments_page'),
     urls.url(
         r'^thread/(?P<pk>\d+)/read_mark/$',

@@ -9,7 +9,8 @@ export default LazyComponent('forum_online_status', {
     },
     watch: {
         thread: function (val, oldVal) {
-          this.load_api(val.id);
+            val.online_ids = oldVal.online_ids;
+            this.load_api(val.id);
         },
     },
     methods: {

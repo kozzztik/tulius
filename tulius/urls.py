@@ -64,6 +64,8 @@ urlpatterns = [
     url(r'^stories/', include('tulius.stories.urls', namespace='stories')),
     url(r'^play/',
         include(apps.get_app_config('gameforum').site.urls)),
+    url(r'^api/game_forum/',
+        include('tulius.gameforum.urls', namespace='game_forum_api')),
 
     url(r'^vk/', include('tulius.vk.urls', namespace='vk')),
     url(r'^counters/', include('tulius.counters.urls', namespace='counters')),

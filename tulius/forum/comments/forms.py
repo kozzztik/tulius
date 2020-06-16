@@ -26,17 +26,3 @@ class CommentForm(forms.Form):
         if not voting_enabled:
             # not sure about tuple here
             self.fields['voting'].widget = (forms.widgets.HiddenInput(),)
-
-
-class CommentDeleteForm(forms.Form):
-    post = forms.IntegerField(
-        required=True,
-        label=_(u'post'),
-        widget=forms.HiddenInput,
-    )
-
-    message = forms.CharField(
-        required=False,
-        label=_(u'Delete message'),
-        widget=forms.TextInput(attrs={'class': 'mceNoEditor'}),
-    )

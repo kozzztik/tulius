@@ -41,7 +41,7 @@ class UserSession:
     async def _channel_listener_task(self, channel, name, func):
         async for message in channel.iter():
             try:
-                await func(name, message.decode('utf-8'))
+                await func(name, json.loads(message.decode('utf-8')))
             except asyncio.CancelledError:
                 return
             except Exception as e:
@@ -59,29 +59,21 @@ class UserSession:
         pass
 
     async def user_channel(self, name, message):
-        kind = message.split(' ', 1)[0]
         logger.debug('User %s message %s', self.user_id, message)
-        if kind in [consts.USER_NEW_PM, consts.USER_NEW_GAME_INVITATION]:
+        direct = message.pop('.direct')
+        if direct:
             if self.json:
-                await self.ws.send_json({
-                    '.namespaced': 'pm',
-                    '.action': 'new_pm'
-                })
+                message['.namespaced'] = 'pm'
+                await self.ws.send_json(message)
             else:
-                await self.ws.send_str(message)
+                await self.ws.send_str("new_pm {}".format(message['id']))
 
     async def thread_comments_channel(self, name, message, thread_id):
-        kind, payload = message.split(' ', 1)
         logger.debug('User %s message %s', self.user_id, message)
-        if kind == consts.THREAD_COMMENTS_NEW_COMMENT:
-            comment_id, page_num = payload.split(' ', 1)
-            await self.ws.send_json({
-                '.namespaced': 'thread_comments',
-                '.action': 'new_comment',
-                'thread_id': thread_id,
-                'comment_id': int(comment_id),
-                'page': int(page_num),
-            })
+        direct = message.pop('.direct')
+        if direct:
+            message['.namespaced'] = 'thread_comments'
+            await self.ws.send_json(message)
 
     async def action_subscribe_comments(self, data):
         thread_id = data['id']

@@ -3,8 +3,10 @@ import json
 from django import http
 from django import shortcuts
 from django.core import exceptions
-from django.utils import html
 from django.db import models as django_models
+from django.db import transaction
+from django.utils import html
+
 from tulius.forum import plugins
 from tulius.forum import models
 
@@ -161,7 +163,7 @@ class VotingAPI(plugins.BaseAPIView):
         comment_id = int(kwargs['pk'])
         comment = shortcuts.get_object_or_404(models.Comment, id=comment_id)
         thread = comment.parent
-        thread.view_right = self.user
+        thread.view_right = self.user  # TODO oooh
         if not thread.read_right:
             raise exceptions.PermissionDenied()
         self.obj = shortcuts.get_object_or_404(models.Voting, comment=comment)
@@ -170,6 +172,7 @@ class VotingAPI(plugins.BaseAPIView):
         self.get_context_data(**kwargs)
         return self.voting_json()
 
+    @transaction.atomic
     def post(self, request, *args, **kwargs):
         self.get_context_data(**kwargs)
         data = json.loads(self.request.body)

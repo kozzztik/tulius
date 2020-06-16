@@ -2,6 +2,7 @@ from django import urls
 from django import http
 from django.contrib.auth import views
 from django.core import exceptions
+from django.db import transaction
 from django.views import generic
 from django.views.generic import base
 
@@ -98,3 +99,8 @@ class BaseAPIView(base.ContextMixin, base.View):
             return http.HttpResponseForbidden()
         return http.JsonResponse(super(BaseAPIView, self).dispatch(
             request, *args, **kwargs))
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super(BaseAPIView, cls).as_view(**initkwargs)
+        return transaction.non_atomic_requests(view)
