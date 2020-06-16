@@ -1,3 +1,4 @@
+import avatar from '../components/avatar.js'
 import role_selector from '../components/role_selector.js'
 import thread_actions from '../components/thread_actions.js'
 import online_status from '../components/online_status.js'

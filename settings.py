@@ -205,7 +205,7 @@ LOGGING = {
     },
     'loggers': {
         'django.db.backends': {
-            'handlers': ['sqllogfile'],
+            'handlers': ['null'],
             'level': 'DEBUG',
             'propagate': False,
         },

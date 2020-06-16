@@ -1,8 +1,10 @@
+import json
+
 from django import shortcuts
 from django.core import exceptions
 
 from tulius.gameforum import models
-from tulius.gameforum import views
+from tulius.gameforum import base
 from tulius.stories import models as stories_models
 
 max_val = 3
@@ -30,11 +32,11 @@ def recalc_role_trust(role):
     return value
 
 
-class TrustMarkAPI(views.VariationMixin):
-    def post(self, request, *args, role_id=None):
+class TrustMarkAPI(base.VariationMixin):
+    def post(self, request, role_id=None, **kwargs):
         role = shortcuts.get_object_or_404(
             stories_models.Role, id=int(role_id), variation=self.variation)
-        value = int(request.POST['value'])
+        value = int(json.loads(request.body)['value'])
         if role.user == self.user:
             raise exceptions.PermissionDenied('Can`t vote for yourself!')
         if not role.variation.game:
@@ -43,12 +45,13 @@ class TrustMarkAPI(views.VariationMixin):
         if not self.variation.game.write_right(request.user):
             raise exceptions.PermissionDenied('Сan`t vote in this game')
         trust_mark = models.Trustmark.objects.get_or_create(
-            user=self.user, role=role, variation=role.variation)[1]
+            user=self.user, role=role, variation=role.variation,
+            defaults={'value': value})[0]
         trust_mark.value = value
         trust_mark.save()
         all_marks = recalc_role_trust(role)
         my_mark = mark_to_percents(value)
         return {
-            'my_mark': my_mark,
-            'all_marks': all_marks
+            'my_trust': my_mark,
+            'trust_value': all_marks
         }

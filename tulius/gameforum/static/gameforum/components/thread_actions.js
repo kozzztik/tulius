@@ -66,5 +66,13 @@ export default LazyComponent('game_forum_thread_actions', {
                 }
             }
         },
+        role_with_link(role_id) {
+            var role;
+            for (role of this.variation.characters) {
+                if (role.id == role_id)
+                    return true;
+            }
+            return false;
+        },
     },
 })

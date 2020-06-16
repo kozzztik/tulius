@@ -6,7 +6,12 @@
                            :comment_url="comment_url"
                            :edit_thread_url="edit_thread_url"
                            :edit_comment_url="edit_comment_url">
-
+                <template v-slot:avatar="slotProps">
+                    <game_forum_comment_avatar
+                            :variation="variation" :thread="thread"
+                            :role="slotProps.comment.user" :actions="$refs.thread_actions">
+                    </game_forum_comment_avatar>
+                </template>
             </forum_comment>
         </template>
     </forum_thread_comments>
@@ -17,6 +22,16 @@
             <fieldset class="control-group">
                 <tulius_ckeditor v-model="slotProps.form.body"></tulius_ckeditor>
             </fieldset>
+        </template>
+        <template v-slot:comment="slotProps">
+            <forum_comment :thread="thread" :comment="slotProps.preview_comment" :preview="true">
+                <template v-slot:avatar="slotProps2">
+                    <game_forum_comment_avatar
+                            :variation="variation" :thread="thread"
+                            :role="slotProps.preview_comment.user" :actions="$refs.thread_actions">
+                    </game_forum_comment_avatar>
+                </template>
+            </forum_comment>
         </template>
     </forum_reply_form>
     <game_forum_online_status :variation="variation" :thread="thread"></game_forum_online_status>

@@ -2,10 +2,10 @@ from django.utils import timezone
 
 from tulius.stories import models
 from tulius.forum import online_status
-from tulius.gameforum import views
+from tulius.gameforum import base
 
 
-class OnlineStatusAPI(online_status.OnlineStatusAPI, views.VariationMixin):
+class OnlineStatusAPI(online_status.OnlineStatusAPI, base.VariationMixin):
     def update_online_status(self):
         super(OnlineStatusAPI, self).update_online_status()
         if self.variation.game_id and (not self.user.is_anonymous):

@@ -15,7 +15,6 @@ class GameForumConfig(AppConfig):
         from tulius.forum.readmarks.plugin import ReadMarksPlugin
         from tulius.forum.fixes.plugin import FixesPlugin
         from .gamecore import GamePlugin
-        from .trustmarks import TrustmarksPlugin
         from .rights import GameRightsPlugin
         from .search import GameSearchPlugin
         from .threads import GameThreadsPlugin
@@ -27,7 +26,6 @@ class GameForumConfig(AppConfig):
             app_name='gameforum',
             site_id=self.GAME_FORUM_SITE_ID,
             plugins=(
-                TrustmarksPlugin,
                 GameRightsPlugin,
                 GameThreadsPlugin,
                 GameCommentsPlugin,

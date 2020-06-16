@@ -1,10 +1,10 @@
 from django.conf import urls
 
 from tulius.gameforum import views
-from tulius.gameforum import threads
+from tulius.gameforum.threads import api as threads
 from tulius.gameforum import other
 from tulius.gameforum import online_status
-from tulius.gameforum import comments
+from tulius.gameforum.comments import api as comments
 from tulius.gameforum.other import trust_marks
 
 

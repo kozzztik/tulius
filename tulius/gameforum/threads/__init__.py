@@ -1,20 +1,10 @@
 from django.db.models.query_utils import Q
 from django.conf.urls import url
-from django.utils import html
-from django import urls
 
-from tulius.stories import models as stories_models
-from tulius.forum import signals
 from tulius.forum.threads import views
-from tulius.forum.threads import api
 from tulius.forum.threads.plugin import ThreadsPlugin
-from tulius.stories.models import Avatar, Role, AdditionalMaterial, \
+from tulius.stories.models import Role, AdditionalMaterial, \
     Illustration
-from tulius.gameforum.models import Trustmark
-from tulius.gameforum import consts
-from tulius.gameforum import rights
-from tulius.gameforum import views as gameforum_views
-from djfw.wysibb.templatetags import bbcodes
 
 
 class GameThreadsPlugin(ThreadsPlugin):
@@ -26,26 +16,7 @@ class GameThreadsPlugin(ThreadsPlugin):
             user, thread_id, is_room)
         variation = thread.variation
         thread.all_roles = Role.objects.filter(variation=variation)
-        avatars = Avatar.objects.filter(
-            id__in=[
-                role.avatar_id for role in thread.all_roles if role.avatar_id])
-        for role in thread.all_roles:
-            role.my_trust = self.site.core.mark_to_percents(0)
-            if role.avatar_id:
-                for avatar in avatars:
-                    if avatar.id == role.avatar_id:
-                        role.avatar = avatar
-                        break
         thread.edit_marks = variation.game and variation.game.write_right(user)
-        if not user.is_anonymous:
-            trustmarks = Trustmark.objects.filter(
-                variation=variation, user=user)
-            for mark in trustmarks:
-                for role in thread.all_roles:
-                    if mark.role_id == role.id:
-                        role.my_trust = self.site.core.mark_to_percents(
-                            mark.value)
-                        break
         if thread.game:
             if thread.game.edit_right(user):
                 thread.roles_list = [
@@ -161,76 +132,3 @@ class GameThreadsPlugin(ThreadsPlugin):
                 views.MoveThreadConfirm.as_view(plugin=self),
                 name='thread_move_confirm'),
         ]
-
-# TODO cleanup not used items
-# TODO comment avatar & trust marks
-# TODO check how all of that works in variation
-
-
-class BaseThreadAPI(api.BaseThreadView, gameforum_views.VariationMixin):
-    plugin_id = consts.GAME_FORUM_SITE_ID
-
-    def _get_rights_checker(self, thread, parent_rights=None):
-        return rights.RightsChecker(
-            self.variation, thread, self.user, parent_rights=parent_rights)
-
-    def role_to_json(self, role_id, detailed=False):
-        if role_id is None:
-            return {
-                'id': None,
-                'title': 'Ведущий',
-                'url': None,
-                'sex': None,
-                'avatar': None,
-                'online_status': None,
-                'trust': None,
-            }
-        role = self.rights.all_roles[role_id]
-        data = {
-            'id': role.id,
-            'title': html.escape(role.name),
-            'url': role.get_absolute_url(),
-        }
-        if detailed:
-            on = role.is_online() if role.show_in_online_character else False
-            data.update({
-                'sex': role.sex,
-                'avatar': role.avatar.image.url if (
-                    role.avatar and role.avatar.image) else '',
-                'online_status': on,
-                'trust': role.trust_value if role.show_trust_marks else None,
-            })
-        return data
-
-    def thread_url(self, thread):
-        return urls.reverse(
-            'game_forum_api:thread',
-            kwargs={
-                'variation_id': self.variation.id, 'pk': thread.id})
-
-    def room_to_json(self, thread):
-        data = {
-            'id': thread.pk,
-            'title': html.escape(thread.title),
-            'body': bbcodes.bbcode(thread.body),
-            'room': thread.room,
-            'deleted': thread.deleted,
-            'important': thread.important,
-            'closed': thread.closed,
-            'user': self.role_to_json(thread.data1),
-            'moderators': [
-                self.role_to_json(user) for user in thread.moderators],
-            'accessed_users': None if thread.accessed_users is None else [
-                self.role_to_json(user) for user in thread.accessed_users
-            ],
-            'threads_count': thread.threads_count if thread.room else None,
-            'comments_count': thread.comments_count,
-            'pages_count': thread.pages_count,
-            'url': self.thread_url(thread),
-        }
-        signals.thread_room_to_json.send(self, thread=thread, response=data)
-        return data
-
-
-class ThreadAPI(api.ThreadView, BaseThreadAPI):
-    pass
