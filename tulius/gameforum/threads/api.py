@@ -9,10 +9,6 @@ from tulius.gameforum import rights
 from djfw.wysibb.templatetags import bbcodes
 
 
-# TODO cleanup not used items
-# TODO check how all of that works in variation
-
-
 class BaseThreadAPI(api.BaseThreadView, base.VariationMixin):
     plugin_id = consts.GAME_FORUM_SITE_ID
 

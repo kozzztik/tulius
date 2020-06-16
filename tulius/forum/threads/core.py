@@ -80,23 +80,6 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
             (thread.parent_id == room.id) or (thread.parent_id in room_ids)]
         return new_room_list, threads
 
-    def paginate_thread(self, thread, base_url):
-        # TODO remove
-        class ThreadPage:
-            page = 0
-            page_link = ""
-
-        childcount = self.site.models.Comment.objects.filter(
-            parent=thread, deleted=False).count()
-        pages = int((childcount - 1) / self.site.models.COMMENTS_ON_PAGE) + 1
-        if pages > 1:
-            thread.pages = []
-            for i in range(pages):
-                page = ThreadPage()
-                page.page = i + 1
-                page.url = "%s?page=%s" % (base_url, i + 1,)
-                thread.pages += [page]
-
     def process_edit_room(
             self, request, parent_thread, thread, formset_params=None):
         formset_params = formset_params or {}

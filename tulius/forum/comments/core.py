@@ -96,19 +96,6 @@ class CommentsCore(plugins.ForumPlugin):
                 messages.error(request, ERROR_VALIDATION)
         return form, comment
 
-    def get_comments_page(self, user, parent_thread, page_num):
-        comments = self.site.core.models.Comment.objects.select_related('user')
-        comments = comments.filter(
-            parent=parent_thread, page=page_num).exclude(deleted=True)
-        for comment in comments:
-            comment.view_user = user
-            comment.parent = parent_thread
-        if comments and (page_num == 0):
-            parent_thread.first_comment = comments[0]
-        self.read_comments_signal.send(
-            parent_thread, user=user, comments=comments)
-        return comments
-
     def thread_pages_count(self, thread):
         return int(
             (thread.comments_count - 1) / self.COMMENTS_ON_PAGE + 1) or 1
@@ -228,15 +215,6 @@ class CommentsCore(plugins.ForumPlugin):
         thread.last_comment_cache = comment
         return comment
 
-    def thread_view(self, sender, **kwargs):
-        if sender:
-            context = kwargs['context']
-            user = kwargs['user']
-            request = kwargs['request']
-            page_num = request.GET['page'] if 'page' in request.GET else 1
-            context['comments'] = self.get_comments_page(
-                user, sender, int(page_num))
-
     def init_core(self):
         self.Comment = self.models.Comment
         self.read_comments_signal = dispatch.Signal(
@@ -251,18 +229,13 @@ class CommentsCore(plugins.ForumPlugin):
             providing_args=["thread"])
         self.before_save_comment_signal = dispatch.Signal(
             providing_args=["old_comment"])
-        self.view_comments_page = dispatch.Signal(
-            providing_args=["json", "page", "comments", "thread"])
         self.comment_before_edit = dispatch.Signal(
             providing_args=["comment", "context"])
         self.comment_after_edit = dispatch.Signal(
             providing_args=["comment", "context", "adding"])
-        self.comment_before_fastreply = dispatch.Signal(
-            providing_args=["context"])
         self.comment_after_fastreply = dispatch.Signal()
         self.core['get_parent_comment'] = self.get_parent_comment
         self.core['process_edit_comment'] = self.process_edit_comment
-        self.core['get_comments_page'] = self.get_comments_page
         self.core['get_comments_pagination'] = self.get_comments_pagination
         self.core['Thread_get_first_comment'] = self.get_thread_first_comment
         self.core['Thread_pages_count'] = self.thread_pages_count
@@ -277,10 +250,7 @@ class CommentsCore(plugins.ForumPlugin):
         self.signals['before_save_comment'] = self.before_save_comment_signal
         self.signals['comment_before_edit'] = self.comment_before_edit
         self.signals['comment_after_edit'] = self.comment_after_edit
-        self.signals['comment_before_fastreply'] = \
-            self.comment_before_fastreply
         self.signals['comment_after_fastreply'] = self.comment_after_fastreply
-        self.signals['view_comments_page'] = self.view_comments_page
         self.before_add_comment_signal.connect(self.before_add_comment)
         self.before_delete_comment_signal.connect(self.before_delete_comment)
         self.after_add_comment_signal.connect(self.after_add_comment)
@@ -289,4 +259,3 @@ class CommentsCore(plugins.ForumPlugin):
     def post_init(self):
         self.site.signals.thread_repair_counters.connect(
             self.repair_thread_counters)
-        self.site.signals.thread_view.connect(self.thread_view)

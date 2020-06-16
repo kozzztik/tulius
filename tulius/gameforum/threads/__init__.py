@@ -48,35 +48,6 @@ class GameThreadsPlugin(ThreadsPlugin):
         thread.rolize_list = rolize_list
         return thread
 
-    def rolize(self, posts, variation, roles_list):
-        for post in posts:
-            if post.data1:
-                post.role = roles_list[post.data1] if (
-                    post.data1 in roles_list) else None
-            else:
-                post.role = None
-            if post.data2:
-                post.edit_role = roles_list[post.data2] if (
-                    post.data2 in roles_list) else None
-            else:
-                post.edit_role = None
-        return posts
-
-    def rolize_lastest(self, posts, variation, roles_list):
-        for post in posts:
-            if post.last_comment and post.last_comment.data1:
-                post.last_comment.role = roles_list[
-                    post.last_comment.data1] if (
-                        post.last_comment.data1 in roles_list) else None
-        return posts
-
-    def rolize_comments(self, sender, **kwargs):
-        comments = kwargs["comments"]
-        self.rolize(comments, sender.variation, sender.rolize_list)
-
-    def post_init(self):
-        self.site.signals.read_comments.connect(self.rolize_comments)
-
     def move_list(self, thread, user):
         queryset = self.models.Thread.objects.filter(
             plugin_id=self.site_id, level=0, tree_id=thread.tree_id)

@@ -5,9 +5,7 @@
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}forum/css/tulius-forum.css'}
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}stories/tulius-stories.css'}
     %link{rel: 'stylesheet', type: 'text/css', href: '{{ STATIC_URL }}games/css/tulius-games.css'}
-    %script{type: 'text/javascript'}
-        var trustmarks_url = "{{ forum_site.urlizer.trustmarks }}";
-    %script{type: 'text/javascript', src: '{{ STATIC_URL }}gameforum/trustmarks.js'}
+
     
 - block breadcrumbs
     - if parent_thread.game

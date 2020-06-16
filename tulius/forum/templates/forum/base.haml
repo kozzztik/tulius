@@ -41,9 +41,3 @@
         - block forum_content
 
         - block after_actions
-
-- block footer_content
-    - block online_users
-        - if parent_thread
-            - with bottom_online_users=1
-                - include forum_site.templates.online_users

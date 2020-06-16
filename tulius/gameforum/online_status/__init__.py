@@ -1,3 +1,5 @@
+import datetime
+
 from django.utils import timezone
 
 from tulius.stories import models
@@ -20,3 +22,11 @@ class OnlineStatusAPI(online_status.OnlineStatusAPI, base.VariationMixin):
             variation=self.variation, show_in_online_character=True,
             user__in=users)
         return roles
+
+
+def get_online_roles(variation):
+    v = timezone.now() - datetime.timedelta(
+        minutes=OnlineStatusAPI.online_timeout)
+    return models.Role.objects.filter(
+        variation=variation, show_in_online_character=True,
+        visit_time__gte=v)
