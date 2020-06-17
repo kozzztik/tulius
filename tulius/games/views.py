@@ -18,6 +18,7 @@ from tulius.stories import models as stories
 from tulius.games import forms
 from tulius.games import catalog
 from tulius.games import models
+from tulius.gameforum import online_status
 
 
 gameforum_site = apps.get_app_config('gameforum').site
@@ -146,8 +147,8 @@ class CurrentGames(GamesListBase):
         for game in games:
             thread = game.variation.thread
             thread.variation = game.variation
-            game.online_roles = gameforum_site.core.get_online_roles(
-                None, thread, False)
+            game.online_roles = online_status.get_online_roles(
+                game.variation)
 
 
 class CompletedOpenedGames(GamesListBase):

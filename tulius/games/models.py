@@ -1,3 +1,4 @@
+from django import urls
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -294,21 +295,18 @@ class Game(models.Model):
     def is_finishing(self):
         return self.status == GAME_STATUS_FINISHING
 
-    @models.permalink
     def get_absolute_url(self):
-        return 'games:game', (), {'pk': self.id}
+        return urls.reverse('games:game', kwargs={'pk': self.pk})
 
-    @models.permalink
     def get_edit_url(self):
-        return 'games:edit_game_main', (), {'game_id': self.id}
+        return urls.reverse('games:edit_game_main', kwargs={'game_id': self.pk})
 
-    @models.permalink
     def get_request_url(self):
-        return 'games:game_request', (), {'game_id': self.id}
+        return urls.reverse('games:game_request', kwargs={'game_id': self.pk})
 
-    @models.permalink
     def get_cancel_request_url(self):
-        return 'games:cancel_game_request', (), {'game_id': self.id}
+        return urls.reverse(
+            'games:cancel_game_request', kwargs={'game_id': self.pk})
 
     def __str__(self):
         return '%s - %d' % (self.name, int(self.serial_number))

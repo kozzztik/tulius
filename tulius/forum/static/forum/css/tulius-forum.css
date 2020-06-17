@@ -139,6 +139,9 @@ h3 {
     padding: 15px;
     text-align: justify;
     vertical-align: middle;
+    overflow: hidden;
+    text-overflow: clip;
+    word-break: break-word;
 }
 
 .post-url {
@@ -449,6 +452,26 @@ body .quote, blockquote {
     display: inline-block;
 }
 
+#not_read_counter {
+    width: 44px;
+    height: 44px;
+    position: fixed;
+    top: 50%;
+    right: 0px;
+    background-image: url("../../tulius/img/baselayout/bg5.gif");
+    border: 4px solid #735E46;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-right-width: 0px;
+    text-align: center;
+    padding-top: 7px;
+}
+
+#not_read_counter:hover {
+    text-decoration: none;
+    border-color: rgb(182, 152, 73);
+}
+
 .cke_editable ul {
     list-style: url("../../tulius/img/baselayout/li_star.png") outside;
 }
@@ -461,3 +484,8 @@ body .quote, blockquote {
 .cke_editable p {
     margin: 0 0 0 0;
 }
+
+.cke_editable {
+    word-break: break-word;
+}
+

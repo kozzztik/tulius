@@ -1,0 +1,150 @@
+<div v-if="!user.is_anonymous" class="btn-toolbar btn-group-sm justify-content-between forum-menu" role="toolbar" aria-label="Toolbar">
+    <div class="btn-group-sm">
+        <b-dropdown id="dropdown-1" text="Действия" class="" variant="light">
+            <b-dropdown-item data-toggle="modal" href="javascript:void(0);" v-if="!thread.room" v-on:click="$bvModal.show('quoteAnswer')">
+                <img src="/static/games/img/button_blue_heart.png" style="height: 25px">
+                Ответить с цитатой
+            </b-dropdown-item>
+            <b-dropdown-item :href="'/play/add_room/' + thread.id + '/'" v-if="thread.room && thread.rights.moderate">
+                <img src="/static/games/img/button_green_add.png" style="height: 25px">
+                Добавить комнату
+            </b-dropdown-item>
+            <b-dropdown-item :href="'/play/add_thread/' + thread.id + '/'" v-if="thread.room && thread.rights.write">
+                <img src="/static/games/img/button_red_add.png" style="height: 25px">
+                Добавить тему
+            </b-dropdown-item>
+            <b-dropdown-item :href="'/play/edit_room/' + thread.id + '/'" v-if="thread.room && thread.rights.edit">
+                <img src="/static/games/img/button_blue_fastforward.png" style="height: 25px">
+                Редактировать
+            </b-dropdown-item>
+            <b-dropdown-item :href="'/play/thread/' + thread.id + '/move/'" v-if="thread.rights.move">
+                <span v-if="thread.room">Переместить комнату</span>
+                <span v-if="!thread.room">Переместить тему</span>
+            </b-dropdown-item>
+            <b-dropdown-item href="javascript:void(0);" v-if="thread.rights.edit" v-on:click="$bvModal.show('roomDelete' + upper)">
+                <span v-if="thread.room">Удалить комнату</span>
+                <span v-if="!thread.room">Удалить тему</span>
+            </b-dropdown-item>
+            <b-dropdown-item href="javascript:void(0)" v-if="thread.room" @click="mark_all_as_read()">
+                <img src="/static/games/img/check.png" style="height: 25px">
+                Пометить все как прочитанное
+            </b-dropdown-item>
+            <b-dropdown-item data-toggle="modal" href="javascript:void(0);" v-if="!thread.room" v-on:click="mark_not_readed()">
+                Пометить все как не прочитанное
+            </b-dropdown-item>
+            <b-dropdown-item :href="'/play/rebuild_nums/' + thread.id + '/'" v-if="thread.room && user.superuser">
+                Обновить счетчики
+            </b-dropdown-item>
+            <b-dropdown-item :href="'/play/extended_search/' + thread.tree_id + '/'">
+                Расширенный поиск
+            </b-dropdown-item>
+        </b-dropdown>
+        <b-dropdown id="dropdown-characters" text="Персонажи" class="" variant="light" v-if="variation.characters.length > 0">
+            <b-dropdown-item href="javascript:void(0)" v-for="role in variation.characters" :key="role.id" class="card" @click="show_char_modal(role.id)">
+                <table class="character-menu-list card-body">
+                    <tbody>
+                        <tr>
+                            <td width="55">
+                                <img :src="role.avatar" v-if="role.avatar">
+                            </td>
+                            <td>
+                                <b v-html="role.title"></b>
+                                Сообщений:
+                                <span v-html="role.comments_count"></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </b-dropdown-item>
+        </b-dropdown>
+        <b-dropdown id="dropdown-materials" text="Материалы" class="" variant="light" v-if="variation.game||(variation.materials.length > 0)||(variation.illustrations.length>0)">
+            <b-dropdown-item :href="'/games/game/' + variation.game.id + '/'" v-if="variation.game">
+                <img src="/static/games/img/clipboard.png" style="height: 25px">
+                Вводная
+            </b-dropdown-item>
+            <b-dropdown-item :href="material.url" v-for="material in variation.materials" :key="material.id">
+                <img src="/static/games/img/document_blank.png" style="height: 25px">
+                <span v-html="material.title"></span>
+            </b-dropdown-item>
+            <b-dropdown-item href="javascript:void(0)" v-for="(illustration, index) in variation.illustrations" :key="illustration.id" @click="image_index = index">
+                <img src="/static/games/img/chart.png" style="height: 25px">
+                <span v-html="illustration.title"></span>
+            </b-dropdown-item>
+        </b-dropdown>
+        <b-dropdown id="dropdown-roles" text="Роли" class="" variant="light" v-if="variation.roles.length > 0">
+            <b-dropdown-item :href="'/games/view_role/' + role.id + '/'" v-for="role in variation.roles" :key="role.id">
+                <table class="character-menu-list">
+                    <tbody>
+                        <tr>
+                            <td width="55">
+                                <img :src="role.avatar" v-if="role.avatar">
+                            </td>
+                            <td>
+                                <b v-html="role.title"></b>
+                                <br>
+                                Сообщений:
+                                <span v-html="role.comments_count"></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </b-dropdown-item>
+        </b-dropdown>
+    </div>
+    <b-modal id="quoteAnswer" title="Цитирование" ok-only v-if="!thread.room" >
+        <p>
+            Цитировать теперь легко! Просто выделите текст мышкой:
+        </p>
+        <img src="/static/forum/img/quote_help1.png" style="width: 450px;">
+        <p>И нажмите кнопку "Ответить". Под постом появится форма быстрого ответа, а выделенный текст будет вставлен в нее как цитата.</p>
+        <img src="/static/forum/img/quote_help2.png" style="width: 450px;">
+    </b-modal>
+    <b-modal :id="'roomDelete' + upper"
+             :title="delete_title" ok-title="Удалить" ok-variant="danger"
+             cancel-title="Отменить" @ok="delete_thread">
+        <div class="form-horizontal">
+        <fieldset class="control-group">
+            <div class="control-label">
+                <label for="delete_comment">Комментарий:</label>
+            </div>
+            <div class="controls">
+                <input id="delete_comment" type="text" v-model="delete_comment">
+            </div>
+        </fieldset>
+        </div>
+    </b-modal>
+    <b-modal :id="'characterModal' + upper"
+             :title="modal_role.title" ok-title="Закрыть" ok-only>
+        <table class="table characterModal">
+            <tbody>
+                <tr>
+                    <td class="character-avatar">
+                        <img :src="modal_role.avatar">
+                    </td>
+                    <td>
+                        <small>
+                            <div class="trustmark" v-if="!user.hide_trustmarks">
+                                Общее доверие:
+                                <span v-html="modal_role.trust_value"></span>%
+                            </div>
+                            Сообщений:
+                            <span v-html="modal_role.comments_count"></span>
+                        </small>
+                        <br>
+                        <br>
+                        <span v-html="modal_role.description"></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </b-modal>
+    <form class="input-group btn-group-sm" method="post" :action="'/play/search/' + variation.id + '/'">
+        <input type="text" name="text" required="" id="id_text" class="form-control">
+        <input type="hidden" name="csrfmiddlewaretoken" :value="csrftoken">
+        <input id="id_thread" type="hidden" name="thread" :value="thread.id">
+        <button class="btn btn-light" id="search" type="submit">
+            Поиск
+        </button>
+    </form>
+    <Tinybox v-model="image_index" :images="images"></Tinybox>
+</div>

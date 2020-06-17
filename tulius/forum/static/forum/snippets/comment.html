@@ -1,8 +1,10 @@
-<table class="post-table content" :class="comment.unreaded ? 'unreaded-post': ''">
+<table class="post-table content" :class="is_read ? '': 'unreaded-post'">
     <tbody>
         <tr>
             <td class="post-avatar">
-                <user_avatar :user="comment.user" :thread="thread"></user_avatar>
+                <slot v-bind:comment="comment" name="avatar">
+                    <user_avatar :user="comment.user" :thread="thread"></user_avatar>
+                </slot>
             </td>
             <td class="post-body">
                 <table class="wide vertical-center">
@@ -16,7 +18,7 @@
                         <tr class="post-body-content" :class="user.compact_text ? 'post-compact': ''">
                             <td colspan="2">
                                 <span v-html="comment.body"></span>
-                                <forum_voting :comment="comment" :user="user" v-if="comment.voting"></forum_voting>
+                                <forum_voting :comment="comment" v-if="comment.voting"></forum_voting>
                                 <div class="post-signature hidden-phone" v-html="comment.user.signature" v-if="comment.user.signature"></div>
                             </td>
                         </tr>
@@ -26,22 +28,19 @@
         </tr>
         <tr>
             <td class="post-url">
-                <a href="#" class="d-none d-md-block">Наверх</a>
+                <a href="javascript:void(0)" class="d-none d-md-block" @click="scroll_up()">Наверх</a>
                 <b-dropdown variant="light" class="d-md-none btn-group-sm" v-if="!preview && (thread.rights.write || comment.edit_right)" text="Действия">
                     <b-dropdown-item class="fast-reply-link post-actions-button" v-on:click="$parent.fast_reply(comment)" href="javascript:void(0)" v-if="thread.rights.write">
                         Ответить
                     </b-dropdown-item>
-                    <b-dropdown-item class="post-actions-button" :href="'/forums/edit_thread/' + thread.id + '/'" v-if="comment.edit_right && comment.is_thread">
+                    <b-dropdown-item class="post-actions-button" :href="edit_thread_url(thread)" v-if="comment.edit_right && comment.is_thread">
                         Редактировать
                     </b-dropdown-item>
-                    <b-dropdown-item class="post-actions-button" :href="'/forums/edit_comment/' + comment.id + '/'" v-if="comment.edit_right && (!comment.is_thread)">
+                    <b-dropdown-item class="post-actions-button" :href="edit_comment_url(comment.id)" v-if="comment.edit_right && (!comment.is_thread)">
                         Редактировать
                     </b-dropdown-item>
-                    <b-dropdown-item class="post-actions-delete post-actions-button" :href="'javascript:delete_comment(' + comment.id + ')'" v-if="comment.edit_right && thread">
+                    <b-dropdown-item class="post-actions-delete post-actions-button" href="javascript:void(0)" v-if="comment.edit_right && thread" @click="delete_comment()">
                         Удалить
-                    </b-dropdown-item>
-                    <b-dropdown-item class="post-actions-button" :href="'/forums/thread/' + thread.id + '/move/'" v-if="comment.is_thread && thread.rights.move">
-                        Переместить
                     </b-dropdown-item>
                 </b-dropdown>
             </td>
@@ -51,17 +50,14 @@
                     <a v-if="thread.rights.write" class="d-none d-md-inline fast-reply-link post-actions-button" v-on:click="$parent.fast_reply(comment)" href="javascript:void(0);">
                         <img src="/static/forum/img/replybutton.gif" height="26" width="127">
                     </a>
-                    <a v-if="comment.edit_right && (!comment.is_thread)" class="d-none d-md-inline post-actions-button" :href="'/forums/edit_comment/' + comment.id + '/'">
+                    <a v-if="comment.edit_right && (!comment.is_thread)" class="d-none d-md-inline post-actions-button" :href="edit_comment_url(comment)">
                         <img src="/static/forum/img/editbutton.gif" height="26" width="168">
                     </a>
-                    <a v-if="comment.edit_right && comment.is_thread" class="d-none d-md-inline post-actions-button" :href="'/forums/edit_thread/' + thread.id + '/'">
+                    <a v-if="comment.edit_right && comment.is_thread" class="d-none d-md-inline post-actions-button" :href="edit_thread_url(thread)">
                         <img src="/static/forum/img/editbutton.gif" height="26" width="168">
                     </a>
-                    <a v-if="comment.edit_right" class="d-none d-md-inline post-actions-delete post-actions-button" :href="'javascript:delete_comment(' + comment.id + ')'">
+                    <a v-if="comment.edit_right && !comment.is_thread" class="d-none d-md-inline post-actions-delete post-actions-button" href="javascript:void(0)" @click="delete_comment()">
                         <img src="/static/forum/img/delete_post.png">
-                    </a>
-                    <a v-if="comment.is_thread && thread.rights.move" class="d-none d-md-inline post-actions-button" :href="'/forums/thread/' + thread.id + '/move/'">
-                        <img src="/static/forum/img/move.gif">
                     </a>
                     <a v-if="like_img" v-on:click="do_like()" href="javascript:void(0);">
                         <img class="post-actions-button likelink" :id="'likebtn' + comment.id" height="26" width="26" :src="like_img">
@@ -72,8 +68,8 @@
                     <span v-html="comment.editor.title"></span>,
                     <span v-html="forum_datetime(comment.edit_time)"></span>
                 </div>
-                <div class="pull-right">
-                    <router-link :to="comment.url"></router-link>
+                <div class="float-right" v-if="!preview">
+                    <router-link :to="comment_url(comment)">#</router-link>
                 </div>
             </td>
         </tr>

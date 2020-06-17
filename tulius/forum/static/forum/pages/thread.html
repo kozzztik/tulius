@@ -1,13 +1,6 @@
 <div>
     <forum_thread_actions v-if="!loading" :thread="thread" :user="user"></forum_thread_actions>
-    <pagination :pagination="pagination"></pagination>
-    <div v-for="comment in comments" :key="comment.id" :id="comment.id" >
-        <forum_comment :user="user" :thread="thread" :comment="comment" ref="comments"></forum_comment>
-    </div>
-    <pagination :pagination="pagination"></pagination>
-    <div v-if="!loading && thread.rights.write" ref="reply_form_parking">
-        <forum_reply_form :thread="thread" :user="user" ref="reply_form">
-        </forum_reply_form>
-    </div>
+    <forum_thread_comments :thread="thread" v-model="comments_page" v-if="!loading" ref="comments"></forum_thread_comments>
+    <forum_reply_form :thread="thread" ref="reply_form" v-if="!loading && thread.rights.write"></forum_reply_form>
     <forum_online_status :thread="thread"></forum_online_status>
 </div>

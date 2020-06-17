@@ -15,7 +15,6 @@ class ForumConfig(AppConfig):
         from .voting.plugin import VotingPlugin
         from .readmarks.plugin import ReadMarksPlugin
         from .rights.plugin import RightsPlugin
-        from .online_status import OnlineStatusPlugin
         from .sitemap import SitemapPlugin
 
         self.site = site.ForumSite(
@@ -26,7 +25,6 @@ class ForumConfig(AppConfig):
                 VotingPlugin,
                 SearchPlugin,
                 ReadMarksPlugin,
-                OnlineStatusPlugin,
                 SitemapPlugin,
                 FixesPlugin,
             )

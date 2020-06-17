@@ -1,5 +1,4 @@
 from django import template
-from django.utils import html
 
 from djfw.wysibb.models import Smile
 from .bb_parser import bbcode_to_html
@@ -26,9 +25,15 @@ class Smiles:
 smiles = Smiles()
 
 
+def html_escape(value):
+    # same as django.utils.html but without &amp replacement
+    return value.replace('<', '&lt;').replace('>', '&gt;').replace(
+        '"', '&quot;').replace("'", '&#39;')
+
+
 @register.filter
 def bbcode(value):
-    data = bbcode_to_html(html.escape(value))
+    data = bbcode_to_html(html_escape(value))
     for smile in smiles.get_list():
         data = data.replace(
             smile.text, '<img class="sm" src="%s" title="%s" />' % (

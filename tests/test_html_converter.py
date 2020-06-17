@@ -121,15 +121,31 @@ def test_img_tag(data, value):
         assert html_converter.HtmlConverter().convert(data) == value
 
 
-def test_smiles():
+@pytest.fixture(name='smiles')
+def smiles_fixture():
     obj = models.Smile(name='angel', text=':angel:')
     obj.image.name = 'wysibb/smiles/angel.gif'
     smiles = {':angel:': '/media/wysibb/smiles/angel.gif'}
+    with mock.patch.object(bbcodes.smiles, 'smile_dict', return_value=smiles):
+        with mock.patch.object(bbcodes.smiles, 'get_list', return_value=[obj]):
+            yield
+
+
+def test_smiles(smiles):
     original = '<p><img alt=":angel:" src="/media/wysibb/smiles/angel.gif"'\
         ' style="height:26px; width:27px" title=":angel:" /></p>'
-    with mock.patch.object(bbcodes.smiles, 'smile_dict', return_value=smiles):
-        converted = html_converter.html_to_bb(original)
-    with mock.patch.object(bbcodes.smiles, 'get_list', return_value=[obj]):
-        result = bbcodes.bbcode(converted)
+    converted = html_converter.html_to_bb(original)
+    result = bbcodes.bbcode(converted)
     assert result == '<img class="sm" src="/media/wysibb/smiles/angel.gif"' \
-                     ' title="angel" />'
+                     ' title="angel" /><br/>'
+
+
+def test_special_symbols(smiles):
+    original = '&Iuml;'
+    converted = html_converter.html_to_bb(original)
+    assert bbcodes.bbcode(converted) == original
+
+
+def test_paragraph_line_breaks():
+    original = '<p>1</p>\n\n<p>2</p>\n\n<p>3</p>\n'
+    assert html_converter.html_to_bb(original) == '1\n2\n3\n'

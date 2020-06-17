@@ -240,6 +240,7 @@ def request_user_json(request):
         'is_anonymous': request.user.is_anonymous,
         'authenticated': request.user.is_authenticated,
         'superuser': request.user.is_superuser,
+        'id': request.user.pk if auth else None,
         'compact_text': request.user.compact_text if auth else '',
         'username': request.user.username if auth else None,
         'rank': request.user.rank if auth else None,
@@ -249,5 +250,6 @@ def request_user_json(request):
         'new_invites': len(request.user.new_invites()) if auth else None,
         'avatar':
             request.user.avatar.url if auth and request.user.avatar else
-            '/static/tulius/img/blank_avatar.jpg'
-        }
+            '/static/tulius/img/blank_avatar.jpg',
+        'hide_trustmarks': request.user.hide_trustmarks if auth else False,
+    }

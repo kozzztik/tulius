@@ -142,19 +142,6 @@ class RightsPlugin(ForumPlugin):
             ) | Q(user=user))
         return threads.filter(query)
 
-    def get_free_index(self, user, level):
-        threads = self.models.Thread.objects.filter(
-            access_type__lt=self.models.THREAD_ACCESS_TYPE_NO_READ)
-        threads = threads.filter(
-            plugin_id=self.site_id, level=level, deleted=False)
-        if user.is_anonymous:
-            query = Q(access_type__lt=self.models.THREAD_ACCESS_TYPE_NO_READ)
-        else:
-            query = (Q(
-                access_type__lt=self.models.THREAD_ACCESS_TYPE_NO_READ
-            ) | Q(user=user))  # TODO: move it to protected #97
-        return threads.filter(query)
-
     def get_readeable_protected_childs(self, thread):
         user = thread.view_user
         if user.is_superuser or (thread.moderate_right(user)):
@@ -168,24 +155,6 @@ class RightsPlugin(ForumPlugin):
             thread__access_type=self.models.THREAD_ACCESS_TYPE_NO_READ,
             access_level__gte=self.models.THREAD_ACCESS_READ, user=user)
         query = query & (Q(thread__deleted=False) | Q(thread__user=user))
-        rights = self.models.ThreadAccessRight.objects.filter(query)
-        rights = rights.select_related('thread')
-        return [right.thread for right in rights]
-
-    def get_readeable_protected_index(self, user, level):
-        if user.is_superuser:
-            return self.models.Thread.objects.filter(
-                access_type=self.models.THREAD_ACCESS_TYPE_NO_READ,
-                plugin_id=self.site_id, level=level, deleted=False)
-        if user.is_anonymous:
-            return []
-        query = Q(
-            thread__level=level,
-            thread__access_type=self.models.THREAD_ACCESS_TYPE_NO_READ,
-            thread__plugin_id=self.site_id,
-            access_level__gte=self.models.THREAD_ACCESS_READ,
-            user=user, thread__deleted=False)
-#            query = query & (Q(thread__deleted=False) | Q(thread__user=user))
         rights = self.models.ThreadAccessRight.objects.filter(query)
         rights = rights.select_related('thread')
         return [right.thread for right in rights]
@@ -248,19 +217,9 @@ class RightsPlugin(ForumPlugin):
         if pr_threads:
             sender.protected_threads += THREAD_HAVE_PR_THREADS
 
-    def prepare_room_list(self, sender, **kwargs):
-        sender.moderators = sender.get_moderators
-        if sender.access_type == self.models.THREAD_ACCESS_TYPE_NO_READ:
-            sender.accessed_users = sender.get_accessed_users
-        else:
-            sender.accessed_users = None
-
     def init_core(self):
         super(RightsPlugin, self).init_core()
         self.core['Comment_edit_right'] = self.comment_edit_right
-        self.core['get_free_index'] = self.get_free_index
-        self.core['get_readeable_protected_index'] = \
-            self.get_readeable_protected_index
 
         self.core['Thread_get_free_descendants'] = self.get_free_descendants
         self.core['Thread_get_moderators'] = self.get_moderators
@@ -282,4 +241,3 @@ class RightsPlugin(ForumPlugin):
         self.site.signals.thread_on_update.connect(self.thread_on_update)
         self.site.signals.thread_repair_counters.connect(
             self.thread_repair_counters)
-        self.site.signals.thread_prepare_room.connect(self.prepare_room_list)
