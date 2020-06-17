@@ -28,4 +28,5 @@ deploy:
     on:
       branch: master
 after_success:
+  - ln -s $PWD /opt/tulius
   - coveralls --data_file $PWD/coverage/.coverage --nogit
