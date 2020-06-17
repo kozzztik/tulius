@@ -5,7 +5,7 @@ services:
   - docker
   - mysql
   - redis
-install: pip install coveralls coverage==4.5.4
+install: pip install python-coveralls coverage==4.5.4
 before_script:
   - docker build -t kozzztik/tulius:$TRAVIS_BRANCH .
   - docker tag kozzztik/tulius:$TRAVIS_BRANCH tulius_test
