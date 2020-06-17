@@ -396,7 +396,7 @@ if regexes is None:
         json_file.close()
     except IOError:
         yamlFile = open(yamlPath)
-        regexes = yaml.load(yamlFile)
+        regexes = yaml.load(yamlFile, Loader=yaml.FullLoader)
         yamlFile.close()
 
 
