@@ -28,4 +28,4 @@ deploy:
     on:
       branch: master
 after_success:
-  - coveralls --data_file $PWD/coverage/.coverage
+  - coveralls --data_file $PWD/coverage/.coverage --nogit
