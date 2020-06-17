@@ -1,11 +1,11 @@
 language: python
 python:
-  - "3.6"
+  - "3.7"
 services:
   - docker
   - mysql
   - redis
-install: pip install coveralls
+install: pip install coveralls coverage==4.5.4
 before_script:
   - docker build -t kozzztik/tulius:$TRAVIS_BRANCH .
   - docker tag kozzztik/tulius:$TRAVIS_BRANCH tulius_test
