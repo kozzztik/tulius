@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from django import urls
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import now
@@ -30,9 +31,8 @@ class Genre(models.Model):
     def __str__(self):
         return self.name
 
-    @models.permalink
     def get_absolute_url(self):
-        return 'stories:genre', (), {'genre_id': self.id}
+        return urls.reverse('stories:genre', kwargs={'genre_id': self.pk})
 
     def stories_count(self):
         return self.stories.all().count()
@@ -118,13 +118,11 @@ class Story(models.Model):
     def __str__(self):
         return self.name
 
-    @models.permalink
     def get_absolute_url(self):
-        return 'stories:story', (), {'pk': self.id}
+        return urls.reverse('stories:story', kwargs={'pk': self.pk})
 
-    @models.permalink
     def get_edit_url(self):
-        return 'stories:edit_story_main', (self.id,), {}
+        return urls.reverse('stories:edit_story_main', args=(self.pk,))
 
     def edit_right(self, user):
         if user.is_anonymous:
@@ -200,13 +198,11 @@ class Avatar(models.Model):
     def __str__(self):
         return '%s' % (self.name,)
 
-    @models.permalink
     def get_absolute_url(self):
-        return 'stories:avatar', (self.id,), {}
+        return urls.reverse('stories:avatar', args=(self.pk,))
 
-    @models.permalink
     def get_delete_url(self):
-        return 'stories:delete_avatar', (self.id, ), {}
+        return urls.reverse('stories:delete_avatar', args=(self.pk,))
 
 
 class AvatarAlternative(models.Model):
@@ -315,13 +311,11 @@ class Character(models.Model):
     def __str__(self):
         return self.name
 
-    @models.permalink
     def get_absolute_url(self):
-        return 'stories:character', (self.id,), {}
+        return urls.reverse('stories:character', args=(self.pk,))
 
-    @models.permalink
     def get_info_url(self):
-        return 'stories:character_info', (), {'pk': self.id}
+        return urls.reverse('stories:character_info', kwargs={'pk': self.pk})
 
 
 class Variation(SortableModelMixin):
@@ -380,9 +374,8 @@ class Variation(SortableModelMixin):
     def __str__(self):
         return self.name
 
-    @models.permalink
     def get_absolute_url(self):
-        return 'stories:variation', (self.id,), {}
+        return urls.reverse('stories:variation', args=(self.pk,))
 
     def edit_right(self, user):
         if self.game:
@@ -414,9 +407,8 @@ class Variation(SortableModelMixin):
         self.deleted = True
         self.save()
 
-    @models.permalink
     def forumlink(self):
-        return 'gameforum:variation', (self.pk,), {}
+        return urls.reverse('gameforum:variation', args=(self.pk,))
 
     def get_roles(self):
         return Role.objects.filter(variation=self).exclude(deleted=True)
@@ -525,13 +517,11 @@ class Role(SortableModelMixin):
     def __str__(self):
         return self.name
 
-    @models.permalink
     def get_absolute_url(self):
-        return 'stories:role', (self.id,), {}
+        return urls.reverse('stories:role', args=(self.id,))
 
-    @models.permalink
     def get_text_url(self):
-        return 'stories:role_text', (self.id,), {}
+        return urls.reverse('stories:role_text', args=(self.pk,))
 
     def is_online(self):
         if not self.visit_time:
@@ -687,23 +677,20 @@ class AdditionalMaterial(models.Model):
     def __str__(self):
         return self.name
 
-    @models.permalink
     def get_absolute_url(self):
         if self.variation and self.variation.game:
-            return 'games:edit_material', (self.id,), {}
-        return 'stories:edit_material', (self.id,), {}
+            return urls.reverse('games:edit_material', args=(self.pk,))
+        return urls.reverse('stories:edit_material', args=(self.pk,))
 
-    @models.permalink
     def url(self):
         if self.variation and self.variation.game:
-            return 'games:material', (self.id,), {}
-        return 'stories:material', (self.id,), {}
+            return urls.reverse('games:material', args=(self.pk,))
+        return urls.reverse('stories:material', args=(self.pk,))
 
-    @models.permalink
     def delete_url(self):
         if self.variation and self.variation.game:
-            return 'games:material_delete', (self.id,), {}
-        return 'stories:material_delete', (self.id,), {}
+            return urls.reverse('games:material_delete', args=(self.pk,))
+        return urls.reverse('stories:material_delete', args=(self.pk,))
 
     def edit_right(self, user):
         if self.story:
@@ -772,17 +759,15 @@ class Illustration(models.Model):
     def __str__(self):
         return self.name
 
-    @models.permalink
     def get_absolute_url(self):
         if self.variation and self.variation.game:
-            return 'games:edit_illustration', (self.id,), {}
-        return 'stories:edit_illustration', (self.id,), {}
+            return urls.reverse('games:edit_illustration', args=(self.pk,))
+        return urls.reverse('stories:edit_illustration', args=(self.pk,))
 
-    @models.permalink
     def delete_url(self):
         if self.variation and self.variation.game:
-            return 'games:illustration_delete', (self.id,), {}
-        return 'stories:illustration_delete', (self.id,), {}
+            return urls.reverse('games:illustration_delete', args=(self.pk,))
+        return urls.reverse('stories:illustration_delete', args=(self.pk,))
 
     def delete_data(self):
         try:
