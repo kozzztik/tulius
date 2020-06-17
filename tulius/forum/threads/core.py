@@ -80,74 +80,6 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
             (thread.parent_id == room.id) or (thread.parent_id in room_ids)]
         return new_room_list, threads
 
-    def prepare_room_list(self, user, parent_room, rooms):
-        site = self.site
-        for thread in rooms:
-            thread.parent = parent_room
-            thread._site = site
-        # TODO not sure this is needed
-        rooms = [thread for thread in rooms if thread.view_right(user)]
-        for room in rooms:
-            threads = self.room_descendants(user, room)[1]
-            for thread in threads:
-                thread.parent = room
-                thread._site = site
-            threads = [thread for thread in threads if thread.view_right(user)]
-            room.threads_count = len(threads)
-            self.thread_prepare_room_signal.send(
-                room, parent_thread=parent_room, threads=threads, user=user)
-        return rooms
-
-    def paginate_thread(self, thread, base_url):
-        # TODO remove
-        class ThreadPage:
-            page = 0
-            page_link = ""
-
-        childcount = self.site.models.Comment.objects.filter(
-            parent=thread, deleted=False).count()
-        pages = int((childcount - 1) / self.site.models.COMMENTS_ON_PAGE) + 1
-        if pages > 1:
-            thread.pages = []
-            for i in range(pages):
-                page = ThreadPage()
-                page.page = i + 1
-                page.url = "%s?page=%s" % (base_url, i + 1,)
-                thread.pages += [page]
-
-    def get_subthreads(self, user, parent_thread, is_room=False):
-        models = self.site.models
-        threads = models.Thread.objects.filter(
-            parent=parent_thread, room=is_room).exclude(deleted=True)
-        if not parent_thread:
-            threads = threads.filter(plugin_id=self.site_id)
-        if is_room:
-            return self.prepare_room_list(user, parent_thread, threads)
-        threads = threads.order_by('-last_comment_id')
-
-        for thread in threads:
-            thread.parent = parent_thread
-        threads = [thread for thread in threads if thread.view_right(user)]
-
-        for thread in threads:
-            thread.moderators = []
-            thread.accessed_users = None
-            if thread.read_right(user):
-                self.paginate_thread(thread, thread.get_absolute_url)
-            if thread.access_type == models.THREAD_ACCESS_TYPE_NO_READ:
-                thread.accessed_users = thread.get_accessed_users
-        self.threads_list_signal.send(
-            parent_thread, threads=threads, is_room=is_room)
-        return threads
-
-    def get_index(self, user, level):
-        core = self.site.core
-        childs = [child for child in core.get_free_index(user, level)]
-        childs = childs + [
-            child for child in core.get_readeable_protected_index(user, level)]
-        childs = [thread for thread in childs if thread.room]
-        return sorted(childs, key=lambda x: x.id)
-
     def process_edit_room(
             self, request, parent_thread, thread, formset_params=None):
         formset_params = formset_params or {}
@@ -262,40 +194,6 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
             thread = None
         return form, formset, thread, comment
 
-    def delete_thread(self, user, thread_id, message):
-        models = self.site.models
-        success = 'error'
-        error_text = ''
-        redirect = ''
-        text = ''
-        thread = None
-        try:
-            thread_id = int(thread_id)
-            thread = models.Thread.objects.select_for_update().get(
-                id=thread_id)
-        except:
-            error_text = _('Thread not found %(post_id)s.') % {
-                'post_id': thread_id}
-        if thread:
-            if not thread.edit_right(user):
-                error_text = _(
-                    'You have no rights to delete thread %(post_id)s.') % {
-                        'post_id': thread_id}
-            else:
-                thread.deleted = True
-                delete_mark = models.ThreadDeleteMark(
-                    thread=thread, user=user, description=message)
-                thread.save()
-                delete_mark.save()
-                if thread.parent:
-                    redirect = thread.parent.get_absolute_url
-                else:
-                    redirect = self.reverse('index')
-            success = 'success'
-            text = _('Room successfully deleted!') if thread.room else _(
-                'Thread successfully deleted!')
-        return success, error_text, redirect, text
-
     def search_list(self, user, parent, **kwargs):
         queryset = self.models.Thread.objects.filter(
             plugin_id=self.site_id, deleted=False, parent=parent, **kwargs)
@@ -383,10 +281,7 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
     def init_core(self):
         self.thread_view_signal = dispatch.Signal(
             providing_args=["context", "user", "request"])
-        self.threads_list_signal = dispatch.Signal(
-            providing_args=["threads", "is_room"])
-        self.thread_prepare_room_signal = dispatch.Signal(
-            providing_args=["parent_thread", "threads", "user"])
+
         self.thread_before_edit = dispatch.Signal(
             providing_args=["thread", "context"])
         self.thread_after_edit = dispatch.Signal(
@@ -398,12 +293,8 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
         self.thread_on_update = dispatch.Signal(
             providing_args=["old_thread"])
         self.core['get_parent_thread'] = self.get_parent_thread
-        self.core['prepare_room_list'] = self.prepare_room_list
-        self.core['get_subthreads'] = self.get_subthreads
         self.core['process_edit_room'] = self.process_edit_room
         self.core['process_edit_thread'] = self.process_edit_thread
-        self.core['delete_thread'] = self.delete_thread
-        self.core['get_index'] = self.get_index
         self.core['room_descendants'] = self.room_descendants
         self.core['move_thread'] = self.move_thread
         self.core['thread_move_list'] = self.move_list
@@ -411,11 +302,9 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
         self.core['rebuild_tree'] = self.repair_thread_counters
         self.core['threads_search_list'] = self.search_list
         self.signals['thread_view'] = self.thread_view_signal
-        self.signals['threads_list'] = self.threads_list_signal
         self.signals['thread_before_edit'] = self.thread_before_edit
         self.signals['thread_after_edit'] = self.thread_after_edit
         self.signals['thread_on_move'] = self.thread_on_move
         self.signals['thread_repair_counters'] = self.thread_repair_counters
         self.signals['thread_on_create'] = self.thread_on_create
         self.signals['thread_on_update'] = self.thread_on_update
-        self.signals['thread_prepare_room'] = self.thread_prepare_room_signal

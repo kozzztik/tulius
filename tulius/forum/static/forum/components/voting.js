@@ -1,6 +1,6 @@
 export default LazyComponent('forum_voting', {
     template: '/static/forum/components/voting.html',
-    props: ['comment', 'user'],
+    props: ['comment'],
         data: function () {
         return {
             loading: true,
@@ -8,6 +8,9 @@ export default LazyComponent('forum_voting', {
             voting: {},
             choice: null,
         }
+    },
+    computed: {
+        user: function() {return this.$root.user;},
     },
     methods: {
         load_api(pk) {

@@ -8,6 +8,9 @@ export default LazyComponent('forum_index_page', {
             loading: true,
             index: {groups: []},
             user: {is_anonymous: true},
+            breadcrumbs: [
+                {"url": "/forums/", "title": "Форумы"}
+            ],
         }
     },
     methods: {
@@ -15,28 +18,22 @@ export default LazyComponent('forum_index_page', {
             this.$parent.loading_start();
             axios.get('/api/forum/').then(response => {
                 var api_response = response.data;
-                for (var num in api_response['groups']) {
-                    api_response.groups[num]['collapsed'] = false;
-                }
+                for (var group of api_response['groups'])
+                    group['collapsed'] = false;
                 this.index = api_response;
-                //this.$parent.update_footer(true, 'online users')
                 if (this.$parent.user.authenticated) {
                     axios.get('/api/forum/collapse/').then(response => {
-                        for (var key in response.data) {
-                            for (var num in this.index.groups) {
-                                if (this.index.groups[num].id == key) {
-                                    this.index.groups[num].collapsed = response.data[key];
+                        for (var key in response.data)
+                            for (var group of this.index.groups)
+                                if (group.id == key) {
+                                    group.collapsed = response.data[key];
                                     break;
                                 }
-                            }
-                        }
                     });
                 }
             }).catch(error => this.$parent.add_message(error, "error"))
             .then(() => {
-                this.$parent.loading_end([
-                    {"url": "/forums/", "title": "Форумы", 'old': true}
-                ]);
+                this.$parent.loading_end(this.breadcrumbs);
                 this.loading = false;
             });
         },
@@ -51,7 +48,17 @@ export default LazyComponent('forum_index_page', {
                     break;
                 }
             }
-        }
+        },
+        mark_all_as_readed() {
+            this.$parent.loading_start();
+            axios.post('/api/forum/read_mark/', {'comment_id': null}
+            ).then(response => {
+            }).catch(error => this.$parent.add_message(error, "error"))
+            .then(() => {
+                this.$parent.loading_end(this.breadcrumbs);
+                this.load_api();
+            });
+        },
     },
     mounted() {
         this.user = this.$parent.user;

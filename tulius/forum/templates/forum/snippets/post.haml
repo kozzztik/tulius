@@ -65,10 +65,6 @@
                     - block post_action_edit
                         %a.hidden-phone.post-actions-button{href: '{{ comment.get_edit_url }}'}
                                 %img{src: '{{ STATIC_URL }}forum/img/editbutton.gif', height: '26', width: '168'}
-                    - block post_action_delete
-                        - if parent_thread
-                            %a.hidden-phone.post-actions-delete.post-actions-button{href: 'javascript:delete_comment({{ comment.id }})'}
-                                %img{'src': '{{ STATIC_URL }}forum/img/delete_post.png'}
                 - if comment.is_thread
                     - block post_action_move
                         - if comment.parent.move_right

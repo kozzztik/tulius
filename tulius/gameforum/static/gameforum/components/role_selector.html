@@ -1,0 +1,10 @@
+<div class="form-group row roleform" v-show="thread.rights.user_write_roles.length > 1" style="margin-bottom: 0.5rem;">
+    <label class="col-sm-3 col-form-label" style="text-align: center;">
+        <b>Персонаж:</b>
+    </label>
+    <div class="col-sm-9">
+        <select name="role" class="form-control form-control-sm" v-model="form.role_id">
+            <option :value="pk" v-for="(pk, num) in thread.rights.user_write_roles" :key="num" v-html="role_name_by_id(pk)" :selected="num==1"></option>
+        </select>
+    </div>
+</div>

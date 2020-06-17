@@ -92,3 +92,5 @@ ENV/
 .idea/
 
 settings_production.py
+/sql-logfile.txt
+/logfile.txt

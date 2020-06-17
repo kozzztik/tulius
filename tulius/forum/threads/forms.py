@@ -2,20 +2,6 @@ from django.utils.translation import ugettext_lazy as _
 from django import forms
 
 
-class PostDeleteForm(forms.Form):
-    post = forms.IntegerField(
-        required=True,
-        label=_(u'post'),
-        widget=forms.HiddenInput,
-    )
-
-    message = forms.CharField(
-        required=False,
-        label=_(u'Delete message'),
-        widget=forms.TextInput(attrs={'class': 'mceNoEditor'}),
-    )
-
-
 class RoomForm(forms.Form):
     title = forms.CharField(
         required=True,

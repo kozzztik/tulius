@@ -228,22 +228,6 @@ class GamePlugin(ForumPlugin):
                 comment.data2 = editor.id
             comment.save()
 
-    def comment_before_fast_reply(self, sender, **kwargs):
-        context = kwargs['context']
-        (roleform, role) = self.process_role(
-            sender.request, sender.parent_thread, None, True)
-        context['roleform'] = roleform
-        context['role'] = role
-        sender.role = role
-
-    def comment_after_fast_reply(self, sender, **kwargs):
-        comment = sender.comment
-        role = sender.role
-        if comment:
-            if role:
-                comment.data1 = role.id
-            comment.save()
-
     def comment_before_edit(self, sender, **kwargs):
         comment = kwargs['comment']
         sender.init_role_id = comment.data1 if comment else None
@@ -299,10 +283,6 @@ class GamePlugin(ForumPlugin):
         self.site.signals.thread_view.connect(self.thread_view)
         self.site.signals.thread_before_edit.connect(self.thread_before_edit)
         self.site.signals.thread_after_edit.connect(self.thread_after_edit)
-        self.site.signals.comment_before_fastreply.connect(
-            self.comment_before_fast_reply)
-        self.site.signals.comment_after_fastreply.connect(
-            self.comment_after_fast_reply)
         self.site.signals.comment_before_edit.connect(self.comment_before_edit)
         self.site.signals.comment_after_edit.connect(self.comment_after_edit)
 

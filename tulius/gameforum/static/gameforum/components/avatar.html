@@ -1,0 +1,33 @@
+<div>
+    <img class="game-avatar-image" :src="role.avatar" v-if="role.avatar">
+    <table class="online-table">
+        <tr>
+            <td>
+                <div :class="online_icon_class" v-if="role.id"></div>
+            </td>
+            <td>
+                <a href="javascript:void(0)" @click="actions.show_char_modal(role.id)" v-if="actions.role_with_link(role.id)">
+                    {{ role.title }}
+                </a>
+                <span v-else>{{ role.title }}</span>
+            </td>
+        </tr>
+    </table>
+    <div class="trustmark" v-if="(!user.hide_trustmarks)&&role.show_trust_marks">
+        <div class="trustmark-links" v-if="(!role.owned)&&variation.game&&variation.write_right">
+            <a class="do_trustmark" href="javascript:void(0)" @click="do_trustmark(-3)">-3</a>
+            <a class="do_trustmark" href="javascript:void(0)" @click="do_trustmark(-2)">-2</a>
+            <a class="do_trustmark" href="javascript:void(0)" @click="do_trustmark(-1)">-1</a>
+            <a class="do_trustmark" href="javascript:void(0)" @click="do_trustmark(1)">+1</a>
+            <a class="do_trustmark" href="javascript:void(0)" @click="do_trustmark(2)">+2</a>
+            <a class="do_trustmark" href="javascript:void(0)" @click="do_trustmark(3)">+3</a>
+        </div>
+        Общее доверие:
+        <span class="trust">{{trust_value}}%</span>
+        <br>
+        <div v-if="(!role.owned)&&variation.write_right">
+            Мое доверие:
+            <span class="trust_value">{{ my_trust }}%</span>
+        </div>
+    </div>
+</div>

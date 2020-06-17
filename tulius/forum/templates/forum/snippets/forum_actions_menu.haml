@@ -11,9 +11,6 @@
                         %a{data-toggle: 'modal', href: '#quoteAnswer'}
                             {% trans "Answer with quote" %}
                 - else
-                    %li
-                        %a{href: '{{ parent_thread.get_mark_all_as_readed_url }}'}
-                            {% trans "Mark all as readed" %}
                     - if parent_thread.moderate_right
                         %li
                             %a{href: '{{ parent_thread.get_add_room_url}}'}
