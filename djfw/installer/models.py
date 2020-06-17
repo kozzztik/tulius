@@ -1,5 +1,6 @@
 import os
 
+from django import urls
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -108,9 +109,8 @@ class Backup(models.Model):
     def path(self):
         return os.path.join(self.backups_dir(), self.file_name())
 
-    @models.permalink
     def get_absolute_url(self):
-        return 'installer:backup', (), {'object_id': self.id}
+        return urls.reverse('installer:backup', kwargs={'object_id': self.pk})
 
     def url(self):
         return '<a href="%s">%s</a>' % (

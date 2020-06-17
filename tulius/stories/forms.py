@@ -1,6 +1,7 @@
 from django import forms
 from django import urls
-from django.utils.translation import ugettext_lazy as _, _string_concat
+from django.utils import text
+from django.utils.translation import ugettext_lazy as _
 
 from tulius.stories import models
 
@@ -62,8 +63,8 @@ class StoryFilterForm(forms.Form):
 class AddStoryForm(forms.ModelForm):
     url = urls.reverse_lazy('stories:add_story')
     caption = _('Add story')
-    submit_caption = _string_concat(
-        '<i class="icon-plus"></i> ', _('Add story'))
+    submit_caption = text.format_lazy(
+        '<i class="icon-plus"></i> {}', _('Add story'))
 
     class Meta:
         model = models.Story

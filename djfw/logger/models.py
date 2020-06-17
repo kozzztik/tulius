@@ -1,5 +1,6 @@
 import logging
 
+from django import urls
 from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -136,9 +137,9 @@ class ExceptionMessage(models.Model):
     path_link.allow_tags = True
     path_link.short_description = _('path')
 
-    @models.permalink
     def get_absolute_url(self):
-        return 'admin:logger_exceptionmessage_change', (self.id, ), {}
+        return urls.reverse(
+            'admin:logger_exceptionmessage_change', args=(self.pk, ))
 
 
 class ExceptionCookie(models.Model):

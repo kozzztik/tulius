@@ -1,3 +1,4 @@
+from django import urls
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.utils import translation
@@ -48,9 +49,8 @@ class NewsItem(AbstractBaseModel):
     def __str__(self):
         return self.caption
 
-    @models.permalink
     def get_absolute_url(self):
-        return 'news:detail', (), {'pk': self.id}
+        return urls.reverse('news:detail', kwargs={'pk': self.pk})
 
     def save(
             self, force_insert=False, force_update=False, using=None,
