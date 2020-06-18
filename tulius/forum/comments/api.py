@@ -55,7 +55,7 @@ class CommentsBase(api.BaseThreadView):
         return {
             'id': c.id,
             'page': c.page,
-            'url': self.comment_url(c),
+            'url': self.comment_url(c) if c.pk else None,
             'title': html.escape(c.title),
             'body': bbcodes.bbcode(c.body),
             'user': api.user_to_json(c.user, detailed=True),
