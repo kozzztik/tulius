@@ -10,7 +10,7 @@ from tulius.forum import models
 from tulius.forum.threads import api
 
 
-class GrantedRightsAPI(api.BaseThreadView):
+class BaseGrantedRightsAPI(api.BaseThreadView):
     model = models.ThreadAccessRight
     require_user = True
 
@@ -27,6 +27,23 @@ class GrantedRightsAPI(api.BaseThreadView):
                 kwargs={'pk': self.obj.id, 'right_id': right.pk})
         }
 
+    def create_right(self, data):
+        obj = self.model.objects.get_or_create(
+            thread=self.obj, user_id=data['user']['id'],
+            defaults={'access_level': data['access_level']}
+        )[0]
+        obj.access_level = obj.access_level | data['access_level']
+        return obj
+
+    def options(self, request, **kwargs):
+        users = auth.get_user_model().objects.filter(
+            is_active=True, username__istartswith=request.GET['query'])[:10]
+        return {
+            "users": [{"id": u.pk, "name": u.username} for u in users]
+        }
+
+
+class GrantedRightsAPI(BaseGrantedRightsAPI):
     def get_context_data(self, **kwargs):
         self.get_parent_thread(**kwargs)
         if not self.rights.edit:
@@ -35,14 +52,6 @@ class GrantedRightsAPI(api.BaseThreadView):
         return {
             'granted_rights': [self.right_to_json(r) for r in objs]
         }
-
-    def create_right(self, data):
-        obj = self.model.objects.get_or_create(
-            thread=self.obj, user_id=data['user']['id'],
-            defaults={'access_level': data['access_level']}
-        )[0]
-        obj.access_level = obj.access_level | data['access_level']
-        return obj
 
     def post(self, request, **kwargs):
         self.get_parent_thread(**kwargs)
@@ -63,15 +72,8 @@ class GrantedRightsAPI(api.BaseThreadView):
         self.obj.save()
         return {'access_type': self.obj.access_type}
 
-    def options(self, request, **kwargs):
-        users = auth.get_user_model().objects.filter(
-            is_active=True, username__istartswith=request.GET['query'])[:10]
-        return {
-            "users": [{"id": u.pk, "name": u.username} for u in users]
-        }
 
-
-class GrantedRightAPI(GrantedRightsAPI):
+class GrantedRightAPI(BaseGrantedRightsAPI):
     def get_context_data(self, **kwargs):
         self.get_parent_thread(**kwargs)
         if not self.rights.edit:
@@ -86,11 +88,11 @@ class GrantedRightAPI(GrantedRightsAPI):
         count = self.model.objects.filter(pk=right_id).delete()
         return {'count': count}
 
-    def post(self,  *args, right_id=None, **kwargs):
+    def post(self, request, right_id=None, **kwargs):
         self.get_parent_thread(**kwargs)
         if not self.rights.edit:
             raise exceptions.PermissionDenied()
-        data = json.loads(self.request.body)
+        data = json.loads(request.body)
         with transaction.atomic():
             obj = shortcuts.get_object_or_404(
                 self.model.objects.select_for_update(), pk=right_id)

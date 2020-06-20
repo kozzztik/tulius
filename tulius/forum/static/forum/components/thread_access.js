@@ -1,30 +1,38 @@
 export default LazyComponent('forum_thread_access', {
     template: '/static/forum/components/thread_access.html',
     props: ['thread'],
-        data: function () {
-            return {
-                rights: [],
-                add_form: {
-                    user: null,
-                    access_level: 3,
-                },
-                add_loading: false,
-                thread_loading: false,
-                access_levels: [
-                    {value: 1, text: "чтение"},
-                    {value: 3, text: "чтение и запись"},
-                    {value: 7, text: "чтение, запись и модерирование"},
-                    {value: 2, text: "только запись"},
-                    {value: 5, text: "чтение и модерирование"},
-                ],
-                access_types: [
-                    {value: 0, text: "доступ не задан"},
-                    {value: 1, text: "свободный доступ"},
-                    {value: 2, text: "только чтение"},
-                    {value: 3, text: "доступ только по списку"},
-                ],
-                user_options: [],
-            }
+    props: {
+        thread: {
+            type: Object,
+        },
+        user_search: {
+			type: Function,
+	    },
+	},
+    data: function () {
+        return {
+            rights: [],
+            add_form: {
+                user: null,
+                access_level: 3,
+            },
+            add_loading: false,
+            thread_loading: false,
+            access_levels: [
+                {value: 1, text: "чтение"},
+                {value: 3, text: "чтение и запись"},
+                {value: 7, text: "чтение, запись и модерирование"},
+                {value: 2, text: "только запись"},
+                {value: 5, text: "чтение и модерирование"},
+            ],
+            access_types: [
+                {value: 0, text: "доступ не задан"},
+                {value: 1, text: "свободный доступ"},
+                {value: 2, text: "только чтение"},
+                {value: 3, text: "доступ только по списку"},
+            ],
+            user_options: [],
+        }
     },
     computed: {
         user: function() {return this.$root.user;},
@@ -32,20 +40,29 @@ export default LazyComponent('forum_thread_access', {
     methods: {
         show_dialog() {
             if (!this.thread.id)
-                this.$bvModal.show('accessRights')
+                this.$refs.modal.show()
             else
                 this.load_api();
         },
-        user_search(query) {
+        do_search(query) {
+            var res = (this.user_search||this.default_user_search)(
+                query, this.rights);
+            if (res && (typeof res.then === 'function')) {
+                res.then(response => this.user_options = response);
+                return res;
+            }
+            this.user_options = res || this.user_options;
+        },
+        default_user_search(query, rights) {
             if (query.length < 3)
                 return
-            axios.options(
+            return axios.options(
                 this.thread.url + 'granted_rights/', {params: {query: query}}
             ).then(response => {
                 var result = [];
                 for (var user of response.data.users) {
                     var found = false;
-                    for (var right of this.rights)
+                    for (var right of rights)
                         if (right.user.id == user.id) {
                             found = true;
                             break;
@@ -53,7 +70,7 @@ export default LazyComponent('forum_thread_access', {
                     if (!found)
                         result.push(user);
                 }
-                this.user_options = result;
+                return result;
             }).catch(error => this.$root.add_message(error, "error"))
         },
         load_api() {
@@ -62,7 +79,7 @@ export default LazyComponent('forum_thread_access', {
                 this.rights = []
                 for (var right of response.data.granted_rights)
                     this._add_right(right);
-                this.$bvModal.show('accessRights');
+                this.$refs.modal.show();
             }).catch(error => this.$root.add_message(error, "error"))
             .then(() => {
                 this.$root.loading_end(null);

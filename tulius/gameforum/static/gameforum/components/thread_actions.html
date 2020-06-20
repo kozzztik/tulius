@@ -5,6 +5,9 @@
                 <img src="/static/games/img/button_blue_heart.png" style="height: 25px">
                 Ответить с цитатой
             </b-dropdown-item>
+            <b-dropdown-item href="javascript:void(0)" v-if="thread.rights.edit" @click="$refs.thread_access.show_dialog()">
+                Права доступа
+            </b-dropdown-item>
             <b-dropdown-item :href="'/play/add_room/' + thread.id + '/'" v-if="thread.room && thread.rights.moderate">
                 <img src="/static/games/img/button_green_add.png" style="height: 25px">
                 Добавить комнату
@@ -146,5 +149,7 @@
             Поиск
         </button>
     </form>
+    <forum_thread_access :thread="thread" ref="thread_access" :user_search="right_user_search">
+    </forum_thread_access>
     <Tinybox v-model="image_index" :images="images"></Tinybox>
 </div>

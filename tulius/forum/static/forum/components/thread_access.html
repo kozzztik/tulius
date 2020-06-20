@@ -1,4 +1,4 @@
-<b-modal id="accessRights" title="Права доступа" size="lg" centered ok-only>
+<b-modal id="accessRights" title="Права доступа" size="lg" centered ok-only ref="modal">
     <div class="row" style="padding-bottom: 0.75em;border-bottom: 1px solid #dee2e6;margin-bottom: 0.75em;">
         <label class="col-5 col-form-label" for="thread_access_level">
             <b>Для всех:</b>
@@ -36,7 +36,7 @@
     <div class="row" style="padding-top: 0.75em;border-top: 1px solid #dee2e6;margin-top: 0.75em;">
         <div class="col-5">
             <multiselect v-model="add_form.user" :options="user_options"
-                         :searchable="true" @search-change="user_search"
+                         :searchable="true" @search-change="do_search"
                          label="name"  track-by="id"
                          placeholder="Выберите пользователя">
                 <template v-slot:noResult>Пользователь не найден</template>

@@ -74,5 +74,19 @@ export default LazyComponent('game_forum_thread_actions', {
             }
             return false;
         },
+        right_user_search(query, rights) {
+            var result = [];
+            for (var c of this.variation.characters) {
+                var found = false;
+                for (var right of rights)
+                    if (right.user.id == c.id) {
+                        found = true;
+                        break;
+                    }
+                if (!found)
+                    result.push({'id': c.id, 'name': c.title});
+            }
+            return result;
+        },
     },
 })
