@@ -61,13 +61,16 @@ export default LazyComponent('forum_comment', {
             return forum_datetime(new Date(v));
         },
         do_like() {
-            var new_value = !this.comment.is_liked;
+            var old_value = this.comment.is_liked;
             this.comment.is_liked = null;
             axios.post('/api/forum/likes/',
-                {id: this.comment.id, value: new_value}
+                {id: this.comment.id, value: !old_value}
             ).then(response => {
-                this.comment.is_liked = response.data.value;
-            }).catch(error => this.$parent.add_message(error, "error"));
+                old_value = response.data.value;
+            }).catch(error => this.$root.add_message(error, "error")
+            ).then(() => {
+                this.comment.is_liked = old_value;
+            });
         },
         delete_comment() {
             this.$parent.delete_comment(this.comment);
