@@ -40,3 +40,4 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 Vue.use(VueLoading);
 Vue.component('loading', VueLoading)
 Vue.use(Tinybox);
+Vue.component('multiselect', VueMultiselect.default)

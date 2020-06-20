@@ -5,6 +5,7 @@ from tulius.gameforum.threads import api as threads
 from tulius.gameforum import other
 from tulius.gameforum import online_status
 from tulius.gameforum.comments import api as comments
+from tulius.gameforum.rights import api as rights_api
 from tulius.gameforum.other import trust_marks
 
 
@@ -29,6 +30,13 @@ urlpatterns = [
     urls.url(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/read_mark/$',
         other.ReadmarkAPI.as_view(), name='thread_readmark'),
+    urls.url(
+        r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/granted_rights/$',
+        rights_api.GrantedRightsAPI.as_view(), name='thread_rights'),
+    urls.url(
+        r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/granted_rights/'
+        r'(?P<right_id>\d+)/$',
+        rights_api.GrantedRightAPI.as_view(), name='thread_right'),
     urls.url(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/online_status/$',
         online_status.OnlineStatusAPI.as_view(), name='online_status'),
