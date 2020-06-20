@@ -9,6 +9,9 @@
         <b-dropdown-item href="javascript:void(0)" v-if="thread.room" @click="mark_all_as_readed()">
             Пометить все как прочитанное
         </b-dropdown-item>
+        <b-dropdown-item href="javascript:void(0)" v-if="thread.rights.edit" @click="$refs.thread_access.show_dialog()">
+            Права доступа
+        </b-dropdown-item>
         <b-dropdown-item :href="'/forums/add_room/' + thread.id + '/'" v-if="thread.room && thread.rights.moderate">
             Добавить комнату
         </b-dropdown-item>
@@ -33,6 +36,7 @@
             Расширенный поиск
         </b-dropdown-item>
     </b-dropdown>
+    <forum_thread_access :thread="thread" ref="thread_access"></forum_thread_access>
     <b-modal id="quoteAnswer" title="Цитирование" ok-only v-if="!thread.room" >
         <p>
             Цитировать теперь легко! Просто выделите текст мышкой:

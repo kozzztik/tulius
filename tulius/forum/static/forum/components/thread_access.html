@@ -1,0 +1,61 @@
+<b-modal id="accessRights" title="Права доступа" size="lg" centered ok-only>
+    <div class="row" style="padding-bottom: 0.75em;border-bottom: 1px solid #dee2e6;margin-bottom: 0.75em;">
+        <label class="col-5 col-form-label" for="thread_access_level">
+            <b>Для всех:</b>
+        </label>
+        <b-form-select :options="access_types" class="col-6"
+                    v-model="thread.access_type" id="thread_access_level" @change="change_thread_type()">
+        </b-form-select>
+        <div class="col-1">
+            <div class="spinner-border text-warning" role="status"
+                 style="width: 2rem; height: 2rem;margin-top: 0.5em;" v-if="thread_loading">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <div class="row" v-for="(right, num) in rights" :key="num">
+        <label class="col-5 col-form-label" :for="'access_right' + num">
+            {{ right.user.title }}
+        </label>
+        <b-form-select :options="access_levels" class="col-6"
+                    v-model="right.access_level" id="'access_right' + num" @change="change_right(right)">
+        </b-form-select>
+        <div class="col-1 px-1">
+            <svg class="bi bi-trash-fill" width="2em" height="2em"
+                 viewBox="0 0 16 16" fill="red" xmlns="http://www.w3.org/2000/svg"
+                 style="cursor:pointer;margin-top: 0.5em;"
+                 v-if="!right.loading" @click="delete_right(right)">
+              <path fill-rule="evenodd" d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0v-7z"/>
+            </svg>
+            <div class="spinner-border text-warning" role="status"
+                 style="width: 2rem; height: 2rem;margin-top: 0.5em;" v-if="right.loading">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="padding-top: 0.75em;border-top: 1px solid #dee2e6;margin-top: 0.75em;">
+        <div class="col-5">
+            <multiselect v-model="add_form.user" :options="user_options"
+                         :searchable="true" @search-change="user_search"
+                         label="name"  track-by="id"
+                         placeholder="Выберите пользователя">
+                <template v-slot:noResult>Пользователь не найден</template>
+                <template v-slot:noOptions>Пользователь не найден</template>
+            </multiselect>
+        </div>
+        <b-form-select class="col-6" v-model="add_form.access_level" :options="access_levels"></b-form-select>
+        <div class="col-1 px-1">
+            <svg class="bi bi-person-plus-fill" width="2.5em" height="2.5em"
+                    viewBox="0 0 16 16" :fill="add_form.user ? 'green' : 'gray' " xmlns="http://www.w3.org/2000/svg"
+                    style="cursor:pointer;margin-top: 0.2em;"
+                    v-if="!add_loading" @click="add_right">
+                <path fill-rule="evenodd" d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm7.5-3a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"/>
+                <path fill-rule="evenodd" d="M13 7.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0v-2z"/>
+            </svg>
+            <div class="spinner-border text-warning" role="status"
+                    style="width: 2rem; height: 2rem;" v-if="add_loading">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+</b-modal>
