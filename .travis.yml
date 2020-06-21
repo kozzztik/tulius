@@ -10,7 +10,7 @@ before_script:
   - docker tag kozzztik/tulius:$TRAVIS_BRANCH tulius_test
 script:
   - docker run tulius_test python3 -m pylint djfw tulius tests
-  - docker run -e TULIUS_BRANCH=test --net="host" tulius_test python3 -m pytest tests --cov=tulius --cov-report term-missing --cov-report term:skip-covered
+  - docker run -e TULIUS_BRANCH=test --net="host" tulius_test python3 -m pytest tests --cov=tulius --cov-report term-missing
 addons:
   ssh_known_hosts: tulius.co-de.org:22
 before_deploy:
