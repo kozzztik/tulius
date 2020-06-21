@@ -30,8 +30,12 @@ class UserAdmin(DefUserAdmin):
             'show_played_games', 'show_played_characters',
             'show_online_status', 'hide_trustmarks')}),
     )
-    list_display = ('username', 'email', 'is_active',)
+    list_display = ('username', 'email', 'is_active', 'date_joined')
     search_fields = ('username', 'email')
+    date_hierarchy = 'date_joined'
+    list_editable = ('is_active',)
+    ordering = ('-date_joined',)
+    list_filter = ('is_active', 'is_superuser', 'date_joined',)
 
     form = UserChangeForm
     add_form = UserCreationForm

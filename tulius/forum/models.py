@@ -623,25 +623,6 @@ class CommentLike(models.Model):
         verbose_name=_('comment'),
     )
 
-    def save(
-            self, force_insert=False, force_update=False, using=None,
-            update_fields=None):
-        if self.id is None:
-            comment = Comment.objects.select_for_update().get(
-                id=self.comment_id)
-            comment.likes += 1
-            comment.save()
-        super(CommentLike, self).save(
-            force_insert=force_insert, force_update=force_update,
-            using=using, update_fields=update_fields)
-
-    def delete(self, using=None, keep_parents=False):
-        comment = Comment.objects.select_for_update().get(
-            id=self.comment_id)
-        comment.likes -= 1
-        comment.save()
-        super(CommentLike, self).delete(using, keep_parents)
-
 
 class ThreadDeleteMark(models.Model):
     class Meta:

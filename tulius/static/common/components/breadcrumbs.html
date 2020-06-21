@@ -5,8 +5,11 @@
             <a href="/" class="breadcrumb">
                 <div class="homelink"></div>
             </a>
-            <router-link :to="item.url"  v-for="(item, num) in items" class="breadcrumb" :key="num" v-html="item.title">
-            </router-link>
+            <template v-for="(item, num) in items">
+                <a :href="item.url" v-html="item.title" class="breadcrumb" v-if="item.old_style" :key="num"></a>
+                <router-link :to="item.url"  class="breadcrumb" v-html="item.title" v-else :key="num">
+                </router-link>
+            </template>
         </div>
     </div>
     <div class="breadcrumbs-border" v-if="upper"></div>
