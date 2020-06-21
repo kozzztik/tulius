@@ -489,3 +489,26 @@ body .quote, blockquote {
     word-break: break-word;
 }
 
+#reply_form .container.content {
+    border-radius: 10px;
+    padding: 10px 10px;
+    background-image: url("../../tulius/img/baselayout/bg3.gif");
+}
+
+.reply_form_max .form_title {
+    display: flex !important;
+}
+
+.reply_form_only .pagination, .reply_form_only .post-table,
+.reply_form_only .online_users_container {
+    display: none;
+}
+
+.reply_form_only #reply_form .post-table {
+    display: table;
+}
+
+.reply_form_max .cke_editable {
+    min-height: 10em;
+}
+
