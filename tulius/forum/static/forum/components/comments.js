@@ -108,7 +108,7 @@ export default LazyComponent('forum_thread_comments', {
                 this.subscribe_comments();
                 if (this.$route.hash)
                     Vue.nextTick( () => {
-                        this.scroll_to_comment(this.$route.hash.replace('#', ''));
+                        this.scroll_to_comment(this.$route.hash.replace('#', ''), 0);
                     });
             }).catch(error => this.$root.add_message(error, "error")).then(() => {
                 this.$root.loading_end(null);
@@ -175,10 +175,20 @@ export default LazyComponent('forum_thread_comments', {
                     query: {page: this.thread.not_read_comment.page_num},
                     hash: '#' + this.thread.not_read_comment.id})
             else
-                this.scroll_to_comment(this.thread.not_read_comment.id);
+                this.scroll_to_comment(this.thread.not_read_comment.id, 0);
         },
-        scroll_to_comment(comment_id) {
-            document.getElementById(comment_id).scrollIntoView(false);
+        scroll_to_comment(comment_id, retry) {
+            var found = null;
+            for (var ref of this.$refs.comments)
+                if (ref.parentElement.id == comment_id) {
+                    ref.scrollIntoView(false);
+                    return
+                }
+            if (retry > 10) {
+                console.log('Scroll not found ref');
+                return
+            }
+            setTimeout(this.scroll_to_comment, 200, comment_id, retry + 1);
         },
     },
     mounted() {

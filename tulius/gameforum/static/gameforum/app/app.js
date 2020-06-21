@@ -29,11 +29,13 @@ export default LazyComponent('gameforum_app', {
                 updated_breadcrumbs.push({
                     'title': 'Игра',
                     'url': '/games/game/' + this.variation.game.id + '/',
+                    'old_style': true,
                 })
             else
                 updated_breadcrumbs.push({
                     'title': 'Вариация',
                     'url': '/stories/variation/' + this.variation.id + '/main/',
+                    'old_style': true,
                 })
             this.$root.loading_end([...updated_breadcrumbs, ...breadcrumbs]);
         }
