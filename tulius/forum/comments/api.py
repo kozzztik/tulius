@@ -95,7 +95,7 @@ class CommentsPageAPI(CommentsBase):
         comment = models.Comment(plugin_id=self.obj.plugin_id)
         comment.parent = self.obj
         comment.user = self.user
-        comment.title = "Re: " + self.obj.title
+        comment.title = data['title']
         comment.body = text
         comment.reply_id = reply_id
         return comment

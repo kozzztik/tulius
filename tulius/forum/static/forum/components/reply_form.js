@@ -35,6 +35,7 @@ export default LazyComponent('forum_reply_form', {
             show_form: true,
             form_el: null,
             form: {
+                title: 'Re: ' + this.thread.title,
                 body: '',
                 reply_id: null,
             }
@@ -66,7 +67,10 @@ export default LazyComponent('forum_reply_form', {
             }
             this.reply_comment_id = this.thread.first_comment_id;
             this.show_preview = false;
+            this.form.title = 'Re: ' + this.thread.title;
             this.form.body = '';
+            document.getElementById("reply_form").classList.remove("reply_form_max");
+            document.getElementById("content-center").classList.remove("reply_form_only");
         },
         do_reply() {
             if (this.form.body == '')
