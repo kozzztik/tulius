@@ -10,7 +10,7 @@ ADD settings.py /opt/tulius/settings.py
 ADD .pylintrc /opt/tulius/.pylintrc
 ADD tests /opt/tulius/tests
 ADD pytest.ini /opt/tulius/pytest.ini
-ADD .coveragerc /opt/tulius/.coveragerc
+ADD scripts/travis_test.sh /opt/tulius/travis_test.sh
 
 # update requirements
 RUN pip install -r requirements.txt
