@@ -5,14 +5,12 @@ services:
   - docker
   - mysql
   - redis
-install: pip install python-coveralls coverage==4.5.4
 before_script:
   - docker build -t kozzztik/tulius:$TRAVIS_BRANCH .
   - docker tag kozzztik/tulius:$TRAVIS_BRANCH tulius_test
 script:
   - docker run tulius_test python3 -m pylint djfw tulius tests
-  - mkdir $PWD/coverage
-  - docker run -e TULIUS_BRANCH=test --net="host" -v $PWD/coverage:/opt/tulius/coverage tulius_test python3 -m pytest tests --cov=tulius --cov-report term-missing --cov-report term:skip-covered
+  - docker run -e TULIUS_BRANCH=test --net="host" tulius_test python3 -m pytest tests --cov=tulius --cov-report term-missing --cov-report term:skip-covered
 addons:
   ssh_known_hosts: tulius.co-de.org:22
 before_deploy:
@@ -28,5 +26,5 @@ deploy:
     on:
       branch: master
 after_success:
-  - ln -s $PWD /opt/tulius
-  - coveralls --data_file $PWD/coverage/.coverage --nogit
+  - docker run -e TRAVIS_JOB_ID="$TRAVIS_JOB_ID" -e TRAVIS_BRANCH="$TRAVIS_BRANCH" coveralls
+
