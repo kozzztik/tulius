@@ -11,6 +11,7 @@ ADD .pylintrc /opt/tulius/.pylintrc
 ADD tests /opt/tulius/tests
 ADD pytest.ini /opt/tulius/pytest.ini
 ADD scripts/travis_test.sh /opt/tulius/travis_test.sh
+RUN chmod +x /opt/tulius/travis_test.sh
 
 # update requirements
 RUN pip install -r requirements.txt
