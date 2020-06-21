@@ -1,18 +1,15 @@
 language: python
 python:
-  - "3.6"
+  - "3.7"
 services:
   - docker
   - mysql
   - redis
-install: pip install coveralls
 before_script:
   - docker build -t kozzztik/tulius:$TRAVIS_BRANCH .
   - docker tag kozzztik/tulius:$TRAVIS_BRANCH tulius_test
 script:
-  - docker run tulius_test python3 -m pylint djfw tulius tests
-  - mkdir $PWD/coverage
-  - docker run -e TULIUS_BRANCH=test --net="host" -v $PWD/coverage:/opt/tulius/coverage tulius_test python3 -m pytest tests --cov=tulius --cov-report term-missing --cov-report term:skip-covered
+  - docker run -e TULIUS_BRANCH=test -e TRAVIS_JOB_ID="$TRAVIS_JOB_ID"  -e COV_BRANCH="$TRAVIS_BRANCH" --net="host" tulius_test /opt/tulius/travis_test.sh
 addons:
   ssh_known_hosts: tulius.co-de.org:22
 before_deploy:
@@ -27,7 +24,3 @@ deploy:
     script: bash scripts/deploy.sh
     on:
       branch: master
-after_success:
-  - ln -s $PWD /opt/tulius
-  - cd /opt/tulius
-  - coveralls -v
