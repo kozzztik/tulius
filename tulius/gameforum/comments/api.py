@@ -40,6 +40,7 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
                 'id': c.parent_id,
                 'url': self.thread_url(c.parent_id)
             },
+            'page': c.page,
             'url': self.comment_url(c) if c.id else None,
             'title': html.escape(c.title),
             'body': bbcodes.bbcode(c.body),
@@ -76,4 +77,19 @@ class CommentsPageAPI(comments.CommentsPageAPI, CommentsBase):
 
 
 class CommentAPI(comments.CommentAPI, CommentsBase):
-    pass
+    def get_context_data(self, **kwargs):
+        data = super(CommentAPI, self).get_context_data(**kwargs)
+        data['thread']['rights'] = self.rights.to_json()
+        return data
+
+    def update_comment(self, comment, data):
+        super(CommentAPI, self).update_comment(comment, data)
+        new_role = data['role_id']
+        if comment.data1 != new_role:
+            if new_role not in self.rights.user_write_roles:
+                raise exceptions.PermissionDenied()
+            comment.data1 = new_role
+        editor_role = data['edit_role_id']
+        if editor_role not in self.rights.user_write_roles:
+            raise exceptions.PermissionDenied()
+        comment.data2 = editor_role

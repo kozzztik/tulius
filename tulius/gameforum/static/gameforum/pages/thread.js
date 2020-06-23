@@ -71,7 +71,10 @@ export default LazyComponent('gameforum_thread_page', {
             return '/play/edit_thread/' + thread.id + '/';
         },
         edit_comment_url(comment) {
-            return '/play/edit_comment/' + comment.id + '/';
+			return {
+                name: 'game_edit_comment',
+                params: { id: comment.id, variation_id: this.variation.id },
+            }
         },
         reply_str(comment) {
             if (comment.user.sex == 1) {

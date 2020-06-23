@@ -228,32 +228,6 @@ class GamePlugin(ForumPlugin):
                 comment.data2 = editor.id
             comment.save()
 
-    def comment_before_edit(self, sender, **kwargs):
-        comment = kwargs['comment']
-        sender.init_role_id = comment.data1 if comment else None
-
-    def comment_after_edit(self, sender, **kwargs):
-        context = kwargs['context']
-        adding = kwargs['adding']
-        comment = sender.comment
-        parent_thread = sender.parent_thread
-        (roleform, role) = self.process_role(
-            sender.request, parent_thread, sender.init_role_id, adding)
-        context['roleform'] = roleform
-        context['role'] = role
-        editor = None
-        if parent_thread.game and (not adding):
-            (editorform, editor) = self.process_editor(
-                sender.request, parent_thread, comment)
-            context['editorform'] = editorform
-            context['editor'] = editor
-        if comment:
-            if role:
-                comment.data1 = role.id
-            if editor:
-                comment.data2 = editor.id
-            comment.save()
-
     def fix_games(self):
         games = Game.objects.all()
         for game in games:
@@ -283,8 +257,6 @@ class GamePlugin(ForumPlugin):
         self.site.signals.thread_view.connect(self.thread_view)
         self.site.signals.thread_before_edit.connect(self.thread_before_edit)
         self.site.signals.thread_after_edit.connect(self.thread_after_edit)
-        self.site.signals.comment_before_edit.connect(self.comment_before_edit)
-        self.site.signals.comment_after_edit.connect(self.comment_after_edit)
 
     def get_urls(self):
         return [

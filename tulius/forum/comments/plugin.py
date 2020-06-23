@@ -18,10 +18,6 @@ class CommentsPlugin(CommentsCore):
             self.reverse('thread', comment.parent_id),
             comment.page, comment.id)
 
-    def comment_url(self, comment):
-        # TODO hope this wouldn't crush nothing. refactor all of that.
-        return self.get_paged_url(comment)
-
     def get_page_num(self, comment):
         num = self.models.Comment.objects.filter(
             parent=comment.parent, id__lt=comment.id, deleted=False).count()
@@ -41,10 +37,8 @@ class CommentsPlugin(CommentsCore):
         self.templates['comment'] = self.comment_template
         self.templates['comment_player'] = 'forum/comments/avatar.haml'
         self.templates['comment_preview'] = 'forum/preview.haml'
-        self.urlizer['comment'] = self.comment_url
         self.urlizer['comment_paged'] = self.get_paged_url
         self.urlizer['Comment_get_paged_url'] = self.get_paged_url
-        self.urlizer['Comment_get_absolute_url'] = self.comment_url
         self.urlizer['Comment_get_reply_url'] = self.reply_url
         self.urlizer['Comment_get_edit_url'] = self.get_edit_url
         self.core['Comment_get_page_num'] = self.get_page_num

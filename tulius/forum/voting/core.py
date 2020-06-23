@@ -162,38 +162,6 @@ class VotingCore(plugins.ForumPlugin):
                 sender.comment,
                 sender.request.user)
 
-    def comment_before_edit(self, sender, **kwargs):
-        voting = None
-        comment = kwargs['comment']
-        context = kwargs['context']
-        if comment:
-            (voting_valid, voting, voting_form, voting_formset,
-             voting_delete) = self.preprocess_edit_voting(
-                 sender.request, comment)
-            context['voting_delete'] = voting_delete
-        else:
-            (voting_valid, voting_form, voting_formset) = \
-                self.preprocess_add_voting(sender.request)
-        context['voting_valid'] = voting_valid
-        context['voting'] = voting
-        context['voting_form'] = voting_form
-        context['voting_formset'] = voting_formset
-        if not voting_valid:
-            sender.edit_is_valid = False
-
-    def comment_after_edit(self, sender, **kwargs):
-        if sender.request.POST and sender.comment and sender.comment.voting:
-            context = kwargs['context']
-            voting = context['voting']
-            voting_form = context['voting_form']
-            voting_formset = context['voting_formset']
-            self.process_edit_voting(
-                voting,
-                voting_form,
-                voting_formset,
-                sender.comment,
-                sender.request.user)
-
     def init_core(self):
         super(VotingCore, self).init_core()
         self.core['preprocess_add_voting'] = self.preprocess_add_voting
@@ -205,5 +173,3 @@ class VotingCore(plugins.ForumPlugin):
         self.core['prepare_voting_results'] = self.prepare_voting_results
         self.site.signals.thread_before_edit.connect(self.thread_before_edit)
         self.site.signals.thread_after_edit.connect(self.thread_after_edit)
-        self.site.signals.comment_before_edit.connect(self.comment_before_edit)
-        self.site.signals.comment_after_edit.connect(self.comment_after_edit)
