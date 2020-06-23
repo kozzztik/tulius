@@ -30,12 +30,14 @@ export default LazyComponent('forum_voting', {
     },
     computed: {
         user: function() {return this.$root.user;},
+        media: function() {return this.comment.media},
+    },
+    watch: {
+        media: function(newMedia, oldMedia) {return this.voting = newMedia.voting},
     },
     methods: {
         add_media() {
             this.$refs.modal.show();
-        },
-        do_add_media() {
         },
         do_vote() {
             if ((!this.choice)||this.editor||(!this.comment.url))
@@ -51,14 +53,27 @@ export default LazyComponent('forum_voting', {
                 this.loading = false;
             });
         },
+        close_voting() {
+            if (this.editor||(!this.comment.url))
+                return;
+            this.loading = true;
+            axios.post(
+                this.comment.url + 'voting/', {'close': true}
+            ).then(response => {
+                this.voting = response.data;
+            }).catch(error => Vue.app_error_handler(error, "error")
+            ).then(() => {
+                this.loading = false;
+            });
+        },
         on_modal_submit() {
-            this.comment.media.voting = JSON.parse(JSON.stringify(this.add_form));
-            this.voting = this.comment.media.voting;
+            this.voting = JSON.parse(JSON.stringify(this.add_form));
+            this.comment.media.voting = this.voting;
             this.$refs.modal.hide();
             this.menu_item.disabled = true;
         },
         on_editor_delete() {
-            this.voting = this.comment.voting = null;
+            this.voting = this.comment.media.voting = null;
             this.menu_item.disabled = false;
         },
         on_editor_edit() {

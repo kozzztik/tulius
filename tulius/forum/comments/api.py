@@ -59,7 +59,6 @@ class CommentsBase(api.BaseThreadView):
             'body': bbcodes.bbcode(c.body),
             'user': api.user_to_json(c.user, detailed=True),
             'create_time': c.create_time,
-            'voting': c.voting,
             'edit_right': self.comment_edit_right(c),
             'is_thread': c.is_thread(),
             'edit_time': c.edit_time,

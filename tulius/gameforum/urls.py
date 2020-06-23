@@ -43,4 +43,7 @@ urlpatterns = [
     urls.url(
         r'^variation/(?P<variation_id>\d+)/comment/(?P<pk>\d+)/$',
         comments.CommentAPI.as_view(), name='comment'),
+    urls.url(
+        r'^variation/(?P<variation_id>\d+)/comment/(?P<pk>\d+)/voting/$',
+        other.VotingAPI.as_view(), name='voting'),
 ]

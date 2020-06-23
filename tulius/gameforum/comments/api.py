@@ -34,20 +34,21 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
             })
 
     def comment_to_json(self, c):
-        return {
+        data = {
             'id': c.id,
             'url': self.comment_url(c) if c.id else None,
             'title': html.escape(c.title),
             'body': bbcodes.bbcode(c.body),
             'user': self.role_to_json(c.data1, detailed=True),
             'create_time': c.create_time,
-            'voting': c.voting,
             'edit_right': self.comment_edit_right(c),
             'is_thread': c.is_thread(),
             'edit_time': c.edit_time,
             'editor': self.role_to_json(c.data2) if c.editor else None,
             'media': c.media,
         }
+        signals.comment_to_json.send(self, comment=c, data=data)
+        return data
 
 
 class CommentsPageAPI(comments.CommentsPageAPI, CommentsBase):

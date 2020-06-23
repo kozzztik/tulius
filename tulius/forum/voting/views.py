@@ -3,11 +3,12 @@ import json
 from django import http
 from django import dispatch
 from django import shortcuts
+from django.core import exceptions
 from django.db import models as django_models
 from django.db import transaction
 from django.utils import html
-from djfw.wysibb.templatetags import bbcodes
 
+from tulius.core.ckeditor import html_converter
 from tulius.forum import plugins
 from tulius.forum import models
 from tulius.forum import signals
@@ -124,13 +125,13 @@ def comment_to_json(sender, comment, data, **kwargs):
 
 @dispatch.receiver(signals.after_add_comment)
 def after_add_comment(sender, comment, data, preview, **kwargs):
-    if 'voting' not in data['media']:
+    voting_data = data['media'].get('voting')
+    if not voting_data:
         return
     if preview:
-        comment.media['voting'] = data['media']['voting']
+        comment.media['voting'] = voting_data
         return
-    voting = VotingAPI.create_voting(
-        comment, sender.user, data['media']['voting'])
+    voting = VotingAPI.create_voting(comment, sender.user, voting_data)
     comment.media['voting'] = voting.pk
     comment.save()
 
@@ -201,15 +202,15 @@ class VotingAPI(api.CommentBase):
     def create_voting(cls, comment, user, data):
         voting = models.Voting(
             comment=comment, user=user,
-            voting_name=bbcodes.bbcode(data['name']),
-            voting_body=bbcodes.bbcode(data['body']),
+            voting_name=html_converter.html_to_bb(data['name']),
+            voting_body=html_converter.html_to_bb(data['body']),
             show_results=data['show_results'],
             preview_results=data['preview_results'],
         )
         voting.save()
         for item in data['choices']['items']:
             models.VotingChoice(
-                voting=voting, name=bbcodes.bbcode(item['name'])
+                voting=voting, name=html_converter.html_to_bb(item['name'])
             ).save()
         return voting
 
@@ -221,6 +222,12 @@ class VotingAPI(api.CommentBase):
     def post(self, request, *args, **kwargs):
         self.get_voting(**kwargs)
         data = json.loads(self.request.body)
+        if data.get('close'):
+            if not self.comment_edit_right(self.comment):
+                raise exceptions.PermissionDenied()
+            self.voting.closed = True
+            self.voting.save()
+            return self.voting_json(self.voting, self.user)
         choice_id = int(data['choice'])
         choice = shortcuts.get_object_or_404(
             models.VotingChoice, pk=choice_id)

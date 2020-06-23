@@ -53,6 +53,7 @@
             <input v-if="!show_results" type="button" value="Голосовать" v-on:click="do_vote()">
         </form>
         <input v-if="show_results" type="button" value="Перейти к голосованию" v-on:click="show_results=false">
+        <input v-if="(!voting.closed)&&comment.edit_right" type="button" value="Завершить голосование" @click="close_voting()">
     </div>
     <b-modal :title="comment.media.voting ? 'Править голосование' : 'Добавить голосование'"
              size="lg" centered ref="modal" hide-footer>
@@ -75,14 +76,14 @@
                 </div>
             </div>
             <div class="row">
-                <label class="col-5 col-form-label">
-                    <b>Показывать результаты до закрытия:</b>
+                <label class="col-6 col-form-label">
+                    <input type="checkbox" v-model="add_form.show_results">
+                    <b>Показывать результаты до закрытия</b>
                 </label>
-                <input type="checkbox" class="col-1 form-control" v-model="add_form.show_results">
-                <label class="col-5 col-form-label">
-                    <b>Кнопка предпросмотра результатов:</b>
+                <label class="col-6 col-form-label">
+                    <input type="checkbox" class="form-check-input" v-model="add_form.preview_results">
+                    <b>Кнопка предпросмотра результатов</b>
                 </label>
-                <input type="checkbox" class="col-1 form-control" v-model="add_form.preview_results">
             </div>
             <div class="row">
                 <label class="col-11 col-form-label">
