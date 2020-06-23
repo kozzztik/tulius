@@ -1,28 +1,32 @@
 export default LazyComponent('forum_voting', {
     template: '/static/forum/components/voting.html',
-    props: ['comment'],
-        data: function () {
+    props: {
+        comment: {
+            type: Object,
+        },
+        editor: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    data: function () {
         return {
-            loading: true,
+            loading: false,
             show_results: false,
-            voting: {},
             choice: null,
+            add_media_label: "Добавить голосование"
         }
     },
     computed: {
         user: function() {return this.$root.user;},
+        can_add_media: function() {return !this.comment.media.voting},
+        voting: function() {return this.comment.media.voting},
     },
     methods: {
-        load_api(pk) {
-            this.loading = true;
-            axios.get('/api/forum/comment/' + pk + '/voting/').then(response => {
-                this.voting = response.data
-            }).catch(
-                error => Vue.app_error_handler(error, "error")
-            )
-            .then(() => {
-                this.loading = false;
-            });
+        add_media() {
+            this.$refs.modal.show();
+        },
+        do_add_media() {
         },
         do_vote() {
             if (!this.choice) {
@@ -30,18 +34,14 @@ export default LazyComponent('forum_voting', {
             }
             this.loading = true;
             axios.post(
-                '/api/forum/comment/' + this.comment.id + '/voting/',
+                comment.url + 'voting/',
                 {'choice': this.choice}
             ).then(response => {
                 this.voting = response.data;
-            }).catch(
-                error => Vue.app_error_handler(error, "error")
-            )
-            .then(() => {
+            }).catch(error => Vue.app_error_handler(error, "error")
+            ).then(() => {
                 this.loading = false;
             });
-
         }
     },
-    mounted() {this.load_api(this.comment.id)},
 })

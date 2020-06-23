@@ -11,3 +11,6 @@ thread_prepare_threads = dispatch.Signal(providing_args=["threads"])
 # prepare data to json
 thread_room_to_json = dispatch.Signal(
     providing_args=["thread", "response"])
+
+comment_to_json = dispatch.Signal(
+    providing_args=["comment", "data"])

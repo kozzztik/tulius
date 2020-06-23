@@ -1,6 +1,7 @@
 """
 Forum engine models for Tulius project
 """
+import jsonfield
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
@@ -498,6 +499,7 @@ class Comment(SitedModelMixin):
         null=True,
         blank=True,
     )
+    media = jsonfield.JSONField()
 
     view_user = None
 

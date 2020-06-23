@@ -1,14 +1,16 @@
 import json
 
 from django import http
+from django import dispatch
 from django import shortcuts
-from django.core import exceptions
 from django.db import models as django_models
 from django.db import transaction
 from django.utils import html
 
 from tulius.forum import plugins
 from tulius.forum import models
+from tulius.forum import signals
+from tulius.forum.comments import api
 
 
 class Like(plugins.BasePluginView):
@@ -106,13 +108,25 @@ class PreviewResults(BaseVoting):
         ret_json = {'success': True, 'html':  self.render()}
         return http.HttpResponse(json.dumps(ret_json))
 
+@dispatch.receiver(signals.comment_to_json)
+def comment_to_json(sender, comment, data, **kwargs):
+    pk = comment.media.get('voting')
+    if not pk:
+        return
+    voting = models.Voting.objects.filter(pk=pk).first()
+    if not voting:
+        comment.media['voting'] = None
+        return
+    data['media']['voting'] = VotingAPI.voting_json(voting, sender.user)
 
-class VotingAPI(plugins.BaseAPIView):
-    obj = None
+
+class VotingAPI(api.CommentBase):
+    voting = None
     no_revote = False
 
-    def choice_json(self):
-        choice = self.obj.user_choice(self.user)
+    @classmethod
+    def choice_json(cls, voting, user):
+        choice = voting.user_choice(user)
         if not choice:
             return None
         return {
@@ -120,15 +134,16 @@ class VotingAPI(plugins.BaseAPIView):
             'name': html.escape(choice.name),
         }
 
-    def choices_json(self, user_choice):
+    @classmethod
+    def choices_json(cls, voting, user_choice):
         force_results = bool(
-            self.obj.closed or (user_choice and self.obj.show_results))
+            voting.closed or (user_choice and voting.show_results))
         choices = models.VotingChoice.objects.filter(
-            voting=self.obj).annotate(
+            voting=voting).annotate(
                 count=django_models.Count('voting_choices'))
         items = []
         votes = 0
-        include_results = force_results or self.obj.preview_results
+        include_results = force_results or voting.preview_results
         for choice in choices:
             items.append({
                 'id': choice.pk,
@@ -145,41 +160,40 @@ class VotingAPI(plugins.BaseAPIView):
             'votes': votes,
         }
 
-    def voting_json(self):
-        choice = self.choice_json()
+    @classmethod
+    def voting_json(cls, voting, user):
+        choice = cls.choice_json(voting, user)
         return {
-            'id': self.obj.pk,
-            'name': html.escape(self.obj.voting_name),
-            'body': html.escape(self.obj.voting_body),
-            'closed': self.obj.closed,
-            'anonymous': self.obj.anonymous,
-            'show_results': self.obj.show_results,
-            'preview_results': self.obj.preview_results,
+            'id': voting.pk,
+            'name': html.escape(voting.voting_name),
+            'body': html.escape(voting.voting_body),
+            'closed': voting.closed,
+            'anonymous': voting.anonymous,
+            'show_results': voting.show_results,
+            'preview_results': voting.preview_results,
             'choice': choice,
-            'choices': self.choices_json(choice),
+            'choices': cls.choices_json(voting, choice),
         }
 
-    def get_context_data(self, **kwargs):
-        comment_id = int(kwargs['pk'])
-        comment = shortcuts.get_object_or_404(models.Comment, id=comment_id)
-        thread = comment.parent
-        thread.view_right = self.user  # TODO oooh
-        if not thread.read_right:
-            raise exceptions.PermissionDenied()
-        self.obj = shortcuts.get_object_or_404(models.Voting, comment=comment)
+    def get_voting(self, **kwargs):
+        self.get_comment(**kwargs)
+        pk = self.comment.media.get('voting')
+        if not pk:
+            raise http.Http404()
+        self.voting = shortcuts.get_object_or_404(models.Voting, pk=pk)
 
-    def get(self, request, *args, **kwargs):
-        self.get_context_data(**kwargs)
-        return self.voting_json()
+    def get_context_data(self, **kwargs):
+        self.get_voting(**kwargs)
+        return self.voting_json(self.voting, self.user)
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
-        self.get_context_data(**kwargs)
+        self.get_voting(**kwargs)
         data = json.loads(self.request.body)
         choice_id = int(data['choice'])
         choice = shortcuts.get_object_or_404(
             models.VotingChoice, pk=choice_id)
-        if choice.voting_id != self.obj.pk:
+        if choice.voting_id != self.voting.pk:
             raise http.Http404()
         votes = models.VotingVote.objects.filter(
             choice__voting=self.obj, user=request.user)
@@ -188,4 +202,4 @@ class VotingAPI(plugins.BaseAPIView):
                 raise http.Http404()
             votes.delete()
         models.VotingVote(user=request.user, choice=choice).save()
-        return self.voting_json()
+        return self.voting_json(self.voting, self.user)

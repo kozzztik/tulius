@@ -45,7 +45,8 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
             'edit_right': self.comment_edit_right(c),
             'is_thread': c.is_thread(),
             'edit_time': c.edit_time,
-            'editor': self.role_to_json(c.data2) if c.editor else None
+            'editor': self.role_to_json(c.data2) if c.editor else None,
+            'media': c.media,
         }
 
 

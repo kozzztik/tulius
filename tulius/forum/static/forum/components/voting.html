@@ -1,6 +1,6 @@
 <div class="voting">
     <img v-if="loading" src="/static/forum/img/loading.gif">
-    <div v-if="!loading">
+    <div v-if="!loading&&voting">
         <h4 v-html="voting.name"></h4>
         <div v-html="voting.body" v-if="voting.body"></div>
         <br v-if="!voting.body">
@@ -41,4 +41,6 @@
         </form>
         <input v-if="show_results" type="button" value="Перейти к голосованию" v-on:click="show_results=false">
     </div>
+    <b-modal title="Добавить голосование" size="lg" centered ref="modal">
+    </b-modal>
 </div>

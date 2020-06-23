@@ -52,7 +52,7 @@ class CommentsBase(api.BaseThreadView):
         return (comment.user == self.user) or self.rights.moderate
 
     def comment_to_json(self, c):
-        return {
+        data = {
             'id': c.id,
             'page': c.page,
             'url': self.comment_url(c) if c.pk else None,
@@ -64,8 +64,11 @@ class CommentsBase(api.BaseThreadView):
             'edit_right': self.comment_edit_right(c),
             'is_thread': c.is_thread(),
             'edit_time': c.edit_time,
-            'editor': api.user_to_json(c.editor) if c.editor else None
+            'editor': api.user_to_json(c.editor) if c.editor else None,
+            'media': c.media,
         }
+        signals.comment_to_json.send(self, comment=c, data=data)
+        return data
 
 
 class CommentsPageAPI(CommentsBase):
@@ -124,7 +127,7 @@ class CommentsPageAPI(CommentsBase):
         return self.get_context_data(page=page, **kwargs)
 
 
-class CommentAPI(CommentsBase):
+class CommentBase(CommentsBase):
     comment = None
 
     def get_comment(self, pk, for_update=False, **kwargs):
@@ -136,6 +139,8 @@ class CommentAPI(CommentsBase):
         self.get_parent_thread(
             pk=self.comment.parent_id, for_update=for_update, **kwargs)
 
+
+class CommentAPI(CommentBase):
     def get_context_data(self, **kwargs):
         self.get_comment(**kwargs)
         return self.comment_to_json(self.comment)

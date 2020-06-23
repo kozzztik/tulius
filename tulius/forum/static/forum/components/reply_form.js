@@ -1,4 +1,5 @@
 import ckeditor from '../../ckeditor4/components/tulius_ckeditor.js'
+import voting from './voting.js'
 
 
 export default LazyComponent('forum_reply_form', {
@@ -34,10 +35,12 @@ export default LazyComponent('forum_reply_form', {
             loading: false,
             show_form: true,
             form_el: null,
+            media_actions: [],
             form: {
                 title: 'Re: ' + this.thread.title,
                 body: '',
                 reply_id: null,
+                media: {},
             }
         }
     },

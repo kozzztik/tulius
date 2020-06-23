@@ -19,6 +19,11 @@
                     </div>
                 </div>
             </slot>
+            <div class="row" ref="media">
+                <div class="col">
+                    <forum_voting :comment="form" ref="voting"></forum_voting>
+                </div>
+            </div>
             <div class="row" style="margin-top: 0.5em;" >
                 <div class="col">
                     <a class="btn btn-primary" v-on:click="do_reply" v-if="!loading" href="javascript:void(0)" :class="(form.body == '') ? 'disabled': ''">
@@ -30,6 +35,16 @@
                     <a id="post-preview-link" class="float-right" v-on:click="do_preview()" v-if="!loading" href="javascript:void(0)">
                         Предварительный просмотр
                     </a>
+                    <b-dropdown v-if="$refs.media" v-cloak>
+                        <template v-slot:button-content>
+                            <svg class="bi bi-paperclip" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path fill-rule="evenodd" d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0V3z"/>
+                            </svg>
+                        </template>
+                        <b-dropdown-item href="javascript:void(0)" v-if="$refs.voting&&$refs.voting.can_add_media" @click="$refs.voting.add_media()">
+                            {{$refs.voting.add_media_label}}
+                        </b-dropdown-item>
+                    </b-dropdown>
                     <div class="progress" style="height: 24px;margin-bottom: 0px;" v-if="loading">
                         <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%;"></div>
                     </div>
