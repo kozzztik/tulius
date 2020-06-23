@@ -14,13 +14,22 @@ export default LazyComponent('forum_voting', {
             loading: false,
             show_results: false,
             choice: null,
-            add_media_label: "Добавить голосование"
+            menu_item: {},
+            voting: null,
+            add_form: {
+                name: '',
+                body: '',
+                show_results: false,
+                preview_results: false,
+                choices: {
+                    with_results: false,
+                    items: [{name: ''}],
+                },
+            }
         }
     },
     computed: {
         user: function() {return this.$root.user;},
-        can_add_media: function() {return !this.comment.media.voting},
-        voting: function() {return this.comment.media.voting},
     },
     methods: {
         add_media() {
@@ -29,12 +38,11 @@ export default LazyComponent('forum_voting', {
         do_add_media() {
         },
         do_vote() {
-            if (!this.choice) {
+            if ((!this.choice)||this.editor||(!this.comment.url))
                 return;
-            }
             this.loading = true;
             axios.post(
-                comment.url + 'voting/',
+                this.comment.url + 'voting/',
                 {'choice': this.choice}
             ).then(response => {
                 this.voting = response.data;
@@ -42,6 +50,32 @@ export default LazyComponent('forum_voting', {
             ).then(() => {
                 this.loading = false;
             });
-        }
+        },
+        on_modal_submit() {
+            this.comment.media.voting = JSON.parse(JSON.stringify(this.add_form));
+            this.voting = this.comment.media.voting;
+            this.$refs.modal.hide();
+            this.menu_item.disabled = true;
+        },
+        on_editor_delete() {
+            this.voting = this.comment.voting = null;
+            this.menu_item.disabled = false;
+        },
+        on_editor_edit() {
+            this.add_form = JSON.parse(JSON.stringify(this.voting));
+            this.$refs.modal.show();
+        },
+    },
+    mounted() {
+        if (this.comment.media.voting)
+            this.voting = this.comment.media.voting;
+        if (!this.editor)
+            return
+        this.menu_item = {
+            label: "Добавить голосование",
+            disabled: false,
+            action: this.add_media,
+        };
+        this.$parent.media_actions.push(this.menu_item);
     },
 })

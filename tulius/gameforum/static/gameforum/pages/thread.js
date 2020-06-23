@@ -73,9 +73,6 @@ export default LazyComponent('gameforum_thread_page', {
         edit_comment_url(comment) {
             return '/play/edit_comment/' + comment.id + '/';
         },
-        extended_form_url(reply_comment_id) {
-            return '/play/add_comment/' + reply_comment_id + '/';
-        },
         reply_str(comment) {
             if (comment.user.sex == 1) {
                 return comment.user.title + ' сказал:'

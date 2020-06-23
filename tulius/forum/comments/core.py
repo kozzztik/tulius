@@ -233,7 +233,6 @@ class CommentsCore(plugins.ForumPlugin):
             providing_args=["comment", "context"])
         self.comment_after_edit = dispatch.Signal(
             providing_args=["comment", "context", "adding"])
-        self.comment_after_fastreply = dispatch.Signal()
         self.core['get_parent_comment'] = self.get_parent_comment
         self.core['process_edit_comment'] = self.process_edit_comment
         self.core['get_comments_pagination'] = self.get_comments_pagination
@@ -250,7 +249,6 @@ class CommentsCore(plugins.ForumPlugin):
         self.signals['before_save_comment'] = self.before_save_comment_signal
         self.signals['comment_before_edit'] = self.comment_before_edit
         self.signals['comment_after_edit'] = self.comment_after_edit
-        self.signals['comment_after_fastreply'] = self.comment_after_fastreply
         self.before_add_comment_signal.connect(self.before_add_comment)
         self.before_delete_comment_signal.connect(self.before_delete_comment)
         self.after_add_comment_signal.connect(self.after_add_comment)

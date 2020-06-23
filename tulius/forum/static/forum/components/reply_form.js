@@ -8,12 +8,6 @@ export default LazyComponent('forum_reply_form', {
     	thread: {
     	    type: Object,
     	},
-    	extended_form_url: {
-			type: Function,
-			default: function(reply_comment_id) {
-			    return '/forums/add_comment/' + reply_comment_id + '/';
-			}
-		},
         reply_str: {
 			type: Function,
 			default: function(comment) {
@@ -72,6 +66,7 @@ export default LazyComponent('forum_reply_form', {
             this.show_preview = false;
             this.form.title = 'Re: ' + this.thread.title;
             this.form.body = '';
+            this.form.media = {};
             document.getElementById("reply_form").classList.remove("reply_form_max");
             document.getElementById("content-center").classList.remove("reply_form_only");
         },

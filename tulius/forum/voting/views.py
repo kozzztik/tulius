@@ -6,6 +6,7 @@ from django import shortcuts
 from django.db import models as django_models
 from django.db import transaction
 from django.utils import html
+from djfw.wysibb.templatetags import bbcodes
 
 from tulius.forum import plugins
 from tulius.forum import models
@@ -108,16 +109,30 @@ class PreviewResults(BaseVoting):
         ret_json = {'success': True, 'html':  self.render()}
         return http.HttpResponse(json.dumps(ret_json))
 
+
 @dispatch.receiver(signals.comment_to_json)
 def comment_to_json(sender, comment, data, **kwargs):
     pk = comment.media.get('voting')
-    if not pk:
+    if not pk or isinstance(pk, dict):
         return
     voting = models.Voting.objects.filter(pk=pk).first()
     if not voting:
         comment.media['voting'] = None
         return
     data['media']['voting'] = VotingAPI.voting_json(voting, sender.user)
+
+
+@dispatch.receiver(signals.after_add_comment)
+def after_add_comment(sender, comment, data, preview, **kwargs):
+    if 'voting' not in data['media']:
+        return
+    if preview:
+        comment.media['voting'] = data['media']['voting']
+        return
+    voting = VotingAPI.create_voting(
+        comment, sender.user, data['media']['voting'])
+    comment.media['voting'] = voting.pk
+    comment.save()
 
 
 class VotingAPI(api.CommentBase):
@@ -182,6 +197,22 @@ class VotingAPI(api.CommentBase):
             raise http.Http404()
         self.voting = shortcuts.get_object_or_404(models.Voting, pk=pk)
 
+    @classmethod
+    def create_voting(cls, comment, user, data):
+        voting = models.Voting(
+            comment=comment, user=user,
+            voting_name=bbcodes.bbcode(data['name']),
+            voting_body=bbcodes.bbcode(data['body']),
+            show_results=data['show_results'],
+            preview_results=data['preview_results'],
+        )
+        voting.save()
+        for item in data['choices']['items']:
+            models.VotingChoice(
+                voting=voting, name=bbcodes.bbcode(item['name'])
+            ).save()
+        return voting
+
     def get_context_data(self, **kwargs):
         self.get_voting(**kwargs)
         return self.voting_json(self.voting, self.user)
@@ -196,7 +227,7 @@ class VotingAPI(api.CommentBase):
         if choice.voting_id != self.voting.pk:
             raise http.Http404()
         votes = models.VotingVote.objects.filter(
-            choice__voting=self.obj, user=request.user)
+            choice__voting=self.voting, user=request.user)
         if votes:
             if self.no_revote:
                 raise http.Http404()

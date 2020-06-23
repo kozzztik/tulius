@@ -9,7 +9,6 @@ from django.utils import html
 from djfw.wysibb.templatetags import bbcodes
 
 from tulius.core.ckeditor import html_converter
-from tulius.forum import site
 from tulius.forum import models
 from tulius.forum import signals
 from tulius.forum.threads import api
@@ -113,10 +112,15 @@ class CommentsPageAPI(CommentsBase):
         preview = data.pop('preview', False)
         if text:
             comment = self.create_comment(text, data)
+            comment.media = {}
+            signals.before_add_comment.send(
+                self, comment=comment, data=data, preview=preview)
+            if not preview:
+                comment.save()
+            signals.after_add_comment.send(
+                self, comment=comment, data=data, preview=preview)
             if preview:
                 return self.comment_to_json(comment)
-            comment.save()
-            site.site.signals.comment_after_fastreply.send(self)
             # commit transaction to be sure that clients wouldn't be notified
             # before comment will be accessable in DB/
             transaction.commit()

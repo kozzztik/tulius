@@ -1,6 +1,19 @@
-<div class="voting">
+<div>
     <img v-if="loading" src="/static/forum/img/loading.gif">
-    <div v-if="!loading&&voting">
+    <div v-if="!loading&&voting" class="voting">
+        <div class="float-right" v-if="editor">
+            <button class="btn btn-secondary" @click="on_editor_edit()">
+                <svg class="bi bi-pencil" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M11.293 1.293a1 1 0 0 1 1.414 0l2 2a1 1 0 0 1 0 1.414l-9 9a1 1 0 0 1-.39.242l-3 1a1 1 0 0 1-1.266-1.265l1-3a1 1 0 0 1 .242-.391l9-9zM12 2l2 2-9 9-3 1 1-3 9-9z"/>
+                  <path fill-rule="evenodd" d="M12.146 6.354l-2.5-2.5.708-.708 2.5 2.5-.707.708zM3 10v.5a.5.5 0 0 0 .5.5H4v.5a.5.5 0 0 0 .5.5H5v.5a.5.5 0 0 0 .5.5H6v-1.5a.5.5 0 0 0-.5-.5H5v-.5a.5.5 0 0 0-.5-.5H3z"/>
+                </svg>
+            </button>
+            <button class="btn btn-danger" @click="on_editor_delete()">
+                <svg class="bi bi-trash-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0v-7z"/>
+                </svg>
+            </button>
+        </div>
         <h4 v-html="voting.name"></h4>
         <div v-html="voting.body" v-if="voting.body"></div>
         <br v-if="!voting.body">
@@ -41,6 +54,67 @@
         </form>
         <input v-if="show_results" type="button" value="Перейти к голосованию" v-on:click="show_results=false">
     </div>
-    <b-modal title="Добавить голосование" size="lg" centered ref="modal">
+    <b-modal :title="comment.media.voting ? 'Править голосование' : 'Добавить голосование'"
+             size="lg" centered ref="modal" hide-footer>
+        <b-form ref="modal_form" v-if="editor" @submit.prevent.stop="on_modal_submit">
+
+            <div class="row">
+                <label class="col-2 col-form-label" for="add_voting_name">
+                    <b>Заголовок:</b>
+                </label>
+                <div class="col-10">
+                    <input v-model="add_form.name" id="add_voting_name" required class="form-control" minlength="1"></input>
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-2 col-form-label">
+                    <b>Текст:</b>
+                </label>
+                <div class="col-10">
+                    <tulius_ckeditor v-model="add_form.body"></tulius_ckeditor>
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-5 col-form-label">
+                    <b>Показывать результаты до закрытия:</b>
+                </label>
+                <input type="checkbox" class="col-1 form-control" v-model="add_form.show_results">
+                <label class="col-5 col-form-label">
+                    <b>Кнопка предпросмотра результатов:</b>
+                </label>
+                <input type="checkbox" class="col-1 form-control" v-model="add_form.preview_results">
+            </div>
+            <div class="row">
+                <label class="col-11 col-form-label">
+                    <b>Варианты ответов:</b>
+                </label>
+                <div class="col-1">
+                    <button type="button" class="btn btn-success" @click="add_form.choices.items.push({name: ''})">
+                        <svg class="bi bi-plus" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                          <path fill-rule="evenodd" d="M8 3.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5H4a.5.5 0 0 1 0-1h3.5V4a.5.5 0 0 1 .5-.5z"/>
+                          <path fill-rule="evenodd" d="M7.5 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H8.5V12a.5.5 0 0 1-1 0V8z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="row" v-for="(item, num) in add_form.choices.items">
+                <div class="col-11">
+                    <input v-model="item.name" required class="form-control">
+                </div>
+                <div class="col-1">
+                    <button type="button" class="btn btn-danger" v-if="add_form.choices.items.length > 1"
+                            @click="add_form.choices.items.splice(num, 1)">
+                        <svg class="bi bi-trash-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                          <path fill-rule="evenodd" d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0v-7z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <footer class="modal-footer" style="margin-top: 1em;padding:0em;">
+                <button type="button" class="btn btn-secondary" @click="$refs.modal.hide()">Отмена</button>
+                <button type="submit" class="btn btn-primary">OK</button>
+            </footer>
+        </b-form>
     </b-modal>
+
 </div>
