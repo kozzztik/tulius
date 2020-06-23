@@ -49,11 +49,11 @@ class BaseThreadAPI(api.BaseThreadView, base.VariationMixin):
             })
         return data
 
-    def thread_url(self, thread):
+    def thread_url(self, thread_id):
         return urls.reverse(
             'game_forum_api:thread',
             kwargs={
-                'variation_id': self.variation.id, 'pk': thread.id})
+                'variation_id': self.variation.id, 'pk': thread_id})
 
     def room_to_json(self, thread):
         data = {
@@ -73,7 +73,7 @@ class BaseThreadAPI(api.BaseThreadView, base.VariationMixin):
             'threads_count': thread.threads_count if thread.room else None,
             'comments_count': thread.comments_count,
             'pages_count': thread.pages_count,
-            'url': self.thread_url(thread),
+            'url': self.thread_url(thread.pk),
         }
         signals.thread_room_to_json.send(self, thread=thread, response=data)
         return data

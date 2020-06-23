@@ -81,7 +81,7 @@ export default LazyComponent('forum_voting', {
             this.$refs.modal.show();
         },
     },
-    mounted() {
+    created() {
         if (this.comment.media.voting)
             this.voting = this.comment.media.voting;
         if (!this.editor)

@@ -8,6 +8,10 @@ export default LazyComponent('forum_reply_form', {
     	thread: {
     	    type: Object,
     	},
+    	comment: {
+    	    type: Object,
+    	    default: null,
+    	},
         reply_str: {
 			type: Function,
 			default: function(comment) {
@@ -19,22 +23,33 @@ export default LazyComponent('forum_reply_form', {
                 return comment.user.title + ' сказал(а):';
             }
 		},
+    	comment_url: {
+			type: Function,
+			default: function(comment) {
+			    return {
+                    name: 'forum_thread',
+                    params: { id: comment.thread.id },
+                    query: { page: comment.page },
+                    hash: '#' + comment.id,
+                }
+			}
+		},
     },
     data: function () {
         return {
             show_preview: false,
             preview_comment: {},
             reply_comment_id: null,
-            reply_text: '',
             loading: false,
             show_form: true,
             form_el: null,
             media_actions: [],
-            form: {
+            form: this.comment || {
                 title: 'Re: ' + this.thread.title,
                 body: '',
-                reply_id: null,
+                reply_id: this.thread.first_comment_id,
                 media: {},
+                url: this.thread.url + 'comments_page/',
             }
         }
     },
@@ -43,10 +58,7 @@ export default LazyComponent('forum_reply_form', {
     },
     methods: {
         hide() {this.show_form = false;},
-        show() {
-            this.show_form = true;
-            this.reply_text = this.reply_text;  // on chrome resurrects editor
-        },
+        show() {this.show_form = true;},
         getSelectionText() {
             var text = "";
             if (window.getSelection) {
@@ -74,13 +86,14 @@ export default LazyComponent('forum_reply_form', {
             if (this.form.body == '')
                 return;
             this.loading = true;
-            axios.post(
-                this.thread.url + 'comments_page/', this.form
-            ).then(response => {
-                this.cleanup_reply_form();
-                this.$parent.$refs.comments.update_to_comments(response.data);
-            }).catch(error => {
-                this.$root.add_message(error, "error");
+            axios.post(this.form.url, this.form).then(response => {
+                if (this.comment)
+                    this.$router.push(this.comment_url(this.comment))
+                else {
+                    this.cleanup_reply_form();
+                    this.$parent.$refs.comments.update_to_comments(response.data);
+                }
+            }).catch(error => {this.$root.add_message(error, "error");
             }).then(() => {
                 this.loading = false;
             });
@@ -91,9 +104,7 @@ export default LazyComponent('forum_reply_form', {
             this.loading = true;
             const data = JSON.parse(JSON.stringify(this.form))
             data.preview = true;
-            axios.post(
-                this.thread.url + 'comments_page/', data
-            ).then(response => {
+            axios.post(this.form.url, data).then(response => {
                 this.preview_comment = response.data;
                 this.preview_comment.title = "Предварительный просмотр сообщения";
                 this.show_preview = true;
@@ -122,11 +133,9 @@ export default LazyComponent('forum_reply_form', {
             }
         },
     },
-    mounted() {
-        this.form.reply_id = this.thread.first_comment_id;
-    },
     beforeRouteUpdate (to, from, next) {
-        this.cleanup_reply_form();
+        if (!this.comment)
+            this.cleanup_reply_form();
         next();
     },
 })

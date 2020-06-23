@@ -19,3 +19,5 @@ before_add_comment = dispatch.Signal(
     providing_args=["comment", "data", "preview"])
 after_add_comment = dispatch.Signal(
     providing_args=["comment", "data", "preview"])
+on_comment_update = dispatch.Signal(
+    providing_args=["comment", "data", "preview"])

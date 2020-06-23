@@ -8,7 +8,7 @@
                   <path fill-rule="evenodd" d="M12.146 6.354l-2.5-2.5.708-.708 2.5 2.5-.707.708zM3 10v.5a.5.5 0 0 0 .5.5H4v.5a.5.5 0 0 0 .5.5H5v.5a.5.5 0 0 0 .5.5H6v-1.5a.5.5 0 0 0-.5-.5H5v-.5a.5.5 0 0 0-.5-.5H3z"/>
                 </svg>
             </button>
-            <button class="btn btn-danger" @click="on_editor_delete()">
+            <button class="btn btn-danger" @click="on_editor_delete()" v-if="!voting.id">
                 <svg class="bi bi-trash-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                   <path fill-rule="evenodd" d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0v-7z"/>
                 </svg>
@@ -85,7 +85,7 @@
                     <b>Кнопка предпросмотра результатов</b>
                 </label>
             </div>
-            <div class="row">
+            <div class="row" v-if="!add_form.id">
                 <label class="col-11 col-form-label">
                     <b>Варианты ответов:</b>
                 </label>
@@ -98,7 +98,7 @@
                     </button>
                 </div>
             </div>
-            <div class="row" v-for="(item, num) in add_form.choices.items">
+            <div class="row" v-for="(item, num) in add_form.choices.items" v-if="!add_form.id">
                 <div class="col-11">
                     <input v-model="item.name" required class="form-control">
                 </div>

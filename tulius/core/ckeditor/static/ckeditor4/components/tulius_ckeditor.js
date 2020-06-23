@@ -14,7 +14,7 @@ export default LazyComponent('tulius_ckeditor', {
     },
     data () {
         var data = {
-            editorData: '',
+            editorData: this.value,
             editorConfig: {
                 language: 'ru',
                 extraPlugins: 'autogrow,font,colorbutton,image,uploadimage,filebrowser,smiley,divarea',

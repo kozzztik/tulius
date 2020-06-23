@@ -144,8 +144,8 @@ class BaseThreadView(plugins.BaseAPIView):
         return threads
 
     @staticmethod
-    def thread_url(thread):
-        return urls.reverse('forum_api:thread', kwargs={'pk': thread.id})
+    def thread_url(thread_id):
+        return urls.reverse('forum_api:thread', kwargs={'pk': thread_id})
 
     def room_to_json(self, thread):
         data = {
@@ -164,7 +164,7 @@ class BaseThreadView(plugins.BaseAPIView):
             'threads_count': thread.threads_count if thread.room else None,
             'comments_count': thread.comments_count,
             'pages_count': thread.pages_count,
-            'url': self.thread_url(thread),
+            'url': self.thread_url(thread.pk),
         }
         signals.thread_room_to_json.send(self, thread=thread, response=data)
         return data
@@ -179,11 +179,11 @@ class ThreadView(BaseThreadView):
             'body': self.obj.body,
             'room': self.obj.room,
             'deleted': self.obj.deleted,
-            'url': self.thread_url(self.obj),
+            'url': self.thread_url(self.obj.pk),
             'parents': [{
                 'id': parent.id,
                 'title': parent.title,
-                'url': self.thread_url(parent),
+                'url': self.thread_url(parent.pk),
             } for parent in self.obj.get_ancestors()],
             'rooms': [self.room_to_json(t) for t in self.get_subthreads(True)],
             'threads': [

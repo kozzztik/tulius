@@ -1,7 +1,12 @@
 from django.conf.urls import url
+from django.views import generic
 
 from .core import CommentsCore
-from .views import EditComment, CommentRedirrect, Preview
+from .views import CommentRedirrect
+
+
+class Index(generic.TemplateView):
+    template_name = 'base_vue.html'
 
 
 class CommentsPlugin(CommentsCore):
@@ -47,16 +52,11 @@ class CommentsPlugin(CommentsCore):
     def get_urls(self):
         return [
             url(
-                r'^add_comment/(?P<reply_id>\d+)/$',
-                EditComment.as_view(plugin=self),
-                name='add_comment'),
-            url(
                 r'^edit_comment/(?P<comment_id>\d+)/$',
-                EditComment.as_view(plugin=self),
+                Index.as_view(),
                 name='edit_comment'),
             url(
                 r'^comment/(?P<comment_id>\d+)/$',
                 CommentRedirrect.as_view(plugin=self),
                 name='comment'),
-            url(r'^preview/$', Preview.as_view(plugin=self), name='preview'),
         ]

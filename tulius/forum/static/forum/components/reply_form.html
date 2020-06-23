@@ -1,5 +1,5 @@
 <div ref="reply_form_parking">
-    <div ref="reply_form" v-if="show_form" id="reply_form">
+    <div ref="reply_form" v-if="show_form" id="reply_form" :class="comment ? 'reply_form_max' : ''">
         <slot v-bind:preview_comment="preview_comment" name="comment" v-if="show_preview" >
             <forum_comment :thread="thread" :comment="preview_comment" :preview="true"></forum_comment>
         </slot>
@@ -44,7 +44,8 @@
                         </a>
                         <a class="btn btn-primary" v-on:click="do_reply" v-if="!loading"
                            href="javascript:void(0)" :class="(form.body == '') ? 'disabled': ''">
-                            Ответить
+                            <span v-if="!comment">Ответить</span>
+                            <span v-if="comment">Сохранить</span>
                         </a>
                     </div>
                     <div class="progress" style="height: 24px;margin-bottom: 0px;" v-if="loading">

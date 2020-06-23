@@ -5,7 +5,7 @@ from django import shortcuts
 from django import urls
 from django.core import exceptions
 from django.db import transaction
-from django.utils import html
+from django.utils import html, timezone
 from djfw.wysibb.templatetags import bbcodes
 
 from tulius.core.ckeditor import html_converter
@@ -53,6 +53,10 @@ class CommentsBase(api.BaseThreadView):
     def comment_to_json(self, c):
         data = {
             'id': c.id,
+            'thread': {
+                'id': c.parent_id,
+                'url': self.thread_url(c.parent_id)
+            },
             'page': c.page,
             'url': self.comment_url(c) if c.pk else None,
             'title': html.escape(c.title),
@@ -64,6 +68,7 @@ class CommentsBase(api.BaseThreadView):
             'edit_time': c.edit_time,
             'editor': api.user_to_json(c.editor) if c.editor else None,
             'media': c.media,
+            'reply_id': c.reply_id,
         }
         signals.comment_to_json.send(self, comment=c, data=data)
         return data
@@ -101,12 +106,12 @@ class CommentsPageAPI(CommentsBase):
         comment.reply_id = reply_id
         return comment
 
-    def post(self, *args, **kwargs):
+    def post(self, request, **kwargs):
         transaction.set_autocommit(False)
         self.get_parent_thread(**kwargs)
         if not self.rights.write:
             raise exceptions.PermissionDenied()
-        data = json.loads(self.request.body)
+        data = json.loads(request.body)
         text = html_converter.html_to_bb(data.pop('body'))
         preview = data.pop('preview', False)
         if text:
@@ -146,7 +151,14 @@ class CommentBase(CommentsBase):
 class CommentAPI(CommentBase):
     def get_context_data(self, **kwargs):
         self.get_comment(**kwargs)
-        return self.comment_to_json(self.comment)
+        data = self.comment_to_json(self.comment)
+        data['thread']['title'] = self.obj.title
+        data['thread']['parents'] = [{
+            'id': parent.id,
+            'title': parent.title,
+            'url': self.thread_url(parent.pk),
+        } for parent in self.obj.get_ancestors()]
+        return data
 
     @transaction.atomic
     def delete(self, *args, **kwargs):
@@ -164,3 +176,30 @@ class CommentAPI(CommentBase):
         delete_mark.save()
         # TODO clients notification
         return {'pages_count': self.obj.pages_count}
+
+    def update_comment(self, comment, data):
+        comment.edit_time = timezone.now()
+        comment.editor = self.request.user
+        comment.title = data['title'][:120]
+        comment.body = html_converter.html_to_bb(data['body'])
+
+    def post(self, request, **kwargs):
+        data = json.loads(request.body)
+        preview = data.pop('preview', False)
+        transaction.set_autocommit(False)
+        self.get_comment(for_update=True, **kwargs)
+        if self.comment.is_thread():
+            raise exceptions.PermissionDenied()
+        if not self.comment_edit_right(self.comment):
+            raise exceptions.PermissionDenied()
+
+        self.update_comment(self.comment, data)
+
+        signals.on_comment_update.send(
+            self, comment=self.comment, data=data, preview=preview)
+        if preview:
+            transaction.rollback()
+        else:
+            self.comment.save()
+            transaction.commit()
+        return self.comment_to_json(self.comment)

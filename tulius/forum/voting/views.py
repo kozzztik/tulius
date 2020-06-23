@@ -136,6 +136,30 @@ def after_add_comment(sender, comment, data, preview, **kwargs):
     comment.save()
 
 
+@dispatch.receiver(signals.on_comment_update)
+def on_comment_update(sender, comment, data, preview, **kwargs):
+    voting_data = data['media'].get('voting')
+    if not voting_data:
+        return
+    orig_data = comment.media.get('voting')
+    if preview:
+        comment.media['voting'] = voting_data
+        return
+    if not orig_data:
+        # voting added
+        voting = VotingAPI.create_voting(comment, sender.user, voting_data)
+        comment.media['voting'] = voting.pk
+        return
+    voting = models.Voting.objects.filter(pk=orig_data).first()
+    if not voting:
+        return
+    voting.voting_name = html_converter.html_to_bb(voting_data['name'])
+    voting.voting_body = html_converter.html_to_bb(voting_data['body'])
+    voting.show_results = voting_data['show_results']
+    voting.preview_results = voting_data['preview_results']
+    voting.save()
+
+
 class VotingAPI(api.CommentBase):
     voting = None
     no_revote = False

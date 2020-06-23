@@ -35,7 +35,10 @@ export default LazyComponent('forum_comment', {
 		edit_comment_url: {
 			type: Function,
 			default: function(comment) {
-			    return '/forums/edit_comment/' + comment.id + '/';
+			    return {
+                    name: 'forum_edit_comment',
+                    params: { id: comment.id },
+                };
 			}
 		},
     },

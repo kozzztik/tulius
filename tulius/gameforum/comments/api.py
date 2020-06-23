@@ -36,6 +36,10 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
     def comment_to_json(self, c):
         data = {
             'id': c.id,
+            'thread': {
+                'id': c.parent_id,
+                'url': self.thread_url(c.parent_id)
+            },
             'url': self.comment_url(c) if c.id else None,
             'title': html.escape(c.title),
             'body': bbcodes.bbcode(c.body),
@@ -46,6 +50,8 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
             'edit_time': c.edit_time,
             'editor': self.role_to_json(c.data2) if c.editor else None,
             'media': c.media,
+            'reply_id': c.reply_id,
+
         }
         signals.comment_to_json.send(self, comment=c, data=data)
         return data
