@@ -2,48 +2,36 @@ import room_list from '../snippets/room_list.js'
 import thread_list from '../snippets/thread_list.js'
 import thread_actions from '../snippets/thread_actions.js'
 import online_status from '../snippets/online_status.js'
+import APILoadMixin from '../../app/components/api_load_mixin.js'
 
 
 export default LazyComponent('forum_room_page', {
     template: '/static/forum/pages/room.html',
-    data: function () {
-        return {
-            breadcrumbs: [],
-            loading: true,
-            thread: { rooms: [], threads: []},
-        }
-    },
+    mixins: [APILoadMixin,],
+    data: () => ({
+        loading: true,
+        thread: { rooms: [], threads: []},
+    }),
     computed: {
-        user: function() {return this.$root.user;}
+        urls() {return this.$parent.urls},
     },
     methods: {
-        load_api(pk) {
-            this.$parent.loading_start();
-            axios.get('/api/forum/thread/'+ pk + '/').then(response => {
+        load_api(route) {
+            return axios.get(this.urls.thread_api(route.params.id)
+            ).then(response => {
                 this.thread = response.data;
                 this.breadcrumbs = this.$parent.thread_breadcrumbs(this.thread)
                 this.loading = false;
-            }).catch(error => this.$root.add_message(error, "error"))
-            .then(() => {
-                this.$parent.loading_end(this.breadcrumbs);
-                this.loading = false;
-            });
+            })
         },
         mark_all_as_readed() {
             this.$parent.loading_start();
             axios.post(
                 this.thread.url + 'read_mark/', {'comment_id': null}
-            ).then(response => {
-            }).catch(error => this.$parent.add_message(error, "error"))
-            .then(() => {
+            ).then(response => {}).then(() => {
                 this.$parent.loading_end(null);
-                this.load_api(this.thread.id);
+                this._load_api(this.$route);
             });
         },
     },
-    mounted() {this.load_api(this.$route.params.id)},
-    beforeRouteUpdate (to, from, next) {
-        this.load_api(to.params.id);
-        next();
-    }
 })

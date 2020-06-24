@@ -23,17 +23,6 @@ export default LazyComponent('forum_reply_form', {
                 return comment.user.title + ' сказал(а):';
             }
 		},
-    	comment_url: {
-			type: Function,
-			default: function(comment) {
-			    return {
-                    name: 'forum_thread',
-                    params: { id: comment.thread.id },
-                    query: { page: comment.page },
-                    hash: '#' + comment.id,
-                }
-			}
-		},
     },
     data: function () {
         return {
@@ -54,7 +43,8 @@ export default LazyComponent('forum_reply_form', {
         }
     },
     computed: {
-        user: function() {return this.$root.user;}
+        urls: function() {return this.$parent.urls;},
+        user: function() {return this.$root.user;},
     },
     methods: {
         hide() {this.show_form = false;},
@@ -88,7 +78,7 @@ export default LazyComponent('forum_reply_form', {
             this.loading = true;
             axios.post(this.form.url, this.form).then(response => {
                 if (this.comment)
-                    this.$router.push(this.comment_url(this.comment))
+                    this.$router.push(this.urls.comment(this.comment))
                 else {
                     this.cleanup_reply_form();
                     this.$parent.$refs.comments.update_to_comments(response.data);

@@ -16,6 +16,7 @@ export default LazyComponent('forum_thread_comments', {
         }
     },
     computed: {
+        urls: function() {return this.$parent.urls;},
         user: function() {return this.$root.user;},
     },
     watch: {
@@ -58,7 +59,7 @@ export default LazyComponent('forum_thread_comments', {
                     this.thread.not_read_comment = {
                         id: new_comment.id, page_num: new_comment.page, count: 0}
                 this.thread.not_read_comment.count += 1;
-            }).catch(error => this.$root.add_message(error, "error")).then(() => {});
+            }).catch().then(() => {});
         },
         fast_reply(comment) {
             var component;

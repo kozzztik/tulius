@@ -12,7 +12,7 @@
         <b-dropdown-item href="javascript:void(0)" v-if="thread.rights.edit" @click="$refs.thread_access.show_dialog()">
             Права доступа
         </b-dropdown-item>
-        <b-dropdown-item :href="'/forums/add_room/' + thread.id + '/'" v-if="thread.room && thread.rights.moderate">
+        <b-dropdown-item :to="urls.add_room(thread.id)" v-if="thread.room && thread.rights.moderate">
             Добавить комнату
         </b-dropdown-item>
         <b-dropdown-item :href="'/forums/add_thread/' + thread.id + '/'" v-if="thread.room && thread.rights.write">

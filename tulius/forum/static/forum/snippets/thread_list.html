@@ -12,14 +12,14 @@
         <tr v-for="thread in threads" :class="thread.deleted ? 'deleted-thread' : ''">
             <td class="forum-post-icon">
                 <div v-if="thread.important">
-                    <router-link :to="comment_url(thread.unreaded)" v-if="thread.unreaded">
+                    <router-link :to="urls.comment(thread.unreaded)" v-if="thread.unreaded">
                         <img src="/static/forum/img/important_not_readed.gif">
                     </router-link>
                     <img src="/static/forum/img/important_readed.gif" v-if="!thread.unreaded">
                 </div>
                 <div v-else>
                     <img src="/static/forum/img/closed.gif" v-if="thread.closed">
-                    <router-link :to="comment_url(thread.unreaded)" v-if="!thread.closed && thread.unreaded">
+                    <router-link :to="urls.comment(thread.unreaded)" v-if="!thread.closed && thread.unreaded">
                         <img src="/static/forum/img/unreadedmark.gif">
                     </router-link>
                     <img src="/static/forum/img/readedmark.gif" v-if="!thread.closed && !thread.unreaded">
@@ -28,7 +28,7 @@
             <td>
                 <div class="forum-post-description">
                     <h4>
-                        <router-link :to="thread_url(thread)" v-html="thread.title"></router-link>
+                        <router-link :to="urls.thread(thread.id)" v-html="thread.title"></router-link>
                     </h4>
                     <slot v-bind:thread="thread" name="accessed_users">
                         <h6 v-if="thread.accessed_users" class="moderators">Открыта для:</h6>
@@ -40,7 +40,7 @@
                     </slot>
                     <div v-if="thread.pages_count > 1">
                         <h6>Страницы:</h6>
-                        <router-link :to="thread_url(thread, num + 1)"
+                        <router-link :to="urls.thread(thread.id, num + 1)"
                                      v-for="num in Array(thread.pages_count).keys()" :key="num">
                             {{num + 1 }}
                         </router-link>
@@ -54,7 +54,7 @@
             </td>
             <td class="d-none d-sm-table-cell" v-html="thread.comments_count"></td>
             <td class="d-none d-sm-table-cell">
-                <forum_latest_post :comment="thread.last_comment" :comment_url="comment_url"></forum_latest_post>
+                <forum_latest_post :comment="thread.last_comment"></forum_latest_post>
             </td>
         </tr>
     </tbody>

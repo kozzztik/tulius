@@ -10,6 +10,7 @@ export default LazyComponent('game_forum_thread_actions', {
         }
     },
     computed: {
+        urls: function() {return this.$parent.urls;},
         user: function() {return this.$root.user;},
         delete_title: function() {
             if (this.thread.room)

@@ -12,11 +12,9 @@ export default LazyComponent('forum_thread_actions', {
     },
     computed: {
         user: function() {return this.$root.user;},
+        urls() {return this.$parent.urls},
         delete_title: function() {
-            if (this.thread.room)
-                return 'Удалить эту комнату?'
-            else
-                return 'Удалить эту тему?';
+            return this.thread.room ? 'Удалить эту комнату?' : 'Удалить эту тему?';
         }
     },
     methods: {

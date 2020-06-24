@@ -41,7 +41,7 @@ axios.get('/api/app_settings/').then(response => {
                 }
             },
             loading_end(items) {
-                if (!(items === null)) {
+                if (items) {
                     if (items.length > 0)
                         document.title = items[items.length - 1].title;
                     this.breadcrumb_items = items;
@@ -65,3 +65,21 @@ axios.get('/api/app_settings/').then(response => {
 
     Vue.app_error_handler = (message, tag) => app.add_message(message, tag);
 })
+
+// Add a request interceptor
+axios.interceptors.request.use(
+    config => config,
+    error => {
+        Vue.app_error_handler(error, "error")
+        return Promise.reject(error);
+    }
+);
+
+// Add a response interceptor
+axios.interceptors.response.use(
+    response => response,
+    error => {
+        Vue.app_error_handler(error, "error")
+        return Promise.reject(error);
+    }
+);

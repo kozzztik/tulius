@@ -35,7 +35,10 @@ def room_to_json(sender, thread, response, **kwargs):
         return
     response['last_comment'] = {
         'id': thread.last_comment.id,
-        'parent_id': thread.last_comment.parent_id,
+        'thread': {
+            'id': thread.last_comment.parent_id,
+            'url': sender.thread_url(thread.last_comment.parent_id)
+        },
         'page': thread.last_comment.page,
         'user': api.user_to_json(thread.last_comment.user),
         'create_time': thread.last_comment.create_time,

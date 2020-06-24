@@ -12,7 +12,7 @@
             </div>
             <div class="captionright"></div>
         </div>
-        <forum_room_list :rooms="thread.rooms" :room_url="room_url" :comment_url="comment_url">
+        <forum_room_list :rooms="thread.rooms">
             <template v-slot:moderators="slotProps">
                 <h6 v-if="slotProps.room.moderators.length > 0" class="moderators">Модераторы:</h6>
                 <ul v-if="slotProps.room.moderators" class="moderators">
@@ -41,7 +41,7 @@
             </div>
             <div class="captionright"></div>
         </div>
-        <forum_thread_list :threads="thread.threads" :thread_url="thread_url" :comment_url="comment_url">
+        <forum_thread_list :threads="thread.threads">
             <template v-slot:author="slotProps">
                 <div v-if="slotProps.thread.user">
                     <a href="javascript:void(0)" @click="show_role_modal(slotProps.thread.user.id)" v-if="role_with_link(slotProps.thread.user.id)">{{ slotProps.thread.user.title }}</a>

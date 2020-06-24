@@ -1,25 +1,25 @@
 import reply_form_component from '../components/reply_form.js'
+import APILoadMixin from '../../app/components/api_load_mixin.js'
 
 
 export default LazyComponent('forum_edit_comment_page', {
+    mixins: [APILoadMixin,],
     template: '/static/forum/pages/edit_comment.html',
        data: function () {
         return {
-            breadcrumbs: [],
             loading: true,
             thread: {online_ids: [], id: null},
             comment: {},
         }
     },
     computed: {
-        user: function() {return this.$root.user;}
+        urls() {return this.$parent.urls},
     },
     methods: {
-        load_api(pk) {
-            if (this.comment.id == pk)
+        load_api(route) {
+            if (this.comment.id == route.params.id)
                 return;
-            this.$parent.loading_start();
-            axios.get('/api/forum/comment/' + pk + '/').then(response => {
+            return axios.get(this.urls.comment_api(route.params.id)).then(response => {
                 this.comment = response.data;
                 this.thread = this.comment.thread
                 this.thread.online_ids = []
@@ -29,17 +29,7 @@ export default LazyComponent('forum_edit_comment_page', {
                     url: this.$route,
                 });
                 this.loading = false;
-            }).catch(error => this.$root.add_message(error, "error"))
-            .then(() => {
-                this.$parent.loading_end(this.breadcrumbs);
             });
         },
-    },
-    mounted() {
-        this.load_api(this.$route.params.id)
-    },
-    beforeRouteUpdate (to, from, next) {
-        this.load_api(to.params.id);
-        next();
     },
 })

@@ -1,7 +1,6 @@
 <div>
     <game_forum_thread_actions :variation="variation" :thread="thread" :upper="true" ref="thread_actions" v-if="!loading"></game_forum_thread_actions>
-    <forum_reply_form :thread="thread" :comment="comment" ref="reply_form"
-                      v-if="!loading" :comment_url="comment_url">
+    <forum_reply_form :thread="thread" :comment="comment" ref="reply_form" v-if="!loading">
         <template v-slot:before_form="slotProps">
             <game_forum_role_selector :variation="variation" :thread="thread" :form="slotProps.form" :editor="false"></game_forum_role_selector>
             <game_forum_role_selector :variation="variation" :thread="thread" :form="slotProps.form" :editor="true"></game_forum_role_selector>

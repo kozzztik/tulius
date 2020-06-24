@@ -1,27 +1,27 @@
 import room_list from '../snippets/room_list.js'
+import APILoadMixin from '../../app/components/api_load_mixin.js'
 
 
 export default LazyComponent('forum_index_page', {
+    mixins: [APILoadMixin,],
     template: '/static/forum/pages/index.html',
-    data: function () {
-        return {
-            loading: true,
-            index: {groups: []},
-        }
-    },
+    data: () => ({
+        breadcrumbs: [],
+        loading: true,
+        index: {groups: []},
+    }),
     computed: {
-        user: function() {return this.$root.user;}
+        urls() {return this.$parent.urls},
     },
     methods: {
-        load_api() {
-            this.$parent.loading_start();
-            axios.get('/api/forum/').then(response => {
+        load_api(route) {
+            return axios.get(this.urls.root_api).then(response => {
                 var api_response = response.data;
                 for (var group of api_response['groups'])
                     group['collapsed'] = false;
                 this.index = api_response;
                 if (this.user.authenticated) {
-                    axios.get('/api/forum/collapse/').then(response => {
+                    axios.get(this.urls.root_api + 'collapse/').then(response => {
                         for (var key in response.data)
                             for (var group of this.index.groups)
                                 if (group.id == key) {
@@ -30,11 +30,8 @@ export default LazyComponent('forum_index_page', {
                                 }
                     });
                 }
-            }).catch(error => this.$parent.add_message(error, "error"))
-            .then(() => {
-                this.$parent.loading_end([]);
                 this.loading = false;
-            });
+            })
         },
         collapse: function (event) {
             var group_id = event.target.attributes.groupid.nodeValue;
@@ -43,27 +40,18 @@ export default LazyComponent('forum_index_page', {
                     var value = !this.index.groups[num].collapsed;
                     this.index.groups[num].collapsed = value;
                     axios.post(
-                        '/api/forum/collapse/' + group_id, {'value': value})
+                        this.urls.root_api + 'collapse/' + group_id, {'value': value})
                     break;
                 }
             }
         },
         mark_all_as_readed() {
             this.$parent.loading_start();
-            axios.post('/api/forum/read_mark/', {'comment_id': null}
-            ).then(response => {
-            }).catch(error => this.$parent.add_message(error, "error"))
-            .then(() => {
-                this.$parent.loading_end([]);
-                this.load_api();
+            axios.post(this.urls.root_api + 'read_mark/', {'comment_id': null}
+            ).then(response => {}).then(() => {
+                this.$parent.loading_end();
+                this.load_api(null);
             });
         },
     },
-    mounted() {
-        this.load_api()
-    },
-    beforeRouteUpdate (to, from, next) {
-        this.load_api();
-        next();
-    }
 })

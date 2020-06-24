@@ -15,34 +15,9 @@ export default LazyComponent('forum_comment', {
             type: Boolean,
             default: false,
         },
-        comment_url: {
-			type: Function,
-			default: function(comment) {
-			    return {
-                    name: 'forum_thread',
-                    params: { id: this.thread.id },
-                    query: { page: comment.page },
-                    hash: '#' + comment.id,
-                }
-			}
-		},
-		edit_thread_url: {
-			type: Function,
-			default: function(thread) {
-			    return '/forums/edit_thread/' + thread.id + '/';
-			}
-		},
-		edit_comment_url: {
-			type: Function,
-			default: function(comment) {
-			    return {
-                    name: 'forum_edit_comment',
-                    params: { id: comment.id },
-                };
-			}
-		},
     },
     computed: {
+        urls: function() {return this.$parent.urls;},
         user: function() {return this.$root.user;},
         like_img: function() {
             if (this.comment.is_liked === null) return null;

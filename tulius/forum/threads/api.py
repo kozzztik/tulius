@@ -13,7 +13,6 @@ from tulius.forum import models
 from tulius.forum import signals
 from tulius.forum import rights as forum_rights
 from tulius.forum import online_status as online_status_plugin
-from tulius.forum.readmarks import plugin as readmarks
 from djfw.wysibb.templatetags import bbcodes
 
 
@@ -256,6 +255,14 @@ class IndexView(BaseThreadView):
             access_type__lt=models.THREAD_ACCESS_TYPE_NO_READ
         ) | query_utils.Q(user=self.user))  # TODO: move it to protected #97
 
+    def room_group_unreaded_url(self, rooms):
+        unreaded = None
+        for room in rooms:
+            if room.unreaded:
+                if (not unreaded) or (room.unreaded_id < unreaded.id):
+                    unreaded = room.unreaded
+        return self.thread_url(unreaded.pk) if unreaded else None
+
     def get_context_data(self, **kwargs):
         all_rooms = [thread for thread in self.get_index(1)]
         groups = self.get_index(0)
@@ -273,6 +280,6 @@ class IndexView(BaseThreadView):
                 'title': group.title,
                 'rooms': [self.room_to_json(thread) for thread in group.rooms],
                 'url': group.get_absolute_url,
-                'unreaded_url': readmarks.room_group_unreaded_url(group.rooms),
+                'unreaded_url': self.room_group_unreaded_url(group.rooms),
             } for group in groups]
         }

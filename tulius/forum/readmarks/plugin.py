@@ -31,12 +31,3 @@ class ReadMarksPlugin(plugins.ForumPlugin):
         self.site.signals.after_add_comment.connect(self.after_add_comment)
         self.site.signals.before_delete_comment.connect(
             self.before_delete_comment)
-
-
-def room_group_unreaded_url(rooms):
-    unreaded = None
-    for room in rooms:
-        if room.unreaded:
-            if (not unreaded) or (room.unreaded_id < unreaded.id):
-                unreaded = room.unreaded
-    return unreaded.get_absolute_url if unreaded else None
