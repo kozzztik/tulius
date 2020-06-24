@@ -22,36 +22,21 @@ export default LazyComponent('forum_thread_page', {
             this.comments_page = page;
             if (this.thread.id == pk)
                 return;
-            this.$root.loading_start();
-            axios.get('/api/forum/thread/'+ pk).then(response => {
+            this.$parent.loading_start();
+            axios.get('/api/forum/thread/' + pk + '/').then(response => {
                 this.thread = response.data;
-                this.breadcrumbs = [{"url": "/forums/", "title": "Форумы"}]
-                for (var item of this.thread.parents)
-                    this.breadcrumbs.push({
-                        title: item.title,
-                        url: {
-                            name: 'forum_room',
-                            params: {id: item.id},
-                        },
-                    });
-                this.breadcrumbs.push({
-                    title: this.thread.title,
-                    url: {
-                        name: 'forum_thread',
-                        params: {id: this.thread.id},
-                    },
-                });
+                this.breadcrumbs = this.$parent.thread_breadcrumbs(this.thread);
                 this.loading = false;
             }).catch(error => this.$root.add_message(error, "error"))
             .then(() => {
-                this.$root.loading_end(this.breadcrumbs);
+                this.$parent.loading_end(this.breadcrumbs);
             });
         },
         mark_all_not_readed() {
             axios.delete(this.thread.url + 'read_mark/').then(response => {
                 this.thread.last_read_id = response.data.last_read_id;
                 this.thread.not_read_comment = response.data.not_read_comment;
-            }).catch(error => this.$parent.add_message(error, "error"));
+            }).catch(error => this.$root.add_message(error, "error"));
         },
     },
     mounted() {

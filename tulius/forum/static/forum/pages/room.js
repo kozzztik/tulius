@@ -19,27 +19,11 @@ export default LazyComponent('forum_room_page', {
     methods: {
         load_api(pk) {
             this.$parent.loading_start();
-            axios.get('/api/forum/thread/'+ pk).then(response => {
-                const api_response = response.data;
-                this.breadcrumbs = [{"url": "/forums/", "title": "Форумы"}]
-                api_response.parents.forEach(
-                    (item, i, arr) => this.breadcrumbs.push({
-                        title: item.title,
-                        url: {
-                            name: 'forum_room',
-                            params: {id: item.id},
-                        },
-                    }));
-                this.breadcrumbs.push({
-                    title: api_response.title,
-                    url: {
-                        name: 'forum_room',
-                        params: {id: api_response.id},
-                    },
-                });
-                this.thread = api_response;
+            axios.get('/api/forum/thread/'+ pk + '/').then(response => {
+                this.thread = response.data;
+                this.breadcrumbs = this.$parent.thread_breadcrumbs(this.thread)
                 this.loading = false;
-            }).catch(error => this.$parent.add_message(error, "error"))
+            }).catch(error => this.$root.add_message(error, "error"))
             .then(() => {
                 this.$parent.loading_end(this.breadcrumbs);
                 this.loading = false;
@@ -48,12 +32,11 @@ export default LazyComponent('forum_room_page', {
         mark_all_as_readed() {
             this.$parent.loading_start();
             axios.post(
-                '/api/forum/thread/'+ this.thread.id + '/read_mark/',
-                {'comment_id': null}
+                this.thread.url + 'read_mark/', {'comment_id': null}
             ).then(response => {
             }).catch(error => this.$parent.add_message(error, "error"))
             .then(() => {
-                this.$parent.loading_end(this.breadcrumbs);
+                this.$parent.loading_end(null);
                 this.load_api(this.thread.id);
             });
         },

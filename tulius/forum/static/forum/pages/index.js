@@ -7,11 +7,10 @@ export default LazyComponent('forum_index_page', {
         return {
             loading: true,
             index: {groups: []},
-            user: {is_anonymous: true},
-            breadcrumbs: [
-                {"url": "/forums/", "title": "Форумы"}
-            ],
         }
+    },
+    computed: {
+        user: function() {return this.$root.user;}
     },
     methods: {
         load_api() {
@@ -21,7 +20,7 @@ export default LazyComponent('forum_index_page', {
                 for (var group of api_response['groups'])
                     group['collapsed'] = false;
                 this.index = api_response;
-                if (this.$parent.user.authenticated) {
+                if (this.user.authenticated) {
                     axios.get('/api/forum/collapse/').then(response => {
                         for (var key in response.data)
                             for (var group of this.index.groups)
@@ -33,7 +32,7 @@ export default LazyComponent('forum_index_page', {
                 }
             }).catch(error => this.$parent.add_message(error, "error"))
             .then(() => {
-                this.$parent.loading_end(this.breadcrumbs);
+                this.$parent.loading_end([]);
                 this.loading = false;
             });
         },
@@ -55,13 +54,12 @@ export default LazyComponent('forum_index_page', {
             ).then(response => {
             }).catch(error => this.$parent.add_message(error, "error"))
             .then(() => {
-                this.$parent.loading_end(this.breadcrumbs);
+                this.$parent.loading_end([]);
                 this.load_api();
             });
         },
     },
     mounted() {
-        this.user = this.$parent.user;
         this.load_api()
     },
     beforeRouteUpdate (to, from, next) {
