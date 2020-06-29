@@ -75,10 +75,6 @@ class GameThreadsPlugin(ThreadsPlugin):
                 r'^add_room/(?P<parent_id>\d+)/$',
                 views.Index.as_view(), name='add_room'),
             url(
-                r'^edit_room/(?P<thread_id>\d+)/$',
-                views.EditView.as_view(plugin=self, self_is_room=True),
-                name='edit_room'),
-            url(
                 r'^add_thread/(?P<parent_id>\d+)/$',
                 views.EditView.as_view(plugin=self, self_is_room=False),
                 name='add_thread'),

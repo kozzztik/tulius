@@ -80,44 +80,6 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
             (thread.parent_id == room.id) or (thread.parent_id in room_ids)]
         return new_room_list, threads
 
-    def process_edit_room(
-            self, request, parent_thread, thread, formset_params=None):
-        formset_params = formset_params or {}
-        models = self.site.models
-        right_model = self.site.core.right_model
-        right_form = self.site.core.right_form
-        adding = thread is None
-        form = forms.RoomForm(models, thread=thread, data=request.POST or None)
-        form.room = True
-        formset_params['parent_thread'] = parent_thread or thread
-        formset = inlineformsets.get_formset(
-            models.Thread, right_model, request.POST,
-            form=right_form, extra=1, params=formset_params,
-            instance=thread)
-        if request.method == 'POST':
-            if form.is_valid():
-                if not thread:
-                    thread = models.Thread(room=True)
-                thread.title = form.cleaned_data['title']
-                thread.body = form.cleaned_data['body']
-                thread.access_type = int(form.cleaned_data['access_type'])
-                if not thread.id:
-                    thread.user = request.user
-                    thread.parent = parent_thread
-                thread.plugin_id = self.site_id
-                if formset.is_valid():
-                    thread.save()
-                    for form in formset:
-                        if form.is_valid() and form.changed_data:
-                            right = form.save(commit=False)
-                            right.thread = thread
-                            right.save()
-                    if not adding:
-                        formset.save()
-                else:
-                    thread = None
-        return form, formset, thread
-
     # pylint: disable=too-many-branches,too-many-nested-blocks
     # pylint: disable=too-many-arguments,too-many-statements
     def process_edit_thread(
@@ -293,7 +255,6 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
         self.thread_on_update = dispatch.Signal(
             providing_args=["old_thread"])
         self.core['get_parent_thread'] = self.get_parent_thread
-        self.core['process_edit_room'] = self.process_edit_room
         self.core['process_edit_thread'] = self.process_edit_thread
         self.core['room_descendants'] = self.room_descendants
         self.core['move_thread'] = self.move_thread

@@ -197,10 +197,6 @@ class GamePlugin(ForumPlugin):
             context['roleform'] = roleform
             context['role'] = role
 
-    def thread_before_edit(self, sender, **kwargs):
-        if sender.self_is_room:
-            return
-
     def thread_after_edit(self, sender, **kwargs):
         if sender.self_is_room:
             return
@@ -255,7 +251,6 @@ class GamePlugin(ForumPlugin):
         self.core['fix_games'] = self.fix_games
         self.templates['fix_games'] = 'gameforum/fix.haml'
         self.site.signals.thread_view.connect(self.thread_view)
-        self.site.signals.thread_before_edit.connect(self.thread_before_edit)
         self.site.signals.thread_after_edit.connect(self.thread_after_edit)
 
     def get_urls(self):

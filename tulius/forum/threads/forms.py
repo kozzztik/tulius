@@ -2,39 +2,6 @@ from django.utils.translation import ugettext_lazy as _
 from django import forms
 
 
-class RoomForm(forms.Form):
-    title = forms.CharField(
-        required=True,
-        label=_(u'Title'),
-    )
-
-    body = forms.CharField(
-        required=False,
-        label=_(u'Body'),
-        widget=forms.widgets.Textarea(),
-    )
-
-    access_type = forms.ChoiceField(
-        required=False,
-        label=_(u'Access type'),
-    )
-
-    def __init__(self, models, *args, thread=None, **kwargs):
-        self.caption = _('edit room') if thread else _('add room')
-        self.base_fields['access_type'].choices = \
-            models.THREAD_ACCESS_TYPE_CHOICES
-        self.base_fields['access_type'].initial = \
-            models.THREAD_ACCESS_TYPE_NOT_SET
-        if thread:
-            initial = {
-                'title': thread.title,
-                'body': thread.body,
-                'access_type': thread.access_type,
-            }
-            kwargs['initial'] = initial
-        super(RoomForm, self).__init__(*args, **kwargs)
-
-
 class ThreadForm(forms.Form):
     title = forms.CharField(
         required=True,

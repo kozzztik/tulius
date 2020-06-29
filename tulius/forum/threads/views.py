@@ -63,18 +63,13 @@ class EditView(BaseThreadView):
                     if not parent_thread.write_right():
                         raise Http404()
         self.parent_thread = parent_thread
-        comment = None
         self.adding = not bool(thread)
         self.edit_is_valid = True
         self.site.signals.thread_before_edit.send(
             self, thread=thread, context=context)
-        if self.self_is_room:
-            (form, formset, thread) = self.core.process_edit_room(
-                self.request, parent_thread, thread)
-        else:
-            (form, formset, thread, comment) = self.core.process_edit_thread(
-                self.request, parent_thread, thread, True, self.edit_is_valid)
-            context['comment'] = comment
+        (form, formset, thread, comment) = self.core.process_edit_thread(
+            self.request, parent_thread, thread, True, self.edit_is_valid)
+        context['comment'] = comment
         context['form'] = form
         context['formset'] = formset
         context['thread'] = thread

@@ -25,8 +25,6 @@ class ThreadsPlugin(ThreadsCorePlugin):
         return self.reverse('add_room')
 
     def thread_edit_url(self, thread):
-        if thread.room:
-            return self.reverse('edit_room', thread.id)
         return self.reverse('edit_thread', thread.id)
 
     def get_add_room_url(self, thread):
@@ -67,10 +65,6 @@ class ThreadsPlugin(ThreadsCorePlugin):
             url(
                 r'^add_room/(?P<parent_id>\d+)/$',
                 views.Index.as_view(), name='add_room'),
-            url(
-                r'^edit_room/(?P<thread_id>\d+)/$',
-                views.EditView.as_view(plugin=self, self_is_room=True),
-                name='edit_room'),
             url(
                 r'^add_thread/(?P<parent_id>\d+)/$',
                 views.EditView.as_view(plugin=self, self_is_room=False),
