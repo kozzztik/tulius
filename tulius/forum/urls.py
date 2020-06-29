@@ -14,6 +14,9 @@ app_name = 'tulius.forum'
 urlpatterns = [
     urls.url(r'^$', threads_api.IndexView.as_view(), name='index'),
     urls.url(
+        r'^granted_rights/$',
+        rights_api.GrantedRightsAPI.as_view(), name='index_rights'),
+    urls.url(
         r'^read_mark/$',
         readmarks.ReadmarkAPI.as_view(), name='index_readmark'),
     urls.url(

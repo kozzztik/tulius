@@ -40,6 +40,7 @@ class DefaultRightsChecker(base.BaseThreadRightsChecker):
         rights = self._base_rights_class()
         rights.read = True
         rights.write = True
+        rights.edit = self.user.is_superuser
         rights.moderate = self.user.is_superuser
         return rights
 

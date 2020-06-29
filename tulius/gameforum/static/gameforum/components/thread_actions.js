@@ -85,7 +85,7 @@ export default LazyComponent('game_forum_thread_actions', {
                         break;
                     }
                 if (!found)
-                    result.push({'id': c.id, 'name': c.title});
+                    result.push({'id': c.id, 'title': c.title});
             }
             return result;
         },

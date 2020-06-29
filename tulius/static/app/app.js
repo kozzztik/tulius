@@ -47,6 +47,8 @@ axios.get('/api/app_settings/').then(response => {
                     this.breadcrumb_items = items;
                 }
                 this.loading_counter = this.loading_counter - 1;
+                if (this.loading_counter < 0)
+                    this.loading_counter = 0;
                 const new_loading = (this.loading_counter > 0);
                 if (this.loading != new_loading) {
                     this.loading = new_loading;

@@ -23,9 +23,7 @@
                     <h4>
                         <router-link :to="urls.room(room.id)">{{ room.title }}</router-link>
                     </h4>
-                    <div class=".hidden-phone" v-if="room.body">
-                        {{ room.body }}
-                    </div>
+                    <div class=".hidden-phone" v-if="room.body" v-html="room.body"></div>
                     <slot v-bind:room="room" name="moderators">
                         <h6 v-if="room.moderators.length > 0" class="moderators">Модераторы:</h6>
                         <ul v-if="room.moderators" class="moderators">

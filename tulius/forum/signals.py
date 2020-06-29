@@ -21,3 +21,8 @@ after_add_comment = dispatch.Signal(
     providing_args=["comment", "data", "preview"])
 on_comment_update = dispatch.Signal(
     providing_args=["comment", "data", "preview"])
+
+before_create_thread = dispatch.Signal(providing_args=["thread", "data"])
+after_create_thread = dispatch.Signal(providing_args=["thread", "data"])
+update_thread = dispatch.Signal(
+    providing_args=["thread", "old_thread", "data"])

@@ -1,4 +1,6 @@
+import thread_access from '../components/thread_access.js'
 import APILoadMixin from '../../app/components/api_load_mixin.js'
+
 
 export default LazyComponent('forum_add_room_page', {
     mixins: [APILoadMixin,],
@@ -29,8 +31,14 @@ export default LazyComponent('forum_add_room_page', {
             this.body = '';
             this.access_type = 0;
             this.granted_rights = [];
-            if (!route.params.id)
-                return this.parent_thread = null;
+            if (!route.params.id) {
+                this.parent_thread = {};
+                this.$parent.loading_end([{
+                    title: "Добавить комнату",
+                    url: this.$route,
+                }]);
+                return
+             }
             if (this.parent_thread.id == route.params.id)
                 return;
             return axios.get(this.urls.thread_api(route.params.id)
@@ -45,13 +53,11 @@ export default LazyComponent('forum_add_room_page', {
             })
         },
         on_submit() {
-            var submit_url = '/api/forum/';
-            if (this.parent_thread)
-                submit_url = this.parent_thread.url;
-            axios.put(submit_url, this.form).then(response => {
-
-            }).catch(error => this.$root.add_message(error, "error"))
-            .then(() => {
+            axios.put(
+                this.parent_thread.url || this.urls.root_api, this.form
+            ).then(response => {
+                this.$router.push(this.urls.room(response.data.id));
+            }).catch().then(() => {
                 this.$root.loading_end(this.breadcrumbs);
             });
         }

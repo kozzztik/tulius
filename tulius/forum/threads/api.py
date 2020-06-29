@@ -1,3 +1,5 @@
+import json
+
 from django import http
 from django import shortcuts
 from django import urls
@@ -7,6 +9,7 @@ from django.utils import html
 from django.db import transaction
 from django.db.models import query_utils
 
+from tulius.core.ckeditor import html_converter
 from tulius.forum import plugins
 from tulius.forum import const
 from tulius.forum import models
@@ -168,6 +171,17 @@ class BaseThreadView(plugins.BaseAPIView):
         signals.thread_room_to_json.send(self, thread=thread, response=data)
         return data
 
+    def create_thread(self, data):
+        room = bool(data['room'])
+        important = ((not room) and data.get('important', False))
+        return models.Thread(
+            parent=self.obj, room=room,
+            title=html_converter.html_to_bb(data['title']),
+            body=html_converter.html_to_bb(data['body']),
+            user=self.user, plugin_id=self.plugin_id,
+            important=self.rights.moderate and important,
+        )
+
 
 class ThreadView(BaseThreadView):
     def obj_to_json(self):
@@ -219,6 +233,20 @@ class ThreadView(BaseThreadView):
         self.obj.save()
         delete_mark.save()
         return {'result': True}
+
+    def put(self, request, **kwargs):
+        transaction.set_autocommit(False)
+        self.get_parent_thread(for_update=True, **kwargs)
+        if not self.rights.write:
+            raise exceptions.PermissionDenied()
+        data = json.loads(request.body)
+        thread = self.create_thread(data)
+        signals.before_create_thread.send(self, thread=thread, data=data)
+        thread.save()
+        signals.after_create_thread.send(self, thread=thread, data=data)
+        transaction.commit()
+        # TODO notify clients
+        return {'id': thread.id, 'url': self.thread_url(thread.id)}
 
 
 class IndexView(BaseThreadView):
@@ -283,3 +311,19 @@ class IndexView(BaseThreadView):
                 'unreaded_url': self.room_group_unreaded_url(group.rooms),
             } for group in groups]
         }
+
+    def put(self, request, **kwargs):
+        transaction.set_autocommit(False)
+        self.rights = self._get_rights_checker(None).get_rights_for_root()
+        if not self.rights.moderate:
+            raise exceptions.PermissionDenied()
+        data = json.loads(request.body)
+        if not data['room']:
+            raise exceptions.PermissionDenied()
+        thread = self.create_thread(data)
+        signals.before_create_thread.send(self, thread=thread, data=data)
+        thread.save()
+        signals.after_create_thread.send(self, thread=thread, data=data)
+        transaction.commit()
+        # TODO notify clients
+        return {'id': thread.id, 'url': self.thread_url(thread.id)}
