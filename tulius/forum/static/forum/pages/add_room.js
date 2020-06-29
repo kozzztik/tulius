@@ -4,9 +4,14 @@ import APILoadMixin from '../../app/components/api_load_mixin.js'
 
 export default LazyComponent('forum_add_room_page', {
     mixins: [APILoadMixin,],
+    props: {
+        user_search: {
+			type: Function,
+			default: null,
+		}
+	},
     template: '/static/forum/pages/add_room.html',
     data: () => ({
-        loading: true,
         form: {
             room: true,
             title: '',
@@ -49,7 +54,6 @@ export default LazyComponent('forum_add_room_page', {
                     title: "Добавить комнату",
                     url: this.$route,
                 });
-                this.loading = false;
             })
         },
         on_submit() {

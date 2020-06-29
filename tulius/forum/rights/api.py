@@ -23,7 +23,7 @@ def after_create_thread(sender, thread, data, **kwargs):
         return
     for right in data['granted_rights']:
         models.ThreadAccessRight(
-            thread=thread, user=right['user']['id'],
+            thread=thread, user_id=int(right['user']['id']),
             access_level=right['access_level']).save()
 
 

@@ -1,5 +1,6 @@
-from django.utils import html
 from django import urls
+from django.core import exceptions
+from django.utils import html
 
 from tulius.forum import signals
 from tulius.forum.threads import api
@@ -77,6 +78,22 @@ class BaseThreadAPI(api.BaseThreadView, base.VariationMixin):
         }
         signals.thread_room_to_json.send(self, thread=thread, response=data)
         return data
+
+    def process_role(self, init_role_id, data):
+        role_id = data.get('role_id')
+        if role_id:
+            if role_id not in self.rights.all_roles:
+                raise exceptions.PermissionDenied('Role does not exist')
+            if role_id == init_role_id:
+                return role_id
+        if role_id not in self.rights.user_write_roles:
+            raise exceptions.PermissionDenied('Role is not accessible here')
+        return role_id
+
+    def create_thread(self, data):
+        obj = super(BaseThreadAPI, self).create_thread(data)
+        obj.data1 = self.process_role(None, data)
+        return obj
 
 
 class ThreadAPI(api.ThreadView, BaseThreadAPI):

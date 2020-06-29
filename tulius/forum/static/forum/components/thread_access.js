@@ -40,9 +40,10 @@ export default LazyComponent('forum_thread_access', {
     },
     methods: {
         show_dialog() {
-            if (!this.thread.id)
-                this.$refs.modal.show()
-            else
+            if (!this.thread.id) {
+                this.rights = this.thread.granted_rights;
+                this.$refs.modal.show();
+            } else
                 this.load_api();
         },
         do_search(query) {

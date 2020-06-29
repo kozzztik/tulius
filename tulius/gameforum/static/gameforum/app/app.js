@@ -9,8 +9,10 @@ function urls(variation_id) {
                 variation_id: variation_id
             },
         }),
-        add_room: room_id => room_id ? {name: 'forum_add_room', params: {id: room_id}
-            } : {name: 'forum_add_root_room'},
+        add_room: room_id => ({
+            name: 'game_add_room',
+            params: {id: room_id, variation_id: variation_id}
+        }),
         thread: (thread_id, page) => ({
             name: 'game_thread',
             params: {

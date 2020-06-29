@@ -8,7 +8,7 @@
             <b-dropdown-item href="javascript:void(0)" v-if="thread.rights.edit" @click="$refs.thread_access.show_dialog()">
                 Права доступа
             </b-dropdown-item>
-            <b-dropdown-item :href="'/play/add_room/' + thread.id + '/'" v-if="thread.room && thread.rights.moderate">
+            <b-dropdown-item :to="urls.add_room(thread.id)" v-if="thread.room && thread.rights.moderate">
                 <img src="/static/games/img/button_green_add.png" style="height: 25px">
                 Добавить комнату
             </b-dropdown-item>

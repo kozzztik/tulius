@@ -1,0 +1,5 @@
+<forum_add_room_page :user_search="right_user_search">
+    <template v-slot:before_form="slotProps">
+        <game_forum_role_selector :variation="variation" :thread="slotProps.parent_thread" :form="slotProps.form" :editor="false" v-if="slotProps.parent_thread.id"></game_forum_role_selector>
+    </template>
+</forum_add_room_page>

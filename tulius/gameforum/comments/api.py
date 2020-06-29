@@ -62,17 +62,6 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
 
 
 class CommentsPageAPI(comments.CommentsPageAPI, CommentsBase):
-    def process_role(self, init_role_id, data):
-        role_id = data.get('role_id')
-        if role_id:
-            if role_id not in self.rights.all_roles:
-                raise exceptions.PermissionDenied('Role does not exist')
-            if role_id == init_role_id:
-                return role_id
-        if role_id not in self.rights.user_write_roles:
-            raise exceptions.PermissionDenied('Role is not accessible here')
-        return role_id
-
     def create_comment(self, text, data):
         comment = super(CommentsPageAPI, self).create_comment(text, data)
         comment.data1 = self.process_role(None, data)
