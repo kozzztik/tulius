@@ -95,6 +95,13 @@ class BaseThreadAPI(api.BaseThreadView, base.VariationMixin):
         obj.data1 = self.process_role(None, data)
         return obj
 
+    def update_thread(self, data):
+        super(BaseThreadAPI, self).update_thread(data)
+        self.obj.data1 = self.process_role(self.obj.data1, data)
+
 
 class ThreadAPI(api.ThreadView, BaseThreadAPI):
-    pass
+    def obj_to_json(self):
+        data = super(ThreadAPI, self).obj_to_json()
+        data['user'] = self.role_to_json(self.obj.data1)
+        return data

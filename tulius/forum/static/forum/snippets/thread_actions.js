@@ -1,4 +1,5 @@
 import thread_access from '../components/thread_access.js'
+import edit_room from '../components/edit_room.js'
 
 
 export default LazyComponent('forum_thread_actions', {

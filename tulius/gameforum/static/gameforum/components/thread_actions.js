@@ -1,3 +1,6 @@
+import edit_room from '../../forum/components/edit_room.js'
+
+
 export default LazyComponent('game_forum_thread_actions', {
     template: '/static/gameforum/components/thread_actions.html',
     props: ['variation', 'thread', 'upper'],

@@ -182,6 +182,10 @@ class BaseThreadView(plugins.BaseAPIView):
             important=self.rights.moderate and important,
         )
 
+    def update_thread(self, data):
+        self.obj.title = data['title']
+        self.obj.body = html_converter.html_to_bb(data['body'])
+
 
 class ThreadView(BaseThreadView):
     def obj_to_json(self):
@@ -247,6 +251,16 @@ class ThreadView(BaseThreadView):
         transaction.commit()
         # TODO notify clients
         return {'id': thread.id, 'url': self.thread_url(thread.id)}
+
+    @transaction.atomic
+    def post(self, request, **kwargs):
+        self.get_parent_thread(for_update=True, **kwargs)
+        if not self.rights.edit:
+            raise exceptions.PermissionDenied()
+        data = json.loads(request.body)
+        self.update_thread(data)
+        self.obj.save()
+        return self.obj_to_json()
 
 
 class IndexView(BaseThreadView):
