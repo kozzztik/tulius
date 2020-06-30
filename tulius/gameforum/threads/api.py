@@ -98,10 +98,15 @@ class BaseThreadAPI(api.BaseThreadView, base.VariationMixin):
     def update_thread(self, data):
         super(BaseThreadAPI, self).update_thread(data)
         self.obj.data1 = self.process_role(self.obj.data1, data)
+        editor_role = data['edit_role_id']
+        if editor_role not in self.rights.user_write_roles:
+            raise exceptions.PermissionDenied()
+        self.obj.data2 = editor_role
 
 
 class ThreadAPI(api.ThreadView, BaseThreadAPI):
     def obj_to_json(self):
         data = super(ThreadAPI, self).obj_to_json()
-        data['user'] = self.role_to_json(self.obj.data1)
+        data['user'] = self.role_to_json(self.obj.data1, detailed=True)
+        data['edit_role_id'] = self.obj.data2
         return data

@@ -164,6 +164,8 @@ def on_comment_update(sender, comment, data, preview, **kwargs):
     orig_data = comment.media.get('voting')
     if preview:
         comment.media['voting'] = voting_data
+        if sender.obj.first_comment_id == comment.id:
+            sender.obj.media['voting'] = voting_data
         return
     if not orig_data:
         # voting added

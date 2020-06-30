@@ -11,6 +11,23 @@ from tulius.gameforum.threads import api as threads
 from tulius.forum.comments import api as comments
 
 
+@dispatch.receiver(signals.before_add_comment)
+def before_add_comment(sender, comment, **kwargs):
+    if sender.plugin_id != consts.GAME_FORUM_SITE_ID:
+        return
+    if sender.obj.first_comment_id is None:
+        comment.data1 = sender.obj.data1
+
+
+@dispatch.receiver(signals.on_comment_update)
+def on_comment_update(sender, comment, **kwargs):
+    if sender.plugin_id != consts.GAME_FORUM_SITE_ID:
+        return
+    if sender.obj.first_comment_id == comment.id:
+        comment.data1 = sender.obj.data1
+        comment.data2 = sender.obj.data2
+
+
 @dispatch.receiver(signals.thread_room_to_json)
 def room_to_json(sender, thread, response, **kwargs):
     if thread.plugin_id != consts.GAME_FORUM_SITE_ID:

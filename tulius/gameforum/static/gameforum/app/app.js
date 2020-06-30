@@ -30,7 +30,14 @@ function urls(variation_id) {
             query: { page: comment.page },
             hash: '#' + comment.id,
         }),
-        edit_thread: thread_id => `/play/edit_thread/${thread_id}/`,
+        add_thread: thread_id => ({
+            name: 'game_add_thread',
+            params: {parent_id: thread_id, variation_id: variation_id},
+        }),
+        edit_thread: thread_id => ({
+            name: 'game_edit_thread',
+            params: {id: thread_id, variation_id: variation_id},
+        }),
         edit_comment: comment_id => ({
             name: 'game_edit_comment',
             params: { id: comment_id, variation_id: variation_id },

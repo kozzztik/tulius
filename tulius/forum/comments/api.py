@@ -41,6 +41,8 @@ def update_thread(sender, thread, data, preview, **kwargs):
     comment = models.Comment.objects.get(id=thread.first_comment_id)
     comment.title = thread.title
     comment.body = thread.body
+    comment.edit_time = timezone.now()
+    comment.editor = sender.user
     signals.on_comment_update.send(
         sender, comment=comment, data=data, preview=preview)
     if not preview:
