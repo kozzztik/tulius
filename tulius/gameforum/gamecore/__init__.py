@@ -156,37 +156,6 @@ class GamePlugin(ForumPlugin):
                 role = self.get_role(role_id, roles, admin)
         return form, role
 
-    def process_editor(self, request, parent_thread, comment):
-        variation = parent_thread.variation
-        admin = parent_thread.admin
-        init_editor = comment.data2 if comment else None
-        form = None
-        query = Q(variation=variation)
-        if not admin:
-            query = query & Q(user=request.user)
-        roles = Role.objects.filter(query)
-        roles = [role for role in roles]
-        if parent_thread.strict_write:
-            strict_ids = [role.id for role in parent_thread.strict_write]
-            roles = [role for role in roles if role.id in strict_ids]
-        editor = None
-        if (roles.count == 0) and (not admin):
-            raise Http404()
-        if len(roles) == 1:
-            editor = roles[0]
-            form = None
-        if (len(roles) > 1) or admin:
-            form = EditorForm(
-                admin, roles, data=request.POST or None,
-                initial={'editor': init_editor})
-            if request.method == 'POST':
-                if not form.is_valid():
-                    raise Http404(form.errors)
-                cd = form.cleaned_data
-                role_id = cd['editor']
-                editor = self.get_role(role_id, roles, admin)
-        return (form, editor)
-
     def thread_view(self, sender, **kwargs):
         context = kwargs['context']
         variation = sender.variation
@@ -196,33 +165,6 @@ class GamePlugin(ForumPlugin):
                 None, sender, None, True, user=sender.view_user)
             context['roleform'] = roleform
             context['role'] = role
-
-    def thread_after_edit(self, sender, **kwargs):
-        if sender.self_is_room:
-            return
-        context = kwargs['context']
-        thread = kwargs['thread']
-        comment = sender.comment
-        parent_thread = sender.parent_thread
-        init_role_id = comment.data1 if comment else None
-        (roleform, role) = self.process_role(
-            sender.request, parent_thread, init_role_id, sender.adding)
-        editor = None
-        if parent_thread.game and not sender.adding:
-            (editorform, editor) = self.process_editor(
-                sender.request, parent_thread, comment)
-            context['editorform'] = editorform
-            context['editor'] = editor
-        context['roleform'] = roleform
-        context['role'] = role
-        if thread and comment:
-            if role:
-                self.models.Thread.objects.filter(
-                    id=thread.id).update(data1=role.id)
-                comment.data1 = role.id
-            if editor:
-                comment.data2 = editor.id
-            comment.save()
 
     def fix_games(self):
         games = Game.objects.all()
@@ -251,7 +193,6 @@ class GamePlugin(ForumPlugin):
         self.core['fix_games'] = self.fix_games
         self.templates['fix_games'] = 'gameforum/fix.haml'
         self.site.signals.thread_view.connect(self.thread_view)
-        self.site.signals.thread_after_edit.connect(self.thread_after_edit)
 
     def get_urls(self):
         return [

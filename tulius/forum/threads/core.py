@@ -4,10 +4,7 @@ from django import shortcuts
 from django.core import exceptions
 from django.utils.translation import ugettext_lazy as _
 
-from djfw import inlineformsets
-
 from tulius.forum import plugins
-from tulius.forum.threads import forms
 
 
 ERROR_VALIDATION = _('there were some errors during form validation')
@@ -79,82 +76,6 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
             thread for thread in threads if
             (thread.parent_id == room.id) or (thread.parent_id in room_ids)]
         return new_room_list, threads
-
-    # pylint: disable=too-many-branches,too-many-nested-blocks
-    # pylint: disable=too-many-arguments,too-many-statements
-    def process_edit_thread(
-            self, request, parent_thread, thread, voting_enabled,
-            voting_valid, formset_params=None):
-        formset_params = formset_params or {}
-        models = self.site.models
-        right_model = self.site.core.right_model
-        right_form = self.site.core.right_form
-        adding = thread is None
-        moderate = parent_thread.moderate_right(request.user)
-        comment = None
-        if thread and thread.first_comment:
-            comments = models.Comment.objects.filter(
-                id=thread.first_comment_id)
-            if comments:
-                comment = comments[0]
-        formset_params['parent_thread'] = parent_thread
-        form = forms.ThreadForm(
-            models, thread, comment, voting_enabled, moderate,
-            data=request.POST or None)
-
-        formset = inlineformsets.get_formset(
-            models.Thread, right_model, request.POST,
-            base_form=right_form, extra=1, params=formset_params,
-            instance=thread)
-        if request.method == 'POST':
-            form_valid = form.is_valid()
-            if form_valid and voting_enabled:
-                voting_valid = voting_valid or (
-                    not form.cleaned_data['voting'])
-            if form_valid and ((not voting_enabled) or voting_valid):
-                access_type = int(form.cleaned_data['access_type'])
-                free_access = (access_type <= models.THREAD_ACCESS_TYPE_OPEN)
-                if free_access or formset.is_valid():
-                    if not thread:
-                        thread = models.Thread(
-                            parent=parent_thread, room=False)
-                    thread.title = form.cleaned_data['title']
-                    if not thread.title:
-                        thread.title = ''
-                    thread.title = thread.title[:120]
-                    thread.body = form.cleaned_data['body'][:255]
-                    thread.plugin_id = parent_thread.plugin_id
-                    if adding:
-                        thread.user = request.user
-                    thread.access_type = access_type
-                    if moderate:
-                        thread.important = form.cleaned_data['important']
-                    thread.closed = form.cleaned_data['closed']
-                    thread.save()
-                    if not comment:
-                        comment = models.Comment(parent=thread)
-                    comment.title = thread.title
-                    comment.body = form.cleaned_data['body']
-                    if adding:
-                        comment.user = thread.user
-                    comment.plugin_id = parent_thread.plugin_id
-                    if voting_enabled:
-                        comment.voting = form.cleaned_data['voting']
-                    comment.save()
-                    if formset and not free_access:
-                        if adding:
-                            for form in formset:
-                                if form.is_valid():
-                                    right = form.save(commit=False)
-                                    right.thread = thread
-                                    right.save()
-                        else:
-                            formset.save()
-                else:
-                    thread = None
-        else:
-            thread = None
-        return form, formset, thread, comment
 
     def search_list(self, user, parent, **kwargs):
         queryset = self.models.Thread.objects.filter(
@@ -244,10 +165,6 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
         self.thread_view_signal = dispatch.Signal(
             providing_args=["context", "user", "request"])
 
-        self.thread_before_edit = dispatch.Signal(
-            providing_args=["thread", "context"])
-        self.thread_after_edit = dispatch.Signal(
-            providing_args=["thread", "context"])
         self.thread_on_move = dispatch.Signal(
             providing_args=["user", "old_parent", "old_tree_id"])
         self.thread_repair_counters = dispatch.Signal(providing_args=[])
@@ -255,7 +172,6 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
         self.thread_on_update = dispatch.Signal(
             providing_args=["old_thread"])
         self.core['get_parent_thread'] = self.get_parent_thread
-        self.core['process_edit_thread'] = self.process_edit_thread
         self.core['room_descendants'] = self.room_descendants
         self.core['move_thread'] = self.move_thread
         self.core['thread_move_list'] = self.move_list
@@ -263,8 +179,6 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
         self.core['rebuild_tree'] = self.repair_thread_counters
         self.core['threads_search_list'] = self.search_list
         self.signals['thread_view'] = self.thread_view_signal
-        self.signals['thread_before_edit'] = self.thread_before_edit
-        self.signals['thread_after_edit'] = self.thread_after_edit
         self.signals['thread_on_move'] = self.thread_on_move
         self.signals['thread_repair_counters'] = self.thread_repair_counters
         self.signals['thread_on_create'] = self.thread_on_create

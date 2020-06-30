@@ -11,7 +11,6 @@ class Index(generic.TemplateView):
 
 class CommentsPlugin(CommentsCore):
     comment_template = 'forum/snippets/post.haml'
-    edit_comment_template = 'forum/add_post.haml'
 
     def get_paged_url(self, comment):
         return "%s?page=%s#%s" % (
@@ -33,7 +32,6 @@ class CommentsPlugin(CommentsCore):
 
     def init_core(self):
         super(CommentsPlugin, self).init_core()
-        self.templates['add_comment'] = self.edit_comment_template
         self.templates['comment'] = self.comment_template
         self.templates['comment_player'] = 'forum/comments/avatar.haml'
         self.templates['comment_preview'] = 'forum/preview.haml'

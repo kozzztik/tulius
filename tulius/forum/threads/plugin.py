@@ -4,8 +4,6 @@ from . import views
 
 
 class ThreadsPlugin(ThreadsCorePlugin):
-    thread_edit_template = 'forum/add_post.haml'
-
     def thread_url(self, thread):
         return self.reverse('room' if thread.room else 'thread', thread.id)
 
@@ -41,7 +39,6 @@ class ThreadsPlugin(ThreadsCorePlugin):
         self.urlizer['thread'] = self.thread_url
         self.urlizer['index'] = self.index_url
         self.urlizer['add_root_room'] = self.add_root_room_url
-        self.templates['edit_thread'] = self.thread_edit_template
         self.templates['thread_move_select'] = \
             'forum/threads/move_select.haml'
         self.templates['thread_move_confirm'] = \

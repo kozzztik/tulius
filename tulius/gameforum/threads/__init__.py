@@ -8,8 +8,6 @@ from tulius.stories.models import Role, AdditionalMaterial, \
 
 
 class GameThreadsPlugin(ThreadsPlugin):
-    thread_edit_template = 'gameforum/add_post.haml'
-
     # pylint: disable=too-many-branches
     def get_parent_thread(self, user, thread_id, is_room=None):
         thread = super(GameThreadsPlugin, self).get_parent_thread(
@@ -76,12 +74,10 @@ class GameThreadsPlugin(ThreadsPlugin):
                 views.Index.as_view(), name='add_room'),
             url(
                 r'^add_thread/(?P<parent_id>\d+)/$',
-                views.EditView.as_view(plugin=self, self_is_room=False),
-                name='add_thread'),
+                views.Index.as_view(), name='add_thread'),
             url(
                 r'^edit_thread/(?P<thread_id>\d+)/$',
-                views.EditView.as_view(plugin=self, self_is_room=False),
-                name='edit_thread'),
+                views.Index.as_view(), name='edit_thread'),
             url(
                 r'^thread/(?P<parent_id>\d+)/$',
                 views.Index.as_view(), name='thread'),

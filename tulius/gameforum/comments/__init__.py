@@ -4,7 +4,6 @@ from tulius.stories import models
 
 class GameCommentsPlugin(plugin.CommentsPlugin):
     comment_template = 'gameforum/snippets/post.haml'
-    edit_comment_template = 'gameforum/add_post.haml'
 
     def update_role_comments_count(self, role_id, count):
         if role_id:
