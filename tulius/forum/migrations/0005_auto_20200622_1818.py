@@ -2,6 +2,7 @@
 
 from django.db import migrations
 import jsonfield.fields
+import tulius.forum.models
 
 
 class Migration(migrations.Migration):
@@ -14,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='comment',
             name='media',
-            field=jsonfield.fields.JSONField(default={}),
-            preserve_default=False,
+            field=jsonfield.fields.JSONField(
+                default=tulius.forum.models.default_media),
         ),
     ]

@@ -182,6 +182,10 @@ class ThreadManager(TreeManager):
         return self.none()
 
 
+def default_media():
+    return {}
+
+
 class Thread(MPTTModel, SitedModelMixin):
     """
     Forum thread
@@ -198,11 +202,7 @@ class Thread(MPTTModel, SitedModelMixin):
         unique=False,
         verbose_name=_('title')
     )
-    body = models.CharField(
-        max_length=255,
-        unique=False,
-        verbose_name=_('body')
-    )
+    body = models.TextField(verbose_name=_('body'))
     parent = TreeForeignKey(
         'self', models.PROTECT,
         null=True,
@@ -270,6 +270,7 @@ class Thread(MPTTModel, SitedModelMixin):
         blank=True,
         verbose_name=_(u'protected comments'),
     )
+    media = jsonfield.JSONField(default=default_media)
 
     def __str__(self):
         return self.title[:40] if self.title else self.body[:40]
@@ -470,11 +471,6 @@ class Comment(SitedModelMixin):
         related_name='answers',
         verbose_name=_('reply to')
     )
-    voting = models.BooleanField(
-        default=False,
-        blank=True,
-        verbose_name=_(u'voting')
-    )
     deleted = models.BooleanField(
         default=False,
         verbose_name=_(u'deleted')
@@ -499,7 +495,7 @@ class Comment(SitedModelMixin):
         null=True,
         blank=True,
     )
-    media = jsonfield.JSONField()
+    media = jsonfield.JSONField(default=default_media)
 
     view_user = None
 

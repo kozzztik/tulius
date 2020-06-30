@@ -12,7 +12,11 @@ export default {
             var res = this.load_api(route);
             if (res && (typeof res.then === 'function')) {
                 this.$parent.loading_start();
-                res.catch().then(() => this.$parent.loading_end(this.breadcrumbs));
+                res.catch(
+                    () => this.$parent.loading_end(this.breadcrumbs)
+                ).then(
+                    () => this.$parent.loading_end(this.breadcrumbs)
+                );
             }
         },
     },

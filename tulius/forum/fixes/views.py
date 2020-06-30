@@ -36,7 +36,7 @@ class FixLastPost(plugins.BasePluginView):
                 parent=thread).order_by('-id')[:1]
             if comment:
                 models.Thread.objects.filter(
-                    id=thread.id).update(last_comment=comment[0].id)
+                    id=thread.id).update(last_comment_id=comment[0].id)
         return plugins.BasePluginView.get_context_data(self, **kwargs)
 
 

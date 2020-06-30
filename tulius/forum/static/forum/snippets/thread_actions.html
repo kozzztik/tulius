@@ -15,7 +15,7 @@
         <b-dropdown-item :to="urls.add_room(thread.id)" v-if="thread.room && thread.rights.moderate">
             Добавить комнату
         </b-dropdown-item>
-        <b-dropdown-item :href="'/forums/add_thread/' + thread.id + '/'" v-if="thread.room && thread.rights.write">
+        <b-dropdown-item :to="urls.add_thread(thread.id)" v-if="thread.room && thread.rights.write">
             Добавить тему
         </b-dropdown-item>
         <b-dropdown-item href="javascript:void(0);" @click="$refs.edit_room.show()" v-if="thread.room && thread.rights.edit">

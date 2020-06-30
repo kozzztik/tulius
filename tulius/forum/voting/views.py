@@ -113,6 +113,9 @@ class PreviewResults(BaseVoting):
 
 @dispatch.receiver(signals.comment_to_json)
 def comment_to_json(sender, comment, data, **kwargs):
+    # TODO better to store data directly in media, avoiding loading of it,
+    # TODO but it is too much changes at one time to get rid of it while
+    # TODO previous implementation is still in place
     pk = comment.media.get('voting')
     if not pk or isinstance(pk, dict):
         return
@@ -123,6 +126,18 @@ def comment_to_json(sender, comment, data, **kwargs):
     data['media']['voting'] = VotingAPI.voting_json(voting, sender.user)
 
 
+@dispatch.receiver(signals.thread_view)
+def thread_view(sender, response, **kwargs):
+    pk = sender.obj.media.get('voting')
+    if not pk or isinstance(pk, dict):
+        return
+    voting = models.Voting.objects.filter(pk=pk).first()
+    if not voting:
+        response['media']['voting'] = None
+        return
+    response['media']['voting'] = VotingAPI.voting_json(voting, sender.user)
+
+
 @dispatch.receiver(signals.after_add_comment)
 def after_add_comment(sender, comment, data, preview, **kwargs):
     voting_data = data['media'].get('voting')
@@ -130,10 +145,15 @@ def after_add_comment(sender, comment, data, preview, **kwargs):
         return
     if preview:
         comment.media['voting'] = voting_data
+        if not sender.obj.pk:
+            sender.obj.media['voting'] = voting_data
         return
     voting = VotingAPI.create_voting(comment, sender.user, voting_data)
     comment.media['voting'] = voting.pk
     comment.save()
+    if comment.id == sender.obj.first_comment_id:
+        sender.obj.media['voting'] = voting.pk
+        sender.obj.save()
 
 
 @dispatch.receiver(signals.on_comment_update)

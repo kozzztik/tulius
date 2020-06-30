@@ -9,8 +9,8 @@ from tulius.gameforum.threads import api as threads_api
 
 
 @dispatch.receiver(signals.after_create_thread)
-def after_create_thread(sender, thread, data, **kwargs):
-    if sender.plugin_id != consts.GAME_FORUM_SITE_ID:
+def after_create_thread(sender, thread, data, preview, **kwargs):
+    if (sender.plugin_id != consts.GAME_FORUM_SITE_ID) or preview:
         return
     for right in data['granted_rights']:
         models.GameThreadRight(

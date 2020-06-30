@@ -5,6 +5,7 @@ from django.utils import html
 from djfw.wysibb.templatetags import bbcodes
 
 from tulius.forum import signals
+from tulius.forum import models
 from tulius.gameforum import consts
 from tulius.gameforum.threads import api as threads
 from tulius.forum.comments import api as comments
@@ -14,17 +15,22 @@ from tulius.forum.comments import api as comments
 def room_to_json(sender, thread, response, **kwargs):
     if thread.plugin_id != consts.GAME_FORUM_SITE_ID:
         return
-    if thread.last_comment is None:
+    if thread.last_comment_id is None:
+        return
+    try:
+        last_comment = models.Comment.objects.select_related('user').get(
+            id=thread.last_comment_id)
+    except models.Comment.DoesNotExist:
         return
     response['last_comment'] = {
-        'id': thread.last_comment.id,
+        'id': last_comment.id,
         'thread': {
-            'id': thread.last_comment.parent_id,
-            'url': sender.thread_url(thread.last_comment.parent_id)
+            'id': last_comment.parent_id,
+            'url': sender.thread_url(last_comment.parent_id)
         },
-        'page': thread.last_comment.page,
-        'user': sender.role_to_json(thread.last_comment.data1),
-        'create_time': thread.last_comment.create_time,
+        'page': last_comment.page,
+        'user': sender.role_to_json(last_comment.data1),
+        'create_time': last_comment.create_time,
     }
 
 

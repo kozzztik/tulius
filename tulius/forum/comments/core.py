@@ -87,8 +87,8 @@ class CommentsCore(plugins.ForumPlugin):
             parent=sender, deleted=False)
         comments_count = comments.count()
         if comments_count:
-            sender.first_comment = comments.order_by('id')[0]
-            sender.last_comment = comments.order_by('-id')[0]
+            sender.first_comment_id = comments.order_by('id')[0].pk
+            sender.last_comment_id = comments.order_by('-id')[0].pk
             sender.comments_count = comments_count
             self.thread_update_comments_pages(sender)
 
@@ -113,24 +113,6 @@ class CommentsCore(plugins.ForumPlugin):
         thread.first_comment_cache = comment
         return comment
 
-    def thread_last_comment(self, thread):
-        comment = getattr(thread, 'last_comment_cache', None)
-        if comment:
-            return comment
-        if thread.last_comment_id:
-            try:
-                comment = self.Comment.objects.select_related('user').get(
-                    id=thread.last_comment_id)
-            except self.Comment.DoesNotExist:
-                comment = None
-        else:
-            comment = thread.first_comment
-            if comment:
-                thread.last_comment_id = comment.id
-                thread.save()
-        thread.last_comment_cache = comment
-        return comment
-
     def init_core(self):
         self.Comment = self.models.Comment
         self.before_add_comment_signal = dispatch.Signal(
@@ -147,7 +129,6 @@ class CommentsCore(plugins.ForumPlugin):
         self.core['Thread_get_first_comment'] = self.get_thread_first_comment
         self.core['Thread_pages_count'] = self.thread_pages_count
         self.core['Thread_first_comment'] = self.thread_first_comment
-        self.core['Thread_last_comment'] = self.thread_last_comment
         self.signals['before_add_comment'] = self.before_add_comment_signal
         self.signals['before_delete_comment'] = \
             self.before_delete_comment_signal

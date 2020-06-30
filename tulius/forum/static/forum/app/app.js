@@ -13,7 +13,14 @@ var urls = {
         query: { page: comment.page },
         hash: '#' + comment.id,
     }),
-    edit_thread: thread_id => `/forums/edit_thread/${thread_id}/`,
+    add_thread: thread_id => ({
+        name: 'forum_add_thread',
+        params: {parent_id: thread_id},
+    }),
+    edit_thread: thread_id => ({
+        name: 'forum_edit_thread',
+        params: {id: thread_id},
+    }),
 	edit_comment: comment_id => ({
         name: 'forum_edit_comment',
         params: { id: comment_id },

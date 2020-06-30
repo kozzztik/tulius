@@ -16,6 +16,37 @@ from tulius.forum.comments import pagination
 from tulius.websockets import publisher
 
 
+@dispatch.receiver(signals.after_create_thread)
+def after_create_thread(sender, thread, data, preview, **kwargs):
+    if thread.room:
+        return
+    comment = models.Comment(
+        parent=thread, title=thread.title, body=thread.body,
+        user=thread.user)
+    signals.before_add_comment.send(
+        sender, comment=comment, data=data, preview=preview)
+    if not preview:
+        comment.save()
+        thread.first_comment_id = comment.pk
+        thread.last_comment_id = comment.pk
+        thread.save()
+    signals.after_add_comment.send(
+        sender, comment=comment, data=data, preview=preview)
+
+
+@dispatch.receiver(signals.update_thread)
+def update_thread(sender, thread, data, preview, **kwargs):
+    if thread.room:
+        return
+    comment = models.Comment.objects.get(id=thread.first_comment_id)
+    comment.title = thread.title
+    comment.body = thread.body
+    signals.on_comment_update.send(
+        sender, comment=comment, data=data, preview=preview)
+    if not preview:
+        comment.save()
+
+
 @dispatch.receiver(signals.thread_prepare_room)
 def prepare_room_list(sender, room, threads, **kwargs):
     room.comments_count = 0
@@ -31,17 +62,22 @@ def prepare_room_list(sender, room, threads, **kwargs):
 def room_to_json(sender, thread, response, **kwargs):
     if thread.plugin_id is not None:
         return
-    if thread.last_comment is None:
+    if thread.last_comment_id is None:
+        return
+    try:
+        last_comment = models.Comment.objects.select_related('user').get(
+            id=thread.last_comment_id)
+    except models.Comment.DoesNotExist:
         return
     response['last_comment'] = {
-        'id': thread.last_comment.id,
+        'id': last_comment.id,
         'thread': {
-            'id': thread.last_comment.parent_id,
-            'url': sender.thread_url(thread.last_comment.parent_id)
+            'id': last_comment.parent_id,
+            'url': sender.thread_url(last_comment.parent_id)
         },
-        'page': thread.last_comment.page,
-        'user': api.user_to_json(thread.last_comment.user),
-        'create_time': thread.last_comment.create_time,
+        'page': last_comment.page,
+        'user': api.user_to_json(last_comment.user),
+        'create_time': last_comment.create_time,
     }
 
 

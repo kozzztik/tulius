@@ -33,7 +33,7 @@
                     <b-dropdown-item class="fast-reply-link post-actions-button" v-on:click="$parent.fast_reply(comment)" href="javascript:void(0)" v-if="thread.rights.write">
                         Ответить
                     </b-dropdown-item>
-                    <b-dropdown-item class="post-actions-button" :href="urls.edit_thread(thread.id)" v-if="comment.edit_right && comment.is_thread">
+                    <b-dropdown-item class="post-actions-button" :to="urls.edit_thread(thread.id)" v-if="comment.edit_right && comment.is_thread">
                         Редактировать
                     </b-dropdown-item>
                     <b-dropdown-item class="post-actions-button" :to="urls.edit_comment(comment.id)" v-if="comment.edit_right && (!comment.is_thread)">
@@ -53,9 +53,9 @@
                     <router-link v-if="comment.edit_right && (!comment.is_thread)" class="d-none d-md-inline post-actions-button" :to="urls.edit_comment(comment.id)">
                         <img src="/static/forum/img/editbutton.gif" height="26" width="168">
                     </router-link>
-                    <a v-if="comment.edit_right && comment.is_thread" class="d-none d-md-inline post-actions-button" :href="urls.edit_thread(thread.id)">
+                    <router-link v-if="comment.edit_right && comment.is_thread" class="d-none d-md-inline post-actions-button" :to="urls.edit_thread(thread.id)">
                         <img src="/static/forum/img/editbutton.gif" height="26" width="168">
-                    </a>
+                    </router-link>
                     <a v-if="comment.edit_right && !comment.is_thread" class="d-none d-md-inline post-actions-delete post-actions-button" href="javascript:void(0)" @click="delete_comment()">
                         <img src="/static/forum/img/delete_post.png">
                     </a>

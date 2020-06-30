@@ -18,8 +18,8 @@ def before_create_thread(sender, thread, data, **kwargs):
 
 
 @dispatch.receiver(signals.after_create_thread)
-def after_create_thread(sender, thread, data, **kwargs):
-    if sender.plugin_id:
+def after_create_thread(sender, thread, data, preview, **kwargs):
+    if sender.plugin_id or preview:
         return
     for right in data['granted_rights']:
         models.ThreadAccessRight(

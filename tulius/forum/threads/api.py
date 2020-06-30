@@ -185,30 +185,41 @@ class BaseThreadView(plugins.BaseAPIView):
     def update_thread(self, data):
         self.obj.title = data['title']
         self.obj.body = html_converter.html_to_bb(data['body'])
+        if self.rights.moderate:
+            self.obj.important = bool(data['important'])
+            self.obj.closed = bool(data['closed'])
 
 
 class ThreadView(BaseThreadView):
     def obj_to_json(self):
-        return {
+        data = {
             'id': self.obj.pk,
             'tree_id': self.obj.tree_id,
             'title': self.obj.title,
-            'body': self.obj.body,
+            'body': bbcodes.bbcode(self.obj.body),
             'room': self.obj.room,
             'deleted': self.obj.deleted,
-            'url': self.thread_url(self.obj.pk),
+            'url': self.thread_url(self.obj.pk) if self.obj.pk else None,
             'parents': [{
                 'id': parent.id,
                 'title': parent.title,
                 'url': self.thread_url(parent.pk),
-            } for parent in self.obj.get_ancestors()],
-            'rooms': [self.room_to_json(t) for t in self.get_subthreads(True)],
-            'threads': [
-                self.room_to_json(t) for t in self.get_subthreads(False)],
+            } for parent in self.obj.get_ancestors()] if self.obj.pk else None,
             'rights': self.rights.to_json(),
             'access_type': self.obj.access_type,
             'first_comment_id': self.obj.first_comment_id,
         }
+        if self.obj.room:
+            data['rooms'] = [
+                self.room_to_json(t) for t in self.get_subthreads(True)]
+            data['threads'] = [
+                self.room_to_json(t) for t in self.get_subthreads(False)]
+        else:
+            data['closed'] = self.obj.closed
+            data['important'] = self.obj.important
+            data['user'] = user_to_json(self.obj.user, detailed=True)
+            data['media'] = self.obj.media
+        return data
 
     def get_context_data(self, **kwargs):
         super(ThreadView, self).get_context_data(**kwargs)
@@ -239,27 +250,34 @@ class ThreadView(BaseThreadView):
         return {'result': True}
 
     def put(self, request, **kwargs):
+        data = json.loads(request.body)
+        preview = data.pop('preview', False)
         transaction.set_autocommit(False)
-        self.get_parent_thread(for_update=True, **kwargs)
+        self.get_parent_thread(for_update=not preview, **kwargs)
         if not self.rights.write:
             raise exceptions.PermissionDenied()
-        data = json.loads(request.body)
-        thread = self.create_thread(data)
-        signals.before_create_thread.send(self, thread=thread, data=data)
-        thread.save()
-        signals.after_create_thread.send(self, thread=thread, data=data)
+        self.obj = self.create_thread(data)
+        signals.before_create_thread.send(self, thread=self.obj, data=data)
+        if not preview:
+            self.obj.save()
+        signals.after_create_thread.send(
+            self, thread=self.obj, data=data, preview=preview)
         transaction.commit()
         # TODO notify clients
-        return {'id': thread.id, 'url': self.thread_url(thread.id)}
+        return self.obj_to_json()
 
     @transaction.atomic
     def post(self, request, **kwargs):
+        data = json.loads(request.body)
+        preview = data.pop('preview', False)
         self.get_parent_thread(for_update=True, **kwargs)
         if not self.rights.edit:
             raise exceptions.PermissionDenied()
-        data = json.loads(request.body)
         self.update_thread(data)
-        self.obj.save()
+        signals.update_thread.send(
+            self, thread=self.obj, data=data, preview=preview)
+        if not preview:
+            self.obj.save()
         return self.obj_to_json()
 
 
@@ -337,7 +355,8 @@ class IndexView(BaseThreadView):
         thread = self.create_thread(data)
         signals.before_create_thread.send(self, thread=thread, data=data)
         thread.save()
-        signals.after_create_thread.send(self, thread=thread, data=data)
+        signals.after_create_thread.send(
+            self, thread=thread, data=data, preview=False)
         transaction.commit()
         # TODO notify clients
         return {'id': thread.id, 'url': self.thread_url(thread.id)}
