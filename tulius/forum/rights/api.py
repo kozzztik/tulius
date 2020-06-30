@@ -1,5 +1,6 @@
 import json
 
+from django import dispatch
 from django import shortcuts
 from django import urls
 from django.core import exceptions
@@ -7,7 +8,23 @@ from django.db import transaction
 from django.contrib import auth
 
 from tulius.forum import models
+from tulius.forum import signals
 from tulius.forum.threads import api
+
+
+@dispatch.receiver(signals.before_create_thread)
+def before_create_thread(sender, thread, data, **kwargs):
+    thread.access_type = int(data['access_type'])
+
+
+@dispatch.receiver(signals.after_create_thread)
+def after_create_thread(sender, thread, data, preview, **kwargs):
+    if sender.plugin_id or preview:
+        return
+    for right in data['granted_rights']:
+        models.ThreadAccessRight(
+            thread=thread, user_id=int(right['user']['id']),
+            access_level=right['access_level']).save()
 
 
 class BaseGrantedRightsAPI(api.BaseThreadView):
@@ -39,7 +56,7 @@ class BaseGrantedRightsAPI(api.BaseThreadView):
         users = auth.get_user_model().objects.filter(
             is_active=True, username__istartswith=request.GET['query'])[:10]
         return {
-            "users": [{"id": u.pk, "name": u.username} for u in users]
+            "users": [{"id": u.pk, "title": u.username} for u in users]
         }
 
 

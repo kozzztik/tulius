@@ -12,7 +12,7 @@
         <tr v-for="room in rooms">
             <td class="forum-post-icon">
                 <div v-if="room.unreaded">
-                    <router-link :to="comment_url(room.unreaded)">
+                    <router-link :to="urls.comment(room.unreaded)">
                         <img src="/static/forum/img/unreadedmark.gif">
                     </router-link>
                 </div>
@@ -21,11 +21,9 @@
             <td>
                 <div class="forum-post-description">
                     <h4>
-                        <router-link :to="room_url(room)">{{ room.title }}</router-link>
+                        <router-link :to="urls.room(room.id)">{{ room.title }}</router-link>
                     </h4>
-                    <div class=".hidden-phone" v-if="room.body">
-                        {{ room.body }}
-                    </div>
+                    <div class=".hidden-phone" v-if="room.body" v-html="room.body"></div>
                     <slot v-bind:room="room" name="moderators">
                         <h6 v-if="room.moderators.length > 0" class="moderators">Модераторы:</h6>
                         <ul v-if="room.moderators" class="moderators">
@@ -47,7 +45,7 @@
             <td class="d-none d-md-table-cell">{{ room.threads_count }}</td>
             <td class="d-none d-sm-table-cell">{{ room.comments_count }}</td>
             <td class="d-none d-sm-table-cell">
-                <forum_latest_post :comment="room.last_comment" :comment_url="comment_url"></forum_latest_post>
+                <forum_latest_post :comment="room.last_comment"></forum_latest_post>
             </td>
         </tr>
     </tbody>

@@ -4,7 +4,7 @@
             <b-dropdown-item href="javascript:void(0)" @click="mark_all_as_readed()">
                 Пометить все как прочитанное
             </b-dropdown-item>
-            <b-dropdown-item href="/forums/add_room/" v-if="index.is_superuser">
+            <b-dropdown-item href="/forums/add_room/" v-if="user.superuser">
                 Добавить комнату
             </b-dropdown-item>
         </b-dropdown>
@@ -13,7 +13,7 @@
         <div class="caption" align="center">
             <div class="captionleft"></div>
             <div class="captioncontent">
-                <router-link v-if="index.is_superuser" :to="group.url">
+                <router-link v-if="user.superuser" :to="group.url">
                     {{ group.title }}
                 </router-link>
                 <span v-else="index.is_superuser">{{ group.title }}</span>

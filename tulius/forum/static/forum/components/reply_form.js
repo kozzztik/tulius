@@ -1,4 +1,5 @@
 import ckeditor from '../../ckeditor4/components/tulius_ckeditor.js'
+import voting from './voting.js'
 
 
 export default LazyComponent('forum_reply_form', {
@@ -7,12 +8,10 @@ export default LazyComponent('forum_reply_form', {
     	thread: {
     	    type: Object,
     	},
-    	extended_form_url: {
-			type: Function,
-			default: function(reply_comment_id) {
-			    return '/forums/add_comment/' + reply_comment_id + '/';
-			}
-		},
+    	comment: {
+    	    type: Object,
+    	    default: null,
+    	},
         reply_str: {
 			type: Function,
 			default: function(comment) {
@@ -30,26 +29,26 @@ export default LazyComponent('forum_reply_form', {
             show_preview: false,
             preview_comment: {},
             reply_comment_id: null,
-            reply_text: '',
             loading: false,
             show_form: true,
             form_el: null,
-            form: {
+            media_actions: [],
+            form: this.comment || {
                 title: 'Re: ' + this.thread.title,
                 body: '',
-                reply_id: null,
+                reply_id: this.thread.first_comment_id,
+                media: {},
+                url: this.thread.url + 'comments_page/',
             }
         }
     },
     computed: {
-        user: function() {return this.$root.user;}
+        urls: function() {return this.$parent.urls;},
+        user: function() {return this.$root.user;},
     },
     methods: {
         hide() {this.show_form = false;},
-        show() {
-            this.show_form = true;
-            this.reply_text = this.reply_text;  // on chrome resurrects editor
-        },
+        show() {this.show_form = true;},
         getSelectionText() {
             var text = "";
             if (window.getSelection) {
@@ -69,6 +68,7 @@ export default LazyComponent('forum_reply_form', {
             this.show_preview = false;
             this.form.title = 'Re: ' + this.thread.title;
             this.form.body = '';
+            this.form.media = {};
             document.getElementById("reply_form").classList.remove("reply_form_max");
             document.getElementById("content-center").classList.remove("reply_form_only");
         },
@@ -76,13 +76,14 @@ export default LazyComponent('forum_reply_form', {
             if (this.form.body == '')
                 return;
             this.loading = true;
-            axios.post(
-                this.thread.url + 'comments_page/', this.form
-            ).then(response => {
-                this.cleanup_reply_form();
-                this.$parent.$refs.comments.update_to_comments(response.data);
-            }).catch(error => {
-                this.$root.add_message(error, "error");
+            axios.post(this.form.url, this.form).then(response => {
+                if (this.comment)
+                    this.$router.push(this.urls.comment(this.comment))
+                else {
+                    this.cleanup_reply_form();
+                    this.$parent.$refs.comments.update_to_comments(response.data);
+                }
+            }).catch(error => {this.$root.add_message(error, "error");
             }).then(() => {
                 this.loading = false;
             });
@@ -93,9 +94,7 @@ export default LazyComponent('forum_reply_form', {
             this.loading = true;
             const data = JSON.parse(JSON.stringify(this.form))
             data.preview = true;
-            axios.post(
-                this.thread.url + 'comments_page/', data
-            ).then(response => {
+            axios.post(this.form.url, data).then(response => {
                 this.preview_comment = response.data;
                 this.preview_comment.title = "Предварительный просмотр сообщения";
                 this.show_preview = true;
@@ -124,11 +123,9 @@ export default LazyComponent('forum_reply_form', {
             }
         },
     },
-    mounted() {
-        this.form.reply_id = this.thread.first_comment_id;
-    },
     beforeRouteUpdate (to, from, next) {
-        this.cleanup_reply_form();
+        if (!this.comment)
+            this.cleanup_reply_form();
         next();
     },
 })

@@ -8,15 +8,15 @@
             <b-dropdown-item href="javascript:void(0)" v-if="thread.rights.edit" @click="$refs.thread_access.show_dialog()">
                 Права доступа
             </b-dropdown-item>
-            <b-dropdown-item :href="'/play/add_room/' + thread.id + '/'" v-if="thread.room && thread.rights.moderate">
+            <b-dropdown-item :to="urls.add_room(thread.id)" v-if="thread.room && thread.rights.moderate">
                 <img src="/static/games/img/button_green_add.png" style="height: 25px">
                 Добавить комнату
             </b-dropdown-item>
-            <b-dropdown-item :href="'/play/add_thread/' + thread.id + '/'" v-if="thread.room && thread.rights.write">
+            <b-dropdown-item :to="urls.add_thread(thread.id)" v-if="thread.room && thread.rights.write">
                 <img src="/static/games/img/button_red_add.png" style="height: 25px">
                 Добавить тему
             </b-dropdown-item>
-            <b-dropdown-item :href="'/play/edit_room/' + thread.id + '/'" v-if="thread.room && thread.rights.edit">
+            <b-dropdown-item href="javascript:void(0);" @click="$refs.edit_room.show()" v-if="thread.room && thread.rights.edit">
                 <img src="/static/games/img/button_blue_fastforward.png" style="height: 25px">
                 Редактировать
             </b-dropdown-item>
@@ -94,6 +94,12 @@
             </b-dropdown-item>
         </b-dropdown>
     </div>
+    <forum_edit_room ref="edit_room" :thread="thread" :page="$parent" :extra_fields="['id','user']" v-if="thread.room">
+        <template v-slot:before_form="slotProps">
+            <game_forum_role_selector :variation="variation" :thread="thread" :form="slotProps.form" :editor="false"></game_forum_role_selector>
+        </template>
+    </forum_edit_room>
+
     <b-modal id="quoteAnswer" title="Цитирование" ok-only v-if="!thread.room" >
         <p>
             Цитировать теперь легко! Просто выделите текст мышкой:

@@ -1,4 +1,5 @@
 import thread_access from '../components/thread_access.js'
+import edit_room from '../components/edit_room.js'
 
 
 export default LazyComponent('forum_thread_actions', {
@@ -12,11 +13,9 @@ export default LazyComponent('forum_thread_actions', {
     },
     computed: {
         user: function() {return this.$root.user;},
+        urls() {return this.$parent.urls},
         delete_title: function() {
-            if (this.thread.room)
-                return 'Удалить эту комнату?'
-            else
-                return 'Удалить эту тему?';
+            return this.thread.room ? 'Удалить эту комнату?' : 'Удалить эту тему?';
         }
     },
     methods: {

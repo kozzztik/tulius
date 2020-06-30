@@ -5,7 +5,7 @@ mysqlclient == 1.4.6
 
 # apparently best relational DB trees implementation
 django-mptt == 0.9.0
-
+jsonfield2 == 4.0.0
 # profiler requirement
 pyyaml == 5.1
 

@@ -2,10 +2,7 @@
     <game_forum_thread_actions :variation="variation" :thread="thread" :upper="true" ref="thread_actions"></game_forum_thread_actions>
     <forum_thread_comments :thread="thread" v-model="comments_page" v-if="!loading" ref="comments">
         <template v-slot:comment="slotProps">
-            <forum_comment :thread="thread" :comment="slotProps.comment"
-                           :comment_url="comment_url"
-                           :edit_thread_url="edit_thread_url"
-                           :edit_comment_url="edit_comment_url">
+            <forum_comment :thread="thread" :comment="slotProps.comment">
                 <template v-slot:avatar="slotProps">
                     <game_forum_comment_avatar
                             :variation="variation" :thread="thread"
@@ -16,9 +13,9 @@
         </template>
     </forum_thread_comments>
     <forum_reply_form :thread="thread" ref="reply_form" v-if="!loading && thread.rights.write"
-                      :extended_form_url="extended_form_url" :reply_str="reply_str">
+                      :reply_str="reply_str">
         <template v-slot:before_form="slotProps">
-            <game_forum_role_selector :variation="variation" :thread="thread" :form="slotProps.form"></game_forum_role_selector>
+            <game_forum_role_selector :variation="variation" :thread="thread" :form="slotProps.form" :editor="false"></game_forum_role_selector>
         </template>
         <template v-slot:comment="slotProps">
             <forum_comment :thread="thread" :comment="slotProps.preview_comment" :preview="true">

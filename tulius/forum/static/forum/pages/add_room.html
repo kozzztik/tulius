@@ -1,0 +1,52 @@
+<div class="content container">
+
+    <div class="caption" align="center">
+        <div class="captionleft"></div>
+        <div class="captioncontent">
+            Добавить комнату
+        </div>
+        <div class="captionright"></div>
+    </div>
+    <form @submit.prevent="on_submit">
+        <slot :form="form" :parent_thread="parent_thread" name="before_form">
+        </slot>
+        <div class="row form_title" style="margin-top: 0.75em;" >
+            <label class="col-2 col-form-label"><b>Название:</b></label>
+            <div class="col-10">
+                <input v-model="form.title" class="form-control" required>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 0.5em;" >
+            <div class="col">
+                <tulius_ckeditor v-model="form.body"></tulius_ckeditor>
+            </div>
+        </div>
+        <div class="row" style="padding-bottom: 0.75em;margin-bottom: 0.75em;margin-top: 0.75em;">
+            <label class="col-2 col-form-label" for="thread_access_level">
+                <b>Доступ:</b>
+            </label>
+            <div class="col">
+                <b-form-select :options="access_types"
+                            v-model="form.access_type" id="thread_access_level">
+                </b-form-select>
+
+            </div>
+            <div class="col-3" v-if="form.access_type > 1">
+                <a class="btn btn-light w-100" href="javascript:void(0)"
+                   @click="$refs.thread_access.show_dialog()">
+                    Исключения...
+                </a>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 0.5em;" >
+            <div class="col">
+                <div class="float-right">
+                    <router-link class="btn btn-light" :to="urls.room(parent_thread.id)" v-if="parent_thread.id">Отмена</router-link>
+                    <router-link class="btn btn-light" :to="urls.root_api" v-else>Отмена</router-link>
+                    <button type="submit" class="btn btn-primary">Добавить</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <forum_thread_access :thread="form" ref="thread_access" :user_search="user_search"></forum_thread_access>
+</div>

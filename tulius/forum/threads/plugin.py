@@ -4,8 +4,6 @@ from . import views
 
 
 class ThreadsPlugin(ThreadsCorePlugin):
-    thread_edit_template = 'forum/add_post.haml'
-
     def thread_url(self, thread):
         return self.reverse('room' if thread.room else 'thread', thread.id)
 
@@ -25,8 +23,6 @@ class ThreadsPlugin(ThreadsCorePlugin):
         return self.reverse('add_room')
 
     def thread_edit_url(self, thread):
-        if thread.room:
-            return self.reverse('edit_room', thread.id)
         return self.reverse('edit_thread', thread.id)
 
     def get_add_room_url(self, thread):
@@ -43,7 +39,6 @@ class ThreadsPlugin(ThreadsCorePlugin):
         self.urlizer['thread'] = self.thread_url
         self.urlizer['index'] = self.index_url
         self.urlizer['add_root_room'] = self.add_root_room_url
-        self.templates['edit_thread'] = self.thread_edit_template
         self.templates['thread_move_select'] = \
             'forum/threads/move_select.haml'
         self.templates['thread_move_confirm'] = \
@@ -63,26 +58,16 @@ class ThreadsPlugin(ThreadsCorePlugin):
             url(
                 r'^room/(?P<parent_id>\d+)/$',
                 views.Index.as_view(), name='room'),
-            url(
-                r'^add_room/$',
-                views.EditView.as_view(plugin=self, self_is_room=True),
-                name='add_room'),
+            url(r'^add_room/$', views.Index.as_view(), name='add_room'),
             url(
                 r'^add_room/(?P<parent_id>\d+)/$',
-                views.EditView.as_view(plugin=self, self_is_room=True),
-                name='add_room'),
-            url(
-                r'^edit_room/(?P<thread_id>\d+)/$',
-                views.EditView.as_view(plugin=self, self_is_room=True),
-                name='edit_room'),
+                views.Index.as_view(), name='add_room'),
             url(
                 r'^add_thread/(?P<parent_id>\d+)/$',
-                views.EditView.as_view(plugin=self, self_is_room=False),
-                name='add_thread'),
+                views.Index.as_view(), name='add_thread'),
             url(
                 r'^edit_thread/(?P<thread_id>\d+)/$',
-                views.EditView.as_view(plugin=self, self_is_room=False),
-                name='edit_thread'),
+                views.Index.as_view(), name='edit_thread'),
             url(
                 r'^thread/(?P<parent_id>\d+)/$',
                 views.Index.as_view(), name='thread'),

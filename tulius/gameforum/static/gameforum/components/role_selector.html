@@ -1,9 +1,13 @@
 <div class="form-group row roleform" v-show="thread.rights.user_write_roles.length > 1" style="margin-bottom: 0.5rem;">
     <label class="col-2 col-form-label">
-        Персонаж:
+        <span v-if="!editor">Персонаж:</span>
+        <span v-if="editor">Редактор:</span>
     </label>
     <div class="col-10">
-        <select name="role" class="form-control" v-model="form.role_id">
+        <select name="role" class="form-control" v-model="form.role_id" v-if="!editor">
+            <option :value="pk" v-for="(pk, num) in thread.rights.user_write_roles" :key="num" v-html="role_name_by_id(pk)" :selected="num==1"></option>
+        </select>
+        <select name="role" class="form-control" v-model="form.edit_role_id" v-if="editor">
             <option :value="pk" v-for="(pk, num) in thread.rights.user_write_roles" :key="num" v-html="role_name_by_id(pk)" :selected="num==1"></option>
         </select>
     </div>

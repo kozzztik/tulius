@@ -37,7 +37,7 @@
         <div class="col-5">
             <multiselect v-model="add_form.user" :options="user_options"
                          :searchable="true" @search-change="do_search"
-                         label="name"  track-by="id"
+                         label="title"  track-by="id"
                          placeholder="Выберите пользователя">
                 <template v-slot:noResult>Пользователь не найден</template>
                 <template v-slot:noOptions>Пользователь не найден</template>

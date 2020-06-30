@@ -1,0 +1,9 @@
+<forum_edit_thread_page :user_search="right_user_search" :extra_fields="{role_id: null, edit_role_id: null}">
+    <template v-slot:before_form="slotProps">
+        <game_forum_role_selector :variation="variation"
+                                  :thread="slotProps.thread.id ? slotProps.thread : slotProps.parent_thread"
+                                  :form="slotProps.form" :editor="false"
+                                  v-if="slotProps.thread.id || slotProps.parent_thread.id"></game_forum_role_selector>
+        <game_forum_role_selector :variation="variation" :thread="slotProps.thread" :form="slotProps.form" :editor="true" v-if="slotProps.thread.id"></game_forum_role_selector>
+    </template>
+</forum_edit_thread_page>

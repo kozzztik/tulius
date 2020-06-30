@@ -1,5 +1,5 @@
 <div v-if="comment">
-    <router-link :to="comment_url(comment)">
+    <router-link :to="urls.comment(comment)">
         <span v-html="comment.user.title"></span>
     </router-link>
     <br>

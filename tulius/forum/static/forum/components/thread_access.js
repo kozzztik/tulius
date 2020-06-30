@@ -35,13 +35,15 @@ export default LazyComponent('forum_thread_access', {
         }
     },
     computed: {
-        user: function() {return this.$root.user;},
+        user() {return this.$root.user},
+        urls() {return this.$parent.urls},
     },
     methods: {
         show_dialog() {
-            if (!this.thread.id)
-                this.$refs.modal.show()
-            else
+            if (!this.thread.id) {
+                this.rights = this.thread.granted_rights;
+                this.$refs.modal.show();
+            } else
                 this.load_api();
         },
         do_search(query) {
@@ -56,8 +58,9 @@ export default LazyComponent('forum_thread_access', {
         default_user_search(query, rights) {
             if (query.length < 3)
                 return
+            var base_url = this.thread.url ? this.thread.url : this.urls.root_api;
             return axios.options(
-                this.thread.url + 'granted_rights/', {params: {query: query}}
+                base_url + 'granted_rights/', {params: {query: query}}
             ).then(response => {
                 var result = [];
                 for (var user of response.data.users) {

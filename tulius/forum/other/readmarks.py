@@ -95,9 +95,14 @@ def thread_prepare_thread(sender, threads, **kwargs):
 
 @dispatch.receiver(signals.thread_room_to_json)
 def room_to_json(sender, thread, response, **kwargs):
+    if sender.user.is_anonymous:
+        return
     response['unreaded'] = {
         'id': thread.unreaded.id,
-        'parent_id': thread.unreaded.parent_id,
+        'thread': {
+            'id': thread.unreaded.parent_id,
+            'url': sender.thread_url(thread.unreaded.parent_id),
+        },
         'page': thread.unreaded.page
     } if thread.unreaded else None
 

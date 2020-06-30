@@ -12,13 +12,13 @@
         <b-dropdown-item href="javascript:void(0)" v-if="thread.rights.edit" @click="$refs.thread_access.show_dialog()">
             Права доступа
         </b-dropdown-item>
-        <b-dropdown-item :href="'/forums/add_room/' + thread.id + '/'" v-if="thread.room && thread.rights.moderate">
+        <b-dropdown-item :to="urls.add_room(thread.id)" v-if="thread.room && thread.rights.moderate">
             Добавить комнату
         </b-dropdown-item>
-        <b-dropdown-item :href="'/forums/add_thread/' + thread.id + '/'" v-if="thread.room && thread.rights.write">
+        <b-dropdown-item :to="urls.add_thread(thread.id)" v-if="thread.room && thread.rights.write">
             Добавить тему
         </b-dropdown-item>
-        <b-dropdown-item :href="'/forums/edit_room/' + thread.id + '/'" v-if="thread.room && thread.rights.edit">
+        <b-dropdown-item href="javascript:void(0);" @click="$refs.edit_room.show()" v-if="thread.room && thread.rights.edit">
             Редактировать
         </b-dropdown-item>
         <b-dropdown-item :href="'/forums/thread/' + thread.id + '/move/'" v-if="thread.rights.move">
@@ -59,6 +59,7 @@
         </fieldset>
         </div>
     </b-modal>
+    <forum_edit_room ref="edit_room" :thread="thread" :page="$parent" v-if="thread.room"></forum_edit_room>
     <form class="input-group btn-group-sm" method="post" :action="'/forums/search/' + thread.tree_id + '/'">
         <input type="text" name="text" required="" id="id_text" class="form-control">
         <input type="hidden" name="csrfmiddlewaretoken" :value="csrftoken">

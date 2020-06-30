@@ -1,5 +1,6 @@
-from django.utils import html
 from django import urls
+from django.core import exceptions
+from django.utils import html
 
 from tulius.forum import signals
 from tulius.forum.threads import api
@@ -49,11 +50,11 @@ class BaseThreadAPI(api.BaseThreadView, base.VariationMixin):
             })
         return data
 
-    def thread_url(self, thread):
+    def thread_url(self, thread_id):
         return urls.reverse(
             'game_forum_api:thread',
             kwargs={
-                'variation_id': self.variation.id, 'pk': thread.id})
+                'variation_id': self.variation.id, 'pk': thread_id})
 
     def room_to_json(self, thread):
         data = {
@@ -73,11 +74,39 @@ class BaseThreadAPI(api.BaseThreadView, base.VariationMixin):
             'threads_count': thread.threads_count if thread.room else None,
             'comments_count': thread.comments_count,
             'pages_count': thread.pages_count,
-            'url': self.thread_url(thread),
+            'url': self.thread_url(thread.pk),
         }
         signals.thread_room_to_json.send(self, thread=thread, response=data)
         return data
 
+    def process_role(self, init_role_id, data):
+        role_id = data.get('role_id')
+        if role_id:
+            if role_id not in self.rights.all_roles:
+                raise exceptions.PermissionDenied('Role does not exist')
+            if role_id == init_role_id:
+                return role_id
+        if role_id not in self.rights.user_write_roles:
+            raise exceptions.PermissionDenied('Role is not accessible here')
+        return role_id
+
+    def create_thread(self, data):
+        obj = super(BaseThreadAPI, self).create_thread(data)
+        obj.data1 = self.process_role(None, data)
+        return obj
+
+    def update_thread(self, data):
+        super(BaseThreadAPI, self).update_thread(data)
+        self.obj.data1 = self.process_role(self.obj.data1, data)
+        editor_role = data['edit_role_id']
+        if editor_role not in self.rights.user_write_roles:
+            raise exceptions.PermissionDenied()
+        self.obj.data2 = editor_role
+
 
 class ThreadAPI(api.ThreadView, BaseThreadAPI):
-    pass
+    def obj_to_json(self):
+        data = super(ThreadAPI, self).obj_to_json()
+        data['user'] = self.role_to_json(self.obj.data1, detailed=True)
+        data['edit_role_id'] = self.obj.data2
+        return data

@@ -5,16 +5,48 @@ from django import shortcuts
 from django import urls
 from django.core import exceptions
 from django.db import transaction
-from django.utils import html
+from django.utils import html, timezone
 from djfw.wysibb.templatetags import bbcodes
 
 from tulius.core.ckeditor import html_converter
-from tulius.forum import site
 from tulius.forum import models
 from tulius.forum import signals
 from tulius.forum.threads import api
 from tulius.forum.comments import pagination
 from tulius.websockets import publisher
+
+
+@dispatch.receiver(signals.after_create_thread)
+def after_create_thread(sender, thread, data, preview, **kwargs):
+    if thread.room:
+        return
+    comment = models.Comment(
+        parent=thread, title=thread.title, body=thread.body,
+        user=thread.user)
+    signals.before_add_comment.send(
+        sender, comment=comment, data=data, preview=preview)
+    if not preview:
+        comment.save()
+        thread.first_comment_id = comment.pk
+        thread.last_comment_id = comment.pk
+        thread.save()
+    signals.after_add_comment.send(
+        sender, comment=comment, data=data, preview=preview)
+
+
+@dispatch.receiver(signals.update_thread)
+def update_thread(sender, thread, data, preview, **kwargs):
+    if thread.room:
+        return
+    comment = models.Comment.objects.get(id=thread.first_comment_id)
+    comment.title = thread.title
+    comment.body = thread.body
+    comment.edit_time = timezone.now()
+    comment.editor = sender.user
+    signals.on_comment_update.send(
+        sender, comment=comment, data=data, preview=preview)
+    if not preview:
+        comment.save()
 
 
 @dispatch.receiver(signals.thread_prepare_room)
@@ -32,14 +64,22 @@ def prepare_room_list(sender, room, threads, **kwargs):
 def room_to_json(sender, thread, response, **kwargs):
     if thread.plugin_id is not None:
         return
-    if thread.last_comment is None:
+    if thread.last_comment_id is None:
+        return
+    try:
+        last_comment = models.Comment.objects.select_related('user').get(
+            id=thread.last_comment_id)
+    except models.Comment.DoesNotExist:
         return
     response['last_comment'] = {
-        'id': thread.last_comment.id,
-        'parent_id': thread.last_comment.parent_id,
-        'page': thread.last_comment.page,
-        'user': api.user_to_json(thread.last_comment.user),
-        'create_time': thread.last_comment.create_time,
+        'id': last_comment.id,
+        'thread': {
+            'id': last_comment.parent_id,
+            'url': sender.thread_url(last_comment.parent_id)
+        },
+        'page': last_comment.page,
+        'user': api.user_to_json(last_comment.user),
+        'create_time': last_comment.create_time,
     }
 
 
@@ -52,20 +92,27 @@ class CommentsBase(api.BaseThreadView):
         return (comment.user == self.user) or self.rights.moderate
 
     def comment_to_json(self, c):
-        return {
+        data = {
             'id': c.id,
+            'thread': {
+                'id': c.parent_id,
+                'url': self.thread_url(c.parent_id)
+            },
             'page': c.page,
             'url': self.comment_url(c) if c.pk else None,
             'title': html.escape(c.title),
             'body': bbcodes.bbcode(c.body),
             'user': api.user_to_json(c.user, detailed=True),
             'create_time': c.create_time,
-            'voting': c.voting,
             'edit_right': self.comment_edit_right(c),
             'is_thread': c.is_thread(),
             'edit_time': c.edit_time,
-            'editor': api.user_to_json(c.editor) if c.editor else None
+            'editor': api.user_to_json(c.editor) if c.editor else None,
+            'media': c.media,
+            'reply_id': c.reply_id,
         }
+        signals.comment_to_json.send(self, comment=c, data=data)
+        return data
 
 
 class CommentsPageAPI(CommentsBase):
@@ -100,20 +147,25 @@ class CommentsPageAPI(CommentsBase):
         comment.reply_id = reply_id
         return comment
 
-    def post(self, *args, **kwargs):
+    def post(self, request, **kwargs):
         transaction.set_autocommit(False)
         self.get_parent_thread(**kwargs)
         if not self.rights.write:
             raise exceptions.PermissionDenied()
-        data = json.loads(self.request.body)
+        data = json.loads(request.body)
         text = html_converter.html_to_bb(data.pop('body'))
         preview = data.pop('preview', False)
         if text:
             comment = self.create_comment(text, data)
+            comment.media = {}
+            signals.before_add_comment.send(
+                self, comment=comment, data=data, preview=preview)
+            if not preview:
+                comment.save()
+            signals.after_add_comment.send(
+                self, comment=comment, data=data, preview=preview)
             if preview:
                 return self.comment_to_json(comment)
-            comment.save()
-            site.site.signals.comment_after_fastreply.send(self)
             # commit transaction to be sure that clients wouldn't be notified
             # before comment will be accessable in DB/
             transaction.commit()
@@ -124,7 +176,7 @@ class CommentsPageAPI(CommentsBase):
         return self.get_context_data(page=page, **kwargs)
 
 
-class CommentAPI(CommentsBase):
+class CommentBase(CommentsBase):
     comment = None
 
     def get_comment(self, pk, for_update=False, **kwargs):
@@ -136,9 +188,18 @@ class CommentAPI(CommentsBase):
         self.get_parent_thread(
             pk=self.comment.parent_id, for_update=for_update, **kwargs)
 
+
+class CommentAPI(CommentBase):
     def get_context_data(self, **kwargs):
         self.get_comment(**kwargs)
-        return self.comment_to_json(self.comment)
+        data = self.comment_to_json(self.comment)
+        data['thread']['title'] = self.obj.title
+        data['thread']['parents'] = [{
+            'id': parent.id,
+            'title': parent.title,
+            'url': self.thread_url(parent.pk),
+        } for parent in self.obj.get_ancestors()]
+        return data
 
     @transaction.atomic
     def delete(self, *args, **kwargs):
@@ -156,3 +217,30 @@ class CommentAPI(CommentsBase):
         delete_mark.save()
         # TODO clients notification
         return {'pages_count': self.obj.pages_count}
+
+    def update_comment(self, comment, data):
+        comment.edit_time = timezone.now()
+        comment.editor = self.request.user
+        comment.title = data['title'][:120]
+        comment.body = html_converter.html_to_bb(data['body'])
+
+    def post(self, request, **kwargs):
+        data = json.loads(request.body)
+        preview = data.pop('preview', False)
+        transaction.set_autocommit(False)
+        self.get_comment(for_update=True, **kwargs)
+        if self.comment.is_thread():
+            raise exceptions.PermissionDenied()
+        if not self.comment_edit_right(self.comment):
+            raise exceptions.PermissionDenied()
+
+        self.update_comment(self.comment, data)
+
+        signals.on_comment_update.send(
+            self, comment=self.comment, data=data, preview=preview)
+        if preview:
+            transaction.rollback()
+        else:
+            self.comment.save()
+            transaction.commit()
+        return self.comment_to_json(self.comment)

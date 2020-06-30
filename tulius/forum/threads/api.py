@@ -1,3 +1,5 @@
+import json
+
 from django import http
 from django import shortcuts
 from django import urls
@@ -7,13 +9,13 @@ from django.utils import html
 from django.db import transaction
 from django.db.models import query_utils
 
+from tulius.core.ckeditor import html_converter
 from tulius.forum import plugins
 from tulius.forum import const
 from tulius.forum import models
 from tulius.forum import signals
 from tulius.forum import rights as forum_rights
 from tulius.forum import online_status as online_status_plugin
-from tulius.forum.readmarks import plugin as readmarks
 from djfw.wysibb.templatetags import bbcodes
 
 
@@ -144,8 +146,8 @@ class BaseThreadView(plugins.BaseAPIView):
         return threads
 
     @staticmethod
-    def thread_url(thread):
-        return urls.reverse('forum_api:thread', kwargs={'pk': thread.id})
+    def thread_url(thread_id):
+        return urls.reverse('forum_api:thread', kwargs={'pk': thread_id})
 
     def room_to_json(self, thread):
         data = {
@@ -164,34 +166,60 @@ class BaseThreadView(plugins.BaseAPIView):
             'threads_count': thread.threads_count if thread.room else None,
             'comments_count': thread.comments_count,
             'pages_count': thread.pages_count,
-            'url': self.thread_url(thread),
+            'url': self.thread_url(thread.pk),
         }
         signals.thread_room_to_json.send(self, thread=thread, response=data)
         return data
 
+    def create_thread(self, data):
+        room = bool(data['room'])
+        important = ((not room) and data.get('important', False))
+        return models.Thread(
+            parent=self.obj, room=room,
+            title=html_converter.html_to_bb(data['title']),
+            body=html_converter.html_to_bb(data['body']),
+            user=self.user, plugin_id=self.plugin_id,
+            important=self.rights.moderate and important,
+        )
+
+    def update_thread(self, data):
+        self.obj.title = data['title']
+        self.obj.body = html_converter.html_to_bb(data['body'])
+        if self.rights.moderate:
+            self.obj.important = bool(data['important'])
+            self.obj.closed = bool(data['closed'])
+
 
 class ThreadView(BaseThreadView):
     def obj_to_json(self):
-        return {
+        data = {
             'id': self.obj.pk,
             'tree_id': self.obj.tree_id,
             'title': self.obj.title,
-            'body': self.obj.body,
+            'body': bbcodes.bbcode(self.obj.body),
             'room': self.obj.room,
             'deleted': self.obj.deleted,
-            'url': self.thread_url(self.obj),
+            'url': self.thread_url(self.obj.pk) if self.obj.pk else None,
             'parents': [{
                 'id': parent.id,
                 'title': parent.title,
-                'url': self.thread_url(parent),
-            } for parent in self.obj.get_ancestors()],
-            'rooms': [self.room_to_json(t) for t in self.get_subthreads(True)],
-            'threads': [
-                self.room_to_json(t) for t in self.get_subthreads(False)],
+                'url': self.thread_url(parent.pk),
+            } for parent in self.obj.get_ancestors()] if self.obj.pk else None,
             'rights': self.rights.to_json(),
             'access_type': self.obj.access_type,
             'first_comment_id': self.obj.first_comment_id,
         }
+        if self.obj.room:
+            data['rooms'] = [
+                self.room_to_json(t) for t in self.get_subthreads(True)]
+            data['threads'] = [
+                self.room_to_json(t) for t in self.get_subthreads(False)]
+        else:
+            data['closed'] = self.obj.closed
+            data['important'] = self.obj.important
+            data['user'] = user_to_json(self.obj.user, detailed=True)
+            data['media'] = self.obj.media
+        return data
 
     def get_context_data(self, **kwargs):
         super(ThreadView, self).get_context_data(**kwargs)
@@ -220,6 +248,37 @@ class ThreadView(BaseThreadView):
         self.obj.save()
         delete_mark.save()
         return {'result': True}
+
+    def put(self, request, **kwargs):
+        data = json.loads(request.body)
+        preview = data.pop('preview', False)
+        transaction.set_autocommit(False)
+        self.get_parent_thread(for_update=not preview, **kwargs)
+        if not self.rights.write:
+            raise exceptions.PermissionDenied()
+        self.obj = self.create_thread(data)
+        signals.before_create_thread.send(self, thread=self.obj, data=data)
+        if not preview:
+            self.obj.save()
+        signals.after_create_thread.send(
+            self, thread=self.obj, data=data, preview=preview)
+        transaction.commit()
+        # TODO notify clients
+        return self.obj_to_json()
+
+    @transaction.atomic
+    def post(self, request, **kwargs):
+        data = json.loads(request.body)
+        preview = data.pop('preview', False)
+        self.get_parent_thread(for_update=True, **kwargs)
+        if not self.rights.edit:
+            raise exceptions.PermissionDenied()
+        self.update_thread(data)
+        signals.update_thread.send(
+            self, thread=self.obj, data=data, preview=preview)
+        if not preview:
+            self.obj.save()
+        return self.obj_to_json()
 
 
 class IndexView(BaseThreadView):
@@ -256,6 +315,14 @@ class IndexView(BaseThreadView):
             access_type__lt=models.THREAD_ACCESS_TYPE_NO_READ
         ) | query_utils.Q(user=self.user))  # TODO: move it to protected #97
 
+    def room_group_unreaded_url(self, rooms):
+        unreaded = None
+        for room in rooms:
+            if room.unreaded:
+                if (not unreaded) or (room.unreaded_id < unreaded.id):
+                    unreaded = room.unreaded
+        return self.thread_url(unreaded.pk) if unreaded else None
+
     def get_context_data(self, **kwargs):
         all_rooms = [thread for thread in self.get_index(1)]
         groups = self.get_index(0)
@@ -273,6 +340,23 @@ class IndexView(BaseThreadView):
                 'title': group.title,
                 'rooms': [self.room_to_json(thread) for thread in group.rooms],
                 'url': group.get_absolute_url,
-                'unreaded_url': readmarks.room_group_unreaded_url(group.rooms),
+                'unreaded_url': self.room_group_unreaded_url(group.rooms),
             } for group in groups]
         }
+
+    def put(self, request, **kwargs):
+        transaction.set_autocommit(False)
+        self.rights = self._get_rights_checker(None).get_rights_for_root()
+        if not self.rights.moderate:
+            raise exceptions.PermissionDenied()
+        data = json.loads(request.body)
+        if not data['room']:
+            raise exceptions.PermissionDenied()
+        thread = self.create_thread(data)
+        signals.before_create_thread.send(self, thread=thread, data=data)
+        thread.save()
+        signals.after_create_thread.send(
+            self, thread=thread, data=data, preview=False)
+        transaction.commit()
+        # TODO notify clients
+        return {'id': thread.id, 'url': self.thread_url(thread.id)}

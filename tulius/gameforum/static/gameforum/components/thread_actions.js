@@ -1,3 +1,6 @@
+import edit_room from '../../forum/components/edit_room.js'
+
+
 export default LazyComponent('game_forum_thread_actions', {
     template: '/static/gameforum/components/thread_actions.html',
     props: ['variation', 'thread', 'upper'],
@@ -10,6 +13,7 @@ export default LazyComponent('game_forum_thread_actions', {
         }
     },
     computed: {
+        urls: function() {return this.$parent.urls;},
         user: function() {return this.$root.user;},
         delete_title: function() {
             if (this.thread.room)
@@ -84,7 +88,7 @@ export default LazyComponent('game_forum_thread_actions', {
                         break;
                     }
                 if (!found)
-                    result.push({'id': c.id, 'name': c.title});
+                    result.push({'id': c.id, 'title': c.title});
             }
             return result;
         },

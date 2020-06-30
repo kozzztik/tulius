@@ -1,0 +1,25 @@
+<b-modal title="Редактировать комнату" size="lg" centered hide-footer ref="modal">
+    <form @submit.prevent="on_submit">
+        <slot :form="form" :thread="thread" name="before_form">
+        </slot>
+        <div class="row form_title" style="margin-top: 0.75em;" >
+            <label class="col-2 col-form-label"><b>Название:</b></label>
+            <div class="col-10">
+                <input v-model="form.title" class="form-control" required>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 0.5em;" >
+            <div class="col">
+                <tulius_ckeditor v-model="form.body"></tulius_ckeditor>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 0.5em;" >
+            <div class="col">
+                <div class="float-right">
+                    <button type="button" class="btn btn-light" @click="$refs.modal.hide()">Отменить</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</b-modal>
