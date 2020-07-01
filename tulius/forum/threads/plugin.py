@@ -72,6 +72,9 @@ class ThreadsPlugin(ThreadsCorePlugin):
                 r'^thread/(?P<parent_id>\d+)/$',
                 views.Index.as_view(), name='thread'),
             url(
+                r'^search/(?P<parent_id>\d+)/$',
+                views.Index.as_view(), name='thread_search'),
+            url(
                 r'^thread/(?P<parent_id>\d+)/move/$',
                 views.MoveThreadSelect.as_view(plugin=self),
                 name='thread_move'),

@@ -1,6 +1,8 @@
 from tulius.forum.other import readmarks
 from tulius.forum.other import likes
+from tulius.forum.other import search
 from tulius.forum.voting import views as voting
+from tulius.gameforum import base
 from tulius.gameforum.threads import api as threads
 from tulius.gameforum.comments import api as comments
 from tulius.stories import models as story_models
@@ -12,6 +14,15 @@ class ReadmarkAPI(readmarks.ReadmarkAPI, threads.BaseThreadAPI):
 
 class VotingAPI(voting.VotingAPI, comments.CommentsBase):
     pass
+
+
+class Search(search.Search, base.VariationMixin):
+    comments_class = comments.CommentAPI
+
+    def get_view(self, comment):
+        view = super(Search, self).get_view(comment)
+        view.variation = self.variation
+        return view
 
 
 class Favorites(likes.Favorites):

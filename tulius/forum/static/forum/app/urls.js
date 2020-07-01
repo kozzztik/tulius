@@ -28,4 +28,11 @@ export default {
     thread_api: pk => `/api/forum/thread/${pk}/`,
     comment_api: pk => `/api/forum/comment/${pk}/`,
     root_api: '/api/forum/',
+    search_api: pk => `/api/forum/thread/${pk}/search/`,
+    search_results: (thread_id, query) => ({
+        name: 'forum_search_results',
+        params: { id: thread_id },
+        query: query,
+    }),
+    extended_search: pk => `/forums/extended_search/${pk}/`,
 }

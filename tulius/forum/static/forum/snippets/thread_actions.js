@@ -7,8 +7,8 @@ export default LazyComponent('forum_thread_actions', {
     props: ['thread'],
     data: function () {
         return {
-            csrftoken: getCookie('csrftoken'),
             delete_comment: '',
+            search_text: '',
         }
     },
     computed: {
@@ -43,5 +43,12 @@ export default LazyComponent('forum_thread_actions', {
             }).catch(error => this.$root.add_message(error, "error"))
             .then(() => {});
         },
+        search_submit() {
+            var parents = this.thread.parents;
+            var pk = parents.length > 0 ? parents[0].id : this.thread.id;
+            this.$router.push(
+                this.urls.search_results(pk, {text: this.search_text})
+            );
+        }
     }
 })

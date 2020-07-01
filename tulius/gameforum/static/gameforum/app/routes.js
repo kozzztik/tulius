@@ -5,6 +5,7 @@ import redirect from './redirect.js'
 import edit_comment from '../pages/edit_comment.js'
 import add_room from '../pages/add_room.js'
 import edit_thread from '../pages/edit_thread.js'
+import search_results from '../pages/search_results.js'
 
 
 export default [
@@ -18,6 +19,7 @@ export default [
             {path: 'add_room/:id(\\d+)/', component: add_room, name: 'game_add_room'},
             {path: 'add_thread/:parent_id(\\d+)/', component: edit_thread, name: 'game_add_thread'},
             {path: 'edit_thread/:id(\\d+)/', component: edit_thread, name: 'game_edit_thread'},
+            {path: 'search/:id(\\d+)/', component: search_results, name: 'game_search_results'},
       ]
     },
 ]

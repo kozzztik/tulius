@@ -6,10 +6,10 @@ export default LazyComponent('game_forum_thread_actions', {
     props: ['variation', 'thread', 'upper'],
     data: function () {
         return {
-            csrftoken: getCookie('csrftoken'),
             delete_comment: '',
             modal_role: {},
             image_index: null,
+            search_text: '',
         }
     },
     computed: {
@@ -92,5 +92,12 @@ export default LazyComponent('game_forum_thread_actions', {
             }
             return result;
         },
+        search_submit() {
+            var parents = this.thread.parents;
+            var pk = parents.length > 0 ? parents[0].id : this.thread.id;
+            this.$router.push(
+                this.urls.search_results(pk, {text: this.search_text})
+            );
+        }
     },
 })

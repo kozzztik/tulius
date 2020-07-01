@@ -1,0 +1,19 @@
+<forum_search_results>
+    <template v-slot:thread_actions="slotProps">
+        <game_forum_thread_actions :variation="variation"
+                                   :thread="slotProps.thread"
+                                   :upper="true" ref="thread_actions"
+                                   v-if="slotProps.thread.id">
+        </game_forum_thread_actions>
+    </template>
+    <template v-slot:comment="slotProps">
+        <forum_comment :thread="slotProps.item.thread" :comment="slotProps.item.comment" :preview="true">
+            <template v-slot:avatar="slotProps2">
+                <game_forum_comment_avatar
+                        :variation="variation" :thread="slotProps.item.thread"
+                        :role="slotProps.item.comment.user" :actions="$refs.thread_actions">
+                </game_forum_comment_avatar>
+            </template>
+        </forum_comment>
+    </template>
+</forum_search_results>
