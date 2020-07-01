@@ -28,7 +28,9 @@ class GamePlugin(ForumPlugin):
             body=old_thread.body, room=old_thread.room, user=old_thread.user,
             access_type=old_thread.access_type,
             create_time=old_thread.create_time, closed=old_thread.closed,
-            important=old_thread.important, plugin_id=self.site_id)
+            important=old_thread.important, plugin_id=self.site_id,
+            media=old_thread.media,
+        )
         role_id = old_thread.data1
         if role_id and (role_id in rolelinks):
             thread.data1 = rolelinks[role_id].id
@@ -55,7 +57,7 @@ class GamePlugin(ForumPlugin):
                     parent=thread, title=comment.title, body=comment.body,
                     plugin_id=self.site_id,
                     user=comment.user, create_time=comment.create_time,
-                    voting=comment.voting)
+                    media=comment.media)
                 new_comment.reply_id = first_comment
                 if comment.data1 and (comment.data1 in rolelinks):
                     new_comment.data1 = rolelinks[comment.data1].id
