@@ -9,7 +9,7 @@ app_name = 'tulius.profile'
 urlpatterns = [
     urls.url(
         r'^favorites/$',
-        views.PlayerFavoritesView.as_view(),
+        views.Index.as_view(),
         name='favorites'),
     urls.url(r'^stories/$', views.PlayerStoriesView.as_view(), name='stories'),
     urls.url(r'^games/$', views.PlayerGamesView.as_view(), name='games'),

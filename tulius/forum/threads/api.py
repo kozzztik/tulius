@@ -189,8 +189,6 @@ class BaseThreadView(plugins.BaseAPIView):
             self.obj.important = bool(data['important'])
             self.obj.closed = bool(data['closed'])
 
-
-class ThreadView(BaseThreadView):
     def obj_to_json(self):
         data = {
             'id': self.obj.pk,
@@ -221,6 +219,7 @@ class ThreadView(BaseThreadView):
             data['media'] = self.obj.media
         return data
 
+class ThreadView(BaseThreadView):
     def get_context_data(self, **kwargs):
         super(ThreadView, self).get_context_data(**kwargs)
         if self.obj is None:

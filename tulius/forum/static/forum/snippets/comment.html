@@ -68,7 +68,7 @@
                     <span v-html="comment.editor.title"></span>,
                     <span v-html="forum_datetime(comment.edit_time)"></span>
                 </div>
-                <div class="float-right" v-if="!preview">
+                <div class="float-right" v-if="comment.id">
                     <router-link :to="urls.comment(comment)">#</router-link>
                 </div>
             </td>
