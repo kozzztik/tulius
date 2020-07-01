@@ -55,12 +55,12 @@ class Favorites(plugins.BaseAPIView):
     require_user = True
     comments_class = api.CommentAPI
 
-    def get_api(self, comment):
-        api = self.comments_class()
-        api.setup(self.request)
-        api.user = self.user
-        api.comment = comment
-        return api
+    def get_view(self, comment):
+        view = self.comments_class()
+        view.setup(self.request)
+        view.user = self.user
+        view.comment = comment
+        return view
 
     def get_comments(self):
         likes = models.CommentLike.objects.select_related('comment').filter(
@@ -68,23 +68,23 @@ class Favorites(plugins.BaseAPIView):
         comments = [like.comment for like in likes]
         result = []
         for comment in comments:
-            api = self.get_api(comment)
+            view = self.get_view(comment)
             try:
-                api.get_parent_thread(pk=comment.parent_id)
+                view.get_parent_thread(pk=comment.parent_id)
             except exceptions.PermissionDenied:
                 continue
-            result.append(api)
+            result.append(view)
         return result
 
     @staticmethod
-    def comments_to_json(comments):
+    def comments_to_json(views):
         return {
             'groups': [{
                 'name': 'Форум',
                 'items': [{
-                    'comment': api.comment_to_json(api.comment),
-                    'thread': api.obj_to_json(),
-                } for api in comments],
+                    'comment': view.comment_to_json(view.comment),
+                    'thread': view.obj_to_json(),
+                } for view in views],
             }],
         }
 

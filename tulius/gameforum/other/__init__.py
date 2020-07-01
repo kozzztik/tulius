@@ -18,21 +18,21 @@ class Favorites(likes.Favorites):
     comments_class = comments.CommentAPI
     variations = None
 
-    def get_api(self, comment):
-        api = super(Favorites, self).get_api(comment)
-        tree_id = api.comment.parent.tree_id
+    def get_view(self, comment):
+        view = super(Favorites, self).get_view(comment)
+        tree_id = view.comment.parent.tree_id
         self.variations = self.variations or {}
         if tree_id not in self.variations:
             variation = story_models.Variation.objects.get(
                 thread__tree_id=tree_id)
             self.variations[tree_id] = variation
-        api.variation = self.variations[tree_id]
-        return api
+        view.variation = self.variations[tree_id]
+        return view
 
     @staticmethod
-    def comments_to_json(comments):
+    def comments_to_json(views):
         variations = {}
-        for api in comments:
+        for api in views:
             variations.setdefault(api.variation, [])
             variations[api.variation].append(api)
         return {
