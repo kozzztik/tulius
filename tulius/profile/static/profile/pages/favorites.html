@@ -1,0 +1,16 @@
+<div class="content">
+    <div class="caption" align="center">
+        <div class="captionleft"></div>
+        <div class="captioncontent">
+            Избранное
+        </div>
+        <div class="captionright"></div>
+    </div>
+    <forum_favorites url="/api/game_forum/favorites/">
+        <template v-slot:comment="slotProps">
+            <game_forum_favorite_comment :group="slotProps.group" :item="slotProps.item">
+            </game_forum_favorite_comment>
+        </template>
+    </forum_favorites>
+    <forum_favorites url="/api/forum/favorites/"></forum_favorites>
+</div>

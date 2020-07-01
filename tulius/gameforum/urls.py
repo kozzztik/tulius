@@ -13,6 +13,9 @@ app_name = 'tulius.gameforum'
 
 urlpatterns = [
     urls.url(
+        r'^favorites/$',
+        other.Favorites.as_view(), name='favorites'),
+    urls.url(
         r'^thread_redirrect/(?P<pk>\d+)/$',
         views.RedirrectAPI.as_view(), name='thread_redirect'),
     urls.url(

@@ -21,6 +21,10 @@ from .forms import NotificationForm, ChangeEmailForm, ProfileSettingsForm, \
     PersonalSettingsForm
 
 
+class Index(generic.TemplateView):
+    template_name = 'base_vue.html'
+
+
 class PlayerSettingsView(generic.TemplateView):
     template_name = 'profile/settings.haml'
 

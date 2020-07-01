@@ -33,7 +33,7 @@ class BaseThreadAPI(api.BaseThreadView, base.VariationMixin):
         data = {
             'id': role.id,
             'title': html.escape(role.name),
-            'url': role.get_absolute_url(),
+            'url': None,
         }
         if detailed:
             on = role.is_online() if role.show_in_online_character else None
@@ -103,10 +103,12 @@ class BaseThreadAPI(api.BaseThreadView, base.VariationMixin):
             raise exceptions.PermissionDenied()
         self.obj.data2 = editor_role
 
-
-class ThreadAPI(api.ThreadView, BaseThreadAPI):
     def obj_to_json(self):
-        data = super(ThreadAPI, self).obj_to_json()
+        data = super(BaseThreadAPI, self).obj_to_json()
         data['user'] = self.role_to_json(self.obj.data1, detailed=True)
         data['edit_role_id'] = self.obj.data2
         return data
+
+
+class ThreadAPI(api.ThreadView, BaseThreadAPI):
+    pass

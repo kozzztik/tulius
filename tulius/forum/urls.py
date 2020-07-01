@@ -13,6 +13,7 @@ app_name = 'tulius.forum'
 
 urlpatterns = [
     urls.url(r'^$', threads_api.IndexView.as_view(), name='index'),
+    urls.url(r'^favorites/$', likes.Favorites.as_view(), name='favorites'),
     urls.url(
         r'^granted_rights/$',
         rights_api.GrantedRightsAPI.as_view(), name='index_rights'),
