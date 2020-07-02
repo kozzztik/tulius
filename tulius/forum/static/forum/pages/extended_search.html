@@ -9,9 +9,17 @@
     <form @submit.prevent="form_submit">
         <div class="row">
             <label class="col-3 col-form-label">Где:</label>
-            <label class="col col-form-label">
+            <router-link class="col col-form-label"
+                         :to="thread.room ? urls.room(thread.id) : urls.thread(thread.id)"
+                         v-if="thread.id">
                 {{ thread.title }}
-            </label>
+            </router-link>
+            <thread_selector v-model="thread" ref="thread_selector"></thread_selector>
+            <div class="col-2">
+                <a class="btn btn-light mb-2 form-control" @click="$refs.thread_selector.show()" href="javascript:void(0)">
+                    Выбрать...
+                </a>
+            </div>
         </div>
         <div class="row">
             <label class="col-3 col-form-label">От:</label>

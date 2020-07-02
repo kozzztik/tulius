@@ -54,23 +54,13 @@ class Search(plugins.BaseAPIView):
         thread_view.get_parent_thread(pk)
         comments = models.Comment.objects.select_related('parent').filter(
             plugin_id=self.comments_class.plugin_id,
-            parent__tree_id=thread_view.obj.tree_id)
-        filter_thread = data.get('thread', None)
+            parent__tree_id=thread_view.obj.tree_id,
+            parent__lft__gte=thread_view.obj.lft,
+            parent__rght__lte=thread_view.obj.rght)
         filter_date_from = data.get('date_from', [])
         filter_date_to = data.get('date_to', [])
         filter_text = data.get('text', [])
         conditions = []
-
-        if filter_thread:
-            thread_view.get_parent_thread(filter_thread)
-            if thread_view.obj.room:
-                conditions.append(f'В комнате: {thread_view.obj.title}')
-            else:
-                conditions.append(f'В теме: {thread_view.obj.title}')
-            comments = comments.filter(
-                parent__lft__gte=thread_view.obj.lft,
-                parent__rght__lte=thread_view.obj.rght)
-
         comments = self.apply_users_filters(comments, conditions, data)
 
         if filter_date_from:

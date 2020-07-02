@@ -1,4 +1,5 @@
 import APILoadMixin from '../../app/components/api_load_mixin.js'
+import thread_selector from '../components/thread_selector.js'
 
 
 export default LazyComponent('forum_extended_search_page', {
