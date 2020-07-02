@@ -13,7 +13,7 @@
         <div class="caption" align="center">
             <div class="captionleft"></div>
             <div class="captioncontent">
-                <router-link v-if="user.superuser" :to="group.url">
+                <router-link v-if="user.superuser" :to="urls.room(group.id)">
                     {{ group.title }}
                 </router-link>
                 <span v-else="index.is_superuser">{{ group.title }}</span>

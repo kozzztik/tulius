@@ -38,7 +38,7 @@
             <b-dropdown-item :href="'/play/rebuild_nums/' + thread.id + '/'" v-if="thread.room && user.superuser">
                 Обновить счетчики
             </b-dropdown-item>
-            <b-dropdown-item :href="'/play/extended_search/' + thread.tree_id + '/'">
+            <b-dropdown-item :to="urls.extended_search(thread.id)">
                 Расширенный поиск
             </b-dropdown-item>
         </b-dropdown>
@@ -147,10 +147,8 @@
             </tbody>
         </table>
     </b-modal>
-    <form class="input-group btn-group-sm" method="post" :action="'/play/search/' + variation.id + '/'">
-        <input type="text" name="text" required="" id="id_text" class="form-control">
-        <input type="hidden" name="csrfmiddlewaretoken" :value="csrftoken">
-        <input id="id_thread" type="hidden" name="thread" :value="thread.id">
+    <form class="input-group btn-group-sm" @submit.prevent="search_submit">
+        <input type="text" name="text" required class="form-control" v-model="search_text">
         <button class="btn btn-light" id="search" type="submit">
             Поиск
         </button>

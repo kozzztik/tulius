@@ -338,7 +338,7 @@ class IndexView(BaseThreadView):
                 'id': group.id,
                 'title': group.title,
                 'rooms': [self.room_to_json(thread) for thread in group.rooms],
-                'url': group.get_absolute_url,
+                'url': self.thread_url(group.id),
                 'unreaded_url': self.room_group_unreaded_url(group.rooms),
             } for group in groups]
         }

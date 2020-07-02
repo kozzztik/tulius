@@ -43,5 +43,15 @@ export default function(variation_id) {
         thread_api: pk => `/api/game_forum/variation/${variation_id}/thread/${pk}/`,
         comment_api: pk => `/api/game_forum/variation/${variation_id}/comment/${pk}/`,
         root_api: '/api/forum/',
-    }
+        search_api: pk => `/api/game_forum/variation/${variation_id}/thread/${pk}/search/`,
+        search_results: (thread_id, query) => ({
+            name: 'game_search_results',
+            params: { id: thread_id, variation_id: variation_id },
+            query: query,
+        }),
+        extended_search: pk => ({
+            name: 'game_extended_search',
+            params: { id: pk, variation_id: variation_id },
+        }),
+	}
 }

@@ -123,16 +123,6 @@
                 %label.btn-group{style: 'top: -7px'}
                     {% trans "Comments:" %}
                     = parent_thread.variation.comments_count
-        - block search_form
-            - if core.search_form and not search_results
-                .forum-search-form.hidden-phone
-                    %form#search_form.pull-right{method: "post", action: "{{ parent_thread.search_url }}"}
-                        - csrf_token
-                        {{ core.search_form.text }}
-                        - if parent_thread
-                            %input{id: 'id_thread', type: 'hidden', name: 'thread', value: '{{ parent_thread.id }}'}
-                        %button#search{type: 'submit'}
-                            {% trans "Search" %}
     - if not dropupmenu
         #quoteAnswer.modal.hide.fade.in.well
             .modal-header

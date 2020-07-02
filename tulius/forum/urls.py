@@ -5,9 +5,10 @@ from tulius.forum.collapse_threads import views as collapse_views
 from tulius.forum import online_status
 from tulius.forum.comments import api as comments_api
 from tulius.forum.rights import api as rights_api
-from tulius.forum.voting import views as voting
 from tulius.forum.other import likes
+from tulius.forum.other import voting
 from tulius.forum.other import readmarks
+from tulius.forum.other import search
 
 app_name = 'tulius.forum'
 
@@ -47,6 +48,9 @@ urlpatterns = [
     urls.url(
         r'^thread/(?P<pk>\d+)/granted_rights/(?P<right_id>\d+)/$',
         rights_api.GrantedRightAPI.as_view(), name='thread_right'),
+    urls.url(
+        r'^thread/(?P<pk>\d+)/search/$',
+        search.Search.as_view(), name='thread_search'),
     urls.url(
         r'^comment/(?P<pk>\d+)/$',
         comments_api.CommentAPI.as_view(), name='comment'),

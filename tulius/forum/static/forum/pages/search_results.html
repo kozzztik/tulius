@@ -1,0 +1,32 @@
+<div>
+    <slot :thread="thread" name="thread_actions">
+        <forum_thread_actions v-if="thread.id" :thread="thread"></forum_thread_actions>
+    </slot>
+    <div class="content" style="padding: 10px;">
+        <div class="row">
+            <label class="col-2 col-form-label">
+                <a :href="urls.extended_search(thread.tree_id)">
+                    Условия поиска:
+                </a>
+            </label>
+            <div class="col">
+                <div class="btn btn-success btn-sm" v-for="condition of conditions"
+                    style="margin-right: 0.5em;">
+                    {{condition}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div v-if="thread.id && (results.length == 0)" class="content">
+        <br>
+        Ничего не найдено.
+        <br>
+        <br>
+    </div>
+    <div v-for="item of results" :key="item.comment.id">
+        <slot :item="item" name="comment">
+            <forum_comment :thread="item.thread" :comment="item.comment" :preview="true">
+            </forum_comment>
+        </slot>
+    </div>
+</div>

@@ -22,23 +22,10 @@ class CommentsPlugin(CommentsCore):
             parent=comment.parent, id__lt=comment.id, deleted=False).count()
         return (num / self.COMMENTS_ON_PAGE) + 1
 
-    def reply_url(self, comment):
-        return self.reverse('add_comment', comment.id)
-
-    def get_edit_url(self, comment):
-        if comment.is_thread():
-            return comment.parent.get_edit_url
-        return self.reverse('edit_comment', comment.id)
-
     def init_core(self):
         super(CommentsPlugin, self).init_core()
-        self.templates['comment'] = self.comment_template
-        self.templates['comment_player'] = 'forum/comments/avatar.haml'
-        self.templates['comment_preview'] = 'forum/preview.haml'
         self.urlizer['comment_paged'] = self.get_paged_url
         self.urlizer['Comment_get_paged_url'] = self.get_paged_url
-        self.urlizer['Comment_get_reply_url'] = self.reply_url
-        self.urlizer['Comment_get_edit_url'] = self.get_edit_url
         self.core['Comment_get_page_num'] = self.get_page_num
 
     def get_urls(self):
