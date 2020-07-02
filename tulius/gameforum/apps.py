@@ -11,7 +11,6 @@ class GameForumConfig(AppConfig):
 
     def ready(self):
         from .sites import GameForumSite
-        from tulius.forum.voting.plugin import VotingPlugin
         from tulius.forum.readmarks.plugin import ReadMarksPlugin
         from tulius.forum.fixes.plugin import FixesPlugin
         from .gamecore import GamePlugin
@@ -28,7 +27,6 @@ class GameForumConfig(AppConfig):
                 GameRightsPlugin,
                 GameThreadsPlugin,
                 GameCommentsPlugin,
-                VotingPlugin,
                 ReadMarksPlugin,
                 GamePlugin,
                 GameSitemapPlugin,

@@ -1,7 +1,7 @@
+from tulius.forum.other import voting
 from tulius.forum.other import readmarks
 from tulius.forum.other import likes
 from tulius.forum.other import search
-from tulius.forum.voting import views as voting
 from tulius.gameforum import base
 from tulius.gameforum.threads import api as threads
 from tulius.gameforum.comments import api as comments_api
