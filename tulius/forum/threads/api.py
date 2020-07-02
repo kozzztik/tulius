@@ -219,6 +219,7 @@ class BaseThreadView(plugins.BaseAPIView):
             data['media'] = self.obj.media
         return data
 
+
 class ThreadView(BaseThreadView):
     def get_context_data(self, **kwargs):
         super(ThreadView, self).get_context_data(**kwargs)
@@ -359,3 +360,41 @@ class IndexView(BaseThreadView):
         transaction.commit()
         # TODO notify clients
         return {'id': thread.id, 'url': self.thread_url(thread.id)}
+
+
+class MoveThreadView(BaseThreadView):
+    @staticmethod
+    def repair_thread_counters(obj, only_stats=True):
+        # TODO refactor
+        obj.site().core.content['Thread_rebuild'](obj, only_stats=only_stats)
+
+    @transaction.atomic
+    def put(self, request, **kwargs):
+        data = json.loads(request.body)
+        parent_id = data['parent_id']
+        self.get_parent_thread(parent_id, for_update=True)
+        if not self.rights.edit:
+            raise exceptions.PermissionDenied('No target write right')
+        new_parent = self.obj
+        self.get_parent_thread(for_update=True, **kwargs)
+        if not self.rights.edit:
+            raise exceptions.PermissionDenied('No source edit right')
+        if new_parent.is_descendant_of(self.obj, include_self=True):
+            raise exceptions.PermissionDenied('Cant move inside yourself')
+        if new_parent.plugin_id != self.obj.plugin_id:
+            raise exceptions.PermissionDenied('Cant move between plugins')
+        old_parent = self.obj.parent
+        self.obj.parent = new_parent
+        self.obj.save()
+        if old_parent and ((not new_parent) or (
+                old_parent.tree_id != new_parent.tree_id)):
+            obj = models.Thread.objects.get(
+                tree_id=old_parent.tree_id, parent=None)
+            self.repair_thread_counters(obj, only_stats=True)
+            obj.save()
+        if new_parent:
+            obj = models.Thread.objects.get(
+                tree_id=new_parent.tree_id, parent=None)
+            self.repair_thread_counters(obj, only_stats=True)
+            obj.save()
+        return self.obj_to_json()

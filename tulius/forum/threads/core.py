@@ -141,8 +141,6 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
                 tree_id=new_parent.tree_id, parent=None)
             self.repair_thread_counters(obj, only_stats=True)
             obj.save()
-        self.thread_on_move.send(
-            thread, user=user, old_parent=old_parent, old_tree_id=old_tree_id)
 
     def repair_thread_counters(self, thread=None, only_stats=False):
         if not only_stats:
@@ -165,8 +163,6 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
         self.thread_view_signal = dispatch.Signal(
             providing_args=["context", "user", "request"])
 
-        self.thread_on_move = dispatch.Signal(
-            providing_args=["user", "old_parent", "old_tree_id"])
         self.thread_repair_counters = dispatch.Signal(providing_args=[])
         self.thread_on_create = dispatch.Signal(providing_args=['instance'])
         self.thread_on_update = dispatch.Signal(
@@ -179,7 +175,6 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
         self.core['rebuild_tree'] = self.repair_thread_counters
         self.core['threads_search_list'] = self.search_list
         self.signals['thread_view'] = self.thread_view_signal
-        self.signals['thread_on_move'] = self.thread_on_move
         self.signals['thread_repair_counters'] = self.thread_repair_counters
         self.signals['thread_on_create'] = self.thread_on_create
         self.signals['thread_on_update'] = self.thread_on_update

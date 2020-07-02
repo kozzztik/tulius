@@ -29,9 +29,15 @@ export default LazyComponent('thread_selector', {
     methods: {
         set_thread(thread) {
             this.thread = thread;
-            this.parents = thread.parents;
-            this.rooms = thread.rooms || [];
-            this.threads = thread.threads || [];
+            if (thread) {
+                this.parents = thread.parents;
+                this.rooms = thread.rooms || [];
+                this.threads = thread.threads || [];
+            } else {
+                this.parents = [];
+                this.rooms = [];
+                this.threads = [];
+            }
         },
         show() {
             this.set_thread(this.value);
@@ -46,16 +52,24 @@ export default LazyComponent('thread_selector', {
         },
         on_ok() {
             this.$emit('input', this.thread);
+            if (this.on_choose)
+                this.on_choose(this.thread);
         },
         select_root() {
             this.$root.loading_start();
             axios.get(this.urls.root_api).then(response => {
-                this.thread = null;
-                this.parents = [];
-                this.threads = []
+                this.set_thread(null);
                 this.rooms = response.data.groups;
                 this.$parent.loading_end();
             }).catch(error => this.$root.loading_end());
         }
+    },
+    watch: {
+		value(val) {
+            if (val && !val.parents)
+                this.select_thread(val)
+            else
+                this.set_thread(val);
+        },
     },
 });

@@ -2,12 +2,12 @@
     <slot :thread="thread" name="thread_actions">
         <forum_thread_actions v-if="thread.id" :thread="thread"></forum_thread_actions>
     </slot>
-    <div class="content" style="padding: 10px;">
+    <div class="content" style="padding: 10px;" v-if="thread.id">
         <div class="row">
             <label class="col-2 col-form-label">
-                <a :href="urls.extended_search(thread.tree_id)">
+                <router-link :to="urls.extended_search(thread.id)">
                     Условия поиска:
-                </a>
+                </router-link>
             </label>
             <div class="col">
                 <div class="btn btn-success btn-sm" v-for="condition of conditions"

@@ -1,0 +1,14 @@
+<div>
+    <thread_selector v-model="parent" :show_root="show_root" room_only
+                     ref="selector" :on_choose="on_ok">
+    </thread_selector>
+    <b-modal title="Подтверждение" size="sm"  buttonSize="sm"
+             okVariant="danger" okTitle="ДА" cancelTitle="Нет"
+             footerClass="p-2" :hideHeaderClose="false"
+             centered ref="modal" @ok="on_confirm">
+        <p>Переместить</p>
+        <a href="#" v-html="thread.title" v-if="thread"></a>
+        <p>в</p>
+        <router-link :to="urls.room(parent.id)" v-html="parent.title" v-if="parent"></router-link>
+    </b-modal>
+</div>
