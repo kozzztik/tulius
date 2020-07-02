@@ -34,5 +34,8 @@ export default {
         params: { id: thread_id },
         query: query,
     }),
-    extended_search: pk => `/forums/extended_search/${pk}/`,
+    extended_search: pk => ({
+        name: 'forum_extended_search',
+        params: { id: pk },
+	}),
 }

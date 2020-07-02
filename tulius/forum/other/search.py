@@ -37,11 +37,15 @@ class Search(plugins.BaseAPIView):
         filter_users = data.get('users', [])
         filter_not_users = data.get('not_users', [])
         if filter_users:
-            # TODO conditions
-            comments = comments.filter(user__in=filter_users)
+            users = auth.get_user_model().objects.filter(pk__in=filter_users)
+            conditions.append('От: ' + ', '.join([u.username for u in users]))
+            comments = comments.filter(user__in=users)
         if filter_not_users:
-            # TODO conditions
-            comments = comments.exclude(user__in=filter_not_users)
+            users = auth.get_user_model().objects.filter(
+                pk__in=filter_not_users)
+            conditions.append(
+                'Не от: ' + ', '.join([u.username for u in users]))
+            comments = comments.exclude(user__in=users)
         return comments
 
     def post(self, request, pk, **kwargs):

@@ -9,7 +9,6 @@ class ForumConfig(AppConfig):
     def ready(self):
         from tulius.forum import site
         from .threads.plugin import ThreadsPlugin
-        from .search.plugin import SearchPlugin
         from .comments.plugin import CommentsPlugin
         from .fixes.plugin import FixesPlugin
         from .voting.plugin import VotingPlugin
@@ -23,7 +22,6 @@ class ForumConfig(AppConfig):
                 ThreadsPlugin,
                 CommentsPlugin,
                 VotingPlugin,
-                SearchPlugin,
                 ReadMarksPlugin,
                 SitemapPlugin,
                 FixesPlugin,

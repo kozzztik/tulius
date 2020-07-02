@@ -1,0 +1,70 @@
+<div class="content" >
+    <div class="caption" align="center">
+        <div class="captionleft"></div>
+        <div class="captioncontent">
+            Поиск
+        </div>
+        <div class="captionright"></div>
+    </div>
+    <form @submit.prevent="form_submit">
+        <div class="row">
+            <label class="col-3 col-form-label">Где:</label>
+            <label class="col col-form-label">
+                {{ thread.title }}
+            </label>
+        </div>
+        <div class="row">
+            <label class="col-3 col-form-label">От пользователей:</label>
+            <div class="col">
+                <multiselect v-model="form.users" :options="user_options"
+                             :searchable="true" @search-change="do_search"
+                             label="title"  track-by="id" multiple class="mb-2"
+                             placeholder="Выберите пользователя">
+                    <template v-slot:noResult>Пользователь не найден</template>
+                    <template v-slot:noOptions>Пользователь не найден</template>
+                </multiselect>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-3 col-form-label">Не от пользователей:</label>
+            <div class="col">
+                <multiselect v-model="form.not_users" :options="user_options"
+                             :searchable="true" @search-change="do_search"
+                             label="title"  track-by="id" multiple class="mb-2"
+                             placeholder="Выберите пользователя">
+                    <template v-slot:noResult>Пользователь не найден</template>
+                    <template v-slot:noOptions>Пользователь не найден</template>
+                </multiselect>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-3 col-form-label">С даты:</label>
+            <div class="col">
+                <b-form-datepicker id="date_from" v-model="form.date_from"
+                                   class="mb-2" locale="ru" :max="form.date_to"
+                                   placeholder="Выберите дату">
+                </b-form-datepicker>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-3 col-form-label">По дату:</label>
+            <div class="col">
+                <b-form-datepicker id="date_to" v-model="form.date_to" class="mb-2"
+                                   locale="ru" :min="form.date_from" placeholder="Выберите дату">
+                </b-form-datepicker>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-3 col-form-label">Текст:</label>
+            <div class="col">
+                 <input type="text" name="text" required class="form-control" v-model="form.text">
+            </div>
+        </div>
+        <div class="row" style="margin-top: 1em;">
+            <div class="col-3"></div>
+            <div class="col">
+                <button class="btn btn-primary" type="submit">Искать!</button>
+            </div>
+        </div>
+    </form>
+</div>

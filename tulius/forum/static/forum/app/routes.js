@@ -6,6 +6,7 @@ import edit_comment from '../pages/edit_comment.js'
 import add_room from '../pages/add_room.js'
 import edit_thread from '../pages/edit_thread.js'
 import search_results from '../pages/search_results.js'
+import extended_search from '../pages/extended_search.js'
 
 
 export default [
@@ -20,6 +21,7 @@ export default [
             {path: 'add_thread/:parent_id(\\d+)/', component: edit_thread, name: 'forum_add_thread'},
             {path: 'edit_thread/:id(\\d+)/', component: edit_thread, name: 'forum_edit_thread'},
             {path: 'search/:id(\\d+)/', component: search_results, name: 'forum_search_results'},
+            {path: 'extended_search/:id(\\d+)/', component: extended_search, name: 'forum_extended_search'},
         ],
     }
 ]
