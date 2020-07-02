@@ -14,7 +14,7 @@
             </label>
         </div>
         <div class="row">
-            <label class="col-3 col-form-label">От пользователей:</label>
+            <label class="col-3 col-form-label">От:</label>
             <div class="col">
                 <multiselect v-model="form.users" :options="user_options"
                              :searchable="true" @search-change="do_search"
@@ -26,7 +26,7 @@
             </div>
         </div>
         <div class="row">
-            <label class="col-3 col-form-label">Не от пользователей:</label>
+            <label class="col-3 col-form-label">Не от:</label>
             <div class="col">
                 <multiselect v-model="form.not_users" :options="user_options"
                              :searchable="true" @search-change="do_search"

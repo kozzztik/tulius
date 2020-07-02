@@ -82,6 +82,12 @@ class GameThreadsPlugin(ThreadsPlugin):
                 r'^thread/(?P<parent_id>\d+)/$',
                 views.Index.as_view(), name='thread'),
             url(
+                r'^search/(?P<parent_id>\d+)/$',
+                views.Index.as_view(), name='search'),
+            url(
+                r'^extended_search/(?P<pk>\d+)/$',
+                views.Index.as_view(), name='extended_search'),
+            url(
                 r'^thread/(?P<parent_id>\d+)/move/$',
                 views.MoveThreadSelect.as_view(plugin=self),
                 name='thread_move'),

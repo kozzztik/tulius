@@ -49,6 +49,9 @@ export default function(variation_id) {
             params: { id: thread_id, variation_id: variation_id },
             query: query,
         }),
-        extended_search: pk => `/play/${variation_id}/extended_search/${pk}/`,
-    }
+        extended_search: pk => ({
+            name: 'game_extended_search',
+            params: { id: pk, variation_id: variation_id },
+        }),
+	}
 }

@@ -24,6 +24,22 @@ class Search(search.Search, base.VariationMixin):
         view.variation = self.variation
         return view
 
+    def apply_users_filters(self, comments, conditions, data):
+        filter_users = data.get('users', [])
+        filter_not_users = data.get('not_users', [])
+        if filter_users:
+            users = story_models.Role.objects.filter(
+                pk__in=filter_users, variation=self.variation)
+            conditions.append('От: ' + ', '.join([u.name for u in users]))
+            comments = comments.filter(data1__in=[u.pk for u in users])
+        if filter_not_users:
+            users = story_models.Role.objects.filter(
+                pk__in=filter_not_users, variation=self.variation)
+            conditions.append(
+                'Не от: ' + ', '.join([u.name for u in users]))
+            comments = comments.exclude(data1__in=[u.pk for u in users])
+        return comments
+
 
 class Favorites(likes.Favorites):
     comments_class = comments.CommentAPI

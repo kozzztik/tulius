@@ -38,7 +38,7 @@
             <b-dropdown-item :href="'/play/rebuild_nums/' + thread.id + '/'" v-if="thread.room && user.superuser">
                 Обновить счетчики
             </b-dropdown-item>
-            <b-dropdown-item :href="'/play/extended_search/' + thread.tree_id + '/'">
+            <b-dropdown-item :to="urls.extended_search(thread.id)">
                 Расширенный поиск
             </b-dropdown-item>
         </b-dropdown>
