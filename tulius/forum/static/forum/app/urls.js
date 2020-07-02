@@ -26,6 +26,7 @@ export default {
         params: { id: comment_id },
 	}),
     thread_api: pk => `/api/forum/thread/${pk}/`,
+    thread_move_api: pk => `/api/forum/thread/${pk}/move/`,
     comment_api: pk => `/api/forum/comment/${pk}/`,
     root_api: '/api/forum/',
     search_api: pk => `/api/forum/thread/${pk}/search/`,

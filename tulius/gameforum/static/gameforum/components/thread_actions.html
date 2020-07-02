@@ -20,7 +20,7 @@
                 <img src="/static/games/img/button_blue_fastforward.png" style="height: 25px">
                 Редактировать
             </b-dropdown-item>
-            <b-dropdown-item :href="'/play/thread/' + thread.id + '/move/'" v-if="thread.rights.move">
+            <b-dropdown-item href="javascript:void(0);" @click="$refs.move_thread.show()" v-if="thread.rights.move">
                 <span v-if="thread.room">Переместить комнату</span>
                 <span v-if="!thread.room">Переместить тему</span>
             </b-dropdown-item>
@@ -147,13 +147,15 @@
             </tbody>
         </table>
     </b-modal>
+    <forum_thread_access :thread="thread" ref="thread_access" :user_search="right_user_search">
+    </forum_thread_access>
+    <move_thread :thread="thread" :show_root="false" ref="move_thread"></move_thread>
+    <Tinybox v-model="image_index" :images="images"></Tinybox>
     <form class="input-group btn-group-sm" @submit.prevent="search_submit">
         <input type="text" name="text" required class="form-control" v-model="search_text">
         <button class="btn btn-light" id="search" type="submit">
             Поиск
         </button>
     </form>
-    <forum_thread_access :thread="thread" ref="thread_access" :user_search="right_user_search">
-    </forum_thread_access>
-    <Tinybox v-model="image_index" :images="images"></Tinybox>
+
 </div>

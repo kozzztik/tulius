@@ -1,12 +1,10 @@
 from django.conf.urls import url
-from django.db.models.query_utils import Q
-from django.http import Http404
+
 # TODO: fix this when module moved
-from tulius.forum.plugins import ForumPlugin, BasePluginView
+from tulius.forum.plugins import ForumPlugin
 from tulius.stories.models import Role
 from tulius.games.models import Game
 from .views import GameIndex, VariationIndex, Fix
-from .forms import EditorForm, RoleForm
 
 
 class GamePlugin(ForumPlugin):
@@ -89,85 +87,6 @@ class GamePlugin(ForumPlugin):
         thread.save()
         return thread
 
-    def get_role(self, role_id, roles, admin):
-        if role_id == '':
-            if admin:
-                return None
-            raise Http404()
-        for role in roles:
-            if int(role.id) == int(role_id):
-                return role
-        raise Http404()
-
-    # pylint: disable=too-many-branches,too-many-arguments
-    def process_role(
-            self, request, parent_thread, init_role_id, new=False, user=None):
-        if not user:
-            user = request.user
-        variation = parent_thread.variation
-        admin = parent_thread.admin
-        init_role = None
-        if init_role_id:
-            init_role = Role.objects.get(id=init_role_id)
-        form = None
-        if variation.game:
-            query = Q(variation=variation)
-            if not admin:
-                query = query & Q(user=user)
-            roles = Role.objects.filter(query).exclude(deleted=True)
-            roles = [role for role in roles]
-            strict_write = parent_thread.strict_write
-            if strict_write is not None:
-                roles = [role for role in roles if role in strict_write]
-            if not new:
-                post_role = init_role
-                role_found = False
-                for form_role in roles:
-                    if post_role == form_role:
-                        role_found = True
-                if not role_found:
-                    roles += [post_role]
-        else:
-            roles = Role.objects.filter(
-                variation=variation).exclude(deleted=True)
-        role = None
-        if (roles.count == 0) and (not admin):
-            raise Http404()
-        if len(roles) == 1:
-            role = roles[0]
-            form = None
-        else:
-            if new:
-                init_role = None
-                for tmp_role in roles:
-                    if tmp_role.user_id == user.id:
-                        init_role = tmp_role
-                        break
-        if (len(roles) > 1) or admin:
-            if init_role:
-                init_role = init_role.pk
-            form = RoleForm(
-                admin, roles,
-                data=(request.POST or None) if request else None,
-                initial={'role': init_role})
-            if request and (request.method == 'POST'):
-                if not form.is_valid():
-                    raise Http404(form.errors)
-                cd = form.cleaned_data
-                role_id = cd['role']
-                role = self.get_role(role_id, roles, admin)
-        return form, role
-
-    def thread_view(self, sender, **kwargs):
-        context = kwargs['context']
-        variation = sender.variation
-        context['variation'] = variation
-        if sender.write_right():
-            (roleform, role) = self.process_role(
-                None, sender, None, True, user=sender.view_user)
-            context['roleform'] = roleform
-            context['role'] = role
-
     def fix_games(self):
         games = Game.objects.all()
         for game in games:
@@ -194,7 +113,6 @@ class GamePlugin(ForumPlugin):
         self.core['create_gameforum'] = self.create_gameforum
         self.core['fix_games'] = self.fix_games
         self.templates['fix_games'] = 'gameforum/fix.haml'
-        self.site.signals.thread_view.connect(self.thread_view)
 
     def get_urls(self):
         return [

@@ -21,7 +21,7 @@
         <b-dropdown-item href="javascript:void(0);" @click="$refs.edit_room.show()" v-if="thread.room && thread.rights.edit">
             Редактировать
         </b-dropdown-item>
-        <b-dropdown-item :href="'/forums/thread/' + thread.id + '/move/'" v-if="thread.rights.move">
+        <b-dropdown-item href="javascript:void(0)" @click="$refs.move_thread.show()" v-if="thread.rights.move">
             <span v-if="thread.room">Переместить комнату</span>
             <span v-if="!thread.room">Переместить тему</span>
         </b-dropdown-item>
@@ -37,6 +37,7 @@
         </b-dropdown-item>
     </b-dropdown>
     <forum_thread_access :thread="thread" ref="thread_access"></forum_thread_access>
+    <move_thread :thread="thread" :show_root="true" ref="move_thread"></move_thread>
     <b-modal id="quoteAnswer" title="Цитирование" ok-only v-if="!thread.room" >
         <p>
             Цитировать теперь легко! Просто выделите текст мышкой:

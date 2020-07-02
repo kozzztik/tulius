@@ -52,6 +52,9 @@ urlpatterns = [
         r'^thread/(?P<pk>\d+)/search/$',
         search.Search.as_view(), name='thread_search'),
     urls.url(
+        r'^thread/(?P<pk>\d+)/move/$',
+        threads_api.MoveThreadView.as_view(), name='thread_move'),
+    urls.url(
         r'^comment/(?P<pk>\d+)/$',
         comments_api.CommentAPI.as_view(), name='comment'),
     urls.url(
