@@ -23,10 +23,6 @@
                         %li
                             %a{href: '{{ parent_thread.get_edit_url }}'}
                                 {% trans "edit" %}
-                    - if parent_thread.move_right
-                        %li
-                            %a{href: '{{ parent_thread.get_move_url }}'}
-                                {% trans "Move room" %}
                     - if parent_thread.edit_right
                         %li
                             %a{href: 'javascript:delete_room({{ parent_thread.id }})'}
@@ -53,12 +49,3 @@
                 .modal-footer
                     %button.btn.btn-primary{data-dismiss: "modal"}
                         {% trans "Close" %}
-        - block search_form
-            - if core.search_form and not search_results and parent_thread
-                .forum-search-form
-                    %form.inline-form{method: "post", action: "{{ parent_thread.search_url }}"}
-                        - csrf_token
-                        {{ core.search_form.text }}
-                        %input{id: 'id_thread', type: 'hidden', name: 'thread', value: '{{ parent_thread.id }}'}
-                        %button.submit.btn#search{type: 'submit'}
-                            {% trans "Search" %}
