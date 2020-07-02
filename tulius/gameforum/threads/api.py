@@ -112,3 +112,7 @@ class BaseThreadAPI(api.BaseThreadView, base.VariationMixin):
 
 class ThreadAPI(api.ThreadView, BaseThreadAPI):
     pass
+
+
+class MoveThreadView(api.MoveThreadView, BaseThreadAPI):
+    pass

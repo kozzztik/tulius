@@ -41,6 +41,7 @@ export default function(variation_id) {
             params: { id: comment_id, variation_id: variation_id },
         }),
         thread_api: pk => `/api/game_forum/variation/${variation_id}/thread/${pk}/`,
+        thread_move_api: pk => `/api/game_forum/variation/${variation_id}/thread/${pk}/move/`,
         comment_api: pk => `/api/game_forum/variation/${variation_id}/comment/${pk}/`,
         root_api: '/api/forum/',
         search_api: pk => `/api/game_forum/variation/${variation_id}/thread/${pk}/search/`,

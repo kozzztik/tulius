@@ -127,7 +127,6 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
                 thread, include_self=True):
             raise http.Http404("can`t move to a descendant")
         old_parent = thread.parent
-        old_tree_id = thread.tree_id
         thread.parent = new_parent
         thread.save()
         if old_parent and ((not new_parent) or (

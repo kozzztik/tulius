@@ -1,4 +1,5 @@
 import edit_room from '../../forum/components/edit_room.js'
+import move_thread from '../../forum/components/move_thread.js'
 
 
 export default LazyComponent('game_forum_thread_actions', {
