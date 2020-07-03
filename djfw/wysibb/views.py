@@ -59,6 +59,7 @@ def save_uploaded_image(request, upload, filename):
     image_file = ContentFile(image_content.getvalue())
     uploaded_file.thumb.save(file_name, image_file)
     return {'status': 1,
+            'id': uploaded_file.pk,
             'msg': "OK",
             'file_name': file_name,
             'image_link': uploaded_file.image.url,

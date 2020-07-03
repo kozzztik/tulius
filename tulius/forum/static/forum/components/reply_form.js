@@ -1,5 +1,6 @@
 import ckeditor from '../../ckeditor4/components/tulius_ckeditor.js'
 import voting from './voting.js'
+import images from './media/images.js'
 
 
 export default LazyComponent('forum_reply_form', {
