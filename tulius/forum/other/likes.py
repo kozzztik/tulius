@@ -11,7 +11,7 @@ from tulius.forum.comments import api
 
 
 class Likes(plugins.BaseAPIView):
-    require_true = False
+    require_user = False
 
     def get(self, request, *args, **kwargs):
         data = request.GET['ids'].split(',')

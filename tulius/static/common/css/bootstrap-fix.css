@@ -72,7 +72,7 @@ body.bootstrap4 .room_group_read_mark {
     border: solid red 1px;
 }
 
-.post-body-content img {
+.post-body-content img, .cke_editable img {
     max-width: 100%;
 }
 

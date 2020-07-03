@@ -9,12 +9,14 @@ from tulius.forum.other import likes
 from tulius.forum.other import voting
 from tulius.forum.other import readmarks
 from tulius.forum.other import search
+from tulius.forum.other import images
 
 app_name = 'tulius.forum'
 
 urlpatterns = [
     urls.url(r'^$', threads_api.IndexView.as_view(), name='index'),
     urls.url(r'^favorites/$', likes.Favorites.as_view(), name='favorites'),
+    urls.url(r'^images/$', images.Images.as_view(), name='images'),
     urls.url(
         r'^granted_rights/$',
         rights_api.GrantedRightsAPI.as_view(), name='index_rights'),
