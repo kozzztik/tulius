@@ -5,6 +5,7 @@ import online_status from '../components/online_status.js'
 import comments_component from '../../forum/components/comments.js'
 import reply_form_component from '../../forum/components/reply_form.js'
 import APILoadMixin from '../../app/components/api_load_mixin.js'
+import media_illustrations from '../components/media/illustrations.js'
 
 
 export default LazyComponent('gameforum_thread_page', {

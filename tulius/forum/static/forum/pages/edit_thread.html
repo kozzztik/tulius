@@ -1,5 +1,6 @@
 <div>
-    <slot v-bind:preview_comment="preview_comment" name="comment" v-if="show_preview" >
+    <slot :preview_comment="preview_comment" :thread="thread"
+          :parent_thread="parent_thread" name="comment" v-if="show_preview" >
         <forum_comment :thread="thread.id ? thread : parent_thread" :comment="preview_comment" :preview="true"></forum_comment>
     </slot>
     <div class="content container">
@@ -33,6 +34,7 @@
                 </div>
             </div>
             <forum_images :comment="form" editor ref="images"></forum_images>
+            <slot v-bind:form="form" name="extra_media"></slot>
             <div class="row" style="margin-top: 0.75em;" v-if="rights.moderate">
                 <label class="col-3 col-form-label">
                     <b>Пометка важности:</b>

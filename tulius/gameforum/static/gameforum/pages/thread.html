@@ -9,6 +9,10 @@
                             :role="slotProps.comment.user" :actions="$refs.thread_actions">
                     </game_forum_comment_avatar>
                 </template>
+                <template v-slot:extra_media="slotProps">
+                    <media_illustrations :comment="slotProps.comment" :variation="variation">
+                    </media_illustrations>
+                </template>
             </forum_comment>
         </template>
     </forum_thread_comments>
@@ -26,6 +30,10 @@
                     </game_forum_comment_avatar>
                 </template>
             </forum_comment>
+        </template>
+        <template v-slot:extra_media="slotProps">
+            <media_illustrations :comment="slotProps.form" editor :variation="variation">
+            </media_illustrations>
         </template>
     </forum_reply_form>
     <game_forum_online_status :variation="variation" :thread="thread"></game_forum_online_status>
