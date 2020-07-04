@@ -6,26 +6,75 @@ from djfw.wysibb.templatetags import bbcodes
 
 from tulius.forum import signals
 from tulius.forum import models
+from tulius.stories import models as stories_models
 from tulius.gameforum import consts
 from tulius.gameforum.threads import api as threads
 from tulius.forum.comments import api as comments
 
 
+def validate_image_data(variation, images_data):
+    result = []
+    for image_data in images_data:
+        image = stories_models.Illustration.objects.get(
+            id=image_data['id'])
+        if (image.variation_id == variation.id) or (
+                image.story_id == variation.story_id):
+            result.append({
+                'id': image.id,
+                'title': image.name,
+                'url': image.image.url if image.image else None,
+                'thumb': image.thumb.url if image.thumb else None,
+            })
+    return result
+
+
+@dispatch.receiver(signals.before_create_thread)
+def before_create_thread(sender, thread, data, **kwargs):
+    if sender.plugin_id != consts.GAME_FORUM_SITE_ID:
+        return
+    images_data = data['media'].get('illustrations')
+    if not images_data:
+        return
+    thread.media['illustrations'] = validate_image_data(
+        sender.variation, images_data)
+
+
 @dispatch.receiver(signals.before_add_comment)
-def before_add_comment(sender, comment, **kwargs):
+def before_add_comment(sender, comment, data, **kwargs):
     if sender.plugin_id != consts.GAME_FORUM_SITE_ID:
         return
     if sender.obj.first_comment_id is None:
         comment.data1 = sender.obj.data1
+    images_data = data['media'].get('illustrations')
+    if not images_data:
+        return
+    if sender.obj.first_comment_id == comment.id:
+        comment.media['illustrations'] = sender.obj.media['illustrations']
+    else:
+        comment.media['illustrations'] = validate_image_data(
+            sender.variation, images_data)
 
 
 @dispatch.receiver(signals.on_comment_update)
-def on_comment_update(sender, comment, **kwargs):
+def on_comment_update(sender, comment, data, **kwargs):
     if sender.plugin_id != consts.GAME_FORUM_SITE_ID:
         return
     if sender.obj.first_comment_id == comment.id:
         comment.data1 = sender.obj.data1
         comment.data2 = sender.obj.data2
+    images_data = data['media'].get('illustrations')
+    orig_data = comment.media.get('illustrations')
+    if images_data:
+        images_data = validate_image_data(sender.variation, images_data)
+    if orig_data and not images_data:
+        del comment.media['illustrations']
+    elif images_data:
+        comment.media['illustrations'] = images_data
+    if sender.obj.first_comment_id == comment.id:
+        if (not images_data) and ('illustrations' in sender.obj.media):
+            del sender.obj.media['illustrations']
+        elif images_data:
+            sender.obj.media['illustrations'] = images_data
 
 
 @dispatch.receiver(signals.thread_room_to_json)

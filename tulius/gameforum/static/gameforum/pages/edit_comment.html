@@ -15,5 +15,9 @@
                 </template>
             </forum_comment>
         </template>
+        <template v-slot:extra_media="slotProps">
+            <media_illustrations :comment="slotProps.form" editor :variation="variation">
+            </media_illustrations>
+        </template>
     </forum_reply_form>
 </div>

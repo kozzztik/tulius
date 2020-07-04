@@ -82,22 +82,12 @@ export default LazyComponent('forum_images', {
             }
             this.$refs.modal.hide();
         },
-        on_modal_submit() {
-            this.voting = JSON.parse(JSON.stringify(this.add_form));
-            this.comment.media.voting = this.voting;
-            this.$refs.modal.hide();
-            this.menu_item.disabled = true;
-        },
         on_editor_delete(index) {
             this.images.splice(index, 1);
         },
 
     },
     created() {
-        if (this.comment.media.voting)
-            this.images = this.comment.media.images;
-    },
-    mounted() {
         this.images = this.comment.media.images || [];
     },
 })

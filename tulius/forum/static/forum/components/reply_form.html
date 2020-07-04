@@ -25,6 +25,7 @@
                 </div>
             </div>
             <forum_images :comment="form" editor ref="images"></forum_images>
+            <slot v-bind:form="form" name="extra_media"></slot>
             <div class="row" style="margin-top: 0.5em;" >
                 <div class="col">
                     <b-dropdown v-if="!loading && (media_actions.length > 0)">

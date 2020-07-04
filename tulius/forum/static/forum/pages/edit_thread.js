@@ -110,6 +110,7 @@ export default LazyComponent('forum_edit_thread_page', {
                 data: data
             }).then(response => {
                 this.preview_comment = response.data;
+                this.preview_comment.thread = this.thread;
                 this.preview_comment.create_time = Date();
                 this.show_preview = true;
                 this.$root.loading_end();
