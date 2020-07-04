@@ -1,9 +1,20 @@
-<div>
+<div class="row mx-0 justify-content-start">
+    <div class="col-auto pr-1 pl-0 mt-1" v-for="image, index in images" :key="index"
+         @click="tiny_media_index=index">
+        <img class="rounded-lg" :src="image.thumb" style="max-height: 100px;">
+        <a class="btn btn-danger p-0" @click.stop="on_editor_delete(index)" v-if="editor"
+           style="float: right;margin-left: -20px;z-index: 100;position: relative;">
+            <svg class="bi bi-trash-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0v-7z"/>
+            </svg>
+        </a>
+    </div>
+    <Tinybox v-model="tiny_media_index" :images="tiny_media_images"></Tinybox>
     <b-modal hide-header size="lg" centered scrollable ref="modal"
              footer-class="justify-content-between">
         <div class="row">
             <div class="col px-1" v-for="image, index in user_images" :key="image.id"
-                 style="flex-basis: 100px;">
+                 style="flex-basis: 100px; max-width: 100px;">
                 <div class="card" :class="(selected == image)? 'border-primary' : 'border-secondary'"
                      @click="(selected==image) ? selected=null : selected=image">
                     <img :src="image.thumb" class="card-img-top">
@@ -21,8 +32,8 @@
             <b-form-file placeholder="" size="sm" browse-text="Загрузить"
                          accept="image/*" v-model="uploaded_file" style="width: 6em;"></b-form-file>
             <div>
-                <input type="checkbox" v-model="add_as_attach" v-if="false">
-                <label class="col-form-label" v-if="false">Добавить как вложение</label>
+                <input type="checkbox" v-model="add_as_attach">
+                <label class="col-form-label">Добавить как вложение</label>
             </div>
             <div>
                 <button type="button" class="btn btn-secondary" @click="$refs.modal.hide()">Отмена</button>

@@ -25,6 +25,7 @@ export default {
     beforeDestroy() {
         if (!this.menu_item)
             return
-        this.$parent.media_actions.filter(item => item != this.menu_item);
+        if (this.$parent.media_actions)
+            this.$parent.media_actions.filter(item => item != this.menu_item);
     }
 }

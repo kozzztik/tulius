@@ -5,17 +5,25 @@ export default LazyComponent('forum_images', {
     mixins: [baseMixin],
     data: function () {
         return {
+            images: [],
             user_images: null,
-            images: null,
-            add_as_attach: false,
+            add_as_attach: true,
             uploaded_file: null,
             selected: null,
             tiny_index: null,
             tiny_images: [],
+            tiny_media_index: null,
         }
     },
+    computed: {
+        tiny_media_images: function() {
+            var result = [];
+            for (var image of (this.comment.media.images || []) )
+                result.push(this.tiny_image(image));
+            return result
+        },
+    },
     watch: {
-        media: function(newMedia, oldMedia) {return this.images = newMedia.images},
         uploaded_file: function(newFile, oldFile) {
             if (!newFile)
                 return;
@@ -35,6 +43,9 @@ export default LazyComponent('forum_images', {
             if ((new_value === null) || (old_value === null))
                 return
             this.selected = this.user_images[new_value];
+        },
+        media: function(new_value, old_value) {
+            this.images = new_value.images || [];
         },
     },
     methods: {
@@ -63,6 +74,9 @@ export default LazyComponent('forum_images', {
         },
         do_add(data) {
             if (this.add_as_attach) {
+                if (this.images.length == 0)
+                    this.comment.media.images = this.images = [];
+                this.images.push(data)
             } else {
                 this.comment.body += `<img src="${data.url}">`
             }
@@ -74,14 +88,16 @@ export default LazyComponent('forum_images', {
             this.$refs.modal.hide();
             this.menu_item.disabled = true;
         },
-        on_editor_delete() {
-            this.voting = this.comment.media.voting = null;
-            this.menu_item.disabled = false;
+        on_editor_delete(index) {
+            this.images.splice(index, 1);
         },
 
     },
     created() {
         if (this.comment.media.voting)
             this.images = this.comment.media.images;
+    },
+    mounted() {
+        this.images = this.comment.media.images || [];
     },
 })
