@@ -31,10 +31,8 @@
                 <div class="col">
                     <forum_voting :comment="form" editor ref="voting"></forum_voting>
                 </div>
-                <div class="col">
-                    <forum_images :comment="form" editor ref="images"></forum_images>
-                </div>
             </div>
+            <forum_images :comment="form" editor ref="images"></forum_images>
             <div class="row" style="margin-top: 0.75em;" v-if="rights.moderate">
                 <label class="col-3 col-form-label">
                     <b>Пометка важности:</b>
