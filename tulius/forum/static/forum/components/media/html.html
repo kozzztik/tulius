@@ -1,46 +1,35 @@
 <div class="row mx-0 justify-content-start">
-    <div class="col-auto pr-1 pl-0 mt-1" v-for="image, index in images" :key="index"
-         @click="tiny_media_index=index">
-        <img class="rounded-lg" :src="image.thumb" style="max-height: 100px;">
-        <a class="btn btn-danger p-0" @click.stop="on_editor_delete(index)" v-if="editor"
-           style="float: right;margin-left: -20px;z-index: 10;position: relative;">
-            <svg class="bi bi-trash-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0v-7z"/>
-            </svg>
-        </a>
+    <div class="pr-1 pl-0 mt-1" v-html="html_data" v-if="html_data && !editor"></div>
+    <div class="pr-1 pl-0 mt-1 w-100" v-if="editor && html_data && user.superuser">
+        <div style="float: right; display: block">
+            <a class="btn btn-secondary p-0" @click="add_media()" href="javascript:void(0)">
+                <svg class="bi bi-pencil" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M11.293 1.293a1 1 0 0 1 1.414 0l2 2a1 1 0 0 1 0 1.414l-9 9a1 1 0 0 1-.39.242l-3 1a1 1 0 0 1-1.266-1.265l1-3a1 1 0 0 1 .242-.391l9-9zM12 2l2 2-9 9-3 1 1-3 9-9z"/>
+                  <path fill-rule="evenodd" d="M12.146 6.354l-2.5-2.5.708-.708 2.5 2.5-.707.708zM3 10v.5a.5.5 0 0 0 .5.5H4v.5a.5.5 0 0 0 .5.5H5v.5a.5.5 0 0 0 .5.5H6v-1.5a.5.5 0 0 0-.5-.5H5v-.5a.5.5 0 0 0-.5-.5H3z"/>
+                </svg>
+            </a>
+            <a class="btn btn-danger p-0" @click.stop="on_editor_delete()">
+                <svg class="bi bi-trash-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0v-7z"/>
+                </svg>
+            </a>
+        </div>
+        <div v-html="html_data"></div>
     </div>
-    <Tinybox v-model="tiny_media_index" :images="tiny_media_images"></Tinybox>
     <b-modal hide-header size="lg" centered scrollable ref="modal"
-             footer-class="justify-content-between">
+             footer-class="justify-content-between" v-if="editor && user.superuser">
         <div class="row">
-            <div class="col px-1" v-for="image, index in user_images" :key="image.id"
-                 style="flex-basis: 100px; max-width: 100px;">
-                <div class="card" :class="(selected == image)? 'border-primary' : 'border-secondary'"
-                     @click="(selected==image) ? selected=null : selected=image">
-                    <img :src="image.thumb" class="card-img-top">
-                    <h6 class="px-1 my-0 text-muted" v-if="selected != image">
-                       {{image.file_name}}
-                    </h6>
-                    <a href="javascript:void(0)" v-if="selected == image"
-                       class="btn btn-success w100 p-1" @click.prevent.stop="tiny_index=index">
-                        Просмотр
-                    </a>
-                </div>
+            <div class="col">
+                <textarea v-model="html_data" class="w-100"></textarea>
             </div>
         </div>
         <template v-slot:modal-footer>
             <b-form-file placeholder="" size="sm" browse-text="Загрузить"
-                         accept="image/*" v-model="uploaded_file" style="width: 6em;"></b-form-file>
+                         v-model="uploaded_file" style="width: 6em;"></b-form-file>
             <div>
-                <input type="checkbox" v-model="add_as_attach">
-                <label class="col-form-label">Добавить как вложение</label>
-            </div>
-            <div>
-                <button type="button" class="btn btn-secondary" @click="$refs.modal.hide()">Отмена</button>
-                <button type="button" class="btn btn-primary" :class="selected ? '' : 'disabled'"
-                        @click="if (selected) do_add(selected)">OK</button>
+                <button type="button" class="btn btn-primary"
+                        @click="do_add()">Закрыть</button>
             </div>
         </template>
-        <Tinybox v-model="tiny_index" :images="tiny_images"></Tinybox>
     </b-modal>
 </div>

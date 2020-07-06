@@ -20,7 +20,8 @@ export default {
         if (!this.editor)
             return
         this.menu_item = this.get_menu_item();
-        this.$parent.media_actions.push(this.menu_item);
+        if (this.menu_item)
+            this.$parent.media_actions.push(this.menu_item);
     },
     beforeDestroy() {
         if (!this.menu_item)

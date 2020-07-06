@@ -1,6 +1,6 @@
 import baseMixin from './base.js'
 
-export default LazyComponent('forum_images', {
+export default LazyComponent('forum_html_media', {
     template: '/static/forum/components/media/html.html',
     mixins: [baseMixin],
     data: function () {
@@ -25,26 +25,34 @@ export default LazyComponent('forum_images', {
         },
         media: function(new_value, old_value) {
             this.html_data = new_value.html || '';
+            this.menu_item.disabled = (this.html_data != '');
         },
+    },
+    computed: {
+        user: function() {return this.$root.user;},
     },
     methods: {
         add_media() {
             this.$refs.modal.show();
         },
         get_menu_item() {
-            return {
-                label: "Добавить HTML код",
-                disabled: false,
-                action: this.add_media,
-            }
+            if (this.user.superuser)
+                return {
+                    label: "Добавить HTML код",
+                    disabled: false,
+                    action: this.add_media,
+                }
+            return null;
         },
-        do_add(data) {
-            this.comment.html = this.html_data;
+        do_add() {
+            this.comment.media.html = this.html_data;
+            this.menu_item.disabled = (this.html_data != '');
             this.$refs.modal.hide();
         },
-        on_editor_delete(index) {
+        on_editor_delete() {
             this.html_data = '';
             this.media.html = '';
+            this.menu_item.disabled = false;
         },
 
     },

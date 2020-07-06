@@ -1,6 +1,9 @@
+import io
+
 from django import dispatch
 from django.db import transaction
 from django.core import exceptions
+from django.core.files import uploadedfile
 
 from tulius.forum import signals
 from tulius.forum import plugins
@@ -65,14 +68,22 @@ class UploadFiles(plugins.BaseAPIView):
         if not request.user.is_superuser:
             raise exceptions.PermissionDenied()
         file_name = request.GET['file_name']
+        content_type = request.GET['content_type']
+        uploaded = uploadedfile.InMemoryUploadedFile(
+            io.BytesIO(request.body),
+            'upload',
+            file_name,
+            content_type=content_type,
+            size=len(request.body),
+            charset=None
+        )
         uploaded_file = models.UploadedFile(
             user=request.user,
             filename=file_name,
             file_size=len(request.body),
-            mime=request.GET['content_type']
+            mime=content_type
         )
         uploaded_file.save()
-        uploaded_file.body.save(
-            f'{uploaded_file.pk}_{file_name}', request.body)
+        uploaded_file.body.save(f'{uploaded_file.pk}_{file_name}', uploaded)
         uploaded_file.save()
         return self.file_to_json(uploaded_file)

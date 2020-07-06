@@ -34,6 +34,7 @@
                 </div>
             </div>
             <forum_images :comment="form" editor ref="images"></forum_images>
+            <forum_html_media :comment="form" editor></forum_html_media>
             <slot v-bind:form="form" name="extra_media"></slot>
             <div class="row" style="margin-top: 0.75em;" v-if="rights.moderate">
                 <label class="col-3 col-form-label">
