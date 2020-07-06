@@ -2,6 +2,7 @@ import ckeditor from '../../ckeditor4/components/tulius_ckeditor.js'
 import voting from './voting.js'
 import images from './media/images.js'
 import html_editor from './media/html.js'
+import youtube from './media/youtube.js'
 
 
 export default LazyComponent('forum_reply_form', {
