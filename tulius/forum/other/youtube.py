@@ -9,6 +9,8 @@ regexp = re.compile(r'^[\w\-_]*$')
 
 @dispatch.receiver(signals.before_create_thread)
 def before_create_thread(sender, thread, data, **kwargs):
+    if thread.room:
+        return
     html_data = data['media'].get('youtube')
     if html_data and regexp.match(html_data):
         thread.media['youtube'] = html_data

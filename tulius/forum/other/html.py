@@ -12,6 +12,8 @@ from djfw.wysibb import models
 
 @dispatch.receiver(signals.before_create_thread)
 def before_create_thread(sender, thread, data, **kwargs):
+    if thread.room:
+        return
     html_data = data['media'].get('html')
     if html_data and sender.user.is_superuser:
         thread.media['html'] = html_data

@@ -45,10 +45,16 @@ class BaseThreadRightsChecker:
     def _create_checker(self, thread):
         return self.__class__(thread, self.user)
 
+    def get_rights_for_root(self):
+        raise NotImplementedError()
+
     def get_parent_rights(self) -> RightsDescriptor:
         if not self._parent_rights:
-            self._parent_rights = self._create_checker(
-                self.thread.parent).get_rights()
+            if self.thread.parent is None:
+                self._parent_rights = self.get_rights_for_root()
+            else:
+                self._parent_rights = self._create_checker(
+                    self.thread.parent).get_rights()
         return self._parent_rights
 
     def _get_free_descendants(self):

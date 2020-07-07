@@ -46,8 +46,6 @@ class DefaultRightsChecker(base.BaseThreadRightsChecker):
 
     def _get_rights(self):
         rights = self._rights = self._rights or self._base_rights_class()
-        if self.thread.parent is None:
-            return self.get_rights_for_root()
         author = (not self.user.is_anonymous) and (
             (self.user.id == self.thread.user_id) or self.user.is_superuser)
         parent_rights = self.get_parent_rights()

@@ -19,6 +19,8 @@ def validate_image_data(images_data):
 
 @dispatch.receiver(signals.before_create_thread)
 def before_create_thread(sender, thread, data, **kwargs):
+    if thread.room:
+        return
     images_data = data['media'].get('images')
     if not images_data:
         return
