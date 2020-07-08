@@ -64,7 +64,7 @@ class GrantedRightsAPI(BaseGrantedRightsAPI):
     def get_context_data(self, **kwargs):
         self.get_parent_thread(**kwargs)
         if not self.rights.edit:
-            exceptions.PermissionDenied()
+            raise exceptions.PermissionDenied()
         objs = self.model.objects.filter(thread=self.obj).order_by('id')
         return {
             'granted_rights': [self.right_to_json(r) for r in objs]
