@@ -167,7 +167,7 @@ class CommentsPageAPI(CommentsBase):
             if preview:
                 return self.comment_to_json(comment)
             # commit transaction to be sure that clients wouldn't be notified
-            # before comment will be accessable in DB/
+            # before comment will be accessible in DB
             transaction.commit()
             publisher.notify_thread_about_new_comment(self, self.obj, comment)
             page = comment.page
