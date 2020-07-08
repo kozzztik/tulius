@@ -370,7 +370,7 @@ class MoveThreadView(BaseThreadView):
         data = json.loads(request.body)
         parent_id = data['parent_id']
         self.get_parent_thread(parent_id, for_update=True)
-        if not self.rights.edit:
+        if not self.rights.write:
             raise exceptions.PermissionDenied('No target write right')
         new_parent = self.obj
         self.get_parent_thread(for_update=True, **kwargs)
@@ -378,8 +378,6 @@ class MoveThreadView(BaseThreadView):
             raise exceptions.PermissionDenied('No source edit right')
         if new_parent.is_descendant_of(self.obj, include_self=True):
             raise exceptions.PermissionDenied('Cant move inside yourself')
-        if new_parent.plugin_id != self.obj.plugin_id:
-            raise exceptions.PermissionDenied('Cant move between plugins')
         old_parent = self.obj.parent
         self.obj.parent = new_parent
         self.obj.save()
