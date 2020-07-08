@@ -9,8 +9,8 @@ def test_room_delete(client, superuser, admin, user):
             'room': True, 'access_type': 0, 'granted_rights': []},
         content_type='application/json')
     assert response.status_code == 200
-    # Create rooms in root room
     group = response.json()
+    # Create rooms in root room
     response = admin.put(
         group['url'], {
             'title': 'room1', 'body': 'room1 description',
@@ -87,3 +87,7 @@ def test_room_delete(client, superuser, admin, user):
     assert len(data['rooms']) == 1
     assert data['rooms'][0]['id'] == room1['id']
     assert data['rooms'][0]['threads_count'] == 1
+    response = admin.get(room3['url'])
+    assert response.status_code == 404
+    response = admin.get(room4['url'])
+    assert response.status_code == 404

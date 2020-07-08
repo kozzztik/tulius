@@ -84,7 +84,7 @@ class DefaultRightsChecker(base.BaseThreadRightsChecker):
             thread=self.thread).select_related('user').distinct()
         moderators = [
             right.user for right in rights
-            if right.access_level > models.THREAD_ACCESS_MODERATE]
+            if right.access_level >= models.THREAD_ACCESS_MODERATE]
         if self.thread.access_type == models.THREAD_ACCESS_TYPE_NO_READ:
             accessed_users = [right.user for right in rights]
         else:

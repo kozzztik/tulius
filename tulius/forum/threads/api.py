@@ -137,11 +137,8 @@ class BaseThreadView(plugins.BaseAPIView):
         threads = self._thread_list_apply_rights(self.rights, threads)
 
         for thread in threads:
-            thread.moderators = []
-            thread.accessed_users = None
-            if thread.access_type == models.THREAD_ACCESS_TYPE_NO_READ:
-                thread.accessed_users = thread.rights_checker\
-                    .get_moderators_and_accessed_users()[1]
+            thread.moderators, thread.accessed_users = thread.rights_checker\
+                    .get_moderators_and_accessed_users()
         signals.thread_prepare_threads.send(self, threads=threads)
         return threads
 
