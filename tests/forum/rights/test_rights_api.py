@@ -1,4 +1,7 @@
+import pytest
+
 from tulius.forum import models
+from tulius.forum.rights import base
 
 
 def test_update_and_moderate(client, superuser, admin, user):
@@ -120,3 +123,15 @@ def test_update_and_moderate(client, superuser, admin, user):
     right = response.json()
     response = user.delete(room['url'] + f'granted_rights/{right["id"]}/')
     assert response.status_code == 403
+
+
+def test_base_not_implemented_methods(user):
+    checker = base.BaseThreadRightsChecker(None, user.user)
+    with pytest.raises(NotImplementedError):
+        checker.get_rights()
+    with pytest.raises(NotImplementedError):
+        checker.get_rights_for_root()
+    with pytest.raises(NotImplementedError):
+        checker._get_free_descendants()
+    with pytest.raises(NotImplementedError):
+        checker._get_readable_protected_descendants()

@@ -104,3 +104,15 @@ def test_update_and_moderate(client, superuser, admin, user):
     assert updated['closed']
     assert updated['title'] == 'thread(updated3)'
     assert updated['body'] == 'thread description3'
+    # check room update works too, and 'room' is ignored
+    response = superuser.post(
+        group['url'], {
+            'title': 'group(updated)', 'body': 'group description(updated)',
+            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ},
+        content_type='application/json')
+    assert response.status_code == 200
+    data = response.json()
+    assert data['title'] == 'group(updated)'
+    assert data['body'] == 'group description(updated)'
+    assert data['room']
+    assert data['access_type'] == 0

@@ -182,7 +182,7 @@ class BaseThreadView(plugins.BaseAPIView):
     def update_thread(self, data):
         self.obj.title = data['title']
         self.obj.body = html_converter.html_to_bb(data['body'])
-        if self.rights.moderate:
+        if self.rights.moderate and not self.obj.room:
             self.obj.important = bool(data['important'])
             self.obj.closed = bool(data['closed'])
 
