@@ -6,8 +6,7 @@ def test_room_delete(client, superuser, admin, user):
     response = superuser.put(
         '/api/forum/', {
             'title': 'group', 'body': 'group description',
-            'room': True, 'access_type': 0, 'granted_rights': []},
-        content_type='application/json')
+            'room': True, 'access_type': 0, 'granted_rights': []})
     assert response.status_code == 200
     group = response.json()
     # Create rooms in root room
@@ -15,16 +14,14 @@ def test_room_delete(client, superuser, admin, user):
         group['url'], {
             'title': 'room1', 'body': 'room1 description',
             'room': True, 'access_type': models.THREAD_ACCESS_TYPE_OPEN,
-            'granted_rights': []},
-        content_type='application/json')
+            'granted_rights': []})
     assert response.status_code == 200
     room1 = response.json()
     response = admin.put(
         group['url'], {
             'title': 'room2', 'body': 'room2 description',
             'room': True, 'access_type': models.THREAD_ACCESS_TYPE_OPEN,
-            'granted_rights': []},
-        content_type='application/json')
+            'granted_rights': []})
     assert response.status_code == 200
     room2 = response.json()
     # Create branch of rooms in room1 to test delete in middle of branch
@@ -32,16 +29,14 @@ def test_room_delete(client, superuser, admin, user):
         room1['url'], {
             'title': 'room3', 'body': 'room3 description',
             'room': True, 'access_type': models.THREAD_ACCESS_TYPE_OPEN,
-            'granted_rights': []},
-        content_type='application/json')
+            'granted_rights': []})
     assert response.status_code == 200
     room3 = response.json()
     response = admin.put(
         room3['url'], {
             'title': 'room4', 'body': 'room4 description',
             'room': True, 'access_type': models.THREAD_ACCESS_TYPE_OPEN,
-            'granted_rights': []},
-        content_type='application/json')
+            'granted_rights': []})
     assert response.status_code == 200
     room4 = response.json()
     # Create threads to check how they will be filtered by room delete
@@ -50,8 +45,7 @@ def test_room_delete(client, superuser, admin, user):
             room['url'], {
                 'title': 'thread1', 'body': 'thread1 description',
                 'room': False, 'access_type': models.THREAD_ACCESS_TYPE_OPEN,
-                'granted_rights': [], 'media': {}},
-            content_type='application/json')
+                'granted_rights': [], 'media': {}})
         assert response.status_code == 200
     # Check initial state, that before delete it looks like expected
     response = admin.get(group['url'])

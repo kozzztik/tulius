@@ -1,6 +1,7 @@
 import io
 
 from django import dispatch
+from django.core import exceptions
 from django.core.files import uploadedfile
 
 from tulius.forum import plugins
@@ -75,6 +76,8 @@ class Images(plugins.BaseAPIView):
         ]}
 
     def put(self, request):
+        if not request.user.is_authenticated:
+            raise exceptions.PermissionDenied()
         uploaded = uploadedfile.InMemoryUploadedFile(
             io.BytesIO(request.body),
             'upload',

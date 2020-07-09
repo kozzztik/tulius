@@ -1,12 +1,43 @@
 import os
+
 import pytest
 import django
+from django.test import client as django_client
+
+
+class JSONClient(django_client.Client):
+    # pylint: disable=too-many-arguments
+    def post(
+            self, path, data=None, content_type=django_client.MULTIPART_CONTENT,
+            follow=False, secure=False, **extra):
+        if isinstance(data, dict):
+            content_type = 'application/json'
+        return super(JSONClient, self).post(
+            path, data, content_type=content_type, follow=follow, secure=secure,
+            **extra)
+
+    # pylint: disable=too-many-arguments
+    def put(self, path, data='', content_type='application/octet-stream',
+            follow=False, secure=False, **extra):
+        if isinstance(data, dict):
+            content_type = 'application/json'
+        return super(JSONClient, self).put(
+            path, data=data, content_type=content_type, follow=follow,
+            secure=secure, **extra)
+
+    # pylint: disable=too-many-arguments
+    def options(self, path, data='', content_type='application/octet-stream',
+                follow=False, secure=False, **extra):
+        if isinstance(data, dict):
+            content_type = 'application/json'
+        return super(JSONClient, self).options(
+            path, data=data, content_type=content_type, follow=follow,
+            secure=secure, **extra)
 
 
 @pytest.fixture(name='client')
 def client_fixture():
-    from django.test.client import Client
-    return Client()
+    return JSONClient()
 
 
 @pytest.fixture(name='user_factory', scope='session')
@@ -15,13 +46,12 @@ def create_user_fixture():
 
     def user_factory(username=None, **kwargs):
         from tulius import models as tulius_models
-        from django import test
 
         username = username or f'user_{user_number}'
         user = tulius_models.User(username=username, **kwargs)
         user.set_password(username)
         user.save()
-        client = test.Client()
+        client = JSONClient()
         client.user = user
         client.login(username=username, password=username)
         return client

@@ -3,7 +3,7 @@ export default LazyComponent('game_forum_role_selector', {
     props: ['variation', 'thread', 'form', 'editor'],
     methods: {
 		role_name_by_id(pk) {
-		    if (!pk) return 'Ведущий';
+		    if (!pk) return '---';
 		    for (var role of this.variation.roles)
                 if (role.id == pk)
                     return role.title;

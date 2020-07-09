@@ -21,7 +21,7 @@ class BaseThreadAPI(api.BaseThreadView, base.VariationMixin):
         if role_id is None:
             return {
                 'id': None,
-                'title': 'Ведущий',
+                'title': '---',
                 'url': None,
                 'sex': None,
                 'avatar': None,
