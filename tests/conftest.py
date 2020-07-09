@@ -6,6 +6,7 @@ from django.test import client as django_client
 
 
 class JSONClient(django_client.Client):
+    # pylint: disable=too-many-arguments
     def post(
             self, path, data=None, content_type=django_client.MULTIPART_CONTENT,
             follow=False, secure=False, **extra):
@@ -15,6 +16,7 @@ class JSONClient(django_client.Client):
             path, data, content_type=content_type, follow=follow, secure=secure,
             **extra)
 
+    # pylint: disable=too-many-arguments
     def put(self, path, data='', content_type='application/octet-stream',
             follow=False, secure=False, **extra):
         if isinstance(data, dict):
@@ -23,6 +25,7 @@ class JSONClient(django_client.Client):
             path, data=data, content_type=content_type, follow=follow,
             secure=secure, **extra)
 
+    # pylint: disable=too-many-arguments
     def options(self, path, data='', content_type='application/octet-stream',
                 follow=False, secure=False, **extra):
         if isinstance(data, dict):
