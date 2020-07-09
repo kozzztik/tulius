@@ -6,8 +6,7 @@ def test_update_and_moderate(client, superuser, admin, user):
     response = superuser.put(
         '/api/forum/', {
             'title': 'group', 'body': 'group description',
-            'room': True, 'access_type': 0, 'granted_rights': []},
-        content_type='application/json')
+            'room': True, 'access_type': 0, 'granted_rights': []})
     assert response.status_code == 200
     group = response.json()
     # check that for privileged user important works, but not closed
@@ -15,8 +14,7 @@ def test_update_and_moderate(client, superuser, admin, user):
         group['url'], {
             'title': 'thread', 'body': 'thread description',
             'room': False, 'access_type': 0, 'granted_rights': [],
-            'important': True, 'closed': True, 'media': {}},
-        content_type='application/json')
+            'important': True, 'closed': True, 'media': {}})
     assert response.status_code == 200
     su_thread = response.json()
     assert su_thread['important']
@@ -27,8 +25,7 @@ def test_update_and_moderate(client, superuser, admin, user):
         group['url'], {
             'title': 'thread', 'body': 'thread description',
             'room': False, 'access_type': 0, 'granted_rights': [],
-            'important': True, 'closed': True, 'media': {}},
-        content_type='application/json')
+            'important': True, 'closed': True, 'media': {}})
     assert response.status_code == 200
     thread = response.json()
     assert not thread['important']
@@ -39,8 +36,7 @@ def test_update_and_moderate(client, superuser, admin, user):
             'title': 'thread(updated)', 'body': 'thread description2',
             'access_type': models.THREAD_ACCESS_TYPE_NO_READ,
             'granted_rights': [],
-            'important': True, 'closed': True, 'media': {}},
-        content_type='application/json')
+            'important': True, 'closed': True, 'media': {}})
     assert response.status_code == 200
     updated = response.json()
     assert not updated['important']
@@ -53,21 +49,20 @@ def test_update_and_moderate(client, superuser, admin, user):
         thread['url'], {
             'title': 'thread(updated)', 'body': 'thread description3',
             'access_type': 0, 'granted_rights': [],
-            'important': True, 'closed': True, 'media': {}},
-        content_type='application/json')
+            'important': True, 'closed': True, 'media': {}})
     assert response.status_code == 403
     # add privileges
     response = superuser.post(
         thread['url'] + 'granted_rights/', {
             'user': {'id': admin.user.pk},
             'access_level': models.THREAD_ACCESS_MODERATE
-        }, content_type='application/json'
+        }
     )
     assert response.status_code == 200
     response = superuser.put(
         thread['url'] + 'granted_rights/', {
             'access_type': models.THREAD_ACCESS_TYPE_NO_READ
-        }, content_type='application/json'
+        }
     )
     assert response.status_code == 200
     # check how it looks like on room page for anonymous user
@@ -96,8 +91,7 @@ def test_update_and_moderate(client, superuser, admin, user):
         thread['url'], {
             'title': 'thread(updated3)', 'body': 'thread description3',
             'granted_rights': [],
-            'important': True, 'closed': True, 'media': {}},
-        content_type='application/json')
+            'important': True, 'closed': True, 'media': {}})
     assert response.status_code == 200
     updated = response.json()
     assert updated['important']
@@ -108,8 +102,7 @@ def test_update_and_moderate(client, superuser, admin, user):
     response = superuser.post(
         group['url'], {
             'title': 'group(updated)', 'body': 'group description(updated)',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ},
-        content_type='application/json')
+            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ})
     assert response.status_code == 200
     data = response.json()
     assert data['title'] == 'group(updated)'

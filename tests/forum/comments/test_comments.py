@@ -6,16 +6,14 @@ def test_comments_api(client, superuser, admin, user):
     response = superuser.put(
         '/api/forum/', {
             'title': 'group', 'body': 'group description',
-            'room': True, 'access_type': 0, 'granted_rights': []},
-        content_type='application/json')
+            'room': True, 'access_type': 0, 'granted_rights': []})
     assert response.status_code == 200
     group = response.json()
     response = admin.put(
         group['url'], {
             'title': 'thread', 'body': 'thread description',
             'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ,
-            'granted_rights': [], 'media': {}},
-        content_type='application/json')
+            'granted_rights': [], 'media': {}})
     assert response.status_code == 200
     thread = response.json()
     # check comments not readable for other users
@@ -25,8 +23,7 @@ def test_comments_api(client, superuser, admin, user):
     response = admin.put(
         thread['url'] + 'granted_rights/', {
             'access_type': models.THREAD_ACCESS_TYPE_NO_WRITE
-        }, content_type='application/json'
-    )
+        })
     assert response.status_code == 200
     # check user now can read comments
     response = user.get(thread['url'] + 'comments_page/')
@@ -45,14 +42,14 @@ def test_comments_api(client, superuser, admin, user):
             'reply_id': first_comment['id'],
             'title': 'hello', 'body': 'world',
             'media': {},
-        }, content_type='application/json')
+        })
     assert response.status_code == 403
 
     # make thread opened
     response = admin.put(
         thread['url'] + 'granted_rights/', {
             'access_type': models.THREAD_ACCESS_TYPE_NOT_SET
-        }, content_type='application/json'
+        }
     )
     assert response.status_code == 200
     # check comment preview works
@@ -61,7 +58,7 @@ def test_comments_api(client, superuser, admin, user):
             'reply_id': first_comment['id'],
             'title': 'hello', 'body': 'world',
             'media': {}, 'preview': True,
-        }, content_type='application/json')
+        })
     assert response.status_code == 200
     data = response.json()
     assert data['id'] is None
@@ -80,7 +77,7 @@ def test_comments_api(client, superuser, admin, user):
             'reply_id': first_comment['id'],
             'title': 'hello', 'body': 'world',
             'media': {},
-        }, content_type='application/json')
+        })
     assert response.status_code == 200
     data = response.json()
     assert len(data['comments']) == 2
@@ -95,7 +92,7 @@ def test_comments_api(client, superuser, admin, user):
             'reply_id': first_comment['id'],
             'title': 'hello world', 'body': 'world is great',
             'media': {},
-        }, content_type='application/json')
+        })
     assert response.status_code == 200
     data = response.json()
     assert data['id'] == comment['id']
@@ -126,7 +123,7 @@ def test_comments_api(client, superuser, admin, user):
             'reply_id': first_comment['id'],
             'title': 'Im admin', 'body': 'my comment is awesome',
             'media': {},
-        }, content_type='application/json')
+        })
     assert response.status_code == 200
     data = response.json()
     assert len(data['comments']) == 2
@@ -140,7 +137,7 @@ def test_comments_api(client, superuser, admin, user):
             'reply_id': first_comment['id'],
             'title': 'hello world', 'body': 'world is great',
             'media': {},
-        }, content_type='application/json')
+        })
     assert response.status_code == 403
     # check comments readable by anonymous user
     response = client.get(thread['url'] + 'comments_page/')
@@ -153,7 +150,7 @@ def test_comments_api(client, superuser, admin, user):
             'reply_id': first_comment['id'],
             'title': 'hello world', 'body': 'world is great',
             'media': {},
-        }, content_type='application/json')
+        })
     assert response.status_code == 403
     # check update comment preview
     response = admin.post(
@@ -161,7 +158,7 @@ def test_comments_api(client, superuser, admin, user):
             'reply_id': first_comment['id'],
             'title': 'hello world', 'body': 'world is great',
             'media': {}, 'preview': True
-        }, content_type='application/json')
+        })
     assert response.status_code == 200
     data = response.json()
     assert data['id'] == admin_comment['id']
@@ -178,8 +175,7 @@ def test_comments_api(client, superuser, admin, user):
         group['url'], {
             'title': 'thread2', 'body': 'thread2 description',
             'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NOT_SET,
-            'granted_rights': [], 'media': {}},
-        content_type='application/json')
+            'granted_rights': [], 'media': {}})
     assert response.status_code == 200
     thread2 = response.json()
     response = admin.post(
@@ -187,7 +183,7 @@ def test_comments_api(client, superuser, admin, user):
             'reply_id': thread2['first_comment_id'],
             'title': 'Im admin2', 'body': 'my comment is awesome2',
             'media': {},
-        }, content_type='application/json')
+        })
     assert response.status_code == 403
     # check comment without body is not added
     response = admin.post(
@@ -195,7 +191,7 @@ def test_comments_api(client, superuser, admin, user):
             'reply_id': thread['first_comment_id'],
             'title': 'Im admin2', 'body': '',
             'media': {},
-        }, content_type='application/json')
+        })
     assert response.status_code == 200
     data = response.json()
     assert len(data['comments']) == 2
