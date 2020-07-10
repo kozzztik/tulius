@@ -31,7 +31,7 @@ def update_thread_links(apps, schema_editor):
             print(thread)
     print('started to migrate comments')
     i = 0
-    for comment in Comment.objects.all().iterator():
+    for comment in Comment.objects.all().iterator(chunk_size=100):
         i += 1
         if (i % 100) == 0:
             gc.collect()
