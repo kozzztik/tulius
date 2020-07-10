@@ -33,9 +33,9 @@ def update_thread_links(apps, schema_editor):
     i = 0
     for comment in Comment.objects.all().iterator():
         i += 1
-        if i % 1000:
+        if (i % 1000) == 0:
             gc.collect()
-        if i % 100000:
+        if (i % 100000) == 0:
             print(f'Passed {i} comments')
         comment.title, count1 = regexp.subn(new_link, comment.title)
         migrated_ct += count1
