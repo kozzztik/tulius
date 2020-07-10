@@ -9,6 +9,7 @@ old_link = 'old.tulius.com'
 new_link = 'tulius.danetka.ru'
 regexp = re.compile(re.escape(old_link), re.IGNORECASE)
 
+
 def update_thread_links(apps, schema_editor):
     Comment = apps.get_model('forum', 'Comment')
     Thread = apps.get_model('forum', 'Thread')
@@ -18,7 +19,7 @@ def update_thread_links(apps, schema_editor):
     migrated_ct = 0
     migrated_t = 0
     migrated_c = 0
-    for thread in Thread.objects.all():
+    for thread in Thread.objects.all().iterator():
         thread.title, count1 = regexp.subn(new_link, thread.title)
         migrated_tt += count1
         thread.body, count2 = regexp.subn(new_link, thread.body)
@@ -27,7 +28,7 @@ def update_thread_links(apps, schema_editor):
             migrated_t += 1
             thread.save()
             print(thread)
-    for comment in Comment.objects.all():
+    for comment in Comment.objects.all().iterator():
         comment.title, count1 = regexp.subn(new_link, comment.title)
         migrated_ct += count1
         comment.body, count2 = regexp.subn(new_link, comment.body)
