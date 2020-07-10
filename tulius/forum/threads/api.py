@@ -261,7 +261,9 @@ class ThreadView(BaseThreadView):
             self, thread=self.obj, data=data, preview=preview)
         transaction.commit()
         # TODO notify clients
-        return self.obj_to_json()
+        response = self.obj_to_json()
+        signals.thread_view.send(self, response=response)
+        return response
 
     @transaction.atomic
     def post(self, request, **kwargs):
@@ -275,7 +277,9 @@ class ThreadView(BaseThreadView):
             self, thread=self.obj, data=data, preview=preview)
         if not preview:
             self.obj.save()
-        return self.obj_to_json()
+        response = self.obj_to_json()
+        signals.thread_view.send(self, response=response)
+        return response
 
 
 class IndexView(BaseThreadView):
@@ -392,4 +396,6 @@ class MoveThreadView(BaseThreadView):
                 tree_id=new_parent.tree_id, parent=None)
             self.repair_thread_counters(obj, only_stats=True)
             obj.save()
-        return self.obj_to_json()
+        response = self.obj_to_json()
+        signals.thread_view.send(self, response=response)
+        return response

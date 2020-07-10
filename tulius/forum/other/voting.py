@@ -12,6 +12,7 @@ from tulius.core.ckeditor import html_converter
 from tulius.forum import models
 from tulius.forum import signals
 from tulius.forum.comments import api
+from djfw.wysibb.templatetags import bbcodes
 
 
 @dispatch.receiver(signals.comment_to_json)
@@ -74,6 +75,8 @@ def on_comment_update(sender, comment, data, preview, **kwargs):
         # voting added
         voting = VotingAPI.create_voting(comment, sender.user, voting_data)
         comment.media['voting'] = voting.pk
+        if sender.obj.first_comment_id == comment.id:
+            sender.obj.media['voting'] = voting.pk
         return
     voting = models.Voting.objects.filter(pk=orig_data).first()
     if not voting:
@@ -87,7 +90,6 @@ def on_comment_update(sender, comment, data, preview, **kwargs):
 
 class VotingAPI(api.CommentBase):
     voting = None
-    no_revote = False
 
     @classmethod
     def choice_json(cls, voting, user):
@@ -130,8 +132,8 @@ class VotingAPI(api.CommentBase):
         choice = cls.choice_json(voting, user)
         return {
             'id': voting.pk,
-            'name': html.escape(voting.voting_name),
-            'body': html.escape(voting.voting_body),
+            'name': bbcodes.bbcode(voting.voting_name),
+            'body': bbcodes.bbcode(voting.voting_body),
             'closed': voting.closed,
             'anonymous': voting.anonymous,
             'show_results': voting.show_results,
@@ -185,8 +187,6 @@ class VotingAPI(api.CommentBase):
         votes = models.VotingVote.objects.filter(
             choice__voting=self.voting, user=request.user)
         if votes:
-            if self.no_revote:
-                raise http.Http404()
-            votes.delete()
+            raise http.Http404()
         models.VotingVote(user=request.user, choice=choice).save()
         return self.voting_json(self.voting, self.user)
