@@ -46,6 +46,7 @@ def update_thread_links(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
+    atomic = False
 
     dependencies = [
         ('forum', '0007_auto_20200630_1059'),
