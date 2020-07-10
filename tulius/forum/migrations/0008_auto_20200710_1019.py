@@ -20,7 +20,8 @@ def update_thread_links(apps, schema_editor):
     migrated_ct = 0
     migrated_t = 0
     migrated_c = 0
-    for thread in Thread.objects.all().iterator():
+    i = 0
+    for thread in Thread.objects.all().iterator(chunk_size=10):
         thread.title, count1 = regexp.subn(new_link, thread.title)
         migrated_tt += count1
         thread.body, count2 = regexp.subn(new_link, thread.body)
@@ -29,22 +30,20 @@ def update_thread_links(apps, schema_editor):
             migrated_t += 1
             thread.save()
             print(thread)
-    print('started to migrate comments')
-    i = 0
-    for comment in Comment.objects.all().iterator(chunk_size=100):
+        for comment in Comment.objects.filter(
+                parent=thread).iterator(chunk_size=50):
+            comment.title, count1 = regexp.subn(new_link, comment.title)
+            migrated_ct += count1
+            comment.body, count2 = regexp.subn(new_link, comment.body)
+            migrated_cb += count2
+            if count1 + count2:
+                migrated_c += 1
+                comment.save()
+                print(comment)
         i += 1
-        if (i % 100) == 0:
-            gc.collect()
-        if (i % 10000) == 0:
-            print(f'Passed {i} comments')
-        comment.title, count1 = regexp.subn(new_link, comment.title)
-        migrated_ct += count1
-        comment.body, count2 = regexp.subn(new_link, comment.body)
-        migrated_cb += count2
-        if count1 + count2:
-            migrated_c += 1
-            comment.save()
-            print(comment)
+        if (i % 50) == 0:
+            print(f'Passed {i} threads')
+        gc.collect()
     print(f'Replaced in thread titles: {migrated_tt}')
     print(f'Replaced in thread body: {migrated_tb}')
     print(f'Total migrated threads {migrated_t}')
