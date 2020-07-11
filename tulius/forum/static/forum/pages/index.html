@@ -20,10 +20,10 @@
             </div>
             <div class="captionright"></div>
         </div>
-        <a v-if="(!user.is_anonymous) && group.unreaded_url" :href="group.unreaded_url">
+        <router-link v-if="(!user.is_anonymous) && group.unreaded" :to="urls.comment(group.unreaded)">
             <div class="room_group_read_mark not_readed"></div>
-        </a>
-        <div v-if="(!user.is_anonymous) && (!group.unreaded_url)" class="room_group_read_mark"></div>
+        </router-link>
+        <div v-if="(!user.is_anonymous) && (!group.unreaded)" class="room_group_read_mark"></div>
         <div v-if="!user.is_anonymous" class="thread_collapse" v-on:click="collapse" :groupid="group.id">
             {{ group.collapsed ? "+" : "-" }}
         </div>
