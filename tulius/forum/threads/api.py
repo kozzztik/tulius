@@ -316,13 +316,20 @@ class IndexView(BaseThreadView):
             access_type__lt=models.THREAD_ACCESS_TYPE_NO_READ
         ) | query_utils.Q(user=self.user))  # TODO: move it to protected #97
 
-    def room_group_unreaded_url(self, rooms):
+    def room_group_unreaded(self, rooms):
         unreaded = None
         for room in rooms:
             if room.unreaded:
                 if (not unreaded) or (room.unreaded_id < unreaded.id):
                     unreaded = room.unreaded
-        return self.thread_url(unreaded.pk) if unreaded else None
+        return {
+            'id': unreaded.id,
+            'thread': {
+                'id': unreaded.parent_id,
+                'url': self.thread_url(unreaded.parent_id),
+            },
+            'page': unreaded.page
+        } if unreaded else None
 
     def get_context_data(self, **kwargs):
         all_rooms = [thread for thread in self.get_index(1)]
@@ -341,7 +348,7 @@ class IndexView(BaseThreadView):
                 'title': group.title,
                 'rooms': [self.room_to_json(thread) for thread in group.rooms],
                 'url': self.thread_url(group.id),
-                'unreaded_url': self.room_group_unreaded_url(group.rooms),
+                'unreaded': self.room_group_unreaded(group.rooms),
             } for group in groups]
         }
 
