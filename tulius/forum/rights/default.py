@@ -11,6 +11,9 @@ class DefaultRightsChecker(base.BaseThreadRightsChecker):
         persons = [
             right.user for right in
             models.ThreadAccessRight.objects.filter(thread=self.thread)]
+        if self.thread.user not in persons:
+            # owner have access too
+            persons.append(self.thread.user)
         if parent_rights.limited_read is not None:
             persons = [p for p in persons if p in parent_rights.limited_read]
         return persons
@@ -85,11 +88,7 @@ class DefaultRightsChecker(base.BaseThreadRightsChecker):
         moderators = [
             right.user for right in rights
             if right.access_level >= models.THREAD_ACCESS_MODERATE]
-        if self.thread.access_type == models.THREAD_ACCESS_TYPE_NO_READ:
-            accessed_users = [right.user for right in rights]
-        else:
-            accessed_users = None
-        return moderators, accessed_users
+        return moderators, self._rights.limited_read
 
     def _get_free_descendants(self):
         query = Q(access_type__lt=models.THREAD_ACCESS_TYPE_NO_READ)
