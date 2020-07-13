@@ -195,3 +195,21 @@ def test_comments_api(client, superuser, admin, user):
     assert response.status_code == 200
     data = response.json()
     assert len(data['comments']) == 2
+
+
+def test_broken_last_comment(room_group, thread, user):
+    # check last comment is on place
+    response = user.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    last_comment = data['threads'][0]['last_comment']
+    assert last_comment['id'] == thread['first_comment_id']
+    # break it
+    obj = models.Thread.objects.get(pk=thread['id'])
+    obj.last_comment_id += 1
+    obj.save()
+    # check it not breaks original view
+    response = user.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert 'last_comment' not in data['threads'][0]
