@@ -73,8 +73,7 @@ def user_fixture(user_factory):
     return user_factory(username='John Doe')
 
 
-@pytest.mark.trylast
-def pytest_configure():
+def init_settings():
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", 'settings')
     from django.conf import settings
 
@@ -83,6 +82,8 @@ def pytest_configure():
     from django.test import utils
     utils.setup_test_environment()
 
+
+init_settings()
 
 @pytest.mark.trylast
 def pytest_sessionstart(session):
