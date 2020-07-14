@@ -24,19 +24,6 @@ def story_hidden_material_fixture(story):
     return obj
 
 
-@pytest.fixture(name='story_illustration', scope='session')
-def story_illustration_fixture(story, image):
-    obj = models.Illustration(
-        story=story, name='Map of location', admins_only=False)
-    obj.save()
-    obj.image.save(
-        'image.jpg',
-        uploadedfile.SimpleUploadedFile(
-            "image.jpeg", image, content_type="image/jpeg"))
-    obj.save()
-    return obj
-
-
 @pytest.fixture(name='story_hidden_illustration', scope='session')
 def story_hidden_illustration_fixture(story, image):
     obj = models.Illustration(
@@ -73,20 +60,6 @@ def variation_hidden_material_fixture(story, variation):
     obj = models.AdditionalMaterial(
         story=story, variation=variation, name='Hidden in variation',
         body='Info hidden from users', admins_only=True)
-    obj.save()
-    return obj
-
-
-@pytest.fixture(name='variation_illustration')
-def variation_illustration_fixture(story, variation, image):
-    obj = models.Illustration(
-        story=story, variation=variation, name='Map of location',
-        admins_only=False)
-    obj.save()
-    obj.image.save(
-        'image.jpg',
-        uploadedfile.SimpleUploadedFile(
-            "image.jpeg", image, content_type="image/jpeg"))
     obj.save()
     return obj
 

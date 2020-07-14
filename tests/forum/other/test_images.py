@@ -1,10 +1,8 @@
 import io
 
-import pytest
 from PIL import Image, ImageDraw
 
 
-@pytest.mark.dependency()
 def test_images_media_upload(user, client):
     img = Image.new('RGB', (100, 30), color=(73, 109, 137))
     d = ImageDraw.Draw(img)
@@ -33,7 +31,6 @@ def test_images_media_upload(user, client):
     assert response.status_code == 200
 
 
-@pytest.mark.dependency(depends=['test_images_media_upload'])
 def test_images_media_on_thread(user, room_group):
     response = user.get('/api/forum/images/')
     assert response.status_code == 200
@@ -96,7 +93,6 @@ def test_images_media_on_thread(user, room_group):
     assert thread['media'] == {}
 
 
-@pytest.mark.dependency(depends=['test_images_media_upload'])
 def test_images_media_on_comments(user, thread):
     response = user.get('/api/forum/images/')
     assert response.status_code == 200
