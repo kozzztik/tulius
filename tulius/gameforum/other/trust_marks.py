@@ -23,10 +23,8 @@ def recalc_role_trust(role):
     if markcount:
         marksum = (marksum / markcount)
     value = mark_to_percents(marksum)
-    if value > 100:
-        value = 100
-    if value < 0:
-        value = 0
+    value = min(value, 100)
+    value = max(value, 0)
     role.trust_value = value
     role.save()
     return value
