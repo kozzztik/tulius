@@ -9,8 +9,8 @@ from tulius.games import models as game_models
 @pytest.fixture(name='story_material', scope='session')
 def story_material_fixture(story):
     obj = models.AdditionalMaterial(
-        story=story, name='Всякая инфа',
-        body='Всякое о сюжете для пользователей', admins_only=False)
+        story=story, name='Misc information',
+        body='Misc info about story for users', admins_only=False)
     obj.save()
     return obj
 
@@ -18,8 +18,8 @@ def story_material_fixture(story):
 @pytest.fixture(name='story_hidden_material', scope='session')
 def story_hidden_material_fixture(story):
     obj = models.AdditionalMaterial(
-        story=story, name='Тайны сюжета',
-        body='Всякое скрытое от пользователей', admins_only=True)
+        story=story, name='Hidden info',
+        body='Info hidden from users', admins_only=True)
     obj.save()
     return obj
 
@@ -27,7 +27,7 @@ def story_hidden_material_fixture(story):
 @pytest.fixture(name='story_illustration', scope='session')
 def story_illustration_fixture(story, image):
     obj = models.Illustration(
-        story=story, name='Карта местности', admins_only=False)
+        story=story, name='Map of location', admins_only=False)
     obj.save()
     obj.image.save(
         'image.jpg',
@@ -40,7 +40,7 @@ def story_illustration_fixture(story, image):
 @pytest.fixture(name='story_hidden_illustration', scope='session')
 def story_hidden_illustration_fixture(story, image):
     obj = models.Illustration(
-        story=story, name='Карта сокровищ', admins_only=True)
+        story=story, name='Map of treasures', admins_only=True)
     obj.save()
     obj.image.save(
         'image.jpg',
@@ -62,8 +62,8 @@ def story_materials_fixture(
 @pytest.fixture(name='variation_material')
 def variation_material_fixture(story, variation):
     obj = models.AdditionalMaterial(
-        story=story, variation=variation, name='Всякая инфа вариации',
-        body='Всякое о вариации для пользователей', admins_only=False)
+        story=story, variation=variation, name='Misc info about variation',
+        body='Misc info for users', admins_only=False)
     obj.save()
     return obj
 
@@ -71,8 +71,8 @@ def variation_material_fixture(story, variation):
 @pytest.fixture(name='variation_hidden_material')
 def variation_hidden_material_fixture(story, variation):
     obj = models.AdditionalMaterial(
-        story=story, variation=variation, name='Тайны вариации',
-        body='Всякое скрытое от пользователей', admins_only=True)
+        story=story, variation=variation, name='Hidden in variation',
+        body='Info hidden from users', admins_only=True)
     obj.save()
     return obj
 
@@ -80,7 +80,7 @@ def variation_hidden_material_fixture(story, variation):
 @pytest.fixture(name='variation_illustration')
 def variation_illustration_fixture(story, variation, image):
     obj = models.Illustration(
-        story=story, variation=variation, name='Карта местности',
+        story=story, variation=variation, name='Map of location',
         admins_only=False)
     obj.save()
     obj.image.save(
@@ -94,7 +94,7 @@ def variation_illustration_fixture(story, variation, image):
 @pytest.fixture(name='variation_hidden_illustration')
 def variation_hidden_illustration_fixture(story, variation, image):
     obj = models.Illustration(
-        story=story, variation=variation, name='Карта сокровищ',
+        story=story, variation=variation, name='Map of treasures',
         admins_only=True)
     obj.save()
     obj.image.save(

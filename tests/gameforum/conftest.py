@@ -24,8 +24,8 @@ def image_fixture():
 @pytest.fixture(name='story', scope='session')
 def story_fixture(image, admin):
     obj = models.Story(
-        name='Убийство в тестах',
-        short_comment='Тестовый сюжет',
+        name='Murder in tests',
+        short_comment='Story for tests',
         creation_year=2020,
     )
     obj.save()
@@ -48,7 +48,7 @@ def story_fixture(image, admin):
 
 @pytest.fixture(name='story_detective', scope='session')
 def story_detective_fixture(story, image):
-    avatar = models.Avatar(story=story, name='Детектив Смит')
+    avatar = models.Avatar(story=story, name='Detective Smith')
     avatar.save()
     avatar.image.save(
         'detective.jpg',
@@ -56,7 +56,7 @@ def story_detective_fixture(story, image):
             "detective.jpeg", image, content_type="image/jpeg"))
     avatar.save()
     obj = models.Character(
-        story=story, name='Детектив Смит', description='Публичный персонаж',
+        story=story, name='Detective Smith', description='Public character',
         show_in_character_list=True, avatar=avatar)
     obj.save()
     return obj
@@ -64,7 +64,7 @@ def story_detective_fixture(story, image):
 
 @pytest.fixture(name='variation')
 def variation_fixture(story):
-    obj = models.Variation(story=story, name='Вариация')
+    obj = models.Variation(story=story, name='Variation')
     obj.save()
     return obj
 
@@ -82,7 +82,7 @@ def variation_forum_fixture(variation, admin):
 
 @pytest.fixture(name='game')
 def game_fixture(story, variation, admin):
-    obj = game_models.Game(name='Игра', variation=variation, serial_number=1)
+    obj = game_models.Game(name='Game', variation=variation, serial_number=1)
     obj.save()
     variation.game = obj
     variation.save()
@@ -92,7 +92,7 @@ def game_fixture(story, variation, admin):
 
 @pytest.fixture(name='game_guest_user', scope='session')
 def game_guest_user_fixture(user_factory):
-    return user_factory(username='Гость игры')
+    return user_factory(username='Game Guest')
 
 
 @pytest.fixture(name='game_guest')
@@ -105,7 +105,7 @@ def game_guest_fixture(game, game_guest_user):
 def detective_role_fixture(variation, user, story_detective):
     role = models.Role(
         variation=variation, character=story_detective, user=user.user,
-        avatar=story_detective.avatar, name='Детектив',
+        avatar=story_detective.avatar, name='Detective',
         show_in_character_list=True)
     role.save()
     return role
@@ -115,7 +115,7 @@ def detective_role_fixture(variation, user, story_detective):
 def murderer_fixture(variation):
     role = models.Role(
         variation=variation, character=None, user=None,
-        avatar=None, name='Убийца',
+        avatar=None, name='Murderer',
         show_in_character_list=False)
     role.save()
     return role
