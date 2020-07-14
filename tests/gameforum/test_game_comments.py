@@ -90,7 +90,7 @@ def test_comments_api(
     assert data['characters'][1]['id'] == detective.pk
     assert data['characters'][1]['comments_count'] == 1
     variation = story_models.Variation.objects.get(pk=data['id'])
-    assert variation.comments_count == 1
+    assert variation.comments_count == 2
     # check role update works
     response = admin.post(
         comment['url'], {
@@ -114,7 +114,7 @@ def test_comments_api(
     assert data['characters'][1]['id'] == detective.pk
     assert data['characters'][1]['comments_count'] == 0
     variation = story_models.Variation.objects.get(pk=data['id'])
-    assert variation.comments_count == 1
+    assert variation.comments_count == 2
     # delete comment
     response = user.delete(comment['url'] + '?comment=moo')
     assert response.status_code == 200
@@ -127,7 +127,7 @@ def test_comments_api(
     assert data['characters'][1]['id'] == detective.pk
     assert data['characters'][1]['comments_count'] == 0
     variation = story_models.Variation.objects.get(pk=data['id'])
-    assert variation.comments_count == 0
+    assert variation.comments_count == 1
 
 
 def test_comments_illustrations(

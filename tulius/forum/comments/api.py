@@ -22,7 +22,7 @@ def after_create_thread(sender, thread, data, preview, **kwargs):
         return
     comment = models.Comment(
         parent=thread, title=thread.title, body=thread.body,
-        user=thread.user)
+        user=thread.user, plugin_id=thread.plugin_id)
     signals.before_add_comment.send(
         sender, comment=comment, data=data, preview=preview)
     if not preview:
