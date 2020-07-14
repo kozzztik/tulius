@@ -88,7 +88,7 @@ class VariationAPI(base.VariationMixin):
             self.process_trust_marks(character_list)
 
         query = query_utils.Q(variation=self.obj) | query_utils.Q(
-            story_id=self.obj.story_id)
+            story_id=self.obj.story_id, variation=None)
         if not admin:
             query = query & query_utils.Q(admins_only=False)
         materials = stories_models.AdditionalMaterial.objects.filter(query)
@@ -108,7 +108,7 @@ class VariationAPI(base.VariationMixin):
                 'avatar': role.avatar.image.url if role.avatar else None,
                 'comments_count': role.comments_count,
                 'trust_value': role.trust_value,
-                'my_trust': getattr(role, 'my_trust'),
+                'my_trust': getattr(role, 'my_trust', None),
                 'description': role.description,
             } for role in character_list],
             'roles': [{
