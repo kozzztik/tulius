@@ -448,8 +448,8 @@ class RightsChecker(default.DefaultRightsChecker):
     def get_moderators_and_accessed_users(self):
         return self._rights.moderator_roles or [], self._rights.strict_read
 
-    def limited_read_list(self):
-        return self._rights.strict_read
+    def get_limited_read_list(self, parent_rights):
+        return parent_rights.strict_read
 
     def _get_free_descendants(self):
         query = Q(access_type__lt=forum_models.THREAD_ACCESS_TYPE_NO_READ)

@@ -37,11 +37,6 @@ class BaseThreadRightsChecker:
             self._rights = self._get_rights()
         return self._rights
 
-    def read_right(self) -> bool:
-        if not self._rights:
-            self._rights = self._get_rights()
-        return self._rights.read
-
     def _create_checker(self, thread):
         return self.__class__(thread, self.user)
 
