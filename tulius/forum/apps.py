@@ -13,7 +13,6 @@ class ForumConfig(AppConfig):
         from .fixes.plugin import FixesPlugin
         from .readmarks.plugin import ReadMarksPlugin
         from .rights.plugin import RightsPlugin
-        from .sitemap import SitemapPlugin
 
         self.site = site.ForumSite(
             plugins=(
@@ -21,7 +20,6 @@ class ForumConfig(AppConfig):
                 ThreadsPlugin,
                 CommentsPlugin,
                 ReadMarksPlugin,
-                SitemapPlugin,
                 FixesPlugin,
             )
         )
