@@ -17,6 +17,15 @@ def not_read_comment_json(comment, user):
     }
 
 
+@dispatch.receiver(signals.after_add_comment)
+def after_add_comment(sender, comment, preview, **kwargs):
+    if preview or (sender.obj.first_comment_id != comment.id):
+        return
+    models.ThreadReadMark(
+        user=sender.user, thread=sender.obj, readed_comment=comment,
+        not_readed_comment=None).save()
+
+
 @dispatch.receiver(signals.thread_prepare_room)
 def prepare_room_list(sender, room, threads, **kwargs):
     read_marks = []

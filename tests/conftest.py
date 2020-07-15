@@ -85,6 +85,7 @@ def init_settings():
 
 init_settings()
 
+
 @pytest.mark.trylast
 def pytest_sessionstart(session):
     from django.test import utils
