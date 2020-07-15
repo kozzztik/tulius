@@ -27,6 +27,7 @@ export default {
         if (!this.menu_item)
             return
         if (this.$parent.media_actions)
-            this.$parent.media_actions.filter(item => item != this.menu_item);
+            this.$parent.media_actions = this.$parent.media_actions.filter(
+                item => item != this.menu_item, this);
     }
 }
