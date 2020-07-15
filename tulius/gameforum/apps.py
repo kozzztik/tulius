@@ -17,7 +17,6 @@ class GameForumConfig(AppConfig):
         from .rights import GameRightsPlugin
         from .threads import GameThreadsPlugin
         from .comments import GameCommentsPlugin
-        from .sitemap import GameSitemapPlugin
 
         self.site = GameForumSite(
             name='gameforum',
@@ -29,7 +28,6 @@ class GameForumConfig(AppConfig):
                 GameCommentsPlugin,
                 ReadMarksPlugin,
                 GamePlugin,
-                GameSitemapPlugin,
                 FixesPlugin
             )
         )

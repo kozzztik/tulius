@@ -7,6 +7,9 @@ from django.conf.urls.static import static
 
 from djfw.flatpages.views import FlatpagesList
 from tulius import views
+from tulius.forum.other import sitemap as forum_sitemap
+from tulius.gameforum.other import sitemap as game_forum_sitemap
+
 from .sitemap import sitemaps
 
 admin.autodiscover()
@@ -55,6 +58,11 @@ urlpatterns = [
     url(r'^pm/', include('tulius.pm.urls', namespace='pm')),
     url(r'^games/', include('tulius.games.urls', namespace='games')),
     url(
+        r'^forums/sitemap\.xml$',
+        sitemaps_views.sitemap,
+        {'sitemaps': forum_sitemap.ForumSitemap.sitemaps()},
+        name='forum_sitemap'),
+    url(
         r'^forums/',
         include(apps.get_app_config('forum').site.urls)),
     url(r'^api/forum/', include('tulius.forum.urls', namespace='forum_api')),
@@ -62,6 +70,11 @@ urlpatterns = [
         r'^api/ckeditor/',
         include('tulius.core.ckeditor.urls', namespace='ckeditor')),
     url(r'^stories/', include('tulius.stories.urls', namespace='stories')),
+    url(
+        r'^play/sitemap\.xml$',
+        sitemaps_views.sitemap,
+        {'sitemaps': game_forum_sitemap.GameForumSitemap.sitemaps()},
+        name='game_forum_sitemap'),
     url(r'^play/',
         include(apps.get_app_config('gameforum').site.urls)),
     url(r'^api/game_forum/',
