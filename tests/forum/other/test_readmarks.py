@@ -35,6 +35,13 @@ def test_read_marks(room_group, admin, user):
     rooms = {g['id']: g for g in data['groups']}
     room_data = rooms[room_group['id']]
     assert room_data['unreaded']['id'] == thread['first_comment_id']
+    # check how it looks for admin
+    response = admin.get('/api/forum/')
+    assert response.status_code == 200
+    data = response.json()
+    rooms = {g['id']: g for g in data['groups']}
+    room_data = rooms[room_group['id']]
+    assert room_data['unreaded'] is None
     # mark first comment as read
     response = user.post(
         thread['url'] + 'read_mark/',

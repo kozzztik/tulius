@@ -8,7 +8,7 @@ class ReadMarksPlugin(plugins.ForumPlugin):
             thread = kwargs['thread']
             self.models.ThreadReadMark.objects.filter(
                 thread=thread, not_readed_comment=None
-            ).update(not_readed_comment=sender)
+            ).exclude(user=thread.user).update(not_readed_comment=sender)
 
     def before_delete_comment(self, sender, **kwargs):
         thread = kwargs['thread']
