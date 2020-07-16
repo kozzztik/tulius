@@ -7,6 +7,7 @@ import add_room from '../pages/add_room.js'
 import edit_thread from '../pages/edit_thread.js'
 import search_results from '../pages/search_results.js'
 import extended_search from '../pages/extended_search.js'
+import comment_redirect from '../../forum/app/comment_redirect.js'
 
 
 export default [
@@ -14,6 +15,7 @@ export default [
     {path: '/play/room/:id(\\d+)/', component: redirect, name: 'game_room_redirrect'},
     {path: '/play/:variation_id(\\d+)', component: app,
         children: [
+            {path: 'comment/:id(\\d+)/', component: comment_redirect, name: 'game_comment_redirect'},
             {path: 'room/:id(\\d+)/', component: room, name: 'game_room'},
             {path: 'thread/:id(\\d+)/', component: thread, name: 'game_thread'},
             {path: 'edit_comment/:id(\\d+)/', component: edit_comment, name: 'game_edit_comment'},

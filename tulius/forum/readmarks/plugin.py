@@ -12,7 +12,7 @@ class ReadMarksPlugin(plugins.ForumPlugin):
 
     def before_delete_comment(self, sender, **kwargs):
         thread = kwargs['thread']
-        if (sender.id != thread.first_comment) and (
+        if (sender.id != thread.first_comment_id) and (
                 thread.last_comment_id == sender.id):
             comments = self.models.Comment.objects.filter(
                 parent=thread, deleted=False).exclude(id=sender.id)

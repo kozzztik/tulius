@@ -3,8 +3,6 @@ from tulius.stories import models
 
 
 class GameCommentsPlugin(plugin.CommentsPlugin):
-    comment_template = 'gameforum/snippets/post.haml'
-
     def update_role_comments_count(self, role_id, count):
         if role_id:
             role = models.Role.objects.get(id=role_id)

@@ -67,4 +67,10 @@ class ThreadsPlugin(ThreadsCorePlugin):
             url(
                 r'^extended_search/(?P<pk>\d+)/$',
                 Index.as_view(), name='extended_search'),
+            url(
+                r'^edit_comment/(?P<comment_id>\d+)/$',
+                Index.as_view(), name='edit_comment'),
+            url(
+                r'^comment/(?P<comment_id>\d+)/$',
+                Index.as_view(), name='comment'),
         ]

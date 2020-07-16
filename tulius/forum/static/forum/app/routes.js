@@ -7,12 +7,14 @@ import add_room from '../pages/add_room.js'
 import edit_thread from '../pages/edit_thread.js'
 import search_results from '../pages/search_results.js'
 import extended_search from '../pages/extended_search.js'
+import comment_redirect from './comment_redirect.js'
 
 
 export default [
     {path: '/forums/', component: app,
         children: [
             {path: '', component: index, name: 'forum_root'},
+            {path: 'comment/:id(\\d+)/', component: comment_redirect, name: 'comment_redirect'},
             {path: 'room/:id(\\d+)/', component: room, name: 'forum_room'},
             {path: 'thread/:id(\\d+)/', component: thread, name: 'forum_thread'},
             {path: 'edit_comment/:id(\\d+)/', component: edit_comment, name: 'forum_edit_comment'},
