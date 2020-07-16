@@ -59,7 +59,7 @@ export default {
 
 	watch: {
 		value( val ) {
-			if ( this.instance.getData() !== val ) {
+			if ( this.instance && (this.instance.getData() !== val) ) {
 				this.instance.destroy();
 				this.build_editor();
 				//this.instance.setData( val );

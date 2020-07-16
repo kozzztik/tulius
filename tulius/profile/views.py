@@ -1,6 +1,5 @@
 from django import http
 from django import urls
-from django.apps import apps
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
 from django.utils import decorators
@@ -10,8 +9,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.db.models import query_utils
 
 from tulius.events.models import UserNotification, Notification
-from tulius.forum.models import CommentLike
-from tulius.stories.models import StoryAdmin, Role, Variation
+from tulius.stories.models import StoryAdmin, Role
 from tulius.games.views import invite_accept, invite_decline, set_edit
 from tulius.games.models import Game, GAME_STATUS_COMPLETED, \
     GAME_STATUS_COMPLETED_OPEN, GameAdmin, GameInvite
@@ -19,6 +17,10 @@ from tulius.games.models import GAME_INVITE_STATUS_NEW, GameGuest, \
     GAME_STATUS_IN_PROGRESS, GAME_STATUS_FINISHING
 from .forms import NotificationForm, ChangeEmailForm, ProfileSettingsForm, \
     PersonalSettingsForm
+
+
+class Index(generic.TemplateView):
+    template_name = 'base_vue.html'
 
 
 class PlayerSettingsView(generic.TemplateView):
@@ -59,62 +61,6 @@ class LoginTemplateView(generic.TemplateView):
     @decorators.method_decorator(auth_decorators.login_required)
     def get(self, request, *args, **kwargs):
         return super(LoginTemplateView, self).get(request, *args, **kwargs)
-
-
-class PostGroup:
-    def __init__(self, name, game_id, comment):
-        self.name = name
-        self.id = game_id
-        self.comments = [comment]
-        app = 'gameforum' if game_id else 'forum'
-        self.forumsite = apps.get_app_config(app).site
-
-
-class PlayerFavoritesView(LoginTemplateView):
-    template_name = 'profile/favorites.haml'
-
-    @staticmethod
-    def get_post_group(groups, comment):
-        config = apps.get_app_config('gameforum')
-        if comment.plugin_id == config.GAME_FORUM_SITE_ID:
-            variation = Variation.objects.get(
-                thread__tree_id=comment.parent.tree_id)
-            game_id = variation.id
-            if variation.game:
-                name = str(variation.game)
-            else:
-                name = str(variation)
-            if comment.data1:
-                comment.role = Role.objects.get(id=comment.data1)
-        else:
-            game_id = None
-            name = _('Forums')
-        for postgroup in groups:
-            if postgroup.id == game_id:
-                postgroup.comments += [comment]
-                return groups
-        resgroup = PostGroup(name, game_id, comment)
-        groups += [resgroup]
-        return groups
-
-    def get_context_data(self, **kwargs):
-        user = self.request.user
-        likes = CommentLike.objects.select_related('comment').filter(user=user)
-        comments = [like.comment for like in likes]
-        for comment in comments:
-            comment.view_user = user
-        comments = [
-            comment for comment in comments if comment.parent.read_right]
-        groups = []
-        for comment in comments:
-            self.get_post_group(groups, comment)
-        block_trustmarks = True
-        block_reply = True
-        return {
-            'groups': groups,
-            'block_trustmarks': block_trustmarks,
-            'block_reply': block_reply,
-        }
 
 
 class PlayerSubscriptionsView(LoginTemplateView):
@@ -250,5 +196,6 @@ def request_user_json(request):
         'new_invites': len(request.user.new_invites()) if auth else None,
         'avatar':
             request.user.avatar.url if auth and request.user.avatar else
-            '/static/tulius/img/blank_avatar.jpg'
-        }
+            '/static/tulius/img/blank_avatar.jpg',
+        'hide_trustmarks': request.user.hide_trustmarks if auth else False,
+    }

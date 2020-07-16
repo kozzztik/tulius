@@ -6,18 +6,6 @@
 
     - block plugin_styles
 
-- block additional_scripts
-    - if not request.user.is_anonymous
-        %script{type: 'text/javascript'}
-            var delete_thread_options = {
-                'room_header': '{% trans "Delete room" %}', 
-                'thread_header': '{% trans "Delete thread" %}',
-                'comment_header': '{% trans "Delete comment" %}',
-                'room_url': '{{ forum_site.urlizer.delete_thread }}', 
-                'thread_url': '{{ forum_site.urlizer.delete_comment }}',
-                'comment_url': '{{ forum_site.urlizer.delete_comment }}',
-                };
-
 - block title
     - if parent_thread
         = parent_thread.title
@@ -53,13 +41,3 @@
         - block forum_content
 
         - block after_actions
-
-        - block delete_post_form
-            - if parent_thread
-                - include forum_site.templates.delete_thread_form
-            
-- block footer_content
-    - block online_users
-        - if parent_thread
-            - with bottom_online_users=1
-                - include forum_site.templates.online_users

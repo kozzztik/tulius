@@ -1,24 +1,16 @@
 from django.conf.urls import url
+from django.views import generic
+
 from .core import ThreadsCorePlugin
-from . import views
+
+
+class Index(generic.TemplateView):
+    template_name = 'base_vue.html'
 
 
 class ThreadsPlugin(ThreadsCorePlugin):
-    room_list_template = 'forum/snippets/room_list.haml'
-    thread_list_template = 'forum/snippets/thread_list.haml'
-    thread_edit_template = 'forum/add_post.haml'
-
     def thread_url(self, thread):
         return self.reverse('room' if thread.room else 'thread', thread.id)
-
-    def thread_move(self, thread):
-        return self.reverse('thread_move', thread.id)
-
-    def thread_move_confirm(self, thread, new_parent):
-        if new_parent:
-            return self.reverse(
-                'thread_move_confirm', thread.id, new_parent.id)
-        return self.reverse('thread_move_confirm', thread.id)
 
     def index_url(self):
         return self.reverse('index')
@@ -26,12 +18,7 @@ class ThreadsPlugin(ThreadsCorePlugin):
     def add_root_room_url(self):
         return self.reverse('add_room')
 
-    def delete_thread_url(self):
-        return self.reverse('delete_thread')
-
     def thread_edit_url(self, thread):
-        if thread.room:
-            return self.reverse('edit_room', thread.id)
         return self.reverse('edit_thread', thread.id)
 
     def get_add_room_url(self, thread):
@@ -47,71 +34,37 @@ class ThreadsPlugin(ThreadsCorePlugin):
         super(ThreadsPlugin, self).init_core()
         self.urlizer['thread'] = self.thread_url
         self.urlizer['index'] = self.index_url
-        self.urlizer['delete_thread'] = self.delete_thread_url
         self.urlizer['add_root_room'] = self.add_root_room_url
-        self.templates['room'] = 'forum/room.haml'
-        self.templates['edit_thread'] = self.thread_edit_template
-        self.templates['room_list'] = self.room_list_template
-        self.templates['thread_list'] = self.thread_list_template
-        self.templates['thread'] = 'forum/thread.haml'
-        self.templates['delete_thread_form'] = \
-            'forum/snippets/delete_post.haml'
-        self.templates['thread_move_select'] = \
-            'forum/threads/move_select.haml'
-        self.templates['thread_move_confirm'] = \
-            'forum/threads/move_confirm.haml'
         self.core['Thread_get_edit_url'] = self.thread_edit_url
-        self.core['move_thread_confirm_url'] = self.thread_move_confirm
         self.urlizer['Thread_get_absolute_url'] = self.thread_url
         self.urlizer['Thread_get_add_room_url'] = self.get_add_room_url
         self.urlizer['Thread_get_add_thread_url'] = self.get_add_thread_url
         self.urlizer['Thread_get_comments_page_url'] = \
             self.get_comments_page_url
-        self.urlizer['Thread_get_delete_url'] = self.delete_thread_url
-        self.urlizer['Thread_get_move_url'] = self.thread_move
 
     def get_urls(self):
         return [
-            url(r'^$', views.Index.as_view(), name='index'),
+            url(r'^$', Index.as_view(), name='index'),
             url(
                 r'^room/(?P<parent_id>\d+)/$',
-                views.Index.as_view(), name='room'),
-            url(
-                r'^add_room/$',
-                views.EditView.as_view(plugin=self, self_is_room=True),
-                name='add_room'),
+                Index.as_view(), name='room'),
+            url(r'^add_room/$', Index.as_view(), name='add_room'),
             url(
                 r'^add_room/(?P<parent_id>\d+)/$',
-                views.EditView.as_view(plugin=self, self_is_room=True),
-                name='add_room'),
-            url(
-                r'^edit_room/(?P<thread_id>\d+)/$',
-                views.EditView.as_view(plugin=self, self_is_room=True),
-                name='edit_room'),
+                Index.as_view(), name='add_room'),
             url(
                 r'^add_thread/(?P<parent_id>\d+)/$',
-                views.EditView.as_view(plugin=self, self_is_room=False),
-                name='add_thread'),
+                Index.as_view(), name='add_thread'),
             url(
                 r'^edit_thread/(?P<thread_id>\d+)/$',
-                views.EditView.as_view(plugin=self, self_is_room=False),
-                name='edit_thread'),
+                Index.as_view(), name='edit_thread'),
             url(
                 r'^thread/(?P<parent_id>\d+)/$',
-                views.Index.as_view(), name='thread'),
+                Index.as_view(), name='thread'),
             url(
-                r'^thread/(?P<parent_id>\d+)/move/$',
-                views.MoveThreadSelect.as_view(plugin=self),
-                name='thread_move'),
+                r'^search/(?P<parent_id>\d+)/$',
+                Index.as_view(), name='search'),
             url(
-                r'^thread/(?P<parent_id>\d+)/move/(?P<thread_id>\d+)/$',
-                views.MoveThreadConfirm.as_view(plugin=self),
-                name='thread_move_confirm'),
-            url(r'^thread/(?P<parent_id>\d+)/move/root/$',
-                views.MoveThreadConfirm.as_view(plugin=self),
-                name='thread_move_confirm'),
-            url(
-                r'^delete_thread/$',
-                views.DeleteThread.as_view(plugin=self),
-                name='delete_thread'),
+                r'^extended_search/(?P<pk>\d+)/$',
+                Index.as_view(), name='extended_search'),
         ]

@@ -1,0 +1,22 @@
+<forum_edit_thread_page :user_search="right_user_search" :extra_fields="{role_id: null, edit_role_id: null}">
+    <template v-slot:comment="slotProps">
+        <forum_comment :thread="slotProps.thread.id ? slotProps.thread : slotProps.parent_thread"
+                       :comment="slotProps.preview_comment" :preview="true">
+            <template v-slot:extra_media="slotProps2">
+                <media_illustrations :comment="slotProps.preview_comment" :variation="variation">
+                </media_illustrations>
+            </template>
+        </forum_comment>
+    </template>
+    <template v-slot:before_form="slotProps">
+        <game_forum_role_selector :variation="variation"
+                                  :thread="slotProps.thread.id ? slotProps.thread : slotProps.parent_thread"
+                                  :form="slotProps.form" :editor="false"
+                                  v-if="slotProps.thread.id || slotProps.parent_thread.id"></game_forum_role_selector>
+        <game_forum_role_selector :variation="variation" :thread="slotProps.thread" :form="slotProps.form" :editor="true" v-if="slotProps.thread.id"></game_forum_role_selector>
+    </template>
+    <template v-slot:extra_media="slotProps">
+        <media_illustrations :comment="slotProps.form" editor :variation="variation">
+        </media_illustrations>
+    </template>
+</forum_edit_thread_page>

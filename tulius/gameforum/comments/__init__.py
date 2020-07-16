@@ -1,28 +1,9 @@
-from django.utils.translation import ugettext_lazy as _, pgettext
-
 from tulius.forum.comments import plugin
 from tulius.stories import models
 
 
 class GameCommentsPlugin(plugin.CommentsPlugin):
     comment_template = 'gameforum/snippets/post.haml'
-    fast_reply_template = 'gameforum/snippets/fast_reply.haml'
-    edit_comment_template = 'gameforum/add_post.haml'
-
-    def reply_str(self, comment):
-        sex = comment.role.sex if comment.role else None
-        name = comment.role.name if comment.role else _('Leader')
-        if sex == models.CHAR_SEX_MALE:
-            s = pgettext('He', '%s said')
-        elif sex == models.CHAR_SEX_FEMALE:
-            s = pgettext('She', '%s said')
-        elif sex == models.CHAR_SEX_MIDDLE:
-            s = pgettext('It', '%s said')
-        elif sex == models.CHAR_SEX_PLUR:
-            s = pgettext('They', '%s said')
-        else:
-            s = pgettext('Someone', '%s said')
-        return s % name
 
     def update_role_comments_count(self, role_id, count):
         if role_id:

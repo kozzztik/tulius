@@ -1,4 +1,4 @@
-FROM kozzztik/tulius:base_3.0.1
+FROM kozzztik/tulius:base_3.0.2
 
 ADD tulius /opt/tulius/tulius
 ADD djfw /opt/tulius/djfw
@@ -10,7 +10,8 @@ ADD settings.py /opt/tulius/settings.py
 ADD .pylintrc /opt/tulius/.pylintrc
 ADD tests /opt/tulius/tests
 ADD pytest.ini /opt/tulius/pytest.ini
-ADD .coveragerc /opt/tulius/.coveragerc
+ADD scripts/travis_test.sh /opt/tulius/travis_test.sh
+RUN chmod +x /opt/tulius/travis_test.sh
 
 # update requirements
 RUN pip install -r requirements.txt

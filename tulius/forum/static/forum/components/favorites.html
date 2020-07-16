@@ -1,0 +1,15 @@
+<div class="list-group">
+    <template v-for="(group, num) of groups">
+        <a class="list-group-item d-flex justify-content-between align-items-center"
+             @click="group.show = !group.show" href="javascript:void(0)">
+            {{group.name}}
+            <span class="badge badge-primary badge-pill">{{group.items.length}}</span>
+        </a>
+
+        <div v-for="item of group.items" :key="item.comment.id" class="list-group-item" v-show="group.show">
+            <slot :group="group" :item="item" name="comment">
+                <forum_comment :thread="item.thread" :comment="item.comment" :preview="true"></forum_comment>
+            </slot>
+        </div>
+    </template>
+</div>

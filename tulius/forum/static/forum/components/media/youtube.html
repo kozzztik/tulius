@@ -1,0 +1,52 @@
+<div class="row mx-0 justify-content-start">
+    <div class="pr-1 pl-0 mt-1 w-100" v-if="video">
+        <div style="float: right; display: block" v-if="editor">
+            <a class="btn btn-secondary p-0" @click="add_media()" href="javascript:void(0)">
+                <svg class="bi bi-pencil" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M11.293 1.293a1 1 0 0 1 1.414 0l2 2a1 1 0 0 1 0 1.414l-9 9a1 1 0 0 1-.39.242l-3 1a1 1 0 0 1-1.266-1.265l1-3a1 1 0 0 1 .242-.391l9-9zM12 2l2 2-9 9-3 1 1-3 9-9z"/>
+                  <path fill-rule="evenodd" d="M12.146 6.354l-2.5-2.5.708-.708 2.5 2.5-.707.708zM3 10v.5a.5.5 0 0 0 .5.5H4v.5a.5.5 0 0 0 .5.5H5v.5a.5.5 0 0 0 .5.5H6v-1.5a.5.5 0 0 0-.5-.5H5v-.5a.5.5 0 0 0-.5-.5H3z"/>
+                </svg>
+            </a>
+            <a class="btn btn-danger p-0" @click.stop="on_editor_delete()">
+                <svg class="bi bi-trash-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0v-7z"/>
+                </svg>
+            </a>
+        </div>
+        <iframe width="100%" height="315" frameborder="0" allowfullscreen
+                :src="'https://www.youtube.com/embed/' + video"></iframe>
+    </div>
+    <b-modal hide-header size="lg" centered ref="modal" v-if="editor">
+        <div class="row">
+            <label class="col-3 col-form-label">
+                <b>Ссылка на видео:</b>
+            </label>
+            <input type="text" class="col-8" v-model="search">
+            <div class="col-1">
+                <svg width="1.75em" height="1.75em" viewBox="0 0 16 16" v-if="!preview_video"
+                     class="bi bi-exclamation-circle my-1" fill="red"
+                     xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+                </svg>
+                <svg width="1.75em" height="1.75em" viewBox="0 0 16 16" v-if="preview_video"
+                     class="bi bi-check my-1" fill="green"
+                     xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.236.236 0 0 1 .02-.022z"/>
+                </svg>
+            </div>
+        </div>
+        <div class="row">
+            <iframe width="100%" height="315" frameborder="0" allowfullscreen
+                    :src="'https://www.youtube.com/embed/' + preview_video"
+                    v-if="preview_video"></iframe>
+        </div>
+        <template v-slot:modal-footer>
+            <div>
+                <button type="button" class="btn btn-secondary" @click="$refs.modal.hide()">Отмена</button>
+                <button type="button" class="btn btn-primary" :class="preview_video ? '' : 'disabled'"
+                        @click="do_add()">Сохранить</button>
+            </div>
+        </template>
+    </b-modal>
+</div>

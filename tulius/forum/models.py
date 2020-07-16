@@ -1,6 +1,7 @@
 """
 Forum engine models for Tulius project
 """
+import jsonfield
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
@@ -181,6 +182,10 @@ class ThreadManager(TreeManager):
         return self.none()
 
 
+def default_media():
+    return {}
+
+
 class Thread(MPTTModel, SitedModelMixin):
     """
     Forum thread
@@ -197,11 +202,7 @@ class Thread(MPTTModel, SitedModelMixin):
         unique=False,
         verbose_name=_('title')
     )
-    body = models.CharField(
-        max_length=255,
-        unique=False,
-        verbose_name=_('body')
-    )
+    body = models.TextField(verbose_name=_('body'))
     parent = TreeForeignKey(
         'self', models.PROTECT,
         null=True,
@@ -269,6 +270,7 @@ class Thread(MPTTModel, SitedModelMixin):
         blank=True,
         verbose_name=_(u'protected comments'),
     )
+    media = jsonfield.JSONField(default=default_media)
 
     def __str__(self):
         return self.title[:40] if self.title else self.body[:40]
@@ -362,7 +364,7 @@ class ThreadAccessRight(models.Model):
         Thread, models.PROTECT,
         null=False,
         blank=False,
-        related_name='rights',
+        related_name='granted_rights',
         verbose_name=_('thread')
     )
     user = models.ForeignKey(
@@ -469,11 +471,6 @@ class Comment(SitedModelMixin):
         related_name='answers',
         verbose_name=_('reply to')
     )
-    voting = models.BooleanField(
-        default=False,
-        blank=True,
-        verbose_name=_(u'voting')
-    )
     deleted = models.BooleanField(
         default=False,
         verbose_name=_(u'deleted')
@@ -498,6 +495,7 @@ class Comment(SitedModelMixin):
         null=True,
         blank=True,
     )
+    media = jsonfield.JSONField(default=default_media)
 
     view_user = None
 
@@ -622,25 +620,6 @@ class CommentLike(models.Model):
         related_name='liked',
         verbose_name=_('comment'),
     )
-
-    def save(
-            self, force_insert=False, force_update=False, using=None,
-            update_fields=None):
-        if self.id is None:
-            comment = Comment.objects.select_for_update().get(
-                id=self.comment_id)
-            comment.likes += 1
-            comment.save()
-        super(CommentLike, self).save(
-            force_insert=force_insert, force_update=force_update,
-            using=using, update_fields=update_fields)
-
-    def delete(self, using=None, keep_parents=False):
-        comment = Comment.objects.select_for_update().get(
-            id=self.comment_id)
-        comment.likes -= 1
-        comment.save()
-        super(CommentLike, self).delete(using, keep_parents)
 
 
 class ThreadDeleteMark(models.Model):

@@ -3,13 +3,21 @@ var cached_smiley_response = {data: null};
 
 export default LazyComponent('tulius_ckeditor', {
     template: '/static/ckeditor4/components/tulius_ckeditor.html',
-    props: ['value'],
+    props: {
+        value: {
+            type: String
+        },
+        reply_form: {
+            type: Boolean,
+            default: false,
+        },
+    },
     data () {
-        return {
-            editorData: '',
+        var data = {
+            editorData: this.value,
             editorConfig: {
                 language: 'ru',
-                extraPlugins: 'autogrow,font,colorbutton,image,uploadimage,filebrowser,smiley',
+                extraPlugins: 'autogrow,font,colorbutton,image,uploadimage,filebrowser,smiley,divarea',
                 removePlugins: 'elementspath,stylescombo',
                 removeButtons: 'Anchor,BGColor,Font,Format,Subscript,Superscript,HorizontalRule,Table',
                 resize_enabled: false,
@@ -30,6 +38,11 @@ export default LazyComponent('tulius_ckeditor', {
                 uploadUrl: '/api/ckeditor/images/',
             }
         }
+        if (this.reply_form) {
+            data.editorConfig.extraPlugins += ',replyformmax';
+            data.editorConfig.removePlugins += ',maximize';
+        }
+        return data;
     },
     methods: {
         build_editor() {

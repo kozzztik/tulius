@@ -1,7 +1,11 @@
 function LazyComponent(name, defs) {
+    var template_resolved = false;
     return Vue.component(name, function(resolve, reject) {
+        if (template_resolved)
+            return resolve(defs);
         fetch(defs['template']).then(response => response.text()).then(
             function(response) {
+                template_resolved = true;
                 defs['template'] = response;
                 resolve(defs);
             }
@@ -39,3 +43,5 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 
 Vue.use(VueLoading);
 Vue.component('loading', VueLoading)
+Vue.use(Tinybox);
+Vue.component('multiselect', VueMultiselect.default)

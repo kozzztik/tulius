@@ -1,0 +1,14 @@
+<div class="content">
+    <span v-if="loading">...</span>
+    <div v-if="!loading" class="online-users">
+        <span v-if="thread && thread.room">В этой комнате:</span>
+        <span v-if="thread && !thread.room">В этой теме:</span>
+        <ul class="comma-list">
+            <li v-for="user in users">
+                <a href="javascript:void(0)" @click="show_role_modal(user.id)" v-if="role_with_link(user.id)">{{ user.title }}</a>
+                <span v-else>{{ user.title }}</span>
+            </li>
+        </ul>
+        <span v-if="users.length == 0">никого нет </span>
+    </div>
+</div>

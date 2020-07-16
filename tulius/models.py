@@ -1,5 +1,6 @@
 import re
 
+from django import urls
 from django.db import models
 from django.contrib.auth import models as auth_models
 from django.core.mail import send_mail
@@ -152,9 +153,9 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
         v = self.username
         return u'%s' % (v, )
 
-    @models.permalink
     def get_absolute_url(self):
-        return 'players:player_details', (), {'player_id': self.id}
+        return urls.reverse(
+            'players:player_details', kwargs={'player_id': self.pk})
 
     def get_full_name(self):
         return self.username

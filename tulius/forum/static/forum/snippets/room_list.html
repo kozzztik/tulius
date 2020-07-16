@@ -12,32 +12,34 @@
         <tr v-for="room in rooms">
             <td class="forum-post-icon">
                 <div v-if="room.unreaded">
-                    <a :href="room.unreaded">
+                    <router-link :to="urls.comment(room.unreaded)">
                         <img src="/static/forum/img/unreadedmark.gif">
-                    </a>
+                    </router-link>
                 </div>
                 <img v-else="room.unreaded" src="/static/forum/img/readedmark.gif">
             </td>
             <td>
                 <div class="forum-post-description">
                     <h4>
-                        <router-link :to="room.url">{{ room.title }}</router-link>
+                        <router-link :to="urls.room(room.id)">{{ room.title }}</router-link>
                     </h4>
-                    <div class=".hidden-phone" v-if="room.body">
-                        {{ room.body }}
-                    </div>
-                    <h6 v-if="room.moderators.length > 0" class="moderators">Модераторы:</h6>
-                    <ul v-if="room.moderators" class="moderators">
-                        <li v-for="moderator in room.moderators">
-                            <a :href="moderator.url">{{ moderator.title }}</a>
-                        </li>
-                    </ul>
-                    <h6 v-if="room.accessed_users" class="moderators">Открыта для:</h6>
-                    <ul v-if="room.accessed_users" class="moderators">
-                        <li v-for="accessed_user in room.accessed_users">
-                            <a :href="accessed_user.url">{{ accessed_user.title }}</a>
-                        </li>
-                    </ul>
+                    <div class=".hidden-phone" v-if="room.body" v-html="room.body"></div>
+                    <slot v-bind:room="room" name="moderators">
+                        <h6 v-if="room.moderators.length > 0" class="moderators">Модераторы:</h6>
+                        <ul v-if="room.moderators" class="moderators">
+                            <li v-for="moderator in room.moderators">
+                                <a :href="moderator.url">{{ moderator.title }}</a>
+                            </li>
+                        </ul>
+                    </slot>
+                    <slot v-bind:room="room" name="accessed_users">
+                        <h6 v-if="room.accessed_users" class="moderators">Открыта для:</h6>
+                        <ul v-if="room.accessed_users" class="moderators">
+                            <li v-for="accessed_user in room.accessed_users">
+                                <a :href="accessed_user.url">{{ accessed_user.title }}</a>
+                            </li>
+                        </ul>
+                    </slot>
                 </div>
             </td>
             <td class="d-none d-md-table-cell">{{ room.threads_count }}</td>
