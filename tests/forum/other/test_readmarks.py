@@ -148,3 +148,19 @@ def test_readmark_rights(room_group, admin, user):
     room_data = rooms[room_group['id']]
     assert room_data['unreaded']['id'] == thread['first_comment_id']
 
+
+def test_thread_author_notified(room_group, thread, admin, user):
+    response = user.post(
+        thread['url'] + 'comments_page/', {
+            'reply_id': thread['first_comment_id'],
+            'title': 'hello', 'body': 'world',
+            'media': {},
+        })
+    assert response.status_code == 200
+    data = response.json()
+    comment = data['comments'][1]
+    # check on room
+    response = admin.get(room_group['url'])
+    assert response.status_code == 200
+    room = response.json()
+    assert room['threads'][0]['unreaded']['id'] == comment['id']
