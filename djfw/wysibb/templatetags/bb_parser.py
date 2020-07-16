@@ -130,7 +130,7 @@ def bb_li(tagname, param, text):
 def check_color(param):
     if param in VALID_BB_COLORS:
         return True
-    if (param[0] != '#') or (len(param) != 7):
+    if (len(param) != 7) or (param[0] != '#'):
         return False
     for c in param[1:7]:
         if c not in 'abcdef0123456789':

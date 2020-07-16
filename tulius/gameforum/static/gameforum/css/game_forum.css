@@ -23,3 +23,9 @@
 table.table.characterModal tr, table.table.characterModal td {
     border: none;
 }
+
+@media (max-width: 767px) {
+    .game-avatar-image {
+        max-width: 70px;
+    }
+}

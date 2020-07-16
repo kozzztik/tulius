@@ -58,6 +58,9 @@ def test_lists(data, value):
     [  # check valid text color
         '11<font color="red">23</font>', '11[color=red]23[/color]'
     ],
+    [  # check empty color
+        '11<font>23</font>', '1123'
+    ],
 ])
 def test_font(data, value):
     assert html_converter.HtmlConverter().convert(data) == value

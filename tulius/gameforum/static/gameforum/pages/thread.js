@@ -24,7 +24,7 @@ export default LazyComponent('gameforum_thread_page', {
     },
     methods: {
         load_api(route) {
-            this.comments_page = this.$route.query['page'] || 1;
+            this.comments_page = route.query['page'] || 1;
             if (this.thread.id == route.params.id)
                 return;
             return axios.get(this.urls.thread_api(route.params.id)).then(response => {
