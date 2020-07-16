@@ -1,5 +1,4 @@
 from django import dispatch
-from django import http
 from django.utils.translation import ugettext_lazy as _
 
 from tulius.forum import plugins
@@ -10,24 +9,6 @@ ERROR_VALIDATION = _('there were some errors during form validation')
 
 class CommentsCore(plugins.ForumPlugin):
     COMMENTS_ON_PAGE = 25
-
-    def get_parent_comment(self, user, comment_id, check_write):
-        try:
-            comment_id = int(comment_id)
-        except:
-            raise http.Http404()
-        models = self.site.core.models
-        try:
-            parent_comment = models.Comment.objects.select_related(
-                'parent').get(id=comment_id, plugin_id=self.site_id)
-        except models.Comment.DoesNotExist:
-            raise http.Http404()
-        parent_thread = parent_comment.parent
-        if not parent_thread.read_right(user):
-            raise http.Http404()
-        if check_write and (not parent_thread.write_right(user)):
-            raise http.Http404()
-        return parent_thread, parent_comment
 
     def thread_pages_count(self, thread):
         return int(
@@ -43,22 +24,23 @@ class CommentsCore(plugins.ForumPlugin):
 
     def before_delete_comment(self, sender, **kwargs):
         thread = kwargs['thread']
-        if sender.id == thread.first_comment:
+        if sender.id == thread.first_comment_id:
             thread.deleted = True
         else:
             thread.comments_count -= 1
 
     def get_thread_first_comment(self, thread):
-        if thread.first_comment:
+        if thread.first_comment_id:
             try:
-                return self.models.Comment.objects.get(id=thread.first_comment)
+                return self.models.Comment.objects.get(
+                    id=thread.first_comment_id)
             except self.models.Comment.DoesNotExist:
                 pass
         first_comment = self.models.Comment(
             parent=thread, title=thread.title, body=thread.body,
             user=thread.user)
         first_comment.save()
-        thread.first_comment = first_comment.id
+        thread.first_comment_id = first_comment.id
         thread.save()
         return first_comment
 
@@ -92,27 +74,6 @@ class CommentsCore(plugins.ForumPlugin):
             sender.comments_count = comments_count
             self.thread_update_comments_pages(sender)
 
-    def thread_first_comment(self, thread):
-        comment = getattr(thread, 'first_comment_cache', None)
-        if comment:
-            return comment
-        if thread.first_comment_id:
-            try:
-                comment = self.Comment.objects.select_related('user').get(
-                    id=thread.first_comment_id)
-                comment.parent = thread
-            except self.Comment.DoesNotExist:
-                comment = None
-        elif not thread.room:
-            comment = self.Comment(user=thread.user, parent=thread)
-            comment.title = thread.title
-            comment.body = thread.body
-            comment.save()
-            thread.first_comment_id = comment.id
-            thread.save()
-        thread.first_comment_cache = comment
-        return comment
-
     def init_core(self):
         self.Comment = self.models.Comment
         self.before_add_comment_signal = dispatch.Signal(
@@ -125,10 +86,8 @@ class CommentsCore(plugins.ForumPlugin):
             providing_args=["thread"])
         self.before_save_comment_signal = dispatch.Signal(
             providing_args=["old_comment"])
-        self.core['get_parent_comment'] = self.get_parent_comment
         self.core['Thread_get_first_comment'] = self.get_thread_first_comment
         self.core['Thread_pages_count'] = self.thread_pages_count
-        self.core['Thread_first_comment'] = self.thread_first_comment
         self.signals['before_add_comment'] = self.before_add_comment_signal
         self.signals['before_delete_comment'] = \
             self.before_delete_comment_signal
