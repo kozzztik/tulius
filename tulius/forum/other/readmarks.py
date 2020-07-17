@@ -146,6 +146,7 @@ def thread_view(sender, **kwargs):
 
 class ReadmarkAPI(api.BaseThreadView):
     require_user = True
+    read_mark_model = models.ThreadReadMark
 
     def mark_room_as_read(self, room, room_rights):
         if room:
@@ -210,3 +211,18 @@ class ReadmarkAPI(api.BaseThreadView):
             'not_read_comment':
                 not_read_comment_json(comment, self.user) if comment else None
         }
+
+    @classmethod
+    def on_delete_comment(cls, sender, comment, view, **kwargs):
+        thread = view.obj
+        if (comment.pk != thread.first_comment_id) and (
+                thread.last_comment_id <= comment.pk):
+            comments = sender.objects.filter(
+                parent=thread, deleted=False, id__gt=comment.id).order_by('id')
+            new_not_read = comments[0].id if comments else None
+            cls.read_mark_model.objects.filter(
+                thread=thread, not_readed_comment=comment.pk
+            ).update(not_readed_comment=new_not_read)
+
+
+dispatch.receiver(comment_signals.on_delete)(ReadmarkAPI.on_delete_comment)

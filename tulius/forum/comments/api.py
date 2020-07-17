@@ -52,6 +52,7 @@ def room_to_json(sender, thread, response, **kwargs):
 
 
 class CommentsBase(api.BaseThreadView):
+    COMMENTS_ON_PAGE = 25
     comment_model = models.Comment
 
     @staticmethod
@@ -87,8 +88,6 @@ class CommentsBase(api.BaseThreadView):
 
 
 class CommentsPageAPI(CommentsBase):
-    COMMENTS_ON_PAGE = 25
-
     def get_context_data(self, **kwargs):
         self.get_parent_thread(**kwargs)
         page_num = kwargs.get('page') or int(self.request.GET.get('page', 1))
@@ -222,10 +221,26 @@ class CommentAPI(CommentBase):
             comment=self.comment,
             user=self.user,
             description=self.request.GET['comment'])
+        # update page nums
+        comments_count = self.comment_model.objects.filter(
+            parent=self.obj, deleted=False, pk__lt=self.comment.pk).count()
+        update_comments = self.comment_model.objects.filter(
+            parent=self.obj, deleted=False, pk__gt=self.comment.pk
+        ).select_for_update().order_by('id')
+        for comment in update_comments:
+            comment.page = int(comments_count / self.COMMENTS_ON_PAGE) + 1
+            comment.save()
+            comments_count += 1
+        self.obj.comments_count = comments_count
+        if self.comment.pk == self.obj.last_comment_id:
+            self.obj.last_comment_id = self.comment_model.objects.filter(
+                parent=self.obj, deleted=False).exclude(
+                    pk=self.comment.pk).order_by('-id')[0].pk
         comment_signals.on_delete.send(
             self.comment_model, comment=self.comment, view=self)
         self.comment.save()
         delete_mark.save()
+        self.obj.save()
         # TODO clients notification
         return {'pages_count': self.obj.pages_count}
 

@@ -511,32 +511,6 @@ class Comment(SitedModelMixin):
     def is_thread(self):
         return self.id == self.parent.first_comment_id
 
-    def save(
-            self, force_insert=False, force_update=False, using=None,
-            update_fields=None):
-        was_none = self.id is None
-        thread = Thread.objects.select_for_update().get(id=self.parent_id)
-        delete_changed = False
-        # before safe work
-        if not was_none:
-            old_self = Comment.objects.select_for_update().get(id=self.id)
-            if old_self.deleted != self.deleted:
-                delete_changed = True
-                thread = Thread.objects.select_for_update().get(
-                    id=self.parent.id)
-                if not old_self.deleted:
-                    self.site().signals.before_delete_comment.send(
-                        self, thread=thread)
-                thread.save()
-        # real safe
-        super(Comment, self).save(
-            force_insert=force_insert, force_update=force_update,
-            using=using, update_fields=update_fields)
-        # after save
-        if (not was_none) and delete_changed and self.deleted:
-            self.site().signals.after_delete_comment.send(
-                self, thread=thread)
-
 
 class ThreadReadMark(models.Model):
     """
