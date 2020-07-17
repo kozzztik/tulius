@@ -11,6 +11,7 @@ from django.utils import html
 from tulius.core.ckeditor import html_converter
 from tulius.forum import models
 from tulius.forum import signals
+from tulius.forum.comments import signals as comment_signals
 from tulius.forum.comments import api
 from djfw.wysibb.templatetags import bbcodes
 
@@ -42,22 +43,22 @@ def thread_view(sender, response, **kwargs):
     response['media']['voting'] = VotingAPI.voting_json(voting, sender.user)
 
 
-@dispatch.receiver(signals.after_add_comment)
-def after_add_comment(sender, comment, data, preview, **kwargs):
+@dispatch.receiver(comment_signals.after_add)
+def after_add_comment(sender, comment, data, preview, view, **kwargs):
     voting_data = data['media'].get('voting')
     if not voting_data:
         return
     if preview:
         comment.media['voting'] = voting_data
-        if not sender.obj.pk:
-            sender.obj.media['voting'] = voting_data
+        if not view.obj.pk:
+            view.obj.media['voting'] = voting_data
         return
-    voting = VotingAPI.create_voting(comment, sender.user, voting_data)
+    voting = VotingAPI.create_voting(comment, view.user, voting_data)
     comment.media['voting'] = voting.pk
     comment.save()
-    if comment.id == sender.obj.first_comment_id:
-        sender.obj.media['voting'] = voting.pk
-        sender.obj.save()
+    if comment.id == view.obj.first_comment_id:
+        view.obj.media['voting'] = voting.pk
+        view.obj.save()
 
 
 @dispatch.receiver(signals.on_comment_update)

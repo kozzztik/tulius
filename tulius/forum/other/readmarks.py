@@ -4,6 +4,7 @@ from django import dispatch
 
 from tulius.forum import models
 from tulius.forum import signals
+from tulius.forum.comments import signals as comment_signals
 from tulius.forum.threads import api
 
 
@@ -17,13 +18,18 @@ def not_read_comment_json(comment, user):
     }
 
 
-@dispatch.receiver(signals.after_add_comment)
-def after_add_comment(sender, comment, preview, **kwargs):
-    if preview or (sender.obj.first_comment_id != comment.id):
+@dispatch.receiver(comment_signals.after_add)
+def after_add_comment(sender, comment, preview, view, **kwargs):
+    if preview:
         return
-    models.ThreadReadMark(
-        user=sender.user, thread=sender.obj, readed_comment=comment,
-        not_readed_comment=None).save()
+    if view.obj.first_comment_id != comment.id:
+        models.ThreadReadMark.objects.filter(
+            thread=view.obj, not_readed_comment=None
+        ).exclude(user=view.user).update(not_readed_comment=comment)
+    else:
+        models.ThreadReadMark(
+            user=view.user, thread=view.obj, readed_comment=comment,
+            not_readed_comment=None).save()
 
 
 @dispatch.receiver(signals.thread_prepare_room)

@@ -32,8 +32,9 @@ def after_create_thread(sender, thread, data, preview, **kwargs):
         thread.first_comment_id = comment.pk
         thread.last_comment_id = comment.pk
         thread.save()
-    signals.after_add_comment.send(
-        sender, comment=comment, data=data, preview=preview)
+    comment_signals.after_add.send(
+        models.Comment, comment=comment, data=data, preview=preview,
+        view=sender)
 
 
 @dispatch.receiver(signals.update_thread)
@@ -167,8 +168,9 @@ class CommentsPageAPI(CommentsBase):
                 view=self)
             if not preview:
                 comment.save()
-            signals.after_add_comment.send(
-                self, comment=comment, data=data, preview=preview)
+            comment_signals.after_add.send(
+                self.comment_model, comment=comment, data=data, preview=preview,
+                view=self)
             if preview:
                 return self.comment_to_json(comment)
             # commit transaction to be sure that clients wouldn't be notified
