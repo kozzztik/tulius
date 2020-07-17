@@ -55,26 +55,23 @@ def before_add_comment(sender, comment, data, view, **kwargs):
             view.variation, images_data)
 
 
-@dispatch.receiver(signals.on_comment_update)
-def on_comment_update(sender, comment, data, **kwargs):
-    if sender.plugin_id != consts.GAME_FORUM_SITE_ID:
+@dispatch.receiver(comment_signals.on_update)
+def on_comment_update(sender, comment, data, view, **kwargs):
+    if view.plugin_id != consts.GAME_FORUM_SITE_ID:
         return
-    if sender.obj.first_comment_id == comment.id:
-        comment.data1 = sender.obj.data1
-        comment.data2 = sender.obj.data2
     images_data = data['media'].get('illustrations')
     orig_data = comment.media.get('illustrations')
     if images_data:
-        images_data = validate_image_data(sender.variation, images_data)
+        images_data = validate_image_data(view.variation, images_data)
     if orig_data and not images_data:
         del comment.media['illustrations']
     elif images_data:
         comment.media['illustrations'] = images_data
-    if sender.obj.first_comment_id == comment.id:
-        if (not images_data) and ('illustrations' in sender.obj.media):
-            del sender.obj.media['illustrations']
+    if view.obj.first_comment_id == comment.id:
+        if (not images_data) and ('illustrations' in view.obj.media):
+            del view.obj.media['illustrations']
         elif images_data:
-            sender.obj.media['illustrations'] = images_data
+            view.obj.media['illustrations'] = images_data
 
 
 @dispatch.receiver(signals.thread_room_to_json)
@@ -150,6 +147,8 @@ class CommentsPageAPI(comments.CommentsPageAPI, CommentsBase):
 
     @classmethod
     def on_create_thread(cls, sender, thread, data, preview, **kwargs):
+        # TODO this func will be removed with plugin_id field cleanup
+        # it will use signals "sender" field
         if sender.plugin_id != consts.GAME_FORUM_SITE_ID:
             return
         super(CommentsPageAPI, cls).on_create_thread(
@@ -172,16 +171,28 @@ class CommentAPI(comments.CommentAPI, CommentsBase):
         data['thread']['rights'] = self.rights.to_json()
         return data
 
-    def update_comment(self, comment, data):
-        super(CommentAPI, self).update_comment(comment, data)
+    @classmethod
+    def update_comment(cls, comment, data, preview, view):
+        super(CommentAPI, cls).update_comment(comment, data, preview, view)
         new_role = data['role_id']
         if comment.data1 != new_role:
-            if new_role not in self.rights.user_write_roles:
+            if new_role not in view.rights.user_write_roles:
                 raise exceptions.PermissionDenied()
             update_role_comments_count(new_role, 1)
             update_role_comments_count(comment.data1, -1)
             comment.data1 = new_role
         editor_role = data['edit_role_id']
-        if editor_role not in self.rights.user_write_roles:
+        if editor_role not in view.rights.user_write_roles:
             raise exceptions.PermissionDenied()
         comment.data2 = editor_role
+
+    @classmethod
+    def on_thread_update(cls, sender, thread, data, preview, **kwargs):
+        # TODO this func will be removed with plugin_id field cleanup
+        # it will use signals "sender" field
+        if sender.plugin_id == consts.GAME_FORUM_SITE_ID:
+            super(CommentAPI, cls).on_thread_update(
+                sender, thread, data, preview, **kwargs)
+
+
+dispatch.receiver(signals.update_thread)(CommentAPI.on_thread_update)

@@ -29,16 +29,16 @@ def before_add_comment(sender, comment, data, view, **kwargs):
         comment.media['youtube'] = html_data
 
 
-@dispatch.receiver(signals.on_comment_update)
-def on_comment_update(sender, comment, data, **kwargs):
+@dispatch.receiver(comment_signals.on_update)
+def on_comment_update(sender, comment, data, view, **kwargs):
     html_data = data['media'].get('youtube')
     orig_data = comment.media.get('youtube')
     if orig_data and not html_data:
         del comment.media['youtube']
     elif html_data:
         comment.media['youtube'] = html_data
-    if sender.obj.first_comment_id == comment.id:
-        if (not html_data) and ('youtube' in sender.obj.media):
-            del sender.obj.media['youtube']
+    if view.obj.first_comment_id == comment.id:
+        if (not html_data) and ('youtube' in view.obj.media):
+            del view.obj.media['youtube']
         elif html_data:
-            sender.obj.media['youtube'] = html_data
+            view.obj.media['youtube'] = html_data

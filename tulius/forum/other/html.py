@@ -31,9 +31,9 @@ def before_add_comment(sender, comment, data, view, **kwargs):
         comment.media['html'] = html_data
 
 
-@dispatch.receiver(signals.on_comment_update)
-def on_comment_update(sender, comment, data, preview, **kwargs):
-    if not sender.user.is_superuser:
+@dispatch.receiver(comment_signals.on_update)
+def on_comment_update(sender, comment, data, view, **kwargs):
+    if not view.user.is_superuser:
         return
     html_data = data['media'].get('html')
     orig_data = comment.media.get('html')
@@ -41,11 +41,11 @@ def on_comment_update(sender, comment, data, preview, **kwargs):
         del comment.media['html']
     elif html_data:
         comment.media['html'] = html_data
-    if sender.obj.first_comment_id == comment.id:
-        if (not html_data) and ('html' in sender.obj.media):
-            del sender.obj.media['html']
+    if view.obj.first_comment_id == comment.id:
+        if (not html_data) and ('html' in view.obj.media):
+            del view.obj.media['html']
         elif html_data:
-            sender.obj.media['html'] = html_data
+            view.obj.media['html'] = html_data
 
 
 class UploadFiles(plugins.BaseAPIView):

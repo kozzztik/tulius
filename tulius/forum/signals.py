@@ -15,9 +15,6 @@ thread_room_to_json = dispatch.Signal(
 comment_to_json = dispatch.Signal(
     providing_args=["comment", "data"])
 
-on_comment_update = dispatch.Signal(
-    providing_args=["comment", "data", "preview"])
-
 before_create_thread = dispatch.Signal(providing_args=["thread", "data"])
 after_create_thread = dispatch.Signal(
     providing_args=["thread", "data", "preview"])

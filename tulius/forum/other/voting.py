@@ -47,12 +47,12 @@ def thread_view(sender, response, **kwargs):
 def after_add_comment(sender, comment, data, preview, view, **kwargs):
     voting_data = data['media'].get('voting')
     if not voting_data:
-        return
+        return None
     if preview:
         comment.media['voting'] = voting_data
         if not view.obj.pk:
             view.obj.media['voting'] = voting_data
-        return
+        return None
     voting = VotingAPI.create_voting(comment, view.user, voting_data)
     comment.media['voting'] = voting.pk
     if comment.id == view.obj.first_comment_id:
@@ -60,23 +60,23 @@ def after_add_comment(sender, comment, data, preview, view, **kwargs):
     return voting
 
 
-@dispatch.receiver(signals.on_comment_update)
-def on_comment_update(sender, comment, data, preview, **kwargs):
+@dispatch.receiver(comment_signals.on_update)
+def on_comment_update(sender, comment, data, preview, view, **kwargs):
     voting_data = data['media'].get('voting')
     if not voting_data:
         return
     orig_data = comment.media.get('voting')
     if preview:
         comment.media['voting'] = voting_data
-        if sender.obj.first_comment_id == comment.id:
-            sender.obj.media['voting'] = voting_data
+        if view.obj.first_comment_id == comment.id:
+            view.obj.media['voting'] = voting_data
         return
     if not orig_data:
         # voting added
-        voting = VotingAPI.create_voting(comment, sender.user, voting_data)
+        voting = VotingAPI.create_voting(comment, view.user, voting_data)
         comment.media['voting'] = voting.pk
-        if sender.obj.first_comment_id == comment.id:
-            sender.obj.media['voting'] = voting.pk
+        if view.obj.first_comment_id == comment.id:
+            view.obj.media['voting'] = voting.pk
         return
     voting = models.Voting.objects.filter(pk=orig_data).first()
     if not voting:

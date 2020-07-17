@@ -40,8 +40,8 @@ def before_add_comment(sender, comment, data, view, **kwargs):
         comment.media['images'] = validate_image_data(images_data)
 
 
-@dispatch.receiver(signals.on_comment_update)
-def on_comment_update(sender, comment, data, preview, **kwargs):
+@dispatch.receiver(comment_signals.on_update)
+def on_comment_update(sender, comment, data, view, **kwargs):
     images_data = data['media'].get('images')
     orig_data = comment.media.get('images')
     if images_data:
@@ -50,11 +50,11 @@ def on_comment_update(sender, comment, data, preview, **kwargs):
         del comment.media['images']
     elif images_data:
         comment.media['images'] = images_data
-    if sender.obj.first_comment_id == comment.id:
-        if (not images_data) and ('images' in sender.obj.media):
-            del sender.obj.media['images']
+    if view.obj.first_comment_id == comment.id:
+        if (not images_data) and ('images' in view.obj.media):
+            del view.obj.media['images']
         elif images_data:
-            sender.obj.media['images'] = images_data
+            view.obj.media['images'] = images_data
 
 
 class Images(plugins.BaseAPIView):
