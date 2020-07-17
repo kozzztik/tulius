@@ -41,22 +41,22 @@ def before_create_thread(sender, thread, data, **kwargs):
         sender.variation, images_data)
 
 
-@dispatch.receiver(signals.before_add_comment)
-def before_add_comment(sender, comment, data, **kwargs):
-    if sender.plugin_id != consts.GAME_FORUM_SITE_ID:
+@dispatch.receiver(comment_signals.before_add)
+def before_add_comment(sender, comment, data, view, **kwargs):
+    if view.plugin_id != consts.GAME_FORUM_SITE_ID:
         return
-    if sender.obj.first_comment_id is None:
-        comment.data1 = sender.obj.data1
+    if view.obj.first_comment_id is None:
+        comment.data1 = view.obj.data1
         update_role_comments_count(comment.data1, 1)
-        sender.variation.comments_count_inc(1)
+        view.variation.comments_count_inc(1)
     images_data = data['media'].get('illustrations')
     if not images_data:
         return
-    if sender.obj.first_comment_id == comment.id:
-        comment.media['illustrations'] = sender.obj.media['illustrations']
+    if view.obj.first_comment_id == comment.id:
+        comment.media['illustrations'] = view.obj.media['illustrations']
     else:
         comment.media['illustrations'] = validate_image_data(
-            sender.variation, images_data)
+            view.variation, images_data)
 
 
 @dispatch.receiver(signals.on_comment_update)

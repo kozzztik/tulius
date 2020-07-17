@@ -3,6 +3,8 @@ import re
 from django import dispatch
 
 from tulius.forum import signals
+from tulius.forum.comments import signals as comment_signals
+
 
 regexp = re.compile(r'^[\w\-_]*$')
 
@@ -16,13 +18,13 @@ def before_create_thread(sender, thread, data, **kwargs):
         thread.media['youtube'] = html_data
 
 
-@dispatch.receiver(signals.before_add_comment)
-def before_add_comment(sender, comment, data, **kwargs):
+@dispatch.receiver(comment_signals.before_add)
+def before_add_comment(sender, comment, data, view, **kwargs):
     html_data = data['media'].get('youtube')
     if (not html_data) or (not regexp.match(html_data)):
         return
-    if sender.obj.first_comment_id == comment.id:
-        comment.media['youtube'] = sender.obj.media['youtube']
+    if view.obj.first_comment_id == comment.id:
+        comment.media['youtube'] = view.obj.media['youtube']
     else:
         comment.media['youtube'] = html_data
 

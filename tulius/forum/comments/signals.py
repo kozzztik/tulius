@@ -1,4 +1,5 @@
 from django import dispatch
 
-
-on_delete = dispatch.Signal(providing_args=["comment", "view"])
+before_add = dispatch.Signal(
+    providing_args=['comment', 'data', 'preview', 'view'])
+on_delete = dispatch.Signal(providing_args=['comment', 'view'])

@@ -24,8 +24,9 @@ def after_create_thread(sender, thread, data, preview, **kwargs):
     comment = models.Comment(
         parent=thread, title=thread.title, body=thread.body,
         user=thread.user, plugin_id=thread.plugin_id)
-    signals.before_add_comment.send(
-        sender, comment=comment, data=data, preview=preview)
+    comment_signals.before_add.send(
+        models.Comment, comment=comment, data=data, preview=preview,
+        view=sender)
     if not preview:
         comment.save()
         thread.first_comment_id = comment.pk
@@ -161,8 +162,9 @@ class CommentsPageAPI(CommentsBase):
         if text:
             comment = self.create_comment(text, data)
             comment.media = {}
-            signals.before_add_comment.send(
-                self, comment=comment, data=data, preview=preview)
+            comment_signals.before_add.send(
+                self.comment_model, comment=comment, data=data, preview=preview,
+                view=self)
             if not preview:
                 comment.save()
             signals.after_add_comment.send(
