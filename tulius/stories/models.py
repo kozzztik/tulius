@@ -413,6 +413,11 @@ class Variation(SortableModelMixin):
     def get_roles(self):
         return Role.objects.filter(variation=self).exclude(deleted=True)
 
+    def comments_count_inc(self, value):
+        Variation.objects.filter(pk=self.pk).update(
+            comments_count=models.F('comments_count') + value)
+        self.comments_count += value
+
 
 class Role(SortableModelMixin):
     class Meta:

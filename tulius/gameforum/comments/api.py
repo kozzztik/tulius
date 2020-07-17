@@ -1,11 +1,13 @@
 from django import dispatch
 from django import urls
 from django.core import exceptions
+from django.db import models as dj_models
 from django.utils import html
 from djfw.wysibb.templatetags import bbcodes
 
 from tulius.forum import signals
 from tulius.forum import models
+from tulius.forum.comments import signals as comment_signals
 from tulius.stories import models as stories_models
 from tulius.gameforum import consts
 from tulius.gameforum.threads import api as threads
@@ -45,6 +47,8 @@ def before_add_comment(sender, comment, data, **kwargs):
         return
     if sender.obj.first_comment_id is None:
         comment.data1 = sender.obj.data1
+        update_role_comments_count(comment.data1, 1)
+        sender.variation.comments_count_inc(1)
     images_data = data['media'].get('illustrations')
     if not images_data:
         return
@@ -133,11 +137,26 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
         return data
 
 
+def update_role_comments_count(role_id, value):
+    if role_id:
+        stories_models.Role.objects.filter(pk=role_id).update(
+            comments_count=dj_models.F('comments_count') + value)
+
+
 class CommentsPageAPI(comments.CommentsPageAPI, CommentsBase):
     def create_comment(self, text, data):
         comment = super(CommentsPageAPI, self).create_comment(text, data)
         comment.data1 = self.process_role(None, data)
+        update_role_comments_count(comment.data1, 1)
+        self.variation.comments_count_inc(1)
         return comment
+
+
+@dispatch.receiver(comment_signals.on_delete)
+def on_delete(sender, comment, view, **kwargs):
+    if comment.plugin_id == consts.GAME_FORUM_SITE_ID:
+        update_role_comments_count(comment.data1, -1)
+        view.variation.comments_count_inc(-1)
 
 
 class CommentAPI(comments.CommentAPI, CommentsBase):
@@ -152,6 +171,8 @@ class CommentAPI(comments.CommentAPI, CommentsBase):
         if comment.data1 != new_role:
             if new_role not in self.rights.user_write_roles:
                 raise exceptions.PermissionDenied()
+            update_role_comments_count(new_role, 1)
+            update_role_comments_count(comment.data1, -1)
             comment.data1 = new_role
         editor_role = data['edit_role_id']
         if editor_role not in self.rights.user_write_roles:

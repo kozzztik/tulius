@@ -13,10 +13,10 @@ class GameForumConfig(AppConfig):
         from .sites import GameForumSite
         from tulius.forum.readmarks.plugin import ReadMarksPlugin
         from tulius.forum.fixes.plugin import FixesPlugin
+        from tulius.forum.comments.plugin import CommentsPlugin
         from .gamecore import GamePlugin
         from .rights import GameRightsPlugin
         from .threads import GameThreadsPlugin
-        from .comments import GameCommentsPlugin
 
         self.site = GameForumSite(
             name='gameforum',
@@ -25,7 +25,7 @@ class GameForumConfig(AppConfig):
             plugins=(
                 GameRightsPlugin,
                 GameThreadsPlugin,
-                GameCommentsPlugin,
+                CommentsPlugin,
                 ReadMarksPlugin,
                 GamePlugin,
                 FixesPlugin

@@ -13,6 +13,7 @@ from tulius.forum import models
 from tulius.forum import signals
 from tulius.forum.threads import api
 from tulius.forum.comments import pagination
+from tulius.forum.comments import signals as comment_signals
 from tulius.websockets import publisher
 
 
@@ -84,6 +85,8 @@ def room_to_json(sender, thread, response, **kwargs):
 
 
 class CommentsBase(api.BaseThreadView):
+    comment_model = models.Comment
+
     @staticmethod
     def comment_url(comment):
         return urls.reverse('forum_api:comment', kwargs={'pk': comment.id})
@@ -213,6 +216,8 @@ class CommentAPI(CommentBase):
             comment=self.comment,
             user=self.user,
             description=self.request.GET['comment'])
+        comment_signals.on_delete.send(
+            self.comment_model, comment=self.comment, view=self)
         self.comment.save()
         delete_mark.save()
         # TODO clients notification
