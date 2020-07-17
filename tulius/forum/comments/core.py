@@ -14,14 +14,6 @@ class CommentsCore(plugins.ForumPlugin):
         return int(
             (thread.comments_count - 1) / self.COMMENTS_ON_PAGE + 1) or 1
 
-    def before_add_comment(self, **kwargs):
-        thread = kwargs['sender']
-        instance = kwargs['instance']
-        comments_count = self.models.Comment.objects.filter(
-            parent=thread, deleted=False).count()
-        instance.page = int(comments_count / self.COMMENTS_ON_PAGE) + 1
-        thread.comments_count += 1
-
     def before_delete_comment(self, sender, **kwargs):
         thread = kwargs['thread']
         if sender.id == thread.first_comment_id:
@@ -55,10 +47,6 @@ class CommentsCore(plugins.ForumPlugin):
             comments = [comment['id'] for comment in comments]
             model.objects.filter(id__in=comments).update(page=(x + 1))
 
-    def after_add_comment(self, sender, **kwargs):
-        if kwargs['restore']:
-            self.thread_update_comments_pages(kwargs['thread'])
-
     def after_delete_comment(self, sender, **kwargs):
         self.thread_update_comments_pages(kwargs['thread'])
 
@@ -76,27 +64,16 @@ class CommentsCore(plugins.ForumPlugin):
 
     def init_core(self):
         self.Comment = self.models.Comment
-        self.before_add_comment_signal = dispatch.Signal(
-            providing_args=["instance", "restore"])
         self.before_delete_comment_signal = dispatch.Signal(
             providing_args=["thread"])
-        self.after_add_comment_signal = dispatch.Signal(
-            providing_args=["thread", "restore"])
         self.after_delete_comment_signal = dispatch.Signal(
             providing_args=["thread"])
-        self.before_save_comment_signal = dispatch.Signal(
-            providing_args=["old_comment"])
         self.core['Thread_get_first_comment'] = self.get_thread_first_comment
         self.core['Thread_pages_count'] = self.thread_pages_count
-        self.signals['before_add_comment'] = self.before_add_comment_signal
         self.signals['before_delete_comment'] = \
             self.before_delete_comment_signal
-        self.signals['after_add_comment'] = self.after_add_comment_signal
         self.signals['after_delete_comment'] = self.after_delete_comment_signal
-        self.signals['before_save_comment'] = self.before_save_comment_signal
-        self.before_add_comment_signal.connect(self.before_add_comment)
         self.before_delete_comment_signal.connect(self.before_delete_comment)
-        self.after_add_comment_signal.connect(self.after_add_comment)
         self.after_delete_comment_signal.connect(self.after_delete_comment)
 
     def post_init(self):

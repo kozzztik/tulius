@@ -45,10 +45,6 @@ def before_create_thread(sender, thread, data, **kwargs):
 def before_add_comment(sender, comment, data, view, **kwargs):
     if view.plugin_id != consts.GAME_FORUM_SITE_ID:
         return
-    if view.obj.first_comment_id is None:
-        comment.data1 = view.obj.data1
-        update_role_comments_count(comment.data1, 1)
-        view.variation.comments_count_inc(1)
     images_data = data['media'].get('illustrations')
     if not images_data:
         return
@@ -144,12 +140,23 @@ def update_role_comments_count(role_id, value):
 
 
 class CommentsPageAPI(comments.CommentsPageAPI, CommentsBase):
-    def create_comment(self, text, data):
-        comment = super(CommentsPageAPI, self).create_comment(text, data)
-        comment.data1 = self.process_role(None, data)
+    @classmethod
+    def create_comment(cls, data, view):
+        comment = super(CommentsPageAPI, cls).create_comment(data, view)
+        comment.data1 = view.process_role(None, data)
         update_role_comments_count(comment.data1, 1)
-        self.variation.comments_count_inc(1)
+        view.variation.comments_count_inc(1)
         return comment
+
+    @classmethod
+    def on_create_thread(cls, sender, thread, data, preview, **kwargs):
+        if sender.plugin_id != consts.GAME_FORUM_SITE_ID:
+            return
+        super(CommentsPageAPI, cls).on_create_thread(
+            sender, thread, data, preview, **kwargs)
+
+
+dispatch.receiver(signals.after_create_thread)(CommentsPageAPI.on_create_thread)
 
 
 @dispatch.receiver(comment_signals.on_delete)

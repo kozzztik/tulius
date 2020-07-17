@@ -55,10 +55,9 @@ def after_add_comment(sender, comment, data, preview, view, **kwargs):
         return
     voting = VotingAPI.create_voting(comment, view.user, voting_data)
     comment.media['voting'] = voting.pk
-    comment.save()
     if comment.id == view.obj.first_comment_id:
         view.obj.media['voting'] = voting.pk
-        view.obj.save()
+    return voting
 
 
 @dispatch.receiver(signals.on_comment_update)

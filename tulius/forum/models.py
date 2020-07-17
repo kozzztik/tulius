@@ -524,43 +524,18 @@ class Comment(SitedModelMixin):
                 delete_changed = True
                 thread = Thread.objects.select_for_update().get(
                     id=self.parent.id)
-                if old_self.deleted:
-                    self.site().signals.before_add_comment.send(
-                        thread, instance=self, restore=True)
-                else:
+                if not old_self.deleted:
                     self.site().signals.before_delete_comment.send(
                         self, thread=thread)
                 thread.save()
-            else:
-                self.site().signals.before_save_comment.send(
-                    self, old_comment=old_self)
-        else:
-            # trick to avoid pylint warning
-            reply_id = getattr(self, 'reply_id', None)
-            if (not reply_id) and (
-                    self.parent.first_comment_id != self.id):
-                self.reply_id = self.parent.first_comment_id
-            self.site().signals.before_add_comment.send(
-                thread, instance=self, restore=False)
         # real safe
         super(Comment, self).save(
             force_insert=force_insert, force_update=force_update,
             using=using, update_fields=update_fields)
         # after save
-        if was_none:
-            if not thread.first_comment_id:
-                thread.first_comment_id = self.id
-            thread.last_comment_id = self.id
-            thread.save()
-            self.site().signals.after_add_comment.send(
-                self, thread=thread, restore=False)
-        elif delete_changed:
-            if self.deleted:
-                self.site().signals.after_delete_comment.send(
-                    self, thread=thread)
-            else:
-                self.site().signals.after_add_comment.send(
-                    self, thread=thread, restore=True)
+        if (not was_none) and delete_changed and self.deleted:
+            self.site().signals.after_delete_comment.send(
+                self, thread=thread)
 
 
 class ThreadReadMark(models.Model):
