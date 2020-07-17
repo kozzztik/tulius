@@ -12,3 +12,5 @@ after_add = dispatch.Signal(
 on_delete = dispatch.Signal(providing_args=['comment', 'view'])
 on_update = dispatch.Signal(
     providing_args=['comment', 'data', 'preview', 'view'])
+
+to_json = dispatch.Signal(providing_args=['comment', 'data', 'view'])

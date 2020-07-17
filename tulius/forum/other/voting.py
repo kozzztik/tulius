@@ -16,8 +16,8 @@ from tulius.forum.comments import api
 from djfw.wysibb.templatetags import bbcodes
 
 
-@dispatch.receiver(signals.comment_to_json)
-def comment_to_json(sender, comment, data, **kwargs):
+@dispatch.receiver(comment_signals.to_json)
+def comment_to_json(sender, comment, data, view, **kwargs):
     # TODO better to store data directly in media, avoiding loading of it,
     # TODO but it is too much changes at one time to get rid of it while
     # TODO previous implementation is still in place
@@ -28,7 +28,7 @@ def comment_to_json(sender, comment, data, **kwargs):
     if not voting:
         comment.media['voting'] = None
         return
-    data['media']['voting'] = VotingAPI.voting_json(voting, sender.user)
+    data['media']['voting'] = VotingAPI.voting_json(voting, view.user)
 
 
 @dispatch.receiver(signals.thread_view)

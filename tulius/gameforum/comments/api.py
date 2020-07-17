@@ -126,7 +126,8 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
             'reply_id': c.reply_id,
 
         }
-        signals.comment_to_json.send(self, comment=c, data=data)
+        comment_signals.to_json.send(
+            self.comment_model, comment=c, data=data, view=self)
         return data
 
 
