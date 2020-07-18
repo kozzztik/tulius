@@ -73,4 +73,11 @@ class ThreadsPlugin(ThreadsCorePlugin):
             url(
                 r'^comment/(?P<comment_id>\d+)/$',
                 Index.as_view(), name='comment'),
+            url(
+                r'^rebuild_nums/(?P<post_id>\d+)/$',
+                Index.as_view(), name='rebuild_nums'),
+            url(
+                r'^rebuild_nums/$',
+                Index.as_view(), name='rebuild_nums'),
+
         ]

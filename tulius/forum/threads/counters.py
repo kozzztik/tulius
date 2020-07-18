@@ -13,14 +13,16 @@ class CountersFix(plugins.BaseAPIView):
     notify_user = True
 
     def process_thread(self, thread, with_descendants):
-        thread_calls = signals.on_fix_counters(
-            self.thread_model, thread=thread, with_descendants=with_descendants,
-            view=self)
+        thread_calls = signals.on_fix_counters.send(
+            self.thread_model, thread=thread,
+            with_descendants=with_descendants, view=self)
         thread_calls = list(map(lambda x: x[0], thread_calls))
         if with_descendants and thread.room:
             threads = self.thread_model.objects.filter(
-                parent=thread, deleted=False).select_for_update()
+                parent=thread, deleted=False)
             for sub_thread in threads:
+                sub_thread = self.thread_model.objects.select_for_update().get(
+                    pk=sub_thread.pk)
                 sub_result = self.process_thread(
                     sub_thread, with_descendants)
                 thread_calls += sub_result

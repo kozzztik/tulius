@@ -6,4 +6,4 @@ from django import dispatch
 # callable have only one parameter - thread. Use object methods or
 # functools partial if you need to provide additional params.
 on_fix_counters = dispatch.Signal(
-    providing_args=['thread' , 'with_descendants', 'view'])
+    providing_args=['thread', 'with_descendants', 'view'])
