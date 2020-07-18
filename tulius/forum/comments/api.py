@@ -13,40 +13,8 @@ from tulius.forum import models
 from tulius.forum import signals
 from tulius.forum.threads import api
 from tulius.forum.comments import pagination
+from tulius.forum.comments import signals as comment_signals
 from tulius.websockets import publisher
-
-
-@dispatch.receiver(signals.after_create_thread)
-def after_create_thread(sender, thread, data, preview, **kwargs):
-    if thread.room:
-        return
-    comment = models.Comment(
-        parent=thread, title=thread.title, body=thread.body,
-        user=thread.user, plugin_id=thread.plugin_id)
-    signals.before_add_comment.send(
-        sender, comment=comment, data=data, preview=preview)
-    if not preview:
-        comment.save()
-        thread.first_comment_id = comment.pk
-        thread.last_comment_id = comment.pk
-        thread.save()
-    signals.after_add_comment.send(
-        sender, comment=comment, data=data, preview=preview)
-
-
-@dispatch.receiver(signals.update_thread)
-def update_thread(sender, thread, data, preview, **kwargs):
-    if thread.room:
-        return
-    comment = models.Comment.objects.get(id=thread.first_comment_id)
-    comment.title = thread.title
-    comment.body = thread.body
-    comment.edit_time = timezone.now()
-    comment.editor = sender.user
-    signals.on_comment_update.send(
-        sender, comment=comment, data=data, preview=preview)
-    if not preview:
-        comment.save()
 
 
 @dispatch.receiver(signals.thread_prepare_room)
@@ -84,6 +52,9 @@ def room_to_json(sender, thread, response, **kwargs):
 
 
 class CommentsBase(api.BaseThreadView):
+    COMMENTS_ON_PAGE = 25
+    comment_model = models.Comment
+
     @staticmethod
     def comment_url(comment):
         return urls.reverse('forum_api:comment', kwargs={'pk': comment.id})
@@ -111,7 +82,8 @@ class CommentsBase(api.BaseThreadView):
             'media': c.media,
             'reply_id': c.reply_id,
         }
-        signals.comment_to_json.send(self, comment=c, data=data)
+        comment_signals.to_json.send(
+            self.comment_model, comment=c, data=data, view=self)
         return data
 
 
@@ -133,47 +105,83 @@ class CommentsPageAPI(CommentsBase):
             'comments': [self.comment_to_json(c) for c in comments]
         }
 
-    def create_comment(self, text, data):
-        reply_id = data['reply_id']
-        if reply_id != self.obj.first_comment_id:
-            obj = shortcuts.get_object_or_404(models.Comment, pk=reply_id)
-            if obj.parent_id != self.obj.id:
+    @classmethod
+    def on_create_thread(cls, sender, thread, data, preview, **kwargs):
+        if not thread.room:
+            cls.create_comment_process(data, preview, sender)
+            if not preview:
+                thread.save()
+
+    @classmethod
+    def create_comment(cls, data, view):
+        reply_id = data.get('reply_id') or view.obj.first_comment_id
+        if reply_id and (reply_id != view.obj.first_comment_id):
+            obj = shortcuts.get_object_or_404(cls.comment_model, pk=reply_id)
+            if obj.parent_id != view.obj.id:
                 raise exceptions.PermissionDenied()
-        comment = models.Comment(plugin_id=self.obj.plugin_id)
-        comment.parent = self.obj
-        comment.user = self.user
+        comment = cls.comment_model(plugin_id=view.obj.plugin_id)
+        comment.parent = view.obj
+        comment.user = view.user
         comment.title = data['title']
-        comment.body = text
+        comment.body = data['body']
         comment.reply_id = reply_id
+        return comment
+
+    @classmethod
+    def create_comment_process(cls, data, preview, view):
+        comment = cls.create_comment(data, view=view)
+        comment.media = {}
+        comment_signals.before_add.send(
+            cls.comment_model, comment=comment, data=data, preview=preview,
+            view=view)
+        comments_count = cls.comment_model.objects.filter(
+            parent=view.obj, deleted=False).count()
+        comment.page = int(comments_count / cls.COMMENTS_ON_PAGE) + 1
+        if not preview:
+            comment.save()
+        view.obj.comments_count = comments_count + 1
+        if not view.obj.first_comment_id:
+            view.obj.first_comment_id = comment.pk
+        view.obj.last_comment_id = comment.pk
+        results = comment_signals.after_add.send(
+            cls.comment_model, comment=comment, data=data, preview=preview,
+            view=view)
+        if any(map(lambda a: a[1], results)):
+            comment.save()
         return comment
 
     def post(self, request, **kwargs):
         transaction.set_autocommit(False)
-        self.get_parent_thread(**kwargs)
+        self.get_parent_thread(for_update=True, **kwargs)
         if not self.rights.write:
             raise exceptions.PermissionDenied()
         data = json.loads(request.body)
-        text = html_converter.html_to_bb(data.pop('body'))
+        data['body'] = html_converter.html_to_bb(data['body'])
         preview = data.pop('preview', False)
-        if text:
-            comment = self.create_comment(text, data)
-            comment.media = {}
-            signals.before_add_comment.send(
-                self, comment=comment, data=data, preview=preview)
-            if not preview:
-                comment.save()
-            signals.after_add_comment.send(
-                self, comment=comment, data=data, preview=preview)
+        if data['body']:
+            comment = self.create_comment_process(data, preview, self)
             if preview:
                 return self.comment_to_json(comment)
             # commit transaction to be sure that clients wouldn't be notified
             # before comment will be accessible in DB
+            self.obj.save()
             transaction.commit()
             publisher.notify_thread_about_new_comment(self, self.obj, comment)
             page = comment.page
         else:
             page = self.obj.pages_count
         return self.get_context_data(page=page, **kwargs)
+
+
+@dispatch.receiver(signals.after_create_thread)
+def tmp_on_create_plugin_filter(
+        sender, thread, data, preview, **kwargs):
+    # TODO this func will be removed with plugin_id field cleanup
+    # it will use signals "sender" field
+    if thread.plugin_id:
+        return None
+    return CommentsPageAPI.on_create_thread(
+        sender, thread, data, preview, **kwargs)
 
 
 class CommentBase(CommentsBase):
@@ -213,19 +221,51 @@ class CommentAPI(CommentBase):
             comment=self.comment,
             user=self.user,
             description=self.request.GET['comment'])
+        # update page nums
+        comments_count = self.comment_model.objects.filter(
+            parent=self.obj, deleted=False, pk__lt=self.comment.pk).count()
+        update_comments = self.comment_model.objects.filter(
+            parent=self.obj, deleted=False, pk__gt=self.comment.pk
+        ).select_for_update().order_by('id')
+        for comment in update_comments:
+            comment.page = int(comments_count / self.COMMENTS_ON_PAGE) + 1
+            comment.save()
+            comments_count += 1
+        self.obj.comments_count = comments_count
+        if self.comment.pk == self.obj.last_comment_id:
+            self.obj.last_comment_id = self.comment_model.objects.filter(
+                parent=self.obj, deleted=False).exclude(
+                    pk=self.comment.pk).order_by('-id')[0].pk
+        comment_signals.on_delete.send(
+            self.comment_model, comment=self.comment, view=self)
         self.comment.save()
         delete_mark.save()
+        self.obj.save()
         # TODO clients notification
         return {'pages_count': self.obj.pages_count}
 
-    def update_comment(self, comment, data):
+    @classmethod
+    def update_comment(cls, comment, data, preview, view):
         comment.edit_time = timezone.now()
-        comment.editor = self.request.user
+        comment.editor = view.request.user
         comment.title = data['title'][:120]
-        comment.body = html_converter.html_to_bb(data['body'])
+        comment.body = data['body']
+        comment_signals.on_update.send(
+            cls.comment_model, comment=comment, data=data,
+            preview=preview, view=view)
+
+    @classmethod
+    def on_thread_update(cls, sender, thread, data, preview, **kwargs):
+        if not thread.room:
+            comment = cls.comment_model.objects.select_for_update().get(
+                id=thread.first_comment_id)
+            cls.update_comment(comment, data, preview, sender)
+            if not preview:
+                comment.save()
 
     def post(self, request, **kwargs):
         data = json.loads(request.body)
+        data['body'] = html_converter.html_to_bb(data['body'])
         preview = data.pop('preview', False)
         transaction.set_autocommit(False)
         self.get_comment(for_update=True, **kwargs)
@@ -234,13 +274,22 @@ class CommentAPI(CommentBase):
         if not self.comment_edit_right(self.comment):
             raise exceptions.PermissionDenied()
 
-        self.update_comment(self.comment, data)
+        self.update_comment(self.comment, data, preview, self)
 
-        signals.on_comment_update.send(
-            self, comment=self.comment, data=data, preview=preview)
         if preview:
             transaction.rollback()
         else:
             self.comment.save()
             transaction.commit()
         return self.comment_to_json(self.comment)
+
+
+@dispatch.receiver(signals.update_thread)
+def tmp_on_update_plugin_filter(
+        sender, thread, data, preview, **kwargs):
+    # TODO this func will be removed with plugin_id field cleanup
+    # it will use signals "sender" field
+    if thread.plugin_id:
+        return None
+    return CommentAPI.on_thread_update(
+        sender, thread, data, preview, **kwargs)

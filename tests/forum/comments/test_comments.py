@@ -16,6 +16,14 @@ def test_comments_api(client, superuser, admin, user):
             'granted_rights': [], 'media': {}})
     assert response.status_code == 200
     thread = response.json()
+    assert thread['first_comment_id'] is not None
+    # check how thread looks on room page
+    response = admin.get(group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['threads'][0]['comments_count'] == 1
+    last_comment = data['threads'][0]['last_comment']
+    assert last_comment['id'] == thread['first_comment_id']
     # check comments not readable for other users
     response = user.get(thread['url'] + 'comments_page/')
     assert response.status_code == 403
@@ -35,6 +43,7 @@ def test_comments_api(client, superuser, admin, user):
     assert first_comment['body'] == 'thread description'
     assert first_comment['is_thread']
     assert not first_comment['edit_right']
+    assert first_comment['id'] == thread['first_comment_id']
 
     # check that user can't post comments
     response = user.post(
@@ -86,6 +95,13 @@ def test_comments_api(client, superuser, admin, user):
     assert comment['user']['id'] == user.user.pk
     assert comment['title'] == 'hello'
     assert comment['body'] == 'world'
+    # check how thread looks on room page
+    response = admin.get(group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['threads'][0]['comments_count'] == 2
+    last_comment = data['threads'][0]['last_comment']
+    assert last_comment['id'] == comment['id']
     # check user can update his comment
     response = user.post(
         comment['url'], {
@@ -114,6 +130,13 @@ def test_comments_api(client, superuser, admin, user):
     data = response.json()
     assert len(data['comments']) == 1
     assert data['comments'][0]['id'] == first_comment['id']
+    # check how thread looks on room page
+    response = admin.get(group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['threads'][0]['comments_count'] == 1
+    last_comment = data['threads'][0]['last_comment']
+    assert last_comment['id'] == thread['first_comment_id']
     # check we can't delete first comment
     response = superuser.delete(first_comment['url'] + '?comment=wow')
     assert response.status_code == 403

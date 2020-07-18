@@ -11,12 +11,13 @@ from django.utils import html
 from tulius.core.ckeditor import html_converter
 from tulius.forum import models
 from tulius.forum import signals
+from tulius.forum.comments import signals as comment_signals
 from tulius.forum.comments import api
 from djfw.wysibb.templatetags import bbcodes
 
 
-@dispatch.receiver(signals.comment_to_json)
-def comment_to_json(sender, comment, data, **kwargs):
+@dispatch.receiver(comment_signals.to_json)
+def comment_to_json(sender, comment, data, view, **kwargs):
     # TODO better to store data directly in media, avoiding loading of it,
     # TODO but it is too much changes at one time to get rid of it while
     # TODO previous implementation is still in place
@@ -27,7 +28,7 @@ def comment_to_json(sender, comment, data, **kwargs):
     if not voting:
         comment.media['voting'] = None
         return
-    data['media']['voting'] = VotingAPI.voting_json(voting, sender.user)
+    data['media']['voting'] = VotingAPI.voting_json(voting, view.user)
 
 
 @dispatch.receiver(signals.thread_view)
@@ -42,41 +43,40 @@ def thread_view(sender, response, **kwargs):
     response['media']['voting'] = VotingAPI.voting_json(voting, sender.user)
 
 
-@dispatch.receiver(signals.after_add_comment)
-def after_add_comment(sender, comment, data, preview, **kwargs):
+@dispatch.receiver(comment_signals.after_add)
+def after_add_comment(sender, comment, data, preview, view, **kwargs):
     voting_data = data['media'].get('voting')
     if not voting_data:
-        return
+        return None
     if preview:
         comment.media['voting'] = voting_data
-        if not sender.obj.pk:
-            sender.obj.media['voting'] = voting_data
-        return
-    voting = VotingAPI.create_voting(comment, sender.user, voting_data)
+        if not view.obj.pk:
+            view.obj.media['voting'] = voting_data
+        return None
+    voting = VotingAPI.create_voting(comment, view.user, voting_data)
     comment.media['voting'] = voting.pk
-    comment.save()
-    if comment.id == sender.obj.first_comment_id:
-        sender.obj.media['voting'] = voting.pk
-        sender.obj.save()
+    if comment.id == view.obj.first_comment_id:
+        view.obj.media['voting'] = voting.pk
+    return voting
 
 
-@dispatch.receiver(signals.on_comment_update)
-def on_comment_update(sender, comment, data, preview, **kwargs):
+@dispatch.receiver(comment_signals.on_update)
+def on_comment_update(sender, comment, data, preview, view, **kwargs):
     voting_data = data['media'].get('voting')
     if not voting_data:
         return
     orig_data = comment.media.get('voting')
     if preview:
         comment.media['voting'] = voting_data
-        if sender.obj.first_comment_id == comment.id:
-            sender.obj.media['voting'] = voting_data
+        if view.obj.first_comment_id == comment.id:
+            view.obj.media['voting'] = voting_data
         return
     if not orig_data:
         # voting added
-        voting = VotingAPI.create_voting(comment, sender.user, voting_data)
+        voting = VotingAPI.create_voting(comment, view.user, voting_data)
         comment.media['voting'] = voting.pk
-        if sender.obj.first_comment_id == comment.id:
-            sender.obj.media['voting'] = voting.pk
+        if view.obj.first_comment_id == comment.id:
+            view.obj.media['voting'] = voting.pk
         return
     voting = models.Voting.objects.filter(pk=orig_data).first()
     if not voting:

@@ -7,6 +7,7 @@ from django.core.files import uploadedfile
 
 from tulius.forum import signals
 from tulius.forum import plugins
+from tulius.forum.comments import signals as comment_signals
 from djfw.wysibb import models
 
 
@@ -19,20 +20,20 @@ def before_create_thread(sender, thread, data, **kwargs):
         thread.media['html'] = html_data
 
 
-@dispatch.receiver(signals.before_add_comment)
-def before_add_comment(sender, comment, data, **kwargs):
+@dispatch.receiver(comment_signals.before_add)
+def before_add_comment(sender, comment, data, view, **kwargs):
     html_data = data['media'].get('html')
-    if (not html_data) or (not sender.user.is_superuser):
+    if (not html_data) or (not view.user.is_superuser):
         return
-    if sender.obj.first_comment_id == comment.id:
-        comment.media['html'] = sender.obj.media['html']
+    if view.obj.first_comment_id == comment.id:
+        comment.media['html'] = view.obj.media['html']
     else:
         comment.media['html'] = html_data
 
 
-@dispatch.receiver(signals.on_comment_update)
-def on_comment_update(sender, comment, data, preview, **kwargs):
-    if not sender.user.is_superuser:
+@dispatch.receiver(comment_signals.on_update)
+def on_comment_update(sender, comment, data, view, **kwargs):
+    if not view.user.is_superuser:
         return
     html_data = data['media'].get('html')
     orig_data = comment.media.get('html')
@@ -40,11 +41,11 @@ def on_comment_update(sender, comment, data, preview, **kwargs):
         del comment.media['html']
     elif html_data:
         comment.media['html'] = html_data
-    if sender.obj.first_comment_id == comment.id:
-        if (not html_data) and ('html' in sender.obj.media):
-            del sender.obj.media['html']
+    if view.obj.first_comment_id == comment.id:
+        if (not html_data) and ('html' in view.obj.media):
+            del view.obj.media['html']
         elif html_data:
-            sender.obj.media['html'] = html_data
+            view.obj.media['html'] = html_data
 
 
 class UploadFiles(plugins.BaseAPIView):

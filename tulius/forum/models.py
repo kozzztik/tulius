@@ -511,57 +511,6 @@ class Comment(SitedModelMixin):
     def is_thread(self):
         return self.id == self.parent.first_comment_id
 
-    def save(
-            self, force_insert=False, force_update=False, using=None,
-            update_fields=None):
-        was_none = self.id is None
-        thread = Thread.objects.select_for_update().get(id=self.parent_id)
-        delete_changed = False
-        # before safe work
-        if not was_none:
-            old_self = Comment.objects.select_for_update().get(id=self.id)
-            if old_self.deleted != self.deleted:
-                delete_changed = True
-                thread = Thread.objects.select_for_update().get(
-                    id=self.parent.id)
-                if old_self.deleted:
-                    self.site().signals.before_add_comment.send(
-                        thread, instance=self, restore=True)
-                else:
-                    self.site().signals.before_delete_comment.send(
-                        self, thread=thread)
-                thread.save()
-            else:
-                self.site().signals.before_save_comment.send(
-                    self, old_comment=old_self)
-        else:
-            # trick to avoid pylint warning
-            reply_id = getattr(self, 'reply_id', None)
-            if (not reply_id) and (
-                    self.parent.first_comment_id != self.id):
-                self.reply_id = self.parent.first_comment_id
-            self.site().signals.before_add_comment.send(
-                thread, instance=self, restore=False)
-        # real safe
-        super(Comment, self).save(
-            force_insert=force_insert, force_update=force_update,
-            using=using, update_fields=update_fields)
-        # after save
-        if was_none:
-            if not thread.first_comment_id:
-                thread.first_comment_id = self.id
-            thread.last_comment_id = self.id
-            thread.save()
-            self.site().signals.after_add_comment.send(
-                self, thread=thread, restore=False)
-        elif delete_changed:
-            if self.deleted:
-                self.site().signals.after_delete_comment.send(
-                    self, thread=thread)
-            else:
-                self.site().signals.after_add_comment.send(
-                    self, thread=thread, restore=True)
-
 
 class ThreadReadMark(models.Model):
     """

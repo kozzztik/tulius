@@ -6,6 +6,7 @@ from django.core.files import uploadedfile
 
 from tulius.forum import plugins
 from tulius.forum import signals
+from tulius.forum.comments import signals as comment_signals
 from djfw.wysibb import models
 from djfw.wysibb import views as djfw_views
 
@@ -28,19 +29,19 @@ def before_create_thread(sender, thread, data, **kwargs):
     thread.media['images'] = validate_image_data(images_data)
 
 
-@dispatch.receiver(signals.before_add_comment)
-def before_add_comment(sender, comment, data, **kwargs):
+@dispatch.receiver(comment_signals.before_add)
+def before_add_comment(sender, comment, data, view, **kwargs):
     images_data = data['media'].get('images')
     if not images_data:
         return
-    if sender.obj.first_comment_id == comment.id:
-        comment.media['images'] = sender.obj.media['images']
+    if view.obj.first_comment_id == comment.id:
+        comment.media['images'] = view.obj.media['images']
     else:
         comment.media['images'] = validate_image_data(images_data)
 
 
-@dispatch.receiver(signals.on_comment_update)
-def on_comment_update(sender, comment, data, preview, **kwargs):
+@dispatch.receiver(comment_signals.on_update)
+def on_comment_update(sender, comment, data, view, **kwargs):
     images_data = data['media'].get('images')
     orig_data = comment.media.get('images')
     if images_data:
@@ -49,11 +50,11 @@ def on_comment_update(sender, comment, data, preview, **kwargs):
         del comment.media['images']
     elif images_data:
         comment.media['images'] = images_data
-    if sender.obj.first_comment_id == comment.id:
-        if (not images_data) and ('images' in sender.obj.media):
-            del sender.obj.media['images']
+    if view.obj.first_comment_id == comment.id:
+        if (not images_data) and ('images' in view.obj.media):
+            del view.obj.media['images']
         elif images_data:
-            sender.obj.media['images'] = images_data
+            view.obj.media['images'] = images_data
 
 
 class Images(plugins.BaseAPIView):

@@ -173,15 +173,14 @@ class BaseThreadView(plugins.BaseAPIView):
         important = ((not room) and data.get('important', False))
         return models.Thread(
             parent=self.obj, room=room,
-            title=html_converter.html_to_bb(data['title']),
-            body=html_converter.html_to_bb(data['body']),
+            title=data['title'], body=data['body'],
             user=self.user, plugin_id=self.plugin_id,
             important=self.rights.moderate and important,
         )
 
     def update_thread(self, data):
         self.obj.title = data['title']
-        self.obj.body = html_converter.html_to_bb(data['body'])
+        self.obj.body = data['body']
         if self.rights.moderate and not self.obj.room:
             self.obj.important = bool(data['important'])
             self.obj.closed = bool(data['closed'])
@@ -248,6 +247,8 @@ class ThreadView(BaseThreadView):
 
     def put(self, request, **kwargs):
         data = json.loads(request.body)
+        data['title'] = html_converter.html_to_bb(data['title'])
+        data['body'] = html_converter.html_to_bb(data['body'])
         preview = data.pop('preview', False)
         transaction.set_autocommit(False)
         self.get_parent_thread(for_update=not preview, **kwargs)
@@ -268,6 +269,8 @@ class ThreadView(BaseThreadView):
     @transaction.atomic
     def post(self, request, **kwargs):
         data = json.loads(request.body)
+        data['title'] = html_converter.html_to_bb(data['title'])
+        data['body'] = html_converter.html_to_bb(data['body'])
         preview = data.pop('preview', False)
         self.get_parent_thread(for_update=True, **kwargs)
         if not self.rights.edit:
@@ -358,6 +361,8 @@ class IndexView(BaseThreadView):
         if not self.rights.moderate:
             raise exceptions.PermissionDenied()
         data = json.loads(request.body)
+        data['title'] = html_converter.html_to_bb(data['title'])
+        data['body'] = html_converter.html_to_bb(data['body'])
         if not data['room']:
             raise exceptions.PermissionDenied()
         thread = self.create_thread(data)

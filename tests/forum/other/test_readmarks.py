@@ -164,3 +164,11 @@ def test_thread_author_notified(room_group, thread, admin, user):
     assert response.status_code == 200
     room = response.json()
     assert room['threads'][0]['unreaded']['id'] == comment['id']
+    # delete user comment
+    response = user.delete(comment['url'] + '?comment=foo')
+    assert response.status_code == 200
+    # check on room
+    response = admin.get(room_group['url'])
+    assert response.status_code == 200
+    room = response.json()
+    assert room['threads'][0]['unreaded'] is None
