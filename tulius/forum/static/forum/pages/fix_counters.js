@@ -2,15 +2,8 @@ export default LazyComponent('forum_fix_counters', {
     template: '/static/forum/pages/fix_counters.html',
     data: function () {
         return {
-            thread: {id: null},
-            user_options: [],
-            form: {
-                users: [],
-                not_users: [],
-                date_from: null,
-                date_to: null,
-                text: '',
-            },
+            finished: false,
+            results: {},
         }
     },
     computed: {
@@ -18,49 +11,31 @@ export default LazyComponent('forum_fix_counters', {
     },
     methods: {
         load_api(route) {
-            return axios.get(this.urls.thread_api(route.params.id)
-            ).then(response => {
-                this.thread = response.data;
-                this.breadcrumbs = this.$parent.thread_breadcrumbs(this.thread);
-                this.breadcrumbs.push({
-                    'title': 'Поиск',
-                    'url': route
-                })
-                //cleanup form
-                form.text = '';
-                form.date_from = null;
-                form.date_to = null;
-                form.users = [];
-                form.not_users = [];
-            })
+            this.$parent.loading_end([{
+                title: 'Перерасчет счетчиков',
+                url: '',
+            }]);
+            if (route.params.id)
+                var url = this.urls.thread_fix_api(route.params.id)
+            else
+                var url = '/api/forum/fix/';
+            axios.post(url).then(response => {
+                this.results = response.data.result;
+                this.finished = true;
+            }).catch(error => {this.finished = true;})
         },
-        form_submit() {
-            var users = [];
-            var not_users = [];
-            for (var user of this.form.users)
-                users.push(user.id);
-            for (var user of this.form.not_users)
-                not_users.push(user.id);
-            var form = JSON.parse(JSON.stringify(this.form));
-            form.users = users;
-            form.not_users = not_users;
-            this.$router.push(
-                this.urls.search_results(this.thread.id, form));
+        websock_message(msg) {
+            var data = JSON.parse(msg.data);
+            if (data['.namespaced'] != 'fixes_update')  return;
+            this.results = data.data;
         },
-        do_search(query) {
-            var res = (this.user_search||this.default_user_search)(query);
-            if (res && (typeof res.then === 'function')) {
-                res.then(response => this.user_options = response);
-                return res;
-            }
-            this.user_options = res || this.user_options;
-        },
-        default_user_search(query) {
-            if (query.length < 3)
-                return
-            return axios.options(
-                this.thread.url + 'granted_rights/', {params: {query: query}}
-            ).then(response => response.data.users)
-        },
+    },
+    mounted() {
+        this.load_api(this.$route);
+        this.$options.sockets.onmessage = this.websock_message;
+    },
+    beforeRouteUpdate (to, from, next) {
+        this.load_api(to);
+        next();
     },
 })

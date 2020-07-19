@@ -28,6 +28,9 @@ urlpatterns = [
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/$',
         threads.ThreadAPI.as_view(), name='thread'),
     urls.url(
+        r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/fix/$',
+        threads.CountersFix.as_view(), name='fix_thread_counters'),
+    urls.url(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/comments_page/$',
         comments.CommentsPageAPI.as_view(), name='comments_page'),
     urls.url(

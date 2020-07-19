@@ -4,10 +4,15 @@ from django.utils import html
 
 from tulius.forum import signals
 from tulius.forum.threads import api
+from tulius.forum.threads import counters
 from tulius.gameforum import base
 from tulius.gameforum import consts
 from tulius.gameforum import rights
 from djfw.wysibb.templatetags import bbcodes
+
+
+class CountersFix(counters.CountersFix):
+    plugin_id = consts.GAME_FORUM_SITE_ID
 
 
 class BaseThreadAPI(api.BaseThreadView, base.VariationMixin):

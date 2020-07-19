@@ -1,1 +1,21 @@
-<div></div>
+<div class="content container">
+    <div class="caption" align="center">
+        <div class="captionleft"></div>
+        <div class="captioncontent">
+            Перерасчет счетчиков
+        </div>
+        <div class="captionright"></div>
+    </div>
+    <b v-if="!finished">
+        Идет перерасчет, ждите.
+    </b>
+    <b v-else>
+        Перерасчет завершен.
+    </b>
+    <div class="row">
+        <div class="col"><b>Статистика:</b></div>
+    </div>
+    <div class="row" v-for="(value, key) in results">
+        <div class="col">{{key}}:{{value}}</div>
+    </div>
+</div>

@@ -22,6 +22,7 @@ def publish_message_to_user(user, action, pk):
         consts.CHANNEL_USER.format(user.id), {
             '.direct': True,
             '.action': 'new_pm',
+            '.namespaced': 'pm',
             'id': pk,
         })
 
@@ -31,6 +32,7 @@ def notify_user_about_fixes(user, data):
         consts.CHANNEL_USER.format(user.id), {
             '.direct': True,
             '.action': 'fixes_update',
+            '.namespaced': 'fixes_update',
             'data': data,
         })
 

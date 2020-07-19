@@ -11,6 +11,7 @@ class CountersFix(plugins.BaseAPIView):
     thread_model = models.Thread
     result = None
     notify_user = True
+    plugin_id = None
 
     def process_thread(self, thread, with_descendants):
         thread_calls = signals.on_fix_counters.send(
@@ -44,9 +45,10 @@ class CountersFix(plugins.BaseAPIView):
         self.result = {}
         threads = self.thread_model.objects.select_for_update()
         if pk:
-            threads = threads.filter(pk=pk)
+            threads = threads.filter(pk=pk, plugin_id=self.plugin_id)
         else:
-            threads = threads.filter(parent=None, deleted=False)
+            threads = threads.filter(
+                parent=None, deleted=False, plugin_id=self.plugin_id)
         for thread in threads:
             self.process_thread(thread, True)
         return {'result': self.result}
