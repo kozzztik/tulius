@@ -133,6 +133,28 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
             self.comment_model, comment=c, data=data, view=self)
         return data
 
+    @classmethod
+    def on_fix_counters(cls, sender, thread, view, **kwargs):
+        if (thread.plugin_id != consts.GAME_FORUM_SITE_ID) or thread.parent_id:
+            return None
+        variation = stories_models.Variation.objects.select_for_update(
+            ).get(thread=thread)
+        roles = stories_models.Role.objects.filter(variation=variation)
+        for role in roles:
+            role = stories_models.Role.objects.select_for_update(
+                ).get(pk=role.pk)
+            role.comments_count = cls.comment_model.objects.filter(
+                parent__tree_id=thread.tree_id, deleted=False,
+                data1=role.id).count()
+            role.save()
+        variation.comments_count = cls.comment_model.objects.filter(
+            parent__tree_id=thread.tree_id, deleted=False).count()
+        variation.save()
+        return None
+
+
+dispatch.receiver(thread_signals.on_fix_counters)(CommentsBase.on_fix_counters)
+
 
 def update_role_comments_count(role_id, value):
     if role_id:

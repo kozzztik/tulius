@@ -2,9 +2,7 @@ from django.conf.urls import url
 
 # TODO: fix this when module moved
 from tulius.forum.plugins import ForumPlugin
-from tulius.stories.models import Role
-from tulius.games.models import Game
-from .views import GameIndex, VariationIndex, Fix
+from .views import GameIndex, VariationIndex
 
 
 class GamePlugin(ForumPlugin):
@@ -87,32 +85,12 @@ class GamePlugin(ForumPlugin):
         thread.save()
         return thread
 
-    def fix_games(self):
-        games = Game.objects.all()
-        for game in games:
-            variation = game.variation
-            root_thread = variation.thread
-            if not root_thread:
-                continue
-            tree_id = root_thread.tree_id
-            roles = Role.objects.filter(variation=variation)
-            for role in roles:
-                comments = self.models.Comment.objects.filter(
-                    parent__tree_id=tree_id, deleted=False, data1=role.id)
-                role.comments_count = comments.count()
-                role.save()
-            variation.comments_count = self.models.Comment.objects.filter(
-                parent__tree_id=tree_id, deleted=False).count()
-            variation.save()
-
     def init_core(self):
         super(GamePlugin, self).init_core()
         self.urlizer['game'] = self.game_url
         self.urlizer['variation'] = self.variation_url
         self.core['copy_game_forum'] = self.copy_game_forum
         self.core['create_gameforum'] = self.create_gameforum
-        self.core['fix_games'] = self.fix_games
-        self.templates['fix_games'] = 'gameforum/fix.haml'
 
     def get_urls(self):
         return [
@@ -124,8 +102,4 @@ class GamePlugin(ForumPlugin):
                 r'^variation/(?P<variation_id>\d+)/$',
                 VariationIndex.as_view(plugin=self),
                 name='variation'),
-            url(
-                r'^fix/$',
-                Fix.as_view(plugin=self),
-                name='fix'),
         ]

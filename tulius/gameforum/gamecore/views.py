@@ -44,11 +44,3 @@ class VariationIndex(BasePluginView):
             variation.save()
         parent_thread = variation.thread
         return http.HttpResponseRedirect(parent_thread.get_absolute_url)
-
-
-class Fix(BasePluginView):
-    template_name = 'fix_games'
-
-    def get(self, request, *args, **kwargs):
-        self.site.core.fix_games()
-        return super(Fix, self).get(request, *args, **kwargs)

@@ -1,5 +1,6 @@
 import json
 
+from django import dispatch
 from django import http
 from django import shortcuts
 from django import urls
@@ -16,6 +17,7 @@ from tulius.forum import models
 from tulius.forum import signals
 from tulius.forum import rights as forum_rights
 from tulius.forum import online_status as online_status_plugin
+from tulius.forum.threads import signals as thread_signals
 from djfw.wysibb.templatetags import bbcodes
 
 
@@ -214,6 +216,11 @@ class BaseThreadView(plugins.BaseAPIView):
             data['media'] = self.obj.media
         return data
 
+    @classmethod
+    @dispatch.receiver(thread_signals.on_fix_counters)
+    def on_fix_counters(cls, sender, thread, view, **kwargs):
+        sender.objects.partial_rebuild(thread.tree_id)
+
 
 class ThreadView(BaseThreadView):
     def get_context_data(self, **kwargs):
@@ -375,11 +382,6 @@ class IndexView(BaseThreadView):
 
 
 class MoveThreadView(BaseThreadView):
-    @staticmethod
-    def repair_thread_counters(obj, only_stats=True):
-        # TODO refactor
-        obj.site().core.content['Thread_rebuild'](obj, only_stats=only_stats)
-
     @transaction.atomic
     def put(self, request, **kwargs):
         data = json.loads(request.body)
@@ -400,12 +402,12 @@ class MoveThreadView(BaseThreadView):
                 old_parent.tree_id != new_parent.tree_id)):
             obj = models.Thread.objects.get(
                 tree_id=old_parent.tree_id, parent=None)
-            self.repair_thread_counters(obj, only_stats=True)
+            self.on_fix_counters(self.thread_model, obj, self)
             obj.save()
         if new_parent:
             obj = models.Thread.objects.get(
                 tree_id=new_parent.tree_id, parent=None)
-            self.repair_thread_counters(obj, only_stats=True)
+            self.on_fix_counters(self.thread_model, obj, self)
             obj.save()
         response = self.obj_to_json()
         signals.thread_view.send(self, response=response)
