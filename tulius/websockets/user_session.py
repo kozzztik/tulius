@@ -63,7 +63,6 @@ class UserSession:
         direct = message.pop('.direct')
         if direct:
             if self.json:
-                message['.namespaced'] = 'pm'
                 await self.ws.send_json(message)
             else:
                 await self.ws.send_str("new_pm {}".format(message['id']))

@@ -4,10 +4,15 @@ from django.utils import html
 
 from tulius.forum import signals
 from tulius.forum.threads import api
+from tulius.forum.threads import counters
 from tulius.gameforum import base
 from tulius.gameforum import consts
 from tulius.gameforum import rights
 from djfw.wysibb.templatetags import bbcodes
+
+
+class CountersFix(counters.CountersFix):
+    plugin_id = consts.GAME_FORUM_SITE_ID
 
 
 class BaseThreadAPI(api.BaseThreadView, base.VariationMixin):
@@ -72,8 +77,6 @@ class BaseThreadAPI(api.BaseThreadView, base.VariationMixin):
                 self.role_to_json(user) for user in thread.accessed_users
             ],
             'threads_count': thread.threads_count if thread.room else None,
-            'comments_count': thread.comments_count,
-            'pages_count': thread.pages_count,
             'url': self.thread_url(thread.pk),
         }
         signals.thread_room_to_json.send(self, thread=thread, response=data)

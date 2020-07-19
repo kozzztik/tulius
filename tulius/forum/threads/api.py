@@ -1,5 +1,6 @@
 import json
 
+from django import dispatch
 from django import http
 from django import shortcuts
 from django import urls
@@ -16,6 +17,7 @@ from tulius.forum import models
 from tulius.forum import signals
 from tulius.forum import rights as forum_rights
 from tulius.forum import online_status as online_status_plugin
+from tulius.forum.threads import signals as thread_signals
 from djfw.wysibb.templatetags import bbcodes
 
 
@@ -46,6 +48,7 @@ class BaseThreadView(plugins.BaseAPIView):
     obj = None
     rights = None
     plugin_id = None
+    thread_model = models.Thread
 
     def _get_rights_checker(self, thread, parent_rights=None):
         return forum_rights.default.DefaultRightsChecker(
@@ -161,8 +164,6 @@ class BaseThreadView(plugins.BaseAPIView):
                 user_to_json(user) for user in thread.accessed_users
             ],
             'threads_count': thread.threads_count if thread.room else None,
-            'comments_count': thread.comments_count,
-            'pages_count': thread.pages_count,
             'url': self.thread_url(thread.pk),
         }
         signals.thread_room_to_json.send(self, thread=thread, response=data)
@@ -214,6 +215,14 @@ class BaseThreadView(plugins.BaseAPIView):
             data['user'] = user_to_json(self.obj.user, detailed=True)
             data['media'] = self.obj.media
         return data
+
+    @classmethod
+    def on_fix_counters(cls, sender, thread, view, **kwargs):
+        sender.objects.partial_rebuild(thread.tree_id)
+
+
+dispatch.receiver(thread_signals.on_fix_counters)(
+    BaseThreadView.on_fix_counters)
 
 
 class ThreadView(BaseThreadView):
@@ -376,11 +385,6 @@ class IndexView(BaseThreadView):
 
 
 class MoveThreadView(BaseThreadView):
-    @staticmethod
-    def repair_thread_counters(obj, only_stats=True):
-        # TODO refactor
-        obj.site().core.content['Thread_rebuild'](obj, only_stats=only_stats)
-
     @transaction.atomic
     def put(self, request, **kwargs):
         data = json.loads(request.body)
@@ -401,12 +405,12 @@ class MoveThreadView(BaseThreadView):
                 old_parent.tree_id != new_parent.tree_id)):
             obj = models.Thread.objects.get(
                 tree_id=old_parent.tree_id, parent=None)
-            self.repair_thread_counters(obj, only_stats=True)
+            self.on_fix_counters(self.thread_model, obj, self)
             obj.save()
         if new_parent:
             obj = models.Thread.objects.get(
                 tree_id=new_parent.tree_id, parent=None)
-            self.repair_thread_counters(obj, only_stats=True)
+            self.on_fix_counters(self.thread_model, obj, self)
             obj.save()
         response = self.obj_to_json()
         signals.thread_view.send(self, response=response)

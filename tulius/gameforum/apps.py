@@ -11,8 +11,6 @@ class GameForumConfig(AppConfig):
 
     def ready(self):
         from .sites import GameForumSite
-        from tulius.forum.fixes.plugin import FixesPlugin
-        from tulius.forum.comments.plugin import CommentsPlugin
         from .gamecore import GamePlugin
         from .rights import GameRightsPlugin
         from .threads import GameThreadsPlugin
@@ -24,8 +22,6 @@ class GameForumConfig(AppConfig):
             plugins=(
                 GameRightsPlugin,
                 GameThreadsPlugin,
-                CommentsPlugin,
                 GamePlugin,
-                FixesPlugin
             )
         )

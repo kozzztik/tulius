@@ -7,6 +7,7 @@ from djfw.wysibb.templatetags import bbcodes
 
 from tulius.forum import signals
 from tulius.forum import models
+from tulius.forum.threads import signals as thread_signals
 from tulius.forum.comments import signals as comment_signals
 from tulius.stories import models as stories_models
 from tulius.gameforum import consts
@@ -95,6 +96,8 @@ def room_to_json(sender, thread, response, **kwargs):
         'user': sender.role_to_json(last_comment.data1),
         'create_time': last_comment.create_time,
     }
+    response['comments_count'] = thread.comments_count
+    response['pages_count'] = CommentsBase.pages_count(thread)
 
 
 class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
@@ -129,6 +132,28 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
         comment_signals.to_json.send(
             self.comment_model, comment=c, data=data, view=self)
         return data
+
+    @classmethod
+    def on_fix_counters(cls, sender, thread, view, **kwargs):
+        if (thread.plugin_id != consts.GAME_FORUM_SITE_ID) or thread.parent_id:
+            return None
+        variation = stories_models.Variation.objects.select_for_update(
+            ).get(thread=thread)
+        roles = stories_models.Role.objects.filter(variation=variation)
+        for role in roles:
+            role = stories_models.Role.objects.select_for_update(
+                ).get(pk=role.pk)
+            role.comments_count = cls.comment_model.objects.filter(
+                parent__tree_id=thread.tree_id, deleted=False,
+                data1=role.id).count()
+            role.save()
+        variation.comments_count = cls.comment_model.objects.filter(
+            parent__tree_id=thread.tree_id, deleted=False).count()
+        variation.save()
+        return None
+
+
+dispatch.receiver(thread_signals.on_fix_counters)(CommentsBase.on_fix_counters)
 
 
 def update_role_comments_count(role_id, value):
@@ -197,3 +222,12 @@ class CommentAPI(comments.CommentAPI, CommentsBase):
 
 
 dispatch.receiver(signals.update_thread)(CommentAPI.on_thread_update)
+
+
+@dispatch.receiver(thread_signals.on_fix_counters)
+def tmp_on_fix_plugin_filter(sender, thread, view, **kwargs):
+    # TODO this func will be removed with plugin_id field cleanup
+    # it will use signals "sender" field
+    if thread.plugin_id != consts.GAME_FORUM_SITE_ID:
+        return None
+    return CommentsPageAPI.on_fix_counters(sender, thread, view, **kwargs)
