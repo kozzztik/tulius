@@ -161,8 +161,6 @@ class BaseThreadView(plugins.BaseAPIView):
                 user_to_json(user) for user in thread.accessed_users
             ],
             'threads_count': thread.threads_count if thread.room else None,
-            'comments_count': thread.comments_count,
-            'pages_count': thread.pages_count,
             'url': self.thread_url(thread.pk),
         }
         signals.thread_room_to_json.send(self, thread=thread, response=data)

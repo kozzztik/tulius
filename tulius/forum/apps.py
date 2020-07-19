@@ -9,7 +9,6 @@ class ForumConfig(AppConfig):
     def ready(self):
         from tulius.forum import site
         from .threads.plugin import ThreadsPlugin
-        from .comments.plugin import CommentsPlugin
         from .fixes.plugin import FixesPlugin
         from .rights.plugin import RightsPlugin
 
@@ -17,7 +16,6 @@ class ForumConfig(AppConfig):
             plugins=(
                 RightsPlugin,
                 ThreadsPlugin,
-                CommentsPlugin,
                 FixesPlugin,
             )
         )

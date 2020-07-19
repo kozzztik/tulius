@@ -12,6 +12,7 @@ from tulius.core.ckeditor import html_converter
 from tulius.forum import models
 from tulius.forum import signals
 from tulius.forum.threads import api
+from tulius.forum.threads import signals as thread_signals
 from tulius.forum.comments import pagination
 from tulius.forum.comments import signals as comment_signals
 from tulius.websockets import publisher
@@ -49,11 +50,18 @@ def room_to_json(sender, thread, response, **kwargs):
         'user': api.user_to_json(last_comment.user),
         'create_time': last_comment.create_time,
     }
+    response['comments_count'] = thread.comments_count
+    response['pages_count'] = CommentsBase.pages_count(thread)
 
 
 class CommentsBase(api.BaseThreadView):
     COMMENTS_ON_PAGE = 25
     comment_model = models.Comment
+
+    @classmethod
+    def pages_count(cls, thread):
+        return int(
+            (thread.comments_count - 1) / cls.COMMENTS_ON_PAGE + 1) or 1
 
     @staticmethod
     def comment_url(comment):
@@ -61,6 +69,27 @@ class CommentsBase(api.BaseThreadView):
 
     def comment_edit_right(self, comment):
         return (comment.user == self.user) or self.rights.moderate
+
+    @classmethod
+    def on_fix_counters(cls, sender, thread, view, **kwargs):
+        if thread.room:
+            return
+        comments = cls.comment_model.objects.filter(
+            parent=thread, deleted=False)
+        thread.comments_count = 0
+        thread.first_comment_id = None
+        for comment in comments.order_by('id'):
+            comment = cls.comment_model.objects.select_for_update(
+                ).get(pk=comment.pk)
+            comment.page = int(thread.comments_count / cls.COMMENTS_ON_PAGE) + 1
+            comment.save()
+            thread.comments_count += 1
+            if not thread.first_comment_id:
+                thread.first_comment_id = comment.pk
+            thread.last_comment_id = comment.pk
+        if getattr(view, 'result', None):
+            view.result['comments'] = view.result.get(
+                'comments', 0) + thread.comments_count
 
     def comment_to_json(self, c):
         data = {
@@ -99,7 +128,7 @@ class CommentsPageAPI(CommentsBase):
             comment.parent = self.obj
         # TODO move pagination to frontend
         pagination_context = pagination.get_pagination_context(
-            self.request, page_num, self.obj.pages_count)
+            self.request, page_num, self.pages_count(self.obj))
         return {
             'pagination': pagination_context,
             'comments': [self.comment_to_json(c) for c in comments]
@@ -169,7 +198,7 @@ class CommentsPageAPI(CommentsBase):
             publisher.notify_thread_about_new_comment(self, self.obj, comment)
             page = comment.page
         else:
-            page = self.obj.pages_count
+            page = self.pages_count(self.obj)
         return self.get_context_data(page=page, **kwargs)
 
 
@@ -221,28 +250,15 @@ class CommentAPI(CommentBase):
             comment=self.comment,
             user=self.user,
             description=self.request.GET['comment'])
-        # update page nums
-        comments_count = self.comment_model.objects.filter(
-            parent=self.obj, deleted=False, pk__lt=self.comment.pk).count()
-        update_comments = self.comment_model.objects.filter(
-            parent=self.obj, deleted=False, pk__gt=self.comment.pk
-        ).select_for_update().order_by('id')
-        for comment in update_comments:
-            comment.page = int(comments_count / self.COMMENTS_ON_PAGE) + 1
-            comment.save()
-            comments_count += 1
-        self.obj.comments_count = comments_count
-        if self.comment.pk == self.obj.last_comment_id:
-            self.obj.last_comment_id = self.comment_model.objects.filter(
-                parent=self.obj, deleted=False).exclude(
-                    pk=self.comment.pk).order_by('-id')[0].pk
         comment_signals.on_delete.send(
             self.comment_model, comment=self.comment, view=self)
         self.comment.save()
         delete_mark.save()
+        # update page nums
+        self.on_fix_counters(self.comment_model, self.obj, self)
         self.obj.save()
         # TODO clients notification
-        return {'pages_count': self.obj.pages_count}
+        return {'pages_count': self.pages_count(self.obj)}
 
     @classmethod
     def update_comment(cls, comment, data, preview, view):
@@ -293,3 +309,12 @@ def tmp_on_update_plugin_filter(
         return None
     return CommentAPI.on_thread_update(
         sender, thread, data, preview, **kwargs)
+
+
+@dispatch.receiver(thread_signals.on_fix_counters)
+def tmp_on_fix_plugin_filter(sender, thread, view, **kwargs):
+    # TODO this func will be removed with plugin_id field cleanup
+    # it will use signals "sender" field
+    if thread.plugin_id:
+        return None
+    return CommentsPageAPI.on_fix_counters(sender, thread, view, **kwargs)
