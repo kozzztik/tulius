@@ -92,9 +92,9 @@ class GrantedRightsAPI(BaseGrantedRightsAPI):
         self.get_parent_thread(for_update=True, **kwargs)
         if not self.rights.edit:
             raise exceptions.PermissionDenied()
+        old = self.obj.access_type
         self.obj.access_type = data['access_type']
-        if free_access_type(self.obj.access_type) != free_access_type(
-                data['access_type']):
+        if free_access_type(old) != free_access_type(data['access_type']):
             self.on_fix_counters(self.thread_model, self.obj, self)
         self.obj.save()
         return {'access_type': self.obj.access_type}

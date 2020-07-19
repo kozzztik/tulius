@@ -17,7 +17,7 @@ class CountersFix(plugins.BaseAPIView):
         thread_calls = signals.on_fix_counters.send(
             self.thread_model, thread=thread,
             with_descendants=with_descendants, view=self)
-        thread_calls = list(map(lambda x: x[0], thread_calls))
+        thread_calls = list(map(lambda x: x[1], thread_calls))
         if with_descendants and thread.room:
             threads = self.thread_model.objects.filter(
                 parent=thread, deleted=False)
@@ -28,8 +28,9 @@ class CountersFix(plugins.BaseAPIView):
                     sub_thread, with_descendants)
                 thread_calls += sub_result
         parent_results = []
+        thread_calls = [c for c in thread_calls if c]
         for thread_call in thread_calls:
-            sub_result = thread_call()
+            sub_result = thread_call(thread)
             if sub_result:
                 parent_results.append(sub_result)
         thread.save()
@@ -45,9 +46,10 @@ class CountersFix(plugins.BaseAPIView):
         self.result = {}
         threads = self.thread_model.objects.select_for_update()
         if pk:
-            threads = threads.filter(pk=pk)
+            threads = threads.filter(pk=pk, plugin_id=self.plugin_id)
         else:
-            threads = threads.filter(parent=None, deleted=False, plugin_id=self.plugin_id)
+            threads = threads.filter(
+                parent=None, deleted=False, plugin_id=self.plugin_id)
         for thread in threads:
             self.process_thread(thread, True)
         return {'result': self.result}

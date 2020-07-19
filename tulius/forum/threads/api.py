@@ -217,9 +217,12 @@ class BaseThreadView(plugins.BaseAPIView):
         return data
 
     @classmethod
-    @dispatch.receiver(thread_signals.on_fix_counters)
     def on_fix_counters(cls, sender, thread, view, **kwargs):
         sender.objects.partial_rebuild(thread.tree_id)
+
+
+dispatch.receiver(thread_signals.on_fix_counters)(
+    BaseThreadView.on_fix_counters)
 
 
 class ThreadView(BaseThreadView):
