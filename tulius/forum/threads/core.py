@@ -75,11 +75,8 @@ class ThreadsCorePlugin(plugins.ForumPlugin):
     def init_core(self):
         self.thread_repair_counters = dispatch.Signal(providing_args=[])
         self.thread_on_create = dispatch.Signal(providing_args=['instance'])
-        self.thread_on_update = dispatch.Signal(
-            providing_args=["old_thread"])
         self.core['room_descendants'] = self.room_descendants
         self.core['Thread_rebuild'] = self.repair_thread_counters
         self.core['rebuild_tree'] = self.repair_thread_counters
         self.signals['thread_repair_counters'] = self.thread_repair_counters
         self.signals['thread_on_create'] = self.thread_on_create
-        self.signals['thread_on_update'] = self.thread_on_update

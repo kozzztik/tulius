@@ -10,6 +10,8 @@ from django.contrib import auth
 from tulius.forum import models
 from tulius.forum import signals
 from tulius.forum.threads import api
+from tulius.forum.threads import signals as thread_signals
+from tulius.forum.rights import consts
 
 
 @dispatch.receiver(signals.before_create_thread)
@@ -29,6 +31,7 @@ def after_create_thread(sender, thread, data, preview, **kwargs):
 
 class BaseGrantedRightsAPI(api.BaseThreadView):
     model = models.ThreadAccessRight
+    rights_model = models.ThreadAccessRight
     require_user = True
 
     def right_to_json(self, right):
@@ -60,6 +63,10 @@ class BaseGrantedRightsAPI(api.BaseThreadView):
         }
 
 
+def free_access_type(access_type):
+    return access_type < models.THREAD_ACCESS_TYPE_NO_READ
+
+
 class GrantedRightsAPI(BaseGrantedRightsAPI):
     def get_context_data(self, **kwargs):
         self.get_parent_thread(**kwargs)
@@ -86,8 +93,32 @@ class GrantedRightsAPI(BaseGrantedRightsAPI):
         if not self.rights.edit:
             raise exceptions.PermissionDenied()
         self.obj.access_type = data['access_type']
+        if free_access_type(self.obj.access_type) != free_access_type(
+                data['access_type']):
+            self.on_fix_counters(self.thread_model, self.obj, self)
         self.obj.save()
         return {'access_type': self.obj.access_type}
+
+    @classmethod
+    def on_fix_counters(cls, sender, thread, view, **kwargs):
+        pr_rooms = sender.objects.get_protected_descendants(
+            thread).filter(room=True)
+        pr_threads = sender.objects.get_protected_descendants(
+            thread).filter(room=False)
+        thread.protected_threads = consts.THREAD_NO_PR
+        if pr_rooms:
+            thread.protected_threads += consts.THREAD_HAVE_PR_ROOMS
+        if pr_threads:
+            thread.protected_threads += consts.THREAD_HAVE_PR_THREADS
+
+
+@dispatch.receiver(thread_signals.on_fix_counters)
+def tmp_on_fix_plugin_filter(sender, thread, view, **kwargs):
+    # TODO this func will be removed with plugin_id field cleanup
+    # it will use signals "sender" field
+    if thread.plugin_id:
+        return None
+    return GrantedRightsAPI.on_fix_counters(sender, thread, view, **kwargs)
 
 
 class GrantedRightAPI(BaseGrantedRightsAPI):

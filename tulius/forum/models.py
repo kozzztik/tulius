@@ -344,10 +344,6 @@ class Thread(MPTTModel, SitedModelMixin):
         if not self.id:
             self.site().signals.thread_on_create.send(
                 self.parent, instance=self)
-        else:
-            old_thread = Thread.objects.select_for_update().get(id=self.id)
-            self.site().signals.thread_on_update.send(
-                self, old_thread=old_thread)
         super(Thread, self).save(*args, **kwargs)
 
 

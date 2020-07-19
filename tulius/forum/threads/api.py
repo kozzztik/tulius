@@ -46,6 +46,7 @@ class BaseThreadView(plugins.BaseAPIView):
     obj = None
     rights = None
     plugin_id = None
+    thread_model = models.Thread
 
     def _get_rights_checker(self, thread, parent_rights=None):
         return forum_rights.default.DefaultRightsChecker(

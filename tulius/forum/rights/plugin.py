@@ -199,24 +199,6 @@ class RightsPlugin(ForumPlugin):
                     protected_threads=THREAD_HAVE_PR_THREADS +
                     THREAD_HAVE_PR_ROOMS)
 
-    def thread_on_update(self, sender, **kwargs):
-        old_self = kwargs['old_thread']
-        if sender.free_access_type() != old_self.free_access_type():
-            for thread in self.models.Thread.objects.get_ancestors(sender):
-                self.thread_repair_counters(thread)
-                thread.save()
-
-    def thread_repair_counters(self, sender, **kwargs):
-        pr_rooms = self.models.Thread.objects.get_protected_descendants(
-            sender).filter(room=True)
-        pr_threads = self.models.Thread.objects.get_protected_descendants(
-            sender).filter(room=False)
-        sender.protected_threads = 0
-        if pr_rooms:
-            sender.protected_threads += THREAD_HAVE_PR_ROOMS
-        if pr_threads:
-            sender.protected_threads += THREAD_HAVE_PR_THREADS
-
     def init_core(self):
         super(RightsPlugin, self).init_core()
         self.core['Comment_edit_right'] = self.comment_edit_right
@@ -238,6 +220,3 @@ class RightsPlugin(ForumPlugin):
     def post_init(self):
         super(RightsPlugin, self).post_init()
         self.site.signals.thread_on_create.connect(self.thread_on_create)
-        self.site.signals.thread_on_update.connect(self.thread_on_update)
-        self.site.signals.thread_repair_counters.connect(
-            self.thread_repair_counters)
