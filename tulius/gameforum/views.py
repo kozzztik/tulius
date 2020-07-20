@@ -73,7 +73,7 @@ class VariationAPI(base.VariationMixin):
         roles_list = []
         if self.obj.game:
             if self.obj.game.edit_right(self.user):
-                roles_list = [role for role in all_roles]
+                roles_list = all_roles.copy()
             elif self.obj.game.status >= game_models.GAME_STATUS_FINISHING:
                 roles_list = [
                     role for role in all_roles if role.show_in_character_list]

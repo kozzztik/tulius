@@ -344,7 +344,7 @@ class IndexView(BaseThreadView):
         } if unreaded else None
 
     def get_context_data(self, **kwargs):
-        all_rooms = [thread for thread in self.get_index(1)]
+        all_rooms = list(self.get_index(1))
         groups = self.get_index(0)
         self.rights = self._get_rights_checker(None).get_rights_for_root()
         for group in groups:
