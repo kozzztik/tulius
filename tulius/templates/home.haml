@@ -30,7 +30,7 @@
                                         %a{href:'{% url "stories:index" %}'}
                                             {% trans "stories" %}
                                     %li
-                                        %a{href:'{% url "forum:index" %}'}
+                                        %a{href:'/forums/'}
                                             {% trans "forum" %}
                                     %li
                                         %a{href:'{% url "news:index" %}'}
@@ -110,7 +110,7 @@
             %a{href: '{% url "stories:index" %}'}
                 {% trans "Stories" %}
         %h3
-            %a{href: '{% url "forum:index" %}'}
+            %a{href: '/forums/'}
                 {% trans "Forums" %}
         %h3
             %a{href: '{% url "news:index" %}'}

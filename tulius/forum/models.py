@@ -118,11 +118,7 @@ class SitedModelMixin(models.Model):
         if attr_name in core:
             attr_value = core[attr_name]
         else:
-            urls = site.urlizer.content
-            if attr_name in urls:
-                attr_value = urls[attr_name]
-            else:
-                raise AttributeError()
+            raise AttributeError()
         if callable(attr_value):
             return attr_value(self)
         return attr_value

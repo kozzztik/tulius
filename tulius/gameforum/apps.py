@@ -10,10 +10,10 @@ class GameForumConfig(AppConfig):
     GAME_FORUM_SITE_ID = consts.GAME_FORUM_SITE_ID
 
     def ready(self):
+        from tulius.forum.threads.plugin import ThreadsPlugin
         from .sites import GameForumSite
         from .gamecore import GamePlugin
         from .rights import GameRightsPlugin
-        from .threads import GameThreadsPlugin
 
         self.site = GameForumSite(
             name='gameforum',
@@ -21,7 +21,7 @@ class GameForumConfig(AppConfig):
             site_id=self.GAME_FORUM_SITE_ID,
             plugins=(
                 GameRightsPlugin,
-                GameThreadsPlugin,
+                ThreadsPlugin,
                 GamePlugin,
             )
         )

@@ -42,8 +42,6 @@ class BaseForumSite:
     plugins = {}
     plugin_classes = ()
     core = None
-    templates = None
-    urlizer = None
     signals = None
 
     def __init__(
@@ -53,8 +51,6 @@ class BaseForumSite:
         self.site_id = site_id
         self.plugin_classes = plugins
         self.core = SiteCore(self)
-        self.templates = SiteCore(self)
-        self.urlizer = SiteCore(self)
         self.signals = SiteCore(self)
         if self._models is None:
             raise NotImplementedError()
@@ -65,13 +61,7 @@ class BaseForumSite:
         sites_manager.add_site(self)
 
     def init_core(self):
-        self.templates['base'] = 'forum/base.haml'
-        self.templates['form_field'] = 'snippets/form_field.haml'
-        self.templates['init_editor'] = 'wysibb/init.html'
-        self.templates['actions'] = 'forum/snippets/forum_actions_menu.haml'
-
-    def get_own_urls(self):
-        return []
+        pass
 
     def check_dependencies(self):
         for plugin in self.plugins.values():
@@ -83,20 +73,8 @@ class BaseForumSite:
             plugin = plugin_class(self)
             self.plugins[plugin_class.__name__] = plugin
             self.core.content.update(plugin.core)
-            self.templates.content.update(plugin.templates)
-            self.urlizer.content.update(plugin.urlizer)
             self.signals.content.update(plugin.signals)
         for plugin in self.plugins.values():
             plugin.post_init()
         if settings.DEBUG:
             self.check_dependencies()
-
-    def get_urls(self):
-        urlpatterns = self.get_own_urls()
-        for plugin in self.plugins.values():
-            urlpatterns += plugin.get_urls()
-        return urlpatterns
-
-    @property
-    def urls(self):
-        return self.get_urls(), self.app_name

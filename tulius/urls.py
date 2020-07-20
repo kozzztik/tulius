@@ -1,4 +1,3 @@
-from django.apps import apps
 from django.conf import settings
 from django.conf.urls import include, url, re_path
 from django.contrib.sitemaps import views as sitemaps_views
@@ -62,9 +61,7 @@ urlpatterns = [
         sitemaps_views.sitemap,
         {'sitemaps': forum_sitemap.ForumSitemap.sitemaps()},
         name='forum_sitemap'),
-    url(
-        r'^forums/',
-        include(apps.get_app_config('forum').site.urls)),
+    url(r'^forums/', views.IndexVue.as_view()),
     url(r'^api/forum/', include('tulius.forum.urls', namespace='forum_api')),
     url(
         r'^api/ckeditor/',
@@ -75,8 +72,7 @@ urlpatterns = [
         sitemaps_views.sitemap,
         {'sitemaps': game_forum_sitemap.GameForumSitemap.sitemaps()},
         name='game_forum_sitemap'),
-    url(r'^play/',
-        include(apps.get_app_config('gameforum').site.urls)),
+    url(r'^play/', views.IndexVue.as_view()),
     url(r'^api/game_forum/',
         include('tulius.gameforum.urls', namespace='game_forum_api')),
 

@@ -1,13 +1,6 @@
-from django.conf.urls import url
-from django.views import generic
-
 # TODO: fix this when module moved
 from tulius.forum.plugins import ForumPlugin
 from tulius.gameforum import core
-
-
-class Index(generic.TemplateView):
-    template_name = 'base_vue.html'
 
 
 class GamePlugin(ForumPlugin):
@@ -73,9 +66,3 @@ class GamePlugin(ForumPlugin):
     def init_core(self):
         super(GamePlugin, self).init_core()
         self.core['copy_game_forum'] = self.copy_game_forum
-
-    def get_urls(self):
-        return [
-            url(r'^game/(?P<game_id>\d+)/$', Index.as_view()),
-            url(r'^variation/(?P<variation_id>\d+)/$', Index.as_view()),
-        ]
