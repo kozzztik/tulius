@@ -1,8 +1,10 @@
 from django import http
+from django import shortcuts
 from django import urls
 from django.views import generic
 from django.core import exceptions
 from django.utils import html
+from django.db import transaction
 from django.db.models import query_utils
 
 from tulius.forum import models
@@ -10,6 +12,7 @@ from tulius.gameforum import base
 from tulius.games import models as game_models
 from tulius.gameforum import models as game_forum_models
 from tulius.gameforum import consts
+from tulius.gameforum import core
 from tulius.gameforum.other import trust_marks
 from tulius.stories import models as stories_models
 
@@ -93,6 +96,13 @@ class VariationAPI(base.VariationMixin):
             query = query & query_utils.Q(admins_only=False)
         materials = stories_models.AdditionalMaterial.objects.filter(query)
         illustrations = stories_models.Illustration.objects.filter(query)
+        if (not self.variation.thread) and self.user.is_authenticated:
+            with transaction.atomic():
+                variation = stories_models.Variation.objects.select_for_update(
+                    ).get(pk=self.variation.pk)
+                self.obj.thread = variation.thread = core.create_game_forum(
+                    self.user, variation)
+                variation.save()
         return {
             'id': self.obj.id,
             'url': urls.reverse(
@@ -100,6 +110,7 @@ class VariationAPI(base.VariationMixin):
                 kwargs={'variation_id': self.variation.id}),
             'game':
                 self.game_to_json(self.obj.game) if self.obj.game_id else None,
+            'thread_id': self.obj.thread_id,
             'write_right': (
                 (not self.obj.game) or self.obj.game.write_right(self.user)),
             'characters': [{
@@ -129,3 +140,16 @@ class VariationAPI(base.VariationMixin):
                 'thumb': m.thumb.url if m.thumb else None,
             } for m in illustrations],
         }
+
+
+class GameAPI(generic.View):
+    @staticmethod
+    def get(request, pk, **kwargs):
+        variation = shortcuts.get_object_or_404(
+            stories_models.Variation, game_id=pk)
+        if not variation.game.read_right(request.user):
+            raise exceptions.PermissionDenied()
+        return http.JsonResponse({
+            'variation_id': variation.id,
+            'thread_id': variation.thread_id,
+        })

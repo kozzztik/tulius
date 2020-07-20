@@ -1,7 +1,4 @@
-from django.apps import apps
 from django.views.generic import TemplateView
-
-site = apps.get_app_config('forum').site
 
 
 class CountersIndex(TemplateView):
@@ -17,12 +14,6 @@ class CountersBase(TemplateView):
     def get_context_data(self, **kwargs):
         self.do_action()
         return super(CountersBase, self).get_context_data(**kwargs)
-
-
-class ForumNums(CountersBase):
-    def do_action(self):
-        forum_site = apps.get_app_config('forum').site
-        forum_site.core.rebuild_tree(None)
 
 
 class PMCounters(CountersBase):

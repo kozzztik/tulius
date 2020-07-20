@@ -19,6 +19,9 @@ urlpatterns = [
         r'^thread_redirrect/(?P<pk>\d+)/$',
         views.RedirrectAPI.as_view(), name='thread_redirect'),
     urls.url(
+        r'^game/(?P<pk>\d+)/$',
+        views.GameAPI.as_view(), name='game'),
+    urls.url(
         r'^variation/(?P<variation_id>\d+)/$',
         views.VariationAPI.as_view(), name='variation'),
     urls.url(
