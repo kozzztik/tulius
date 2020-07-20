@@ -218,3 +218,13 @@ def test_game_redirect_api(game, variation, variation_forum, user, detective):
     data = response.json()
     assert data['variation_id'] == variation.pk
     assert data['thread_id'] == variation_forum.pk
+
+
+def test_variation_api_creates_thread(variation, admin):
+    assert variation.thread_id is None
+    response = admin.get(f'/api/game_forum/variation/{variation.id}/')
+    assert response.status_code == 200
+    data = response.json()
+    assert data['thread_id'] is not None
+    obj = models.Variation.objects.get(pk=variation.pk)
+    assert obj.thread_id is not None

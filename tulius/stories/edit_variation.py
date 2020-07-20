@@ -226,8 +226,7 @@ def add_variation_illustration(request, variation_id):
 @decorators.login_required
 def edit_variation_forum(request, variation_id):
     (_, variation) = get_variation(request.user, variation_id)
-    return http.HttpResponseRedirect(
-        urls.reverse('gameforum:variation', args=(variation.pk,)))
+    return http.HttpResponseRedirect(f'/play/variation/{variation.pk}/')
 
 
 # pylint: disable=too-many-branches

@@ -408,7 +408,7 @@ class Variation(SortableModelMixin):
         self.save()
 
     def forumlink(self):
-        return urls.reverse('gameforum:variation', args=(self.pk,))
+        return f'/play/variation/{self.pk}/'
 
     def get_roles(self):
         return Role.objects.filter(variation=self).exclude(deleted=True)

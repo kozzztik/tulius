@@ -3,7 +3,7 @@ from django.views import generic
 
 # TODO: fix this when module moved
 from tulius.forum.plugins import ForumPlugin
-from .views import VariationIndex
+from tulius.gameforum import core
 
 
 class Index(generic.TemplateView):
@@ -11,13 +11,6 @@ class Index(generic.TemplateView):
 
 
 class GamePlugin(ForumPlugin):
-
-    def game_url(self, game):
-        return self.reverse('game', game.id)
-
-    def variation_url(self, variation):
-        return self.reverse('variation', variation.id)
-
     def copy_game_post(self, thread, new_parent, variation, rolelinks):
         models = self.site.models
         gamemodels = self.site.gamemodels
@@ -67,22 +60,9 @@ class GamePlugin(ForumPlugin):
                     first_comment = new_comment.id
         return thread
 
-    def create_gameforum(self, user, variation):
-        models = self.site.models
-        if variation.game:
-            title = variation.game.name
-        else:
-            title = variation.name
-        thread = models.Thread(
-            title=title, user=user,
-            access_type=models.THREAD_ACCESS_TYPE_OPEN,
-            room=True, plugin_id=self.site_id)
-        thread.save()
-        return thread
-
     def copy_game_forum(self, variation, rolelinks, user):
         if not variation.thread:
-            variation.thread = self.create_gameforum(user, variation)
+            variation.thread = core.create_game_forum(user, variation)
             variation.save()
         thread = self.copy_game_post(
             variation.thread, None, variation, rolelinks)
@@ -92,18 +72,10 @@ class GamePlugin(ForumPlugin):
 
     def init_core(self):
         super(GamePlugin, self).init_core()
-        self.urlizer['game'] = self.game_url
-        self.urlizer['variation'] = self.variation_url
         self.core['copy_game_forum'] = self.copy_game_forum
-        self.core['create_gameforum'] = self.create_gameforum
 
     def get_urls(self):
         return [
-            url(
-                r'^game/(?P<game_id>\d+)/$',
-                Index.as_view(), name='game'),
-            url(
-                r'^variation/(?P<variation_id>\d+)/$',
-                VariationIndex.as_view(plugin=self),
-                name='variation'),
+            url(r'^game/(?P<game_id>\d+)/$', Index.as_view()),
+            url(r'^variation/(?P<variation_id>\d+)/$', Index.as_view()),
         ]
