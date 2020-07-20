@@ -2,7 +2,6 @@ import json
 
 from django import urls
 from django import http
-from django.apps import apps
 from django.contrib import messages
 from django.db.models import query_utils
 from django.contrib.auth import decorators
@@ -19,9 +18,7 @@ from tulius.games import forms
 from tulius.games import catalog
 from tulius.games import models
 from tulius.gameforum import online_status
-
-
-gameforum_site = apps.get_app_config('gameforum').site
+from tulius.gameforum import core as game_forum_core
 
 
 class MessageMixin:
@@ -190,7 +187,7 @@ class CreateGame(MessageMixin, subviews.SubCreateView):
         game.variation.game = game
         game.variation.save()
         game.save()
-        game.variation.thread = gameforum_site.core.copy_game_forum(
+        game.variation.thread = game_forum_core.copy_game_forum(
             game.variation, rolelinks, self.request.user)
         copy_file(game, story.card_image, game.card_image)
         copy_file(game, story.top_banner, game.top_banner)
