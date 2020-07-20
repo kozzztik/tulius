@@ -44,7 +44,7 @@ class ProfilerMiddleware:
         user = getattr(request, 'user', None)
         if user and (not user.is_anonymous):
             rec.user_id = user.pk
-        rec.exec_time = int(time.clock() * 1000)
+        rec.exec_time = int(time.process_time_ns())
         wrappers.local_counter.clear()
         rec.db_time = 0
         rec.db_count = 0
@@ -98,7 +98,7 @@ class ProfilerMiddleware:
         rec = getattr(request, 'profiler', None)
         if (not rec) or rec.pk:
             return
-        end_time = int(time.clock() * 1000)
+        end_time = int(time.process_time_ns())
         rec.exec_time = end_time - rec.exec_time
         rec.db_time = wrappers.local_counter.exec_time
         rec.template_time = wrappers.local_counter.temlate_time
