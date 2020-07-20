@@ -176,29 +176,6 @@ class RightsPlugin(ForumPlugin):
             (comment.user == comment.view_user) or
             comment.parent.moderate_right(comment.view_user))
 
-    def thread_on_create(self, **kwargs):
-        instance = kwargs['instance']
-        ancestors = self.models.Thread.objects.get_ancestors(instance)
-        if (not instance.free_access_type()) and instance.parent_id:
-            if instance.room:
-                ancestors.filter(
-                    protected_threads=THREAD_NO_PR
-                ).update(protected_threads=THREAD_HAVE_PR_ROOMS)
-                ancestors.filter(
-                    protected_threads=THREAD_HAVE_PR_THREADS
-                ).update(
-                    protected_threads=THREAD_HAVE_PR_THREADS +
-                    THREAD_HAVE_PR_ROOMS)
-            else:
-                ancestors.filter(
-                    protected_threads=THREAD_NO_PR
-                ).update(protected_threads=THREAD_HAVE_PR_THREADS)
-                ancestors.filter(
-                    protected_threads=THREAD_HAVE_PR_ROOMS
-                ).update(
-                    protected_threads=THREAD_HAVE_PR_THREADS +
-                    THREAD_HAVE_PR_ROOMS)
-
     def init_core(self):
         super(RightsPlugin, self).init_core()
         self.core['Comment_edit_right'] = self.comment_edit_right
@@ -216,7 +193,3 @@ class RightsPlugin(ForumPlugin):
         self.core['Thread_get_rights'] = self.get_rights
         self.core['right_model'] = self.site.models.ThreadAccessRight
         self.core['right_form'] = ThreadAccessRightForm
-
-    def post_init(self):
-        super(RightsPlugin, self).post_init()
-        self.site.signals.thread_on_create.connect(self.thread_on_create)

@@ -17,6 +17,26 @@ from tulius.forum.rights import consts
 @dispatch.receiver(signals.before_create_thread)
 def before_create_thread(sender, thread, data, **kwargs):
     thread.access_type = int(data['access_type'])
+    ancestors = models.Thread.objects.get_ancestors(thread)
+    if (not free_access_type(thread.access_type)) and thread.parent_id:
+        if thread.room:
+            ancestors.filter(
+                protected_threads=consts.THREAD_NO_PR
+            ).update(protected_threads=consts.THREAD_HAVE_PR_ROOMS)
+            ancestors.filter(
+                protected_threads=consts.THREAD_HAVE_PR_THREADS
+            ).update(
+                protected_threads=consts.THREAD_HAVE_PR_THREADS +
+                consts.THREAD_HAVE_PR_ROOMS)
+        else:
+            ancestors.filter(
+                protected_threads=consts.THREAD_NO_PR
+            ).update(protected_threads=consts.THREAD_HAVE_PR_THREADS)
+            ancestors.filter(
+                protected_threads=consts.THREAD_HAVE_PR_ROOMS
+            ).update(
+                protected_threads=consts.THREAD_HAVE_PR_THREADS +
+                consts.THREAD_HAVE_PR_ROOMS)
 
 
 @dispatch.receiver(signals.after_create_thread)
@@ -95,6 +115,8 @@ class GrantedRightsAPI(BaseGrantedRightsAPI):
         old = self.obj.access_type
         self.obj.access_type = data['access_type']
         if free_access_type(old) != free_access_type(data['access_type']):
+            # TODO guess that is not enough and its needed to fix have_PR flags
+            # on parents
             self.on_fix_counters(self.thread_model, self.obj, self)
         self.obj.save()
         return {'access_type': self.obj.access_type}
