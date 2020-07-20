@@ -18,7 +18,7 @@ class Tag:
             parent.childs.append(self)
         self.parent = parent
         self.tag_name = tag_name
-        self.attrs = {key: value for (key, value) in attrs}
+        self.attrs = dict(attrs)
         self.childs = []
 
     def convert_internal(self, data_str):
