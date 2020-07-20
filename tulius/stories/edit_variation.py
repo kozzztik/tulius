@@ -3,7 +3,6 @@ import json
 from django import http
 from django import shortcuts
 from django import urls
-from django.apps import apps
 from django.views import generic
 from django.contrib.auth import decorators
 from django.utils.translation import ugettext_lazy as _
@@ -19,9 +18,7 @@ from tulius.stories import edit_variation_forms
 from tulius.stories import edit_variation_catalog as catalog
 from tulius.stories import materials_forms
 from tulius.stories import materials_views
-
-
-GAME_FORUM_SITE_ID = apps.get_app_config('gameforum').GAME_FORUM_SITE_ID
+from tulius.gameforum import consts as game_forum_consts
 
 
 class VarRightsMixin(djfw_views.RightsDetailMixin):
@@ -253,7 +250,7 @@ def delete_role(request, variation_id):
                 if tree_id:
                     threads = forum.Thread.objects.filter(
                         tree_id=tree_id, data1=role.id, deleted=True,
-                        plugin_id=GAME_FORUM_SITE_ID)
+                        plugin_id=game_forum_consts.GAME_FORUM_SITE_ID)
                     threads = [
                         thread for thread in threads
                         if not thread.check_deleted()]
@@ -266,7 +263,8 @@ def delete_role(request, variation_id):
                     if tree_id:
                         comments = forum.Comment.objects.filter(
                             parent__tree_id=tree_id, data1=role.id,
-                            deleted=True, plugin_id=GAME_FORUM_SITE_ID)
+                            deleted=True,
+                            plugin_id=game_forum_consts.GAME_FORUM_SITE_ID)
                         comments = [
                             comment for comment in comments
                             if not comment.parent.check_deleted()]
