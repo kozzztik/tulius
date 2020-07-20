@@ -268,6 +268,10 @@ class GameRights(base.RightsDescriptor):
     user_write_roles = None
     all_roles = {}
 
+    def __init__(self):
+        self.user_roles = []
+        self.moderator_roles = []
+
     def to_json(self):
         result = super(GameRights, self).to_json()
         result['strict_read'] = self.strict_read

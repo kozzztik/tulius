@@ -3,6 +3,7 @@ from django.db import transaction
 from tulius.forum import models
 from tulius.games import models as game_models
 from tulius.stories import models as story_models
+from tulius.gameforum import core
 
 
 def test_thread_with_wrong_variation(
@@ -239,7 +240,7 @@ def test_chain_strict_read(
     assert data['threads'][0]['accessed_users'][0]['title'] == detective.name
 
 
-def test_chain_write_rights( game, variation_forum, admin, user, detective):
+def test_chain_write_rights(game, variation_forum, admin, user, detective):
     game.status = game_models.GAME_STATUS_IN_PROGRESS
     with transaction.atomic():
         game.save()
@@ -300,3 +301,24 @@ def test_chain_write_rights( game, variation_forum, admin, user, detective):
     assert response.status_code == 200
     data = response.json()
     assert len(data['comments']) == 2
+
+
+def test_broken_tree_rights(game, variation_forum, admin):
+    game.status = game_models.GAME_STATUS_IN_PROGRESS
+    with transaction.atomic():
+        game.save()
+    base_url = f'/api/game_forum/variation/{game.variation.pk}/'
+    # create thread room with read limits
+    response = admin.put(
+        base_url + f'thread/{variation_forum.id}/', {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'access_type': models.THREAD_ACCESS_TYPE_NO_WRITE,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    thread = response.json()
+    # break forum tree
+    game.variation.thread = core.create_game_forum(admin.user, game.variation)
+    game.variation.save()
+    # now get thread. Previously it caused 500 on tree rights check.
+    response = admin.get(thread['url'])
+    assert response.status_code == 403
