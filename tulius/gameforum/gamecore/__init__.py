@@ -1,8 +1,13 @@
 from django.conf.urls import url
+from django.views import generic
 
 # TODO: fix this when module moved
 from tulius.forum.plugins import ForumPlugin
-from .views import GameIndex, VariationIndex
+from .views import VariationIndex
+
+
+class Index(generic.TemplateView):
+    template_name = 'base_vue.html'
 
 
 class GamePlugin(ForumPlugin):
@@ -96,8 +101,7 @@ class GamePlugin(ForumPlugin):
         return [
             url(
                 r'^game/(?P<game_id>\d+)/$',
-                GameIndex.as_view(plugin=self),
-                name='game'),
+                Index.as_view(), name='game'),
             url(
                 r'^variation/(?P<variation_id>\d+)/$',
                 VariationIndex.as_view(plugin=self),

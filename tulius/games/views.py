@@ -72,7 +72,7 @@ def set_edit(games, user):
         if game.read_right(user):
             game.enter = (game.status >= models.GAME_STATUS_IN_PROGRESS)
             game.full = False
-            game.enter_url = urls.reverse('gameforum:game', args=(game.pk,))
+            game.enter_url = f'/play/game/{game.pk}/'
             if not game.text_hint:
                 if game.write_right(user):
                     game.text_hint = _("You participate in this game")
@@ -238,7 +238,7 @@ class GameView(djfw_views.RightsDetailMixin, generic.DetailView):
 
     def check_rights(self, obj, user):
         if obj.read_right(user):
-            obj.enter_url = urls.reverse('gameforum:game', args=(obj.pk,))
+            obj.enter_url = f'/play/game/{obj.pk}/'
         if obj.edit_right(user):
             obj.edit_url = obj.get_edit_url()
         obj.send_request = (
@@ -276,7 +276,7 @@ class GameRoleView(djfw_views.RightsDetailMixin, generic.DetailView):
         self.game = game
         self.game.edit = game.edit_right(user)
         if game.read_right(user):
-            game.enter_url = urls.reverse('gameforum:game', args=(game.pk,))
+            game.enter_url = f'/play/game/{game.pk}/'
         return role_text_read_right(obj, user, game)
 
     def get_context_data(self, **kwargs):

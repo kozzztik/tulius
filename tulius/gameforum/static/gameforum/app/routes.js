@@ -2,6 +2,7 @@ import app from './app.js'
 import room from '../pages/room.js'
 import thread from '../pages/thread.js'
 import redirect from './redirect.js'
+import game_redirect from './game_redirect.js'
 import edit_comment from '../pages/edit_comment.js'
 import add_room from '../pages/add_room.js'
 import edit_thread from '../pages/edit_thread.js'
@@ -12,6 +13,7 @@ import fix_counters from '../../forum/pages/fix_counters.js'
 
 
 export default [
+    {path: '/play/game/:id(\\d+)/', component: game_redirect, name: 'game_redirrect'},
     {path: '/play/thread/:id(\\d+)/', component: redirect, name: 'game_thread_redirrect'},
     {path: '/play/room/:id(\\d+)/', component: redirect, name: 'game_room_redirrect'},
     {path: '/play/:variation_id(\\d+)', component: app,

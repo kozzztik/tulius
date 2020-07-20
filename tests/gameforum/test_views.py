@@ -205,3 +205,16 @@ def test_redirect_api(variation, variation_forum, admin, client):
     data = response.json()
     assert data['variation_id'] == variation.pk
     assert not data['room']
+
+
+def test_game_redirect_api(game, variation, variation_forum, user, detective):
+    response = user.get(f'/api/game_forum/game/{game.id}/')
+    assert response.status_code == 403
+    game.status = game_models.GAME_STATUS_IN_PROGRESS
+    with transaction.atomic():
+        game.save()
+    response = user.get(f'/api/game_forum/game/{game.id}/')
+    assert response.status_code == 200
+    data = response.json()
+    assert data['variation_id'] == variation.pk
+    assert data['thread_id'] == variation_forum.pk

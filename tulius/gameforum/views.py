@@ -1,4 +1,5 @@
 from django import http
+from django import shortcuts
 from django import urls
 from django.views import generic
 from django.core import exceptions
@@ -129,3 +130,16 @@ class VariationAPI(base.VariationMixin):
                 'thumb': m.thumb.url if m.thumb else None,
             } for m in illustrations],
         }
+
+
+class GameAPI(generic.View):
+    @staticmethod
+    def get(request, pk, **kwargs):
+        variation = shortcuts.get_object_or_404(
+            stories_models.Variation, game_id=pk)
+        if not variation.game.read_right(request.user):
+            raise exceptions.PermissionDenied()
+        return http.JsonResponse({
+            'variation_id': variation.id,
+            'thread_id': variation.thread_id,
+        })
