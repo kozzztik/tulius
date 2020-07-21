@@ -1,4 +1,5 @@
 from tulius.forum import models
+from tulius.forum.comments import signals
 
 
 def test_comments_api(client, superuser, admin, user):
@@ -236,3 +237,28 @@ def test_broken_last_comment(room_group, thread, user):
     assert response.status_code == 200
     data = response.json()
     assert 'last_comment' not in data['threads'][0]
+
+
+def _my_receiver(sender, comment, **kwargs):
+    comment.media['bar'] = 'foo'
+    return True
+
+
+def test_after_update_saves_comment(thread, user):
+    # do "fix"
+    signals.after_add.connect(_my_receiver)
+    try:
+        response = user.post(
+            thread['url'] + 'comments_page/', {
+                'reply_id': thread['first_comment_id'],
+                'title': 'hohoho', 'body': 'happy new year',
+                'media': {},
+            })
+    finally:
+        assert signals.after_add.disconnect(_my_receiver)
+    assert response.status_code == 200
+    data = response.json()
+    response = user.get(data['comments'][1]['url'])
+    assert response.status_code == 200
+    comment = response.json()
+    assert comment['media']['bar'] == 'foo'

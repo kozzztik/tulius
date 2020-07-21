@@ -570,97 +570,6 @@ class OnlineUser(models.Model):
         return str(self.user)
 
 
-class Voting(models.Model):
-    """
-    Voting
-    """
-    class Meta:
-        verbose_name = _('voting')
-        verbose_name_plural = _('votings')
-
-    user = models.ForeignKey(
-        User, models.PROTECT,
-        null=False,
-        blank=False,
-        verbose_name=_(u'user'),
-        related_name='create_votings',
-    )
-    comment = models.ForeignKey(
-        Comment, models.PROTECT,
-        null=False,
-        blank=False,
-        related_name='voting_list',
-        verbose_name=_(u'comment'),
-    )
-    voting_name = models.CharField(
-        max_length=255,
-        default='',
-        blank=True,
-        verbose_name=_('name')
-    )
-    voting_body = models.TextField(
-        null=False,
-        blank=False,
-        verbose_name=_(u'voting text'),
-    )
-    closed = models.BooleanField(
-        default=False,
-        blank=True,
-        verbose_name=_(u'closed'),
-    )
-    anonymous = models.BooleanField(
-        default=True,
-        blank=True,
-        verbose_name=_(u'anonymous'),
-    )
-    show_results = models.BooleanField(
-        default=True,
-        blank=True,
-        verbose_name=_(u'show results before close of voting'),
-    )
-    preview_results = models.BooleanField(
-        default=False,
-        blank=True,
-        verbose_name=_(u'add preview results button'),
-    )
-
-    def __unicode__(self):
-        return self.voting_name
-
-    def user_choice(self, user):
-        votes = VotingVote.objects.filter(user=user, choice__voting=self)
-        if votes.count() > 0:
-            vote = votes[0]
-            return vote.choice
-        return None
-
-
-class VotingChoice(models.Model):
-    """
-    Voting choice
-    """
-    class Meta:
-        verbose_name = _('voting choice')
-        verbose_name_plural = _('voting choices')
-
-    voting = models.ForeignKey(
-        Voting, models.PROTECT,
-        null=False,
-        blank=False,
-        verbose_name=_(u'voting'),
-        related_name='choices',
-    )
-    name = models.CharField(
-        max_length=255,
-        default='',
-        blank=True,
-        verbose_name=_('name')
-    )
-
-    def __unicode__(self):
-        return "%s - %s" % (self.voting.voting_name, self.name)
-
-
 class VotingVote(models.Model):
     """
     Voting choice
@@ -668,14 +577,12 @@ class VotingVote(models.Model):
     class Meta:
         verbose_name = _('voting vote')
         verbose_name_plural = _('voting votes')
-        unique_together = ('choice', 'user')
+        unique_together = ('choice', 'user', 'comment')
 
-    choice = models.ForeignKey(
-        VotingChoice, models.PROTECT,
-        null=False,
+    choice = models.IntegerField(
         blank=False,
-        verbose_name=_(u'voting'),
-        related_name='voting_choices',
+        null=False,
+        verbose_name=_('choice')
     )
     user = models.ForeignKey(
         User, models.PROTECT,
@@ -684,7 +591,13 @@ class VotingVote(models.Model):
         verbose_name=_(u'user'),
         related_name='voting_votes',
     )
+    comment = models.ForeignKey(
+        Comment, models.PROTECT,
+        null=False,
+        blank=False,
+        related_name='votes',
+        verbose_name=_(u'comment'),
+    )
 
-    def __unicode__(self):
-        return "%s - %s(%s)" % (
-            self.choice.voting.voting_name, self.choice.name, self.user)
+    def __str__(self):
+        return f'{self.comment.title} - {self.choice}({self.user})'
