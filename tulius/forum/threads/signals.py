@@ -10,3 +10,7 @@ on_fix_counters = dispatch.Signal(
 
 to_json = dispatch.Signal(
     providing_args=['instance', 'response', 'view'])
+
+before_create = dispatch.Signal(providing_args=['instance', 'data', 'view'])
+after_create = dispatch.Signal(
+    providing_args=['instance', 'data', 'preview', 'view'])

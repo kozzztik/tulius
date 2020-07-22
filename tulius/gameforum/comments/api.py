@@ -31,19 +31,19 @@ def validate_image_data(variation, images_data):
     return result
 
 
-@dispatch.receiver(signals.before_create_thread)
-def before_create_thread(sender, thread, data, **kwargs):
-    if sender.plugin_id != consts.GAME_FORUM_SITE_ID:
+@dispatch.receiver(thread_signals.before_create)
+def before_create_thread(instance, data, view, **_kwargs):
+    if view.plugin_id != consts.GAME_FORUM_SITE_ID:
         return
     images_data = data['media'].get('illustrations')
     if not images_data:
         return
-    thread.media['illustrations'] = validate_image_data(
-        sender.variation, images_data)
+    instance.media['illustrations'] = validate_image_data(
+        view.variation, images_data)
 
 
 @dispatch.receiver(comment_signals.before_add)
-def before_add_comment(sender, comment, data, view, **kwargs):
+def before_add_comment(comment, data, view, **_kwargs):
     if view.plugin_id != consts.GAME_FORUM_SITE_ID:
         return
     images_data = data['media'].get('illustrations')
@@ -57,7 +57,7 @@ def before_add_comment(sender, comment, data, view, **kwargs):
 
 
 @dispatch.receiver(comment_signals.on_update)
-def on_comment_update(sender, comment, data, view, **kwargs):
+def on_comment_update(comment, data, view, **_kwargs):
     if view.plugin_id != consts.GAME_FORUM_SITE_ID:
         return
     images_data = data['media'].get('illustrations')
@@ -172,16 +172,17 @@ class CommentsPageAPI(comments.CommentsPageAPI, CommentsBase):
         return comment
 
     @classmethod
-    def on_create_thread(cls, sender, thread, data, preview, **kwargs):
+    def on_create_thread(cls, instance, data, preview, view, **kwargs):
         # TODO this func will be removed with plugin_id field cleanup
         # it will use signals "sender" field
-        if sender.plugin_id != consts.GAME_FORUM_SITE_ID:
+        if instance.plugin_id != consts.GAME_FORUM_SITE_ID:
             return
         super(CommentsPageAPI, cls).on_create_thread(
-            sender, thread, data, preview, **kwargs)
+            instance, data, preview, view, **kwargs)
 
 
-dispatch.receiver(signals.after_create_thread)(CommentsPageAPI.on_create_thread)
+dispatch.receiver(thread_signals.after_create)(
+    CommentsPageAPI.on_create_thread)
 
 
 @dispatch.receiver(comment_signals.on_delete)

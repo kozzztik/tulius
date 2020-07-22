@@ -1,7 +1,6 @@
 from django import dispatch
 from django import urls
 
-from tulius.forum import signals
 from tulius.forum.rights import api
 from tulius.forum.threads import signals as thread_signals
 from tulius.gameforum import consts
@@ -9,13 +8,13 @@ from tulius.gameforum import models
 from tulius.gameforum.threads import api as threads_api
 
 
-@dispatch.receiver(signals.after_create_thread)
-def after_create_thread(sender, thread, data, preview, **kwargs):
-    if (sender.plugin_id != consts.GAME_FORUM_SITE_ID) or preview:
+@dispatch.receiver(thread_signals.after_create)
+def after_create_thread(instance, data, preview, view, **_kwargs):
+    if (instance.plugin_id != consts.GAME_FORUM_SITE_ID) or preview:
         return
     for right in data['granted_rights']:
         models.GameThreadRight(
-            thread=thread, role=sender.rights.all_roles[right['user']['id']],
+            thread=instance, role=view.rights.all_roles[right['user']['id']],
             access_level=right['access_level']).save()
 
 

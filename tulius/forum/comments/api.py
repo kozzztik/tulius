@@ -135,11 +135,11 @@ class CommentsPageAPI(CommentsBase):
         }
 
     @classmethod
-    def on_create_thread(cls, sender, thread, data, preview, **kwargs):
-        if not thread.room:
-            cls.create_comment_process(data, preview, sender)
+    def on_create_thread(cls, instance, data, preview, view, **kwargs):
+        if not instance.room:
+            cls.create_comment_process(data, preview, view)
             if not preview:
-                thread.save()
+                instance.save()
 
     @classmethod
     def create_comment(cls, data, view):
@@ -202,15 +202,14 @@ class CommentsPageAPI(CommentsBase):
         return self.get_context_data(page=page, **kwargs)
 
 
-@dispatch.receiver(signals.after_create_thread)
-def tmp_on_create_plugin_filter(
-        sender, thread, data, preview, **kwargs):
+@dispatch.receiver(thread_signals.after_create)
+def tmp_on_create_plugin_filter(instance, data, preview, view, **kwargs):
     # TODO this func will be removed with plugin_id field cleanup
     # it will use signals "sender" field
-    if thread.plugin_id:
+    if instance.plugin_id:
         return None
     return CommentsPageAPI.on_create_thread(
-        sender, thread, data, preview, **kwargs)
+        instance, data, preview, view, **kwargs)
 
 
 class CommentBase(CommentsBase):

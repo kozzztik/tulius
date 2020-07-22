@@ -266,11 +266,13 @@ class ThreadView(BaseThreadView):
         if not self.rights.write:
             raise exceptions.PermissionDenied()
         self.obj = self.create_thread(data)
-        signals.before_create_thread.send(self, thread=self.obj, data=data)
+        thread_signals.before_create.send(
+            self.thread_model, instance=self.obj, data=data, view=self)
         if not preview:
             self.obj.save()
-        signals.after_create_thread.send(
-            self, thread=self.obj, data=data, preview=preview)
+        thread_signals.after_create.send(
+            self.thread_model, instance=self.obj, data=data, preview=preview,
+            view=self)
         transaction.commit()
         # TODO notify clients
         response = self.obj_to_json()
@@ -379,13 +381,15 @@ class IndexView(BaseThreadView):
         if not data['room']:
             raise exceptions.PermissionDenied()
         thread = self.create_thread(data)
-        signals.before_create_thread.send(self, thread=thread, data=data)
+        thread_signals.before_create.send(
+            self.thread_model, instance=thread, data=data, view=self)
         thread.save()
-        signals.after_create_thread.send(
-            self, thread=thread, data=data, preview=False)
+        thread_signals.after_create.send(
+            self.thread_model, instance=thread, data=data, preview=False,
+            view=self)
         transaction.commit()
         # TODO notify clients
-        return {'id': thread.id, 'url': self.thread_url(thread.id)}
+        return {'id': thread.pk, 'url': self.thread_url(thread.pk)}
 
 
 class MoveThreadView(BaseThreadView):
