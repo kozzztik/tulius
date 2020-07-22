@@ -1,19 +1,71 @@
+from django import dispatch
+
+from tulius.forum import models as forum_models
+from tulius.forum.comments import signals as comment_signals
+from tulius.forum.threads import signals as thread_signals
 from tulius.forum.other import voting
 from tulius.forum.other import readmarks
 from tulius.forum.other import likes
 from tulius.forum.other import search
 from tulius.gameforum import base
-from tulius.gameforum.threads import views as threads
+from tulius.gameforum import consts
+from tulius.gameforum.threads import views as thread_views
 from tulius.gameforum.comments import views as comments_api
 from tulius.stories import models as story_models
 
 
-class ReadmarkAPI(readmarks.ReadmarkAPI, threads.BaseThreadAPI):
-    pass
+class ReadmarkAPI(readmarks.ReadmarkAPI, thread_views.BaseThreadAPI):
+    read_mark_model = forum_models.ThreadReadMark
+    comment_model = forum_models.Comment
+
+
+@dispatch.receiver(comment_signals.on_delete)
+def tmp_on_comment_delete_plugin_filter(sender, comment, view, **kwargs):
+    # TODO this func will be removed with plugin_id field cleanup
+    # it will use signals "sender" field
+    if comment.plugin_id != consts.GAME_FORUM_SITE_ID:
+        return None
+    return ReadmarkAPI.on_delete_comment(sender, comment, view, **kwargs)
+
+
+@dispatch.receiver(comment_signals.after_add)
+def tmp_on_after_add_comment_plugin_filter(comment, preview, view, **kwargs):
+    # TODO this func will be removed with plugin_id field cleanup
+    # it will use signals "sender" field
+    if comment.plugin_id != consts.GAME_FORUM_SITE_ID:
+        return None
+    return ReadmarkAPI.after_add_comment(comment, preview, view, **kwargs)
+
+
+@dispatch.receiver(thread_signals.prepare_room)
+def tmp_on_prepare_room_plugin_filter(room, threads, view, **_kwargs):
+    # TODO this func will be removed with plugin_id field cleanup
+    # it will use signals "sender" field
+    if room.plugin_id != consts.GAME_FORUM_SITE_ID:
+        return None
+    return ReadmarkAPI.on_prepare_room_list(room, threads, view, **_kwargs)
+
+
+@dispatch.receiver(thread_signals.prepare_threads)
+def tmp_on_prepare_threads_plugin_filter(threads, view, **kwargs):
+    # TODO this func will be removed with plugin_id field cleanup
+    # it will use signals "sender" field
+    if view.plugin_id != consts.GAME_FORUM_SITE_ID:
+        return None
+    return ReadmarkAPI.on_thread_prepare_thread(threads, view, **kwargs)
+
+
+@dispatch.receiver(thread_signals.to_json)
+def tmp_on_thread_to_json_plugin_filter(instance, view, response, **kwargs):
+    # TODO this func will be removed with plugin_id field cleanup
+    # it will use signals "sender" field
+    if instance.plugin_id != consts.GAME_FORUM_SITE_ID:
+        return None
+    return ReadmarkAPI.on_thread_to_json(instance, view, response, **kwargs)
 
 
 class VotingAPI(voting.VotingAPI, comments_api.CommentsBase):
-    pass
+    voting_model = forum_models.VotingVote
 
 
 class Search(search.Search, base.VariationMixin):
