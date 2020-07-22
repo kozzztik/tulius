@@ -151,7 +151,7 @@ class ReadmarkAPI(views.BaseThreadView):
         if room:
             threads = room.get_children()
         else:
-            threads = models.Thread.objects.filter(
+            threads = self.thread_model.objects.filter(
                 parent=None, plugin_id=self.plugin_id)
         threads = {
             thread: self._get_rights_checker(

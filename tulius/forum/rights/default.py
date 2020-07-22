@@ -6,11 +6,13 @@ from tulius.forum.rights import base
 
 class DefaultRightsChecker(base.BaseThreadRightsChecker):
     _base_rights_class = base.RightsDescriptor
+    rights_model = models.ThreadAccessRight
+    thread_model = models.Thread
 
     def get_limited_read_list(self, parent_rights):
         persons = [
             right.user for right in
-            models.ThreadAccessRight.objects.filter(thread=self.thread)]
+            self.rights_model.objects.filter(thread=self.thread)]
         if self.thread.user not in persons:
             # owner have access too
             persons.append(self.thread.user)
@@ -28,7 +30,7 @@ class DefaultRightsChecker(base.BaseThreadRightsChecker):
                 self.thread.access_type ==
                 models.THREAD_ACCESS_TYPE_NOT_SET):
             return read, write, moderate
-        rights = models.ThreadAccessRight.objects.filter(
+        rights = self.rights_model.objects.filter(
             thread=self.thread, user=self.user)
         for right in rights:
             if right.access_level & models.THREAD_ACCESS_READ:
@@ -83,7 +85,7 @@ class DefaultRightsChecker(base.BaseThreadRightsChecker):
         return rights
 
     def get_moderators_and_accessed_users(self):
-        rights = models.ThreadAccessRight.objects.filter(
+        rights = self.rights_model.objects.filter(
             thread=self.thread).select_related('user').distinct()
         moderators = [
             right.user for right in rights
@@ -94,19 +96,19 @@ class DefaultRightsChecker(base.BaseThreadRightsChecker):
         query = Q(access_type__lt=models.THREAD_ACCESS_TYPE_NO_READ)
         if self.thread and self.user.is_authenticated:
             query = query | Q(user=self.user)
-        return models.Thread.objects.get_descendants(self.thread).filter(
+        return self.thread_model.objects.get_descendants(self.thread).filter(
             query).filter(deleted=False)
 
     def _get_readable_protected_descendants(self):
         if self.user.is_anonymous or not self.thread.protected_threads:
             return []
         if self.user.is_superuser:
-            return models.Thread.objects.get_descendants(
+            return self.thread_model.objects.get_descendants(
                 self.thread
             ).filter(
                 access_type=models.THREAD_ACCESS_TYPE_NO_READ,
                 deleted=False)
-        rights = models.ThreadAccessRight.objects.filter(
+        rights = self.rights_model.objects.filter(
             user=self.user, thread__tree_id=self.thread.tree_id,
             thread__lft__gt=self.thread.lft, thread__rght__lt=self.thread.rght,
             access_level__gte=models.THREAD_ACCESS_READ,

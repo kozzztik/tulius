@@ -119,7 +119,7 @@ class CommentsPageAPI(CommentsBase):
     def get_context_data(self, **kwargs):
         self.get_parent_thread(**kwargs)
         page_num = kwargs.get('page') or int(self.request.GET.get('page', 1))
-        comments = models.Comment.objects.select_related('user')
+        comments = self.comment_model.objects.select_related('user')
         comments = comments.filter(
             parent=self.obj, page=page_num).exclude(deleted=True)
         for comment in comments:
@@ -215,7 +215,7 @@ class CommentBase(CommentsBase):
     comment = None
 
     def get_comment(self, pk, for_update=False, **kwargs):
-        query = models.Comment.objects.filter(deleted=False)
+        query = self.comment_model.objects.filter(deleted=False)
         if for_update:
             query = query.select_for_update()
         self.comment = shortcuts.get_object_or_404(
@@ -225,6 +225,8 @@ class CommentBase(CommentsBase):
 
 
 class CommentAPI(CommentBase):
+    comment_delete_mark_model = models.CommentDeleteMark
+
     def get_context_data(self, **kwargs):
         self.get_comment(**kwargs)
         data = self.comment_to_json(self.comment)
@@ -244,7 +246,7 @@ class CommentAPI(CommentBase):
         if not self.comment_edit_right(self.comment):
             raise exceptions.PermissionDenied()
         self.comment.deleted = True
-        delete_mark = models.CommentDeleteMark(
+        delete_mark = self.comment_delete_mark_model(
             comment=self.comment,
             user=self.user,
             description=self.request.GET['comment'])

@@ -55,7 +55,7 @@ class BaseThreadView(core.BaseAPIView):
 
     def get_parent_thread(self, pk=None, for_update=False, **kwargs):
         thread_id = int(pk)
-        query = models.Thread.objects.filter(deleted=False)
+        query = self.thread_model.objects.filter(deleted=False)
         if for_update:
             query = query.select_for_update()
         self.obj = shortcuts.get_object_or_404(
@@ -129,7 +129,7 @@ class BaseThreadView(core.BaseAPIView):
         return rooms
 
     def get_subthreads(self, is_room=False):
-        threads = models.Thread.objects.filter(
+        threads = self.thread_model.objects.filter(
             parent=self.obj, room=is_room).exclude(deleted=True)
         if not self.obj:
             threads = threads.filter(plugin_id=self.plugin_id)
@@ -173,7 +173,7 @@ class BaseThreadView(core.BaseAPIView):
     def create_thread(self, data):
         room = bool(data['room'])
         important = ((not room) and data.get('important', False))
-        return models.Thread(
+        return self.thread_model(
             parent=self.obj, room=room,
             title=data['title'], body=data['body'],
             user=self.user, plugin_id=self.plugin_id,
@@ -226,6 +226,8 @@ dispatch.receiver(signals.on_fix_counters)(BaseThreadView.on_fix_counters)
 
 
 class ThreadView(BaseThreadView):
+    delete_mark_model = models.ThreadDeleteMark
+
     def get_context_data(self, **kwargs):
         super(ThreadView, self).get_context_data(**kwargs)
         if self.obj is None:
@@ -247,7 +249,7 @@ class ThreadView(BaseThreadView):
         if not self.rights.edit:
             raise exceptions.PermissionDenied()
         self.obj.deleted = True
-        delete_mark = models.ThreadDeleteMark(
+        delete_mark = self.delete_mark_model(
             thread=self.obj,
             user=self.user,
             description=request.GET['comment'])
@@ -301,6 +303,8 @@ class ThreadView(BaseThreadView):
 
 
 class IndexView(BaseThreadView):
+    rights_model = models.ThreadAccessRight
+
     def get_index(self, level):
         children = list(self.get_free_index(level)) + \
             list(self.get_readable_protected_index(level))
@@ -309,7 +313,7 @@ class IndexView(BaseThreadView):
 
     def get_readable_protected_index(self, level):
         if self.user.is_superuser:
-            return models.Thread.objects.filter(
+            return self.thread_model.objects.filter(
                 access_type=models.THREAD_ACCESS_TYPE_NO_READ,
                 plugin_id=self.plugin_id, level=level, deleted=False)
         if self.user.is_anonymous:
@@ -320,12 +324,12 @@ class IndexView(BaseThreadView):
             thread__plugin_id=self.plugin_id,
             access_level__gte=models.THREAD_ACCESS_READ,
             user=self.user, thread__deleted=False)
-        rights = models.ThreadAccessRight.objects.filter(query)
+        rights = self.rights_model.objects.filter(query)
         rights = rights.select_related('thread')
         return [right.thread for right in rights]
 
     def get_free_index(self, level):
-        threads = models.Thread.objects.filter(
+        threads = self.thread_model.objects.filter(
             access_type__lt=models.THREAD_ACCESS_TYPE_NO_READ,
             plugin_id=self.plugin_id, level=level, deleted=False)
         if self.user.is_anonymous:
@@ -411,12 +415,12 @@ class MoveThreadView(BaseThreadView):
         self.obj.save()
         if old_parent and ((not new_parent) or (
                 old_parent.tree_id != new_parent.tree_id)):
-            obj = models.Thread.objects.get(
+            obj = self.thread_model.objects.get(
                 tree_id=old_parent.tree_id, parent=None)
             self.on_fix_counters(self.thread_model, obj, self)
             obj.save()
         if new_parent:
-            obj = models.Thread.objects.get(
+            obj = self.thread_model.objects.get(
                 tree_id=new_parent.tree_id, parent=None)
             self.on_fix_counters(self.thread_model, obj, self)
             obj.save()

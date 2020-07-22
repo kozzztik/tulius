@@ -7,9 +7,10 @@ class ForumSitemap(sitemaps.Sitemap):
     changefreq = "daily"
     priority = 0.5
     plugin_id = None
+    thread_model = models.Thread
 
     def iterate_threads(self, parent):
-        items = models.Thread.objects.filter(
+        items = self.thread_model.objects.filter(
             parent=parent, plugin_id=self.plugin_id, deleted=False,
             access_type__lt=models.THREAD_ACCESS_TYPE_NO_READ)
         for obj in items:

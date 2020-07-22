@@ -20,13 +20,15 @@ def get_user_status(user_id):
 
 
 class OnlineStatusAPI(core.BaseAPIView):
+    online_user_model = models.OnlineUser
+    thread_model = models.Thread
     thread = None
     plugin_id = None
     online_timeout = 3  # minutes
 
     def update_online_status(self):
         if (not self.user.is_anonymous) and self.thread:
-            online_mark = models.OnlineUser.objects.get_or_create(
+            online_mark = self.online_user_model.objects.get_or_create(
                 user=self.user, thread=self.thread)[0]
             online_mark.visit_time = now()
             online_mark.save()
@@ -35,7 +37,7 @@ class OnlineStatusAPI(core.BaseAPIView):
     def get_online_users(self, do_update=True):
         if do_update:
             self.update_online_status()
-        users = models.OnlineUser.objects.select_related(
+        users = self.online_user_model.objects.select_related(
             'user'
         ).filter(
             visit_time__gte=now() - timedelta(minutes=self.online_timeout),
@@ -46,7 +48,7 @@ class OnlineStatusAPI(core.BaseAPIView):
         return users_list.values()
 
     def get_all_online_users(self):
-        users = models.OnlineUser.objects.select_related(
+        users = self.online_user_model.objects.select_related(
             'user'
         ).filter(
             visit_time__gte=now() - timedelta(minutes=self.online_timeout),
@@ -59,7 +61,7 @@ class OnlineStatusAPI(core.BaseAPIView):
     def get(self, request, *args, **kwargs):
         pk = kwargs['pk'] if 'pk' in kwargs else None
         if pk:
-            self.thread = models.Thread.objects.get(pk=pk)
+            self.thread = self.thread_model.objects.get(pk=pk)
             users = self.get_online_users()
         else:
             users = self.get_all_online_users()
