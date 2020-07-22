@@ -24,7 +24,7 @@ from djfw.wysibb.templatetags import bbcodes
 def user_to_json(user, detailed=False):
     data = {
         'id': user.id,
-        'title': html.escape(str(user)),  # TODO
+        'title': html.escape(user.username),
         'url': user.get_absolute_url(),
     }
     if detailed:
@@ -35,9 +35,9 @@ def user_to_json(user, detailed=False):
         data.update({
             'sex': user.sex,
             'avatar': user.avatar.url if user.avatar else '',
-            'full_stars': user.full_stars(),
+            'full_stars': user.full_stars(),  # TODO optimize it
             'rank': html.escape(user.rank),
-            'stories_author': user.stories_author(),  # TODO optimize that!
+            'stories_author': user.stories_author,
             'signature': bbcodes.bbcode(user.signature),
             'online_status': bool(online_status)
         })
