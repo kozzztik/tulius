@@ -10,16 +10,15 @@ from djfw.wysibb.templatetags import bbcodes
 
 from tulius.core.ckeditor import html_converter
 from tulius.forum import models
-from tulius.forum import signals
-from tulius.forum.threads import api
+from tulius.forum.threads import views
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.comments import pagination
 from tulius.forum.comments import signals as comment_signals
 from tulius.websockets import publisher
 
 
-@dispatch.receiver(signals.thread_prepare_room)
-def prepare_room_list(sender, room, threads, **kwargs):
+@dispatch.receiver(thread_signals.prepare_room)
+def prepare_room_list(room, threads, **_kwargs):
     room.comments_count = 0
     room.last_comment_id = None
     for thread in threads:
@@ -29,32 +28,32 @@ def prepare_room_list(sender, room, threads, **kwargs):
             room.last_comment_id = thread.last_comment_id
 
 
-@dispatch.receiver(signals.thread_room_to_json)
-def room_to_json(sender, thread, response, **kwargs):
-    if thread.plugin_id is not None:
+@dispatch.receiver(thread_signals.room_to_json)
+def room_to_json(instance, response, view, **_kwargs):
+    if instance.plugin_id is not None:
         return
-    if thread.last_comment_id is None:
+    if instance.last_comment_id is None:
         return
     try:
         last_comment = models.Comment.objects.select_related('user').get(
-            id=thread.last_comment_id)
+            id=instance.last_comment_id)
     except models.Comment.DoesNotExist:
         return
     response['last_comment'] = {
         'id': last_comment.id,
         'thread': {
             'id': last_comment.parent_id,
-            'url': sender.thread_url(last_comment.parent_id)
+            'url': view.thread_url(last_comment.parent_id)
         },
         'page': last_comment.page,
-        'user': api.user_to_json(last_comment.user),
+        'user': views.user_to_json(last_comment.user),
         'create_time': last_comment.create_time,
     }
-    response['comments_count'] = thread.comments_count
-    response['pages_count'] = CommentsBase.pages_count(thread)
+    response['comments_count'] = instance.comments_count
+    response['pages_count'] = CommentsBase.pages_count(instance)
 
 
-class CommentsBase(api.BaseThreadView):
+class CommentsBase(views.BaseThreadView):
     COMMENTS_ON_PAGE = 25
     comment_model = models.Comment
 
@@ -102,12 +101,12 @@ class CommentsBase(api.BaseThreadView):
             'url': self.comment_url(c) if c.pk else None,
             'title': html.escape(c.title),
             'body': bbcodes.bbcode(c.body),
-            'user': api.user_to_json(c.user, detailed=True),
+            'user': views.user_to_json(c.user, detailed=True),
             'create_time': c.create_time,
             'edit_right': self.comment_edit_right(c),
             'is_thread': c.is_thread(),
             'edit_time': c.edit_time,
-            'editor': api.user_to_json(c.editor) if c.editor else None,
+            'editor': views.user_to_json(c.editor) if c.editor else None,
             'media': c.media,
             'reply_id': c.reply_id,
         }
@@ -135,11 +134,11 @@ class CommentsPageAPI(CommentsBase):
         }
 
     @classmethod
-    def on_create_thread(cls, sender, thread, data, preview, **kwargs):
-        if not thread.room:
-            cls.create_comment_process(data, preview, sender)
+    def on_create_thread(cls, instance, data, preview, view, **kwargs):
+        if not instance.room:
+            cls.create_comment_process(data, preview, view)
             if not preview:
-                thread.save()
+                instance.save()
 
     @classmethod
     def create_comment(cls, data, view):
@@ -202,15 +201,14 @@ class CommentsPageAPI(CommentsBase):
         return self.get_context_data(page=page, **kwargs)
 
 
-@dispatch.receiver(signals.after_create_thread)
-def tmp_on_create_plugin_filter(
-        sender, thread, data, preview, **kwargs):
+@dispatch.receiver(thread_signals.after_create)
+def tmp_on_create_plugin_filter(instance, data, preview, view, **kwargs):
     # TODO this func will be removed with plugin_id field cleanup
     # it will use signals "sender" field
-    if thread.plugin_id:
+    if instance.plugin_id:
         return None
     return CommentsPageAPI.on_create_thread(
-        sender, thread, data, preview, **kwargs)
+        instance, data, preview, view, **kwargs)
 
 
 class CommentBase(CommentsBase):
@@ -271,11 +269,11 @@ class CommentAPI(CommentBase):
             preview=preview, view=view)
 
     @classmethod
-    def on_thread_update(cls, sender, thread, data, preview, **kwargs):
-        if not thread.room:
+    def on_thread_update(cls, instance, data, preview, view, **kwargs):
+        if not instance.room:
             comment = cls.comment_model.objects.select_for_update().get(
-                id=thread.first_comment_id)
-            cls.update_comment(comment, data, preview, sender)
+                id=instance.first_comment_id)
+            cls.update_comment(comment, data, preview, view)
             if not preview:
                 comment.save()
 
@@ -300,15 +298,14 @@ class CommentAPI(CommentBase):
         return self.comment_to_json(self.comment)
 
 
-@dispatch.receiver(signals.update_thread)
+@dispatch.receiver(thread_signals.on_update)
 def tmp_on_update_plugin_filter(
-        sender, thread, data, preview, **kwargs):
+        instance, data, preview, view, **kwargs):
     # TODO this func will be removed with plugin_id field cleanup
     # it will use signals "sender" field
-    if thread.plugin_id:
+    if instance.plugin_id:
         return None
-    return CommentAPI.on_thread_update(
-        sender, thread, data, preview, **kwargs)
+    return CommentAPI.on_thread_update(instance, data, preview, view, **kwargs)
 
 
 @dispatch.receiver(thread_signals.on_fix_counters)

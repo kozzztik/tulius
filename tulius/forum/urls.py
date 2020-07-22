@@ -1,11 +1,11 @@
 from django.conf import urls
 
-from tulius.forum.threads import api as threads_api
+from tulius.forum.threads import views as threads_api
 from tulius.forum.threads import counters
 from tulius.forum.collapse_threads import views as collapse_views
 from tulius.forum import online_status
-from tulius.forum.comments import api as comments_api
-from tulius.forum.rights import api as rights_api
+from tulius.forum.comments import views as comments_api
+from tulius.forum.rights import views as rights_api
 from tulius.forum.other import likes
 from tulius.forum.other import voting
 from tulius.forum.other import readmarks

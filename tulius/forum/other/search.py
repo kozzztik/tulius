@@ -6,9 +6,9 @@ from django.contrib import auth
 from django.core import exceptions
 from django.utils import timezone
 
-from tulius.forum import plugins
+from tulius.forum import core
 from tulius.forum import models
-from tulius.forum.comments import api
+from tulius.forum.comments import views
 
 
 def get_datetime(text):
@@ -21,9 +21,9 @@ def get_datetime(text):
         tzinfo=timezone.get_current_timezone())
 
 
-class Search(plugins.BaseAPIView):
+class Search(core.BaseAPIView):
     require_user = True
-    comments_class = api.CommentAPI
+    comments_class = views.CommentAPI
 
     def get_view(self, comment):
         view = self.comments_class()

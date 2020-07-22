@@ -11,13 +11,12 @@ from django.db import transaction
 from django.db.models import query_utils
 
 from tulius.core.ckeditor import html_converter
-from tulius.forum import plugins
+from tulius.forum import core
 from tulius.forum import const
 from tulius.forum import models
-from tulius.forum import signals
 from tulius.forum import rights as forum_rights
 from tulius.forum import online_status as online_status_plugin
-from tulius.forum.threads import signals as thread_signals
+from tulius.forum.threads import signals
 from djfw.wysibb.templatetags import bbcodes
 
 
@@ -44,7 +43,7 @@ def user_to_json(user, detailed=False):
     return data
 
 
-class BaseThreadView(plugins.BaseAPIView):
+class BaseThreadView(core.BaseAPIView):
     obj = None
     rights = None
     plugin_id = None
@@ -125,8 +124,8 @@ class BaseThreadView(plugins.BaseAPIView):
             room.threads_count = len(threads)
             room.moderators, room.accessed_users = room.rights_checker\
                 .get_moderators_and_accessed_users()
-            signals.thread_prepare_room.send(
-                self, room=room, threads=threads)
+            signals.prepare_room.send(
+                self.thread_model, room=room, threads=threads, view=self)
         return rooms
 
     def get_subthreads(self, is_room=False):
@@ -142,7 +141,8 @@ class BaseThreadView(plugins.BaseAPIView):
         for thread in threads:
             thread.moderators, thread.accessed_users = thread.rights_checker\
                     .get_moderators_and_accessed_users()
-        signals.thread_prepare_threads.send(self, threads=threads)
+        signals.prepare_threads.send(
+            self.thread_model, threads=threads, view=self)
         return threads
 
     @staticmethod
@@ -166,7 +166,8 @@ class BaseThreadView(plugins.BaseAPIView):
             'threads_count': thread.threads_count if thread.room else None,
             'url': self.thread_url(thread.pk),
         }
-        signals.thread_room_to_json.send(self, thread=thread, response=data)
+        signals.room_to_json.send(
+            self.thread_model, instance=thread, response=data, view=self)
         return data
 
     def create_thread(self, data):
@@ -221,8 +222,7 @@ class BaseThreadView(plugins.BaseAPIView):
         sender.objects.partial_rebuild(thread.tree_id)
 
 
-dispatch.receiver(thread_signals.on_fix_counters)(
-    BaseThreadView.on_fix_counters)
+dispatch.receiver(signals.on_fix_counters)(BaseThreadView.on_fix_counters)
 
 
 class ThreadView(BaseThreadView):
@@ -233,11 +233,12 @@ class ThreadView(BaseThreadView):
         # cache rights for async app
         cache.set(
             const.USER_THREAD_RIGHTS.format(
-                user_id=self.user.id, thread_id=self.obj.id),
+                user_id=self.user.id, thread_id=self.obj.pk),
             'r', const.USER_THREAD_RIGHTS_PERIOD * 60
         )
         response = self.obj_to_json()
-        signals.thread_view.send(self, response=response)
+        signals.to_json.send(
+            self.thread_model, instance=self.obj, response=response, view=self)
         return response
 
     @transaction.atomic
@@ -264,15 +265,18 @@ class ThreadView(BaseThreadView):
         if not self.rights.write:
             raise exceptions.PermissionDenied()
         self.obj = self.create_thread(data)
-        signals.before_create_thread.send(self, thread=self.obj, data=data)
+        signals.before_create.send(
+            self.thread_model, instance=self.obj, data=data, view=self)
         if not preview:
             self.obj.save()
-        signals.after_create_thread.send(
-            self, thread=self.obj, data=data, preview=preview)
+        signals.after_create.send(
+            self.thread_model, instance=self.obj, data=data, preview=preview,
+            view=self)
         transaction.commit()
         # TODO notify clients
         response = self.obj_to_json()
-        signals.thread_view.send(self, response=response)
+        signals.to_json.send(
+            self.thread_model, instance=self.obj, response=response, view=self)
         return response
 
     @transaction.atomic
@@ -285,12 +289,14 @@ class ThreadView(BaseThreadView):
         if not self.rights.edit:
             raise exceptions.PermissionDenied()
         self.update_thread(data)
-        signals.update_thread.send(
-            self, thread=self.obj, data=data, preview=preview)
+        signals.on_update.send(
+            self.thread_model, instance=self.obj, data=data, preview=preview,
+            view=self)
         if not preview:
             self.obj.save()
         response = self.obj_to_json()
-        signals.thread_view.send(self, response=response)
+        signals.to_json.send(
+            self.thread_model, instance=self.obj, response=response, view=self)
         return response
 
 
@@ -364,7 +370,7 @@ class IndexView(BaseThreadView):
             } for group in groups]
         }
 
-    def put(self, request, **kwargs):
+    def put(self, request, **_kwargs):
         transaction.set_autocommit(False)
         self.rights = self._get_rights_checker(None).get_rights_for_root()
         if not self.rights.moderate:
@@ -375,13 +381,15 @@ class IndexView(BaseThreadView):
         if not data['room']:
             raise exceptions.PermissionDenied()
         thread = self.create_thread(data)
-        signals.before_create_thread.send(self, thread=thread, data=data)
+        signals.before_create.send(
+            self.thread_model, instance=thread, data=data, view=self)
         thread.save()
-        signals.after_create_thread.send(
-            self, thread=thread, data=data, preview=False)
+        signals.after_create.send(
+            self.thread_model, instance=thread, data=data, preview=False,
+            view=self)
         transaction.commit()
         # TODO notify clients
-        return {'id': thread.id, 'url': self.thread_url(thread.id)}
+        return {'id': thread.pk, 'url': self.thread_url(thread.pk)}
 
 
 class MoveThreadView(BaseThreadView):
@@ -413,5 +421,6 @@ class MoveThreadView(BaseThreadView):
             self.on_fix_counters(self.thread_model, obj, self)
             obj.save()
         response = self.obj_to_json()
-        signals.thread_view.send(self, response=response)
+        signals.to_json.send(
+            self.thread_model, instance=self.obj, response=response, view=self)
         return response

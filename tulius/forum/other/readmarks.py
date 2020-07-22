@@ -3,9 +3,9 @@ import json
 from django import dispatch
 
 from tulius.forum import models
-from tulius.forum import signals
 from tulius.forum.comments import signals as comment_signals
-from tulius.forum.threads import api
+from tulius.forum.threads import signals as thread_signals
+from tulius.forum.threads import views
 
 
 def not_read_comment_json(comment, user):
@@ -32,15 +32,15 @@ def after_add_comment(sender, comment, preview, view, **kwargs):
             not_readed_comment=None).save()
 
 
-@dispatch.receiver(signals.thread_prepare_room)
-def prepare_room_list(sender, room, threads, **kwargs):
+@dispatch.receiver(thread_signals.prepare_room)
+def prepare_room_list(room, threads, view, **_kwargs):
     read_marks = []
-    if not sender.user.is_anonymous:
+    if not view.user.is_anonymous:
         read_marks = models.ThreadReadMark.objects.filter(
             thread__tree_id=room.tree_id,
             thread__lft__gt=room.lft,
             thread__rght__lt=room.rght,
-            thread__room=False, user=sender.user)
+            thread__room=False, user=view.user)
     room.unreaded_id = None
     room.unreaded = None
     for thread in threads:
@@ -57,7 +57,7 @@ def prepare_room_list(sender, room, threads, **kwargs):
                          room.unreaded_id)):
                     room.unreaded_id = read_mark.not_readed_comment_id
         else:
-            if sender.user.is_anonymous:
+            if view.user.is_anonymous:
                 room.unreaded_id = False
             else:
                 if thread.first_comment_id:
@@ -71,11 +71,11 @@ def prepare_room_list(sender, room, threads, **kwargs):
             'parent').get(id=room.unreaded_id)
 
 
-@dispatch.receiver(signals.thread_prepare_threads)
-def thread_prepare_thread(sender, threads, **kwargs):
-    if not sender.user.is_anonymous:
+@dispatch.receiver(thread_signals.prepare_threads)
+def thread_prepare_thread(threads, view, **_kwargs):
+    if not view.user.is_anonymous:
         read_marks = models.ThreadReadMark.objects.filter(
-            thread__parent=sender.obj, user=sender.user)
+            thread__parent=view.obj, user=view.user)
         for thread in threads:
             read_mark = None
             thread.unreaded_id = None
@@ -93,7 +93,7 @@ def thread_prepare_thread(sender, threads, **kwargs):
                 thread.unreaded = models.Comment.objects.get(
                     id=thread.unreaded_id)
     important_threads = [thread for thread in threads if thread.important]
-    if not sender.user.is_anonymous:
+    if not view.user.is_anonymous:
         unreaded_threads = [
             thread for thread in threads if (not thread.important) and
             thread.unreaded_id]
@@ -108,43 +108,42 @@ def thread_prepare_thread(sender, threads, **kwargs):
     threads += important_threads + unreaded_threads + readed_threads
 
 
-@dispatch.receiver(signals.thread_room_to_json)
-def room_to_json(sender, thread, response, **kwargs):
-    if sender.user.is_anonymous:
+@dispatch.receiver(thread_signals.room_to_json)
+def room_to_json(instance, response, view, **_kwargs):
+    if view.user.is_anonymous:
         return
     response['unreaded'] = {
-        'id': thread.unreaded.id,
+        'id': instance.unreaded.id,
         'thread': {
-            'id': thread.unreaded.parent_id,
-            'url': sender.thread_url(thread.unreaded.parent_id),
+            'id': instance.unreaded.parent_id,
+            'url': view.thread_url(instance.unreaded.parent_id),
         },
-        'page': thread.unreaded.page
-    } if thread.unreaded else None
+        'page': instance.unreaded.page
+    } if instance.unreaded else None
 
 
-@dispatch.receiver(signals.thread_view)
-def thread_view(sender, **kwargs):
-    response = kwargs['response']
+@dispatch.receiver(thread_signals.to_json)
+def thread_view(instance, view, response, **_kwargs):
     last_read_id = None
     not_read_comment = None
-    if sender.user.is_authenticated:
+    if view.user.is_authenticated:
         readmark = models.ThreadReadMark.objects.filter(
-            thread=sender.obj, user=sender.user).first()
+            thread=instance, user=view.user).first()
         if readmark:
             last_read_id = readmark.readed_comment_id
             if readmark.not_readed_comment:
                 not_read_comment = not_read_comment_json(
-                    readmark.not_readed_comment, sender.user)
-        elif sender.obj.first_comment_id:
+                    readmark.not_readed_comment, view.user)
+        elif instance.first_comment_id:
             comment = models.Comment.objects.get(
-                pk=sender.obj.first_comment_id)
+                pk=instance.first_comment_id)
             not_read_comment = not_read_comment_json(
-                comment, sender.user)
+                comment, view.user)
     response['last_read_id'] = last_read_id
     response['not_read_comment'] = not_read_comment
 
 
-class ReadmarkAPI(api.BaseThreadView):
+class ReadmarkAPI(views.BaseThreadView):
     require_user = True
     read_mark_model = models.ThreadReadMark
 

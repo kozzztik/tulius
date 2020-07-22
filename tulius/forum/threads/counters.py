@@ -1,13 +1,13 @@
 from django.core import exceptions
 from django.db import transaction
 
-from tulius.forum import plugins
+from tulius.forum import core
 from tulius.forum import models
 from tulius.forum.threads import signals
 from tulius.websockets import publisher
 
 
-class CountersFix(plugins.BaseAPIView):
+class CountersFix(core.BaseAPIView):
     thread_model = models.Thread
     result = None
     notify_user = True

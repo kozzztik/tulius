@@ -1,25 +1,24 @@
 from django import dispatch
 from django import urls
 
-from tulius.forum import signals
-from tulius.forum.rights import api
+from tulius.forum.rights import views
 from tulius.forum.threads import signals as thread_signals
 from tulius.gameforum import consts
 from tulius.gameforum import models
-from tulius.gameforum.threads import api as threads_api
+from tulius.gameforum.threads import views as threads_api
 
 
-@dispatch.receiver(signals.after_create_thread)
-def after_create_thread(sender, thread, data, preview, **kwargs):
-    if (sender.plugin_id != consts.GAME_FORUM_SITE_ID) or preview:
+@dispatch.receiver(thread_signals.after_create)
+def after_create_thread(instance, data, preview, view, **_kwargs):
+    if (instance.plugin_id != consts.GAME_FORUM_SITE_ID) or preview:
         return
     for right in data['granted_rights']:
         models.GameThreadRight(
-            thread=thread, role=sender.rights.all_roles[right['user']['id']],
+            thread=instance, role=view.rights.all_roles[right['user']['id']],
             access_level=right['access_level']).save()
 
 
-class BaseGrantedRightsAPI(api.BaseGrantedRightsAPI, threads_api.BaseThreadAPI):
+class BaseGrantedRightsAPI(views.BaseGrantedRightsAPI, threads_api.BaseThreadAPI):
     model = models.GameThreadRight
 
     def right_to_json(self, right):
@@ -57,9 +56,9 @@ def tmp_on_fix_plugin_filter(sender, thread, view, **kwargs):
     return GrantedRightsAPI.on_fix_counters(sender, thread, view, **kwargs)
 
 
-class GrantedRightsAPI(api.GrantedRightsAPI, BaseGrantedRightsAPI):
+class GrantedRightsAPI(views.GrantedRightsAPI, BaseGrantedRightsAPI):
     pass
 
 
-class GrantedRightAPI(api.GrantedRightAPI, BaseGrantedRightsAPI):
+class GrantedRightAPI(views.GrantedRightAPI, BaseGrantedRightsAPI):
     pass

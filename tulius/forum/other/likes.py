@@ -5,12 +5,12 @@ from django import shortcuts
 from django.core import exceptions
 from django.db import transaction
 
-from tulius.forum import plugins
+from tulius.forum import core
 from tulius.forum import models
-from tulius.forum.comments import api
+from tulius.forum.comments import views
 
 
-class Likes(plugins.BaseAPIView):
+class Likes(core.BaseAPIView):
     require_user = False
 
     def get(self, request, *args, **kwargs):
@@ -51,9 +51,9 @@ class Likes(plugins.BaseAPIView):
         return {'value': value}
 
 
-class Favorites(plugins.BaseAPIView):
+class Favorites(core.BaseAPIView):
     require_user = True
-    comments_class = api.CommentAPI
+    comments_class = views.CommentAPI
 
     def get_view(self, comment):
         view = self.comments_class()
@@ -77,14 +77,14 @@ class Favorites(plugins.BaseAPIView):
         return result
 
     @staticmethod
-    def comments_to_json(views):
+    def comments_to_json(view_objects):
         return {
             'groups': [{
                 'name': 'Форум',
                 'items': [{
                     'comment': view.comment_to_json(view.comment),
                     'thread': view.obj_to_json(),
-                } for view in views],
+                } for view in view_objects],
             }],
         }
 

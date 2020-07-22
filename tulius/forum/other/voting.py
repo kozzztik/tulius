@@ -8,9 +8,9 @@ from django.utils import html
 
 from tulius.core.ckeditor import html_converter
 from tulius.forum import models
-from tulius.forum import signals
+from tulius.forum.threads import signals as thread_signals
 from tulius.forum.comments import signals as comment_signals
-from tulius.forum.comments import api
+from tulius.forum.comments import views
 from djfw.wysibb.templatetags import bbcodes
 
 
@@ -33,7 +33,7 @@ def create_voting(data):
     }
 
 
-class VotingAPI(api.CommentBase):
+class VotingAPI(views.CommentBase):
     voting_model = models.VotingVote
 
     def get_voting(self, for_update=False, **kwargs):
@@ -110,11 +110,11 @@ class VotingAPI(api.CommentBase):
                 v, view.user, comment.pk)
 
     @classmethod
-    def on_thread_view(cls, _, response, view, **_kwargs):
-        v = view.obj.media.get('voting')
+    def on_thread_to_json(cls, instance, response, view, **_kwargs):
+        v = instance.media.get('voting')
         if v:
             response['media']['voting'] = cls.user_voting_data(
-                v, view.user, view.obj.first_comment_id)
+                v, view.user, instance.first_comment_id)
 
     @classmethod
     def on_before_add_comment(cls, _, comment, data, view, **_kwargs):
@@ -155,13 +155,13 @@ def tmp_comment_to_json_plugin_filter(sender, comment, data, view, **kwargs):
     return VotingAPI.on_comment_to_json(sender, comment, data, view, **kwargs)
 
 
-@dispatch.receiver(signals.thread_view)
-def tmp_thread_view_plugin_filter(sender, response, **kwargs):
+@dispatch.receiver(thread_signals.to_json)
+def tmp_thread_view_plugin_filter(instance, response, view, **kwargs):
     # TODO this func will be removed with plugin_id field cleanup
     # it will use signals "sender" field
-    if sender.obj.plugin_id:
+    if instance.plugin_id:
         return None
-    return VotingAPI.on_thread_view(sender, response, sender, **kwargs)
+    return VotingAPI.on_thread_to_json(instance, response, view, **kwargs)
 
 
 @dispatch.receiver(comment_signals.before_add)

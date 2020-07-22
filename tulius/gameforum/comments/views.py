@@ -5,14 +5,13 @@ from django.db import models as dj_models
 from django.utils import html
 from djfw.wysibb.templatetags import bbcodes
 
-from tulius.forum import signals
 from tulius.forum import models
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.comments import signals as comment_signals
 from tulius.stories import models as stories_models
 from tulius.gameforum import consts
-from tulius.gameforum.threads import api as threads
-from tulius.forum.comments import api as comments
+from tulius.gameforum.threads import views as threads
+from tulius.forum.comments import views as comments
 
 
 def validate_image_data(variation, images_data):
@@ -31,19 +30,19 @@ def validate_image_data(variation, images_data):
     return result
 
 
-@dispatch.receiver(signals.before_create_thread)
-def before_create_thread(sender, thread, data, **kwargs):
-    if sender.plugin_id != consts.GAME_FORUM_SITE_ID:
+@dispatch.receiver(thread_signals.before_create)
+def before_create_thread(instance, data, view, **_kwargs):
+    if view.plugin_id != consts.GAME_FORUM_SITE_ID:
         return
     images_data = data['media'].get('illustrations')
     if not images_data:
         return
-    thread.media['illustrations'] = validate_image_data(
-        sender.variation, images_data)
+    instance.media['illustrations'] = validate_image_data(
+        view.variation, images_data)
 
 
 @dispatch.receiver(comment_signals.before_add)
-def before_add_comment(sender, comment, data, view, **kwargs):
+def before_add_comment(comment, data, view, **_kwargs):
     if view.plugin_id != consts.GAME_FORUM_SITE_ID:
         return
     images_data = data['media'].get('illustrations')
@@ -57,7 +56,7 @@ def before_add_comment(sender, comment, data, view, **kwargs):
 
 
 @dispatch.receiver(comment_signals.on_update)
-def on_comment_update(sender, comment, data, view, **kwargs):
+def on_comment_update(comment, data, view, **_kwargs):
     if view.plugin_id != consts.GAME_FORUM_SITE_ID:
         return
     images_data = data['media'].get('illustrations')
@@ -75,29 +74,29 @@ def on_comment_update(sender, comment, data, view, **kwargs):
             view.obj.media['illustrations'] = images_data
 
 
-@dispatch.receiver(signals.thread_room_to_json)
-def room_to_json(sender, thread, response, **kwargs):
-    if thread.plugin_id != consts.GAME_FORUM_SITE_ID:
+@dispatch.receiver(thread_signals.room_to_json)
+def room_to_json(instance, response, view, **_kwargs):
+    if instance.plugin_id != consts.GAME_FORUM_SITE_ID:
         return
-    if thread.last_comment_id is None:
+    if instance.last_comment_id is None:
         return
     try:
         last_comment = models.Comment.objects.select_related('user').get(
-            id=thread.last_comment_id)
+            id=instance.last_comment_id)
     except models.Comment.DoesNotExist:
         return
     response['last_comment'] = {
         'id': last_comment.id,
         'thread': {
             'id': last_comment.parent_id,
-            'url': sender.thread_url(last_comment.parent_id)
+            'url': view.thread_url(last_comment.parent_id)
         },
         'page': last_comment.page,
-        'user': sender.role_to_json(last_comment.data1),
+        'user': view.role_to_json(last_comment.data1),
         'create_time': last_comment.create_time,
     }
-    response['comments_count'] = thread.comments_count
-    response['pages_count'] = CommentsBase.pages_count(thread)
+    response['comments_count'] = instance.comments_count
+    response['pages_count'] = CommentsBase.pages_count(instance)
 
 
 class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
@@ -172,16 +171,17 @@ class CommentsPageAPI(comments.CommentsPageAPI, CommentsBase):
         return comment
 
     @classmethod
-    def on_create_thread(cls, sender, thread, data, preview, **kwargs):
+    def on_create_thread(cls, instance, data, preview, view, **kwargs):
         # TODO this func will be removed with plugin_id field cleanup
         # it will use signals "sender" field
-        if sender.plugin_id != consts.GAME_FORUM_SITE_ID:
+        if instance.plugin_id != consts.GAME_FORUM_SITE_ID:
             return
         super(CommentsPageAPI, cls).on_create_thread(
-            sender, thread, data, preview, **kwargs)
+            instance, data, preview, view, **kwargs)
 
 
-dispatch.receiver(signals.after_create_thread)(CommentsPageAPI.on_create_thread)
+dispatch.receiver(thread_signals.after_create)(
+    CommentsPageAPI.on_create_thread)
 
 
 @dispatch.receiver(comment_signals.on_delete)
@@ -213,15 +213,15 @@ class CommentAPI(comments.CommentAPI, CommentsBase):
         comment.data2 = editor_role
 
     @classmethod
-    def on_thread_update(cls, sender, thread, data, preview, **kwargs):
+    def on_thread_update(cls, instance, data, preview, view, **kwargs):
         # TODO this func will be removed with plugin_id field cleanup
         # it will use signals "sender" field
-        if sender.plugin_id == consts.GAME_FORUM_SITE_ID:
+        if instance.plugin_id == consts.GAME_FORUM_SITE_ID:
             super(CommentAPI, cls).on_thread_update(
-                sender, thread, data, preview, **kwargs)
+                instance, data, preview, view, **kwargs)
 
 
-dispatch.receiver(signals.update_thread)(CommentAPI.on_thread_update)
+dispatch.receiver(thread_signals.on_update)(CommentAPI.on_thread_update)
 
 
 @dispatch.receiver(thread_signals.on_fix_counters)

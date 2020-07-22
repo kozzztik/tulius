@@ -4,8 +4,8 @@ from django import dispatch
 from django.core import exceptions
 from django.core.files import uploadedfile
 
-from tulius.forum import plugins
-from tulius.forum import signals
+from tulius.forum import core
+from tulius.forum.threads import signals as thread_signals
 from tulius.forum.comments import signals as comment_signals
 from djfw.wysibb import models
 from djfw.wysibb import views as djfw_views
@@ -19,18 +19,18 @@ def validate_image_data(images_data):
     return result
 
 
-@dispatch.receiver(signals.before_create_thread)
-def before_create_thread(sender, thread, data, **kwargs):
-    if thread.room:
+@dispatch.receiver(thread_signals.before_create)
+def before_create_thread(instance, data, **_kwargs):
+    if instance.room:
         return
     images_data = data['media'].get('images')
     if not images_data:
         return
-    thread.media['images'] = validate_image_data(images_data)
+    instance.media['images'] = validate_image_data(images_data)
 
 
 @dispatch.receiver(comment_signals.before_add)
-def before_add_comment(sender, comment, data, view, **kwargs):
+def before_add_comment(comment, data, view, **_kwargs):
     images_data = data['media'].get('images')
     if not images_data:
         return
@@ -41,7 +41,7 @@ def before_add_comment(sender, comment, data, view, **kwargs):
 
 
 @dispatch.receiver(comment_signals.on_update)
-def on_comment_update(sender, comment, data, view, **kwargs):
+def on_comment_update(comment, data, view, **_kwargs):
     images_data = data['media'].get('images')
     orig_data = comment.media.get('images')
     if images_data:
@@ -57,7 +57,7 @@ def on_comment_update(sender, comment, data, view, **kwargs):
             view.obj.media['images'] = images_data
 
 
-class Images(plugins.BaseAPIView):
+class Images(core.BaseAPIView):
     require_user = False
 
     @staticmethod
@@ -76,7 +76,8 @@ class Images(plugins.BaseAPIView):
             self.image_to_json(image) for image in images
         ]}
 
-    def put(self, request):
+    @staticmethod
+    def put(request):
         if not request.user.is_authenticated:
             raise exceptions.PermissionDenied()
         uploaded = uploadedfile.InMemoryUploadedFile(

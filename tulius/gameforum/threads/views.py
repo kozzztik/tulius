@@ -2,8 +2,8 @@ from django import urls
 from django.core import exceptions
 from django.utils import html
 
-from tulius.forum import signals
-from tulius.forum.threads import api
+from tulius.forum.threads import signals
+from tulius.forum.threads import views
 from tulius.forum.threads import counters
 from tulius.gameforum import base
 from tulius.gameforum import consts
@@ -15,7 +15,7 @@ class CountersFix(counters.CountersFix):
     plugin_id = consts.GAME_FORUM_SITE_ID
 
 
-class BaseThreadAPI(api.BaseThreadView, base.VariationMixin):
+class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
     plugin_id = consts.GAME_FORUM_SITE_ID
 
     def _get_rights_checker(self, thread, parent_rights=None):
@@ -79,7 +79,8 @@ class BaseThreadAPI(api.BaseThreadView, base.VariationMixin):
             'threads_count': thread.threads_count if thread.room else None,
             'url': self.thread_url(thread.pk),
         }
-        signals.thread_room_to_json.send(self, thread=thread, response=data)
+        signals.room_to_json.send(
+            self.thread_model, instance=thread, response=data, view=self)
         return data
 
     def process_role(self, init_role_id, data):
@@ -113,9 +114,9 @@ class BaseThreadAPI(api.BaseThreadView, base.VariationMixin):
         return data
 
 
-class ThreadAPI(api.ThreadView, BaseThreadAPI):
+class ThreadAPI(views.ThreadView, BaseThreadAPI):
     pass
 
 
-class MoveThreadView(api.MoveThreadView, BaseThreadAPI):
+class MoveThreadView(views.MoveThreadView, BaseThreadAPI):
     pass

@@ -8,18 +8,17 @@ from django.db import transaction
 from django.contrib import auth
 
 from tulius.forum import models
-from tulius.forum import signals
-from tulius.forum.threads import api
+from tulius.forum.threads import views
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.rights import consts
 
 
-@dispatch.receiver(signals.before_create_thread)
-def before_create_thread(sender, thread, data, **kwargs):
-    thread.access_type = int(data['access_type'])
-    ancestors = models.Thread.objects.get_ancestors(thread)
-    if (not free_access_type(thread.access_type)) and thread.parent_id:
-        if thread.room:
+@dispatch.receiver(thread_signals.before_create)
+def before_create_thread(instance, data, **_kwargs):
+    instance.access_type = int(data['access_type'])
+    ancestors = models.Thread.objects.get_ancestors(instance)
+    if (not free_access_type(instance.access_type)) and instance.parent_id:
+        if instance.room:
             ancestors.filter(
                 protected_threads=consts.THREAD_NO_PR
             ).update(protected_threads=consts.THREAD_HAVE_PR_ROOMS)
@@ -39,17 +38,17 @@ def before_create_thread(sender, thread, data, **kwargs):
                 consts.THREAD_HAVE_PR_ROOMS)
 
 
-@dispatch.receiver(signals.after_create_thread)
-def after_create_thread(sender, thread, data, preview, **kwargs):
-    if sender.plugin_id or preview:
+@dispatch.receiver(thread_signals.after_create)
+def after_create_thread(instance, data, preview, **kwargs):
+    if instance.plugin_id or preview:
         return
     for right in data['granted_rights']:
         models.ThreadAccessRight(
-            thread=thread, user_id=int(right['user']['id']),
+            thread=instance, user_id=int(right['user']['id']),
             access_level=right['access_level']).save()
 
 
-class BaseGrantedRightsAPI(api.BaseThreadView):
+class BaseGrantedRightsAPI(views.BaseThreadView):
     model = models.ThreadAccessRight
     rights_model = models.ThreadAccessRight
     require_user = True

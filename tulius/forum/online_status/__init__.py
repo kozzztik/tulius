@@ -4,7 +4,7 @@ from django.core.cache import cache
 from django.utils.timezone import now
 from django.utils import html
 
-from tulius.forum import plugins
+from tulius.forum import core
 from tulius.forum import models
 from tulius.forum import const
 
@@ -19,7 +19,7 @@ def get_user_status(user_id):
     return cache.get(const.USER_ONLINE_CACHE_KEY.format(user_id), False)
 
 
-class OnlineStatusAPI(plugins.BaseAPIView):
+class OnlineStatusAPI(core.BaseAPIView):
     thread = None
     plugin_id = None
     online_timeout = 3  # minutes
