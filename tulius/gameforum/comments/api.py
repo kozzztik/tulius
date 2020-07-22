@@ -5,7 +5,6 @@ from django.db import models as dj_models
 from django.utils import html
 from djfw.wysibb.templatetags import bbcodes
 
-from tulius.forum import signals
 from tulius.forum import models
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.comments import signals as comment_signals
@@ -75,29 +74,29 @@ def on_comment_update(comment, data, view, **_kwargs):
             view.obj.media['illustrations'] = images_data
 
 
-@dispatch.receiver(signals.thread_room_to_json)
-def room_to_json(sender, thread, response, **kwargs):
-    if thread.plugin_id != consts.GAME_FORUM_SITE_ID:
+@dispatch.receiver(thread_signals.room_to_json)
+def room_to_json(instance, response, view, **_kwargs):
+    if instance.plugin_id != consts.GAME_FORUM_SITE_ID:
         return
-    if thread.last_comment_id is None:
+    if instance.last_comment_id is None:
         return
     try:
         last_comment = models.Comment.objects.select_related('user').get(
-            id=thread.last_comment_id)
+            id=instance.last_comment_id)
     except models.Comment.DoesNotExist:
         return
     response['last_comment'] = {
         'id': last_comment.id,
         'thread': {
             'id': last_comment.parent_id,
-            'url': sender.thread_url(last_comment.parent_id)
+            'url': view.thread_url(last_comment.parent_id)
         },
         'page': last_comment.page,
-        'user': sender.role_to_json(last_comment.data1),
+        'user': view.role_to_json(last_comment.data1),
         'create_time': last_comment.create_time,
     }
-    response['comments_count'] = thread.comments_count
-    response['pages_count'] = CommentsBase.pages_count(thread)
+    response['comments_count'] = instance.comments_count
+    response['pages_count'] = CommentsBase.pages_count(instance)
 
 
 class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):

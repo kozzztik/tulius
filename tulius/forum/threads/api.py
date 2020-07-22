@@ -14,10 +14,9 @@ from tulius.core.ckeditor import html_converter
 from tulius.forum import plugins
 from tulius.forum import const
 from tulius.forum import models
-from tulius.forum import signals
 from tulius.forum import rights as forum_rights
 from tulius.forum import online_status as online_status_plugin
-from tulius.forum.threads import signals as thread_signals
+from tulius.forum.threads import signals
 from djfw.wysibb.templatetags import bbcodes
 
 
@@ -125,8 +124,8 @@ class BaseThreadView(plugins.BaseAPIView):
             room.threads_count = len(threads)
             room.moderators, room.accessed_users = room.rights_checker\
                 .get_moderators_and_accessed_users()
-            signals.thread_prepare_room.send(
-                self, room=room, threads=threads)
+            signals.prepare_room.send(
+                self.thread_model, room=room, threads=threads, view=self)
         return rooms
 
     def get_subthreads(self, is_room=False):
@@ -142,7 +141,8 @@ class BaseThreadView(plugins.BaseAPIView):
         for thread in threads:
             thread.moderators, thread.accessed_users = thread.rights_checker\
                     .get_moderators_and_accessed_users()
-        signals.thread_prepare_threads.send(self, threads=threads)
+        signals.prepare_threads.send(
+            self.thread_model, threads=threads, view=self)
         return threads
 
     @staticmethod
@@ -166,8 +166,8 @@ class BaseThreadView(plugins.BaseAPIView):
             'threads_count': thread.threads_count if thread.room else None,
             'url': self.thread_url(thread.pk),
         }
-        signals.thread_room_to_json.send(
-            self, thread=thread, response=data)
+        signals.room_to_json.send(
+            self.thread_model, instance=thread, response=data, view=self)
         return data
 
     def create_thread(self, data):
@@ -222,8 +222,7 @@ class BaseThreadView(plugins.BaseAPIView):
         sender.objects.partial_rebuild(thread.tree_id)
 
 
-dispatch.receiver(thread_signals.on_fix_counters)(
-    BaseThreadView.on_fix_counters)
+dispatch.receiver(signals.on_fix_counters)(BaseThreadView.on_fix_counters)
 
 
 class ThreadView(BaseThreadView):
@@ -238,7 +237,7 @@ class ThreadView(BaseThreadView):
             'r', const.USER_THREAD_RIGHTS_PERIOD * 60
         )
         response = self.obj_to_json()
-        thread_signals.to_json.send(
+        signals.to_json.send(
             self.thread_model, instance=self.obj, response=response, view=self)
         return response
 
@@ -266,17 +265,17 @@ class ThreadView(BaseThreadView):
         if not self.rights.write:
             raise exceptions.PermissionDenied()
         self.obj = self.create_thread(data)
-        thread_signals.before_create.send(
+        signals.before_create.send(
             self.thread_model, instance=self.obj, data=data, view=self)
         if not preview:
             self.obj.save()
-        thread_signals.after_create.send(
+        signals.after_create.send(
             self.thread_model, instance=self.obj, data=data, preview=preview,
             view=self)
         transaction.commit()
         # TODO notify clients
         response = self.obj_to_json()
-        thread_signals.to_json.send(
+        signals.to_json.send(
             self.thread_model, instance=self.obj, response=response, view=self)
         return response
 
@@ -290,13 +289,13 @@ class ThreadView(BaseThreadView):
         if not self.rights.edit:
             raise exceptions.PermissionDenied()
         self.update_thread(data)
-        thread_signals.on_update.send(
+        signals.on_update.send(
             self.thread_model, instance=self.obj, data=data, preview=preview,
             view=self)
         if not preview:
             self.obj.save()
         response = self.obj_to_json()
-        thread_signals.to_json.send(
+        signals.to_json.send(
             self.thread_model, instance=self.obj, response=response, view=self)
         return response
 
@@ -371,7 +370,7 @@ class IndexView(BaseThreadView):
             } for group in groups]
         }
 
-    def put(self, request, **kwargs):
+    def put(self, request, **_kwargs):
         transaction.set_autocommit(False)
         self.rights = self._get_rights_checker(None).get_rights_for_root()
         if not self.rights.moderate:
@@ -382,10 +381,10 @@ class IndexView(BaseThreadView):
         if not data['room']:
             raise exceptions.PermissionDenied()
         thread = self.create_thread(data)
-        thread_signals.before_create.send(
+        signals.before_create.send(
             self.thread_model, instance=thread, data=data, view=self)
         thread.save()
-        thread_signals.after_create.send(
+        signals.after_create.send(
             self.thread_model, instance=thread, data=data, preview=False,
             view=self)
         transaction.commit()
@@ -422,6 +421,6 @@ class MoveThreadView(BaseThreadView):
             self.on_fix_counters(self.thread_model, obj, self)
             obj.save()
         response = self.obj_to_json()
-        thread_signals.to_json.send(
+        signals.to_json.send(
             self.thread_model, instance=self.obj, response=response, view=self)
         return response

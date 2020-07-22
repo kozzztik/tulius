@@ -10,7 +10,6 @@ from djfw.wysibb.templatetags import bbcodes
 
 from tulius.core.ckeditor import html_converter
 from tulius.forum import models
-from tulius.forum import signals
 from tulius.forum.threads import api
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.comments import pagination
@@ -18,8 +17,8 @@ from tulius.forum.comments import signals as comment_signals
 from tulius.websockets import publisher
 
 
-@dispatch.receiver(signals.thread_prepare_room)
-def prepare_room_list(sender, room, threads, **kwargs):
+@dispatch.receiver(thread_signals.prepare_room)
+def prepare_room_list(room, threads, **_kwargs):
     room.comments_count = 0
     room.last_comment_id = None
     for thread in threads:
@@ -29,29 +28,29 @@ def prepare_room_list(sender, room, threads, **kwargs):
             room.last_comment_id = thread.last_comment_id
 
 
-@dispatch.receiver(signals.thread_room_to_json)
-def room_to_json(sender, thread, response, **kwargs):
-    if thread.plugin_id is not None:
+@dispatch.receiver(thread_signals.room_to_json)
+def room_to_json(instance, response, view, **_kwargs):
+    if instance.plugin_id is not None:
         return
-    if thread.last_comment_id is None:
+    if instance.last_comment_id is None:
         return
     try:
         last_comment = models.Comment.objects.select_related('user').get(
-            id=thread.last_comment_id)
+            id=instance.last_comment_id)
     except models.Comment.DoesNotExist:
         return
     response['last_comment'] = {
         'id': last_comment.id,
         'thread': {
             'id': last_comment.parent_id,
-            'url': sender.thread_url(last_comment.parent_id)
+            'url': view.thread_url(last_comment.parent_id)
         },
         'page': last_comment.page,
         'user': api.user_to_json(last_comment.user),
         'create_time': last_comment.create_time,
     }
-    response['comments_count'] = thread.comments_count
-    response['pages_count'] = CommentsBase.pages_count(thread)
+    response['comments_count'] = instance.comments_count
+    response['pages_count'] = CommentsBase.pages_count(instance)
 
 
 class CommentsBase(api.BaseThreadView):
