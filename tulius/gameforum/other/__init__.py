@@ -3,8 +3,8 @@ from tulius.forum.other import readmarks
 from tulius.forum.other import likes
 from tulius.forum.other import search
 from tulius.gameforum import base
-from tulius.gameforum.threads import api as threads
-from tulius.gameforum.comments import api as comments_api
+from tulius.gameforum.threads import views as threads
+from tulius.gameforum.comments import views as comments_api
 from tulius.stories import models as story_models
 
 
@@ -57,9 +57,9 @@ class Favorites(likes.Favorites):
         return view
 
     @staticmethod
-    def comments_to_json(views):
+    def comments_to_json(view_objects):
         variations = {}
-        for api in views:
+        for api in view_objects:
             variations.setdefault(api.variation, [])
             variations[api.variation].append(api)
         return {

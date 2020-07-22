@@ -1,11 +1,11 @@
 from unittest import mock
 
-from tulius.forum.comments import api
+from tulius.forum.comments import views
 
 
 def test_delete_comments_pagination(room_group, thread, user):
     with mock.patch.object(
-            api.CommentsPageAPI, 'COMMENTS_ON_PAGE', 1):
+            views.CommentsPageAPI, 'COMMENTS_ON_PAGE', 1):
         # post first comment
         response = user.post(
             thread['url'] + 'comments_page/', {
@@ -34,7 +34,7 @@ def test_delete_comments_pagination(room_group, thread, user):
         assert data['comments'][0]['id'] == comment2['id']
     # delete first comment
     with mock.patch.object(
-            api.CommentAPI, 'COMMENTS_ON_PAGE', 1):
+            views.CommentAPI, 'COMMENTS_ON_PAGE', 1):
         response = user.delete(comment1['url'] + '?comment=wow')
         assert response.status_code == 200
     # check second comment now on page 2

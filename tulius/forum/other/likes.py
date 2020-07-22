@@ -7,7 +7,7 @@ from django.db import transaction
 
 from tulius.forum import core
 from tulius.forum import models
-from tulius.forum.comments import api
+from tulius.forum.comments import views
 
 
 class Likes(core.BaseAPIView):
@@ -53,7 +53,7 @@ class Likes(core.BaseAPIView):
 
 class Favorites(core.BaseAPIView):
     require_user = True
-    comments_class = api.CommentAPI
+    comments_class = views.CommentAPI
 
     def get_view(self, comment):
         view = self.comments_class()
@@ -77,14 +77,14 @@ class Favorites(core.BaseAPIView):
         return result
 
     @staticmethod
-    def comments_to_json(views):
+    def comments_to_json(view_objects):
         return {
             'groups': [{
                 'name': 'Форум',
                 'items': [{
                     'comment': view.comment_to_json(view.comment),
                     'thread': view.obj_to_json(),
-                } for view in views],
+                } for view in view_objects],
             }],
         }
 

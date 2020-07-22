@@ -8,7 +8,7 @@ from django.db import transaction
 from django.contrib import auth
 
 from tulius.forum import models
-from tulius.forum.threads import api
+from tulius.forum.threads import views
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.rights import consts
 
@@ -48,7 +48,7 @@ def after_create_thread(instance, data, preview, **kwargs):
             access_level=right['access_level']).save()
 
 
-class BaseGrantedRightsAPI(api.BaseThreadView):
+class BaseGrantedRightsAPI(views.BaseThreadView):
     model = models.ThreadAccessRight
     rights_model = models.ThreadAccessRight
     require_user = True

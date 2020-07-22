@@ -10,7 +10,7 @@ from tulius.core.ckeditor import html_converter
 from tulius.forum import models
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.comments import signals as comment_signals
-from tulius.forum.comments import api
+from tulius.forum.comments import views
 from djfw.wysibb.templatetags import bbcodes
 
 
@@ -33,7 +33,7 @@ def create_voting(data):
     }
 
 
-class VotingAPI(api.CommentBase):
+class VotingAPI(views.CommentBase):
     voting_model = models.VotingVote
 
     def get_voting(self, for_update=False, **kwargs):

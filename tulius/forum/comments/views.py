@@ -10,7 +10,7 @@ from djfw.wysibb.templatetags import bbcodes
 
 from tulius.core.ckeditor import html_converter
 from tulius.forum import models
-from tulius.forum.threads import api
+from tulius.forum.threads import views
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.comments import pagination
 from tulius.forum.comments import signals as comment_signals
@@ -46,14 +46,14 @@ def room_to_json(instance, response, view, **_kwargs):
             'url': view.thread_url(last_comment.parent_id)
         },
         'page': last_comment.page,
-        'user': api.user_to_json(last_comment.user),
+        'user': views.user_to_json(last_comment.user),
         'create_time': last_comment.create_time,
     }
     response['comments_count'] = instance.comments_count
     response['pages_count'] = CommentsBase.pages_count(instance)
 
 
-class CommentsBase(api.BaseThreadView):
+class CommentsBase(views.BaseThreadView):
     COMMENTS_ON_PAGE = 25
     comment_model = models.Comment
 
@@ -101,12 +101,12 @@ class CommentsBase(api.BaseThreadView):
             'url': self.comment_url(c) if c.pk else None,
             'title': html.escape(c.title),
             'body': bbcodes.bbcode(c.body),
-            'user': api.user_to_json(c.user, detailed=True),
+            'user': views.user_to_json(c.user, detailed=True),
             'create_time': c.create_time,
             'edit_right': self.comment_edit_right(c),
             'is_thread': c.is_thread(),
             'edit_time': c.edit_time,
-            'editor': api.user_to_json(c.editor) if c.editor else None,
+            'editor': views.user_to_json(c.editor) if c.editor else None,
             'media': c.media,
             'reply_id': c.reply_id,
         }

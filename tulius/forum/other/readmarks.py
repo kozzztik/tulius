@@ -5,7 +5,7 @@ from django import dispatch
 from tulius.forum import models
 from tulius.forum.comments import signals as comment_signals
 from tulius.forum.threads import signals as thread_signals
-from tulius.forum.threads import api
+from tulius.forum.threads import views
 
 
 def not_read_comment_json(comment, user):
@@ -143,7 +143,7 @@ def thread_view(instance, view, response, **_kwargs):
     response['not_read_comment'] = not_read_comment
 
 
-class ReadmarkAPI(api.BaseThreadView):
+class ReadmarkAPI(views.BaseThreadView):
     require_user = True
     read_mark_model = models.ThreadReadMark
 

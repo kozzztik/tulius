@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from tulius.forum import core
 from tulius.forum import models
-from tulius.forum.comments import api
+from tulius.forum.comments import views
 
 
 def get_datetime(text):
@@ -23,7 +23,7 @@ def get_datetime(text):
 
 class Search(core.BaseAPIView):
     require_user = True
-    comments_class = api.CommentAPI
+    comments_class = views.CommentAPI
 
     def get_view(self, comment):
         view = self.comments_class()

@@ -10,8 +10,8 @@ from tulius.forum.threads import signals as thread_signals
 from tulius.forum.comments import signals as comment_signals
 from tulius.stories import models as stories_models
 from tulius.gameforum import consts
-from tulius.gameforum.threads import api as threads
-from tulius.forum.comments import api as comments
+from tulius.gameforum.threads import views as threads
+from tulius.forum.comments import views as comments
 
 
 def validate_image_data(variation, images_data):
