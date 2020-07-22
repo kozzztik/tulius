@@ -290,8 +290,9 @@ class ThreadView(BaseThreadView):
         if not self.rights.edit:
             raise exceptions.PermissionDenied()
         self.update_thread(data)
-        signals.update_thread.send(
-            self, thread=self.obj, data=data, preview=preview)
+        thread_signals.on_update.send(
+            self.thread_model, instance=self.obj, data=data, preview=preview,
+            view=self)
         if not preview:
             self.obj.save()
         response = self.obj_to_json()

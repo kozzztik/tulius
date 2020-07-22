@@ -270,11 +270,11 @@ class CommentAPI(CommentBase):
             preview=preview, view=view)
 
     @classmethod
-    def on_thread_update(cls, sender, thread, data, preview, **kwargs):
-        if not thread.room:
+    def on_thread_update(cls, instance, data, preview, view, **kwargs):
+        if not instance.room:
             comment = cls.comment_model.objects.select_for_update().get(
-                id=thread.first_comment_id)
-            cls.update_comment(comment, data, preview, sender)
+                id=instance.first_comment_id)
+            cls.update_comment(comment, data, preview, view)
             if not preview:
                 comment.save()
 
@@ -299,15 +299,14 @@ class CommentAPI(CommentBase):
         return self.comment_to_json(self.comment)
 
 
-@dispatch.receiver(signals.update_thread)
+@dispatch.receiver(thread_signals.on_update)
 def tmp_on_update_plugin_filter(
-        sender, thread, data, preview, **kwargs):
+        instance, data, preview, view, **kwargs):
     # TODO this func will be removed with plugin_id field cleanup
     # it will use signals "sender" field
-    if thread.plugin_id:
+    if instance.plugin_id:
         return None
-    return CommentAPI.on_thread_update(
-        sender, thread, data, preview, **kwargs)
+    return CommentAPI.on_thread_update(instance, data, preview, view, **kwargs)
 
 
 @dispatch.receiver(thread_signals.on_fix_counters)

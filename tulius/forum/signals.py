@@ -9,5 +9,3 @@ thread_prepare_threads = dispatch.Signal(providing_args=["threads"])
 # prepare data to json
 thread_room_to_json = dispatch.Signal(
     providing_args=["thread", "response"])
-
-update_thread = dispatch.Signal(providing_args=["thread", "data", "preview"])

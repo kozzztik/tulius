@@ -214,15 +214,15 @@ class CommentAPI(comments.CommentAPI, CommentsBase):
         comment.data2 = editor_role
 
     @classmethod
-    def on_thread_update(cls, sender, thread, data, preview, **kwargs):
+    def on_thread_update(cls, instance, data, preview, view, **kwargs):
         # TODO this func will be removed with plugin_id field cleanup
         # it will use signals "sender" field
-        if sender.plugin_id == consts.GAME_FORUM_SITE_ID:
+        if instance.plugin_id == consts.GAME_FORUM_SITE_ID:
             super(CommentAPI, cls).on_thread_update(
-                sender, thread, data, preview, **kwargs)
+                instance, data, preview, view, **kwargs)
 
 
-dispatch.receiver(signals.update_thread)(CommentAPI.on_thread_update)
+dispatch.receiver(thread_signals.on_update)(CommentAPI.on_thread_update)
 
 
 @dispatch.receiver(thread_signals.on_fix_counters)

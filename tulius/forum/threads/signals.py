@@ -14,3 +14,5 @@ to_json = dispatch.Signal(
 before_create = dispatch.Signal(providing_args=['instance', 'data', 'view'])
 after_create = dispatch.Signal(
     providing_args=['instance', 'data', 'preview', 'view'])
+on_update = dispatch.Signal(
+    providing_args=['instance', 'data', 'preview', 'view'])
