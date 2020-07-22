@@ -11,7 +11,7 @@ from django.db import transaction
 from django.db.models import query_utils
 
 from tulius.core.ckeditor import html_converter
-from tulius.forum import plugins
+from tulius.forum import core
 from tulius.forum import const
 from tulius.forum import models
 from tulius.forum import rights as forum_rights
@@ -43,7 +43,7 @@ def user_to_json(user, detailed=False):
     return data
 
 
-class BaseThreadView(plugins.BaseAPIView):
+class BaseThreadView(core.BaseAPIView):
     obj = None
     rights = None
     plugin_id = None

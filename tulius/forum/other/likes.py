@@ -5,12 +5,12 @@ from django import shortcuts
 from django.core import exceptions
 from django.db import transaction
 
-from tulius.forum import plugins
+from tulius.forum import core
 from tulius.forum import models
 from tulius.forum.comments import api
 
 
-class Likes(plugins.BaseAPIView):
+class Likes(core.BaseAPIView):
     require_user = False
 
     def get(self, request, *args, **kwargs):
@@ -51,7 +51,7 @@ class Likes(plugins.BaseAPIView):
         return {'value': value}
 
 
-class Favorites(plugins.BaseAPIView):
+class Favorites(core.BaseAPIView):
     require_user = True
     comments_class = api.CommentAPI
 

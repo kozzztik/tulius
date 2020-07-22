@@ -5,7 +5,7 @@ from django.db import transaction
 from django.core import exceptions
 from django.core.files import uploadedfile
 
-from tulius.forum import plugins
+from tulius.forum import core
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.comments import signals as comment_signals
 from djfw.wysibb import models
@@ -48,7 +48,7 @@ def on_comment_update(comment, data, view, **_kwargs):
             view.obj.media['html'] = html_data
 
 
-class UploadFiles(plugins.BaseAPIView):
+class UploadFiles(core.BaseAPIView):
     require_user = False
 
     @staticmethod
