@@ -5,6 +5,7 @@ from django import dispatch
 from tulius.forum import models
 from tulius.forum import signals
 from tulius.forum.comments import signals as comment_signals
+from tulius.forum.threads import signals as thread_signals
 from tulius.forum.threads import api
 
 
@@ -122,24 +123,23 @@ def room_to_json(sender, thread, response, **kwargs):
     } if thread.unreaded else None
 
 
-@dispatch.receiver(signals.thread_view)
-def thread_view(sender, **kwargs):
-    response = kwargs['response']
+@dispatch.receiver(thread_signals.to_json)
+def thread_view(instance, view, response, **_kwargs):
     last_read_id = None
     not_read_comment = None
-    if sender.user.is_authenticated:
+    if view.user.is_authenticated:
         readmark = models.ThreadReadMark.objects.filter(
-            thread=sender.obj, user=sender.user).first()
+            thread=instance, user=view.user).first()
         if readmark:
             last_read_id = readmark.readed_comment_id
             if readmark.not_readed_comment:
                 not_read_comment = not_read_comment_json(
-                    readmark.not_readed_comment, sender.user)
-        elif sender.obj.first_comment_id:
+                    readmark.not_readed_comment, view.user)
+        elif instance.first_comment_id:
             comment = models.Comment.objects.get(
-                pk=sender.obj.first_comment_id)
+                pk=instance.first_comment_id)
             not_read_comment = not_read_comment_json(
-                comment, sender.user)
+                comment, view.user)
     response['last_read_id'] = last_read_id
     response['not_read_comment'] = not_read_comment
 

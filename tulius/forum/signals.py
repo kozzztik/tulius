@@ -1,8 +1,6 @@
 from django import dispatch
 
 
-thread_view = dispatch.Signal(providing_args=['response'])
-
 # analyze data and prepare to jsonify
 thread_prepare_room = dispatch.Signal(
     providing_args=["room", "threads"])

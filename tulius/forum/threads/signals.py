@@ -7,3 +7,6 @@ from django import dispatch
 # functools partial if you need to provide additional params.
 on_fix_counters = dispatch.Signal(
     providing_args=['thread', 'with_descendants', 'view'])
+
+to_json = dispatch.Signal(
+    providing_args=['instance', 'response', 'view'])

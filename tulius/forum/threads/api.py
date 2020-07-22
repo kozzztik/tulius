@@ -166,7 +166,8 @@ class BaseThreadView(plugins.BaseAPIView):
             'threads_count': thread.threads_count if thread.room else None,
             'url': self.thread_url(thread.pk),
         }
-        signals.thread_room_to_json.send(self, thread=thread, response=data)
+        signals.thread_room_to_json.send(
+            self, thread=thread, response=data)
         return data
 
     def create_thread(self, data):
@@ -233,11 +234,12 @@ class ThreadView(BaseThreadView):
         # cache rights for async app
         cache.set(
             const.USER_THREAD_RIGHTS.format(
-                user_id=self.user.id, thread_id=self.obj.id),
+                user_id=self.user.id, thread_id=self.obj.pk),
             'r', const.USER_THREAD_RIGHTS_PERIOD * 60
         )
         response = self.obj_to_json()
-        signals.thread_view.send(self, response=response)
+        thread_signals.to_json.send(
+            self.thread_model, instance=self.obj, response=response, view=self)
         return response
 
     @transaction.atomic
@@ -272,7 +274,8 @@ class ThreadView(BaseThreadView):
         transaction.commit()
         # TODO notify clients
         response = self.obj_to_json()
-        signals.thread_view.send(self, response=response)
+        thread_signals.to_json.send(
+            self.thread_model, instance=self.obj, response=response, view=self)
         return response
 
     @transaction.atomic
@@ -290,7 +293,8 @@ class ThreadView(BaseThreadView):
         if not preview:
             self.obj.save()
         response = self.obj_to_json()
-        signals.thread_view.send(self, response=response)
+        thread_signals.to_json.send(
+            self.thread_model, instance=self.obj, response=response, view=self)
         return response
 
 
@@ -413,5 +417,6 @@ class MoveThreadView(BaseThreadView):
             self.on_fix_counters(self.thread_model, obj, self)
             obj.save()
         response = self.obj_to_json()
-        signals.thread_view.send(self, response=response)
+        thread_signals.to_json.send(
+            self.thread_model, instance=self.obj, response=response, view=self)
         return response
