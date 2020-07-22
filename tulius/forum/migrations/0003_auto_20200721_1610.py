@@ -10,6 +10,7 @@ def migrate_votes(apps, schema_editor):
     Voting = apps.get_model('forum', 'Voting')
     VotingChoice = apps.get_model('forum', 'VotingChoice')
     VotingVote = apps.get_model('forum', 'VotingVote')
+    dups = 0
     for voting in Voting.objects.all():
         comment = voting.comment
         if comment.media['voting'] != voting.pk:
@@ -23,7 +24,14 @@ def migrate_votes(apps, schema_editor):
         mapping = {choice.pk: i for i, choice in enumerate(choices)}
         votes = 0
         counts = {choice.pk: 0 for choice in choices}
+        users = []
         for vote in VotingVote.objects.filter(choice__in=mapping.keys()):
+            if vote.user_id in users:
+                print(f'Dup found {comment.pk}:{vote.user_id}')
+                vote.delete()
+                dups += 1
+                continue
+            users.append(vote.user_id)
             vote.comment = voting.comment
             vote.tmp = mapping[vote.choice_id]
             vote.save()
@@ -53,6 +61,7 @@ def migrate_votes(apps, schema_editor):
             thread.save()
         print(
             f'Voting {voting.pk} migrated on {comment.pk}({thread.plugin_id})')
+    print(f'Total dupliates: {dups}')
 
 
 class Migration(migrations.Migration):

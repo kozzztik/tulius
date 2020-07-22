@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 default=None, on_delete=django.db.models.deletion.PROTECT,
                 related_name='votes', to='forum.Comment',
-                verbose_name='comment'),
+                verbose_name='comment', blank=True, null=True),
             preserve_default=False,
         ),
         migrations.AddField(

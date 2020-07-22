@@ -577,7 +577,7 @@ class VotingVote(models.Model):
     class Meta:
         verbose_name = _('voting vote')
         verbose_name_plural = _('voting votes')
-        unique_together = ('choice', 'user', 'comment')
+        unique_together = ('user', 'comment')
 
     choice = models.IntegerField(
         blank=False,
