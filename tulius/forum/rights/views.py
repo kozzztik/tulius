@@ -14,9 +14,9 @@ from tulius.forum.rights import consts
 
 
 @dispatch.receiver(thread_signals.before_create)
-def before_create_thread(instance, data, **_kwargs):
+def before_create_thread(sender, instance, data, **_kwargs):
     instance.access_type = int(data['access_type'])
-    ancestors = models.Thread.objects.get_ancestors(instance)
+    ancestors = sender.objects.get_ancestors(instance)
     if (not free_access_type(instance.access_type)) and instance.parent_id:
         if instance.room:
             ancestors.filter(
@@ -49,7 +49,6 @@ def after_create_thread(instance, data, preview, **kwargs):
 
 
 class BaseGrantedRightsAPI(views.BaseThreadView):
-    model = models.ThreadAccessRight
     rights_model = models.ThreadAccessRight
     require_user = True
 
@@ -67,7 +66,7 @@ class BaseGrantedRightsAPI(views.BaseThreadView):
         }
 
     def create_right(self, data):
-        obj = self.model.objects.get_or_create(
+        obj = self.rights_model.objects.get_or_create(
             thread=self.obj, user_id=data['user']['id'],
             defaults={'access_level': data['access_level']}
         )[0]
@@ -91,7 +90,7 @@ class GrantedRightsAPI(BaseGrantedRightsAPI):
         self.get_parent_thread(**kwargs)
         if not self.rights.edit:
             raise exceptions.PermissionDenied()
-        objs = self.model.objects.filter(thread=self.obj).order_by('id')
+        objs = self.rights_model.objects.filter(thread=self.obj).order_by('id')
         return {
             'granted_rights': [self.right_to_json(r) for r in objs]
         }
@@ -147,14 +146,14 @@ class GrantedRightAPI(BaseGrantedRightsAPI):
         self.get_parent_thread(**kwargs)
         if not self.rights.edit:
             raise exceptions.PermissionDenied()
-        obj = self.model.objects.get(pk=kwargs['right_id'])
+        obj = self.rights_model.objects.get(pk=kwargs['right_id'])
         return self.right_to_json(obj)
 
     def delete(self, *args, right_id=None, **kwargs):
         self.get_parent_thread(**kwargs)
         if not self.rights.edit:
             raise exceptions.PermissionDenied()
-        count = self.model.objects.filter(pk=right_id).delete()
+        count = self.rights_model.objects.filter(pk=right_id).delete()
         return {'count': count}
 
     def post(self, request, right_id=None, **kwargs):
@@ -164,7 +163,7 @@ class GrantedRightAPI(BaseGrantedRightsAPI):
         data = json.loads(request.body)
         with transaction.atomic():
             obj = shortcuts.get_object_or_404(
-                self.model.objects.select_for_update(), pk=right_id)
+                self.rights_model.objects.select_for_update(), pk=right_id)
             obj.access_level = data['access_level']
             obj.save()
         return self.right_to_json(obj)

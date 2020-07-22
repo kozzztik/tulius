@@ -18,8 +18,9 @@ def after_create_thread(instance, data, preview, view, **_kwargs):
             access_level=right['access_level']).save()
 
 
-class BaseGrantedRightsAPI(views.BaseGrantedRightsAPI, threads_api.BaseThreadAPI):
-    model = models.GameThreadRight
+class BaseGrantedRightsAPI(
+        views.BaseGrantedRightsAPI, threads_api.BaseThreadAPI):
+    rights_model = models.GameThreadRight
 
     def right_to_json(self, right):
         return {
@@ -39,7 +40,7 @@ class BaseGrantedRightsAPI(views.BaseGrantedRightsAPI, threads_api.BaseThreadAPI
         }
 
     def create_right(self, data):
-        obj = self.model.objects.get_or_create(
+        obj = self.rights_model.objects.get_or_create(
             thread=self.obj, role_id=data['user']['id'],
             defaults={'access_level': data['access_level']}
         )[0]

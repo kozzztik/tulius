@@ -31,6 +31,8 @@ class GameRights(base.RightsDescriptor):
 
 class RightsChecker(default.DefaultRightsChecker):
     _base_rights_class = GameRights
+    rights_model = models.GameThreadRight
+    thread_model = forum_models.Thread
     _rights: GameRights = None
     variation = None
 
@@ -128,7 +130,7 @@ class RightsChecker(default.DefaultRightsChecker):
         rights.user_write_roles = self._process_user_write_roles(rights)
 
     def _process_granted_rights(self, rights: GameRights):
-        granted_rights = models.GameThreadRight.objects.filter(
+        granted_rights = self.rights_model.objects.filter(
             thread_id=self.thread.id).distinct()
         read_roles = [
             right.role_id for right in granted_rights
@@ -209,7 +211,7 @@ class RightsChecker(default.DefaultRightsChecker):
         query = Q(access_type__lt=forum_models.THREAD_ACCESS_TYPE_NO_READ)
         if self.thread and self._rights.user_roles:
             query = query | Q(data1__in=self._rights.user_roles)
-        return forum_models.Thread.objects.get_descendants(self.thread).filter(
+        return self.thread_model.objects.get_descendants(self.thread).filter(
             deleted=False).filter(query)
 
     def _read_all(self):
@@ -220,7 +222,7 @@ class RightsChecker(default.DefaultRightsChecker):
         user = self.user
         r = self._rights
         if user.is_superuser or r.admin or r.guest or self._read_all():
-            threads = forum_models.Thread.objects.get_descendants(
+            threads = self.thread_model.objects.get_descendants(
                 self.thread
             ).filter(
                 deleted=False,
@@ -228,7 +230,7 @@ class RightsChecker(default.DefaultRightsChecker):
             if self.thread and r.user_roles:
                 threads = threads.exclude(data1__in=r.user_roles)
             return threads
-        rights = models.GameThreadRight.objects.filter(
+        rights = self.rights_model.objects.filter(
             role_id__in=r.user_roles,
             thread__tree_id=self.thread.tree_id,
             thread__lft__gt=self.thread.lft,

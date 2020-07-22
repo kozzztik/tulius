@@ -63,7 +63,7 @@ class VotingAPI(views.CommentBase):
             comment=self.comment, user=request.user)
         if votes:
             raise http.Http404()
-        models.VotingVote(
+        self.voting_model(
             user=request.user, choice=choice, comment=self.comment).save()
         voting['choices']['items'][choice]['count'] += 1
         voting['choices']['votes'] += 1
