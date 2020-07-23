@@ -16,6 +16,9 @@ urlpatterns = [
         r'^favorites/$',
         other.Favorites.as_view(), name='favorites'),
     urls.url(
+        r'^likes/$',
+        other.Likes.as_view(), name='likes'),
+    urls.url(
         r'^thread_redirrect/(?P<pk>\d+)/$',
         views.RedirrectAPI.as_view(), name='thread_redirect'),
     urls.url(

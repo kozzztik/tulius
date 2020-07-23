@@ -19,7 +19,7 @@ class ReadmarkAPI(readmarks.ReadmarkAPI, thread_views.BaseThreadAPI):
     comment_model = forum_models.Comment
 
 
-@dispatch.receiver(comment_signals.on_delete)
+@dispatch.receiver(comment_signals.on_delete, sender=forum_models.Comment)
 def tmp_on_comment_delete_plugin_filter(sender, comment, view, **kwargs):
     # TODO this func will be removed with plugin_id field cleanup
     # it will use signals "sender" field
@@ -28,7 +28,7 @@ def tmp_on_comment_delete_plugin_filter(sender, comment, view, **kwargs):
     return ReadmarkAPI.on_delete_comment(sender, comment, view, **kwargs)
 
 
-@dispatch.receiver(comment_signals.after_add)
+@dispatch.receiver(comment_signals.after_add, sender=forum_models.Comment)
 def tmp_on_after_add_comment_plugin_filter(comment, preview, view, **kwargs):
     # TODO this func will be removed with plugin_id field cleanup
     # it will use signals "sender" field
@@ -37,7 +37,7 @@ def tmp_on_after_add_comment_plugin_filter(comment, preview, view, **kwargs):
     return ReadmarkAPI.after_add_comment(comment, preview, view, **kwargs)
 
 
-@dispatch.receiver(thread_signals.prepare_room)
+@dispatch.receiver(thread_signals.prepare_room, sender=forum_models.Thread)
 def tmp_on_prepare_room_plugin_filter(room, threads, view, **_kwargs):
     # TODO this func will be removed with plugin_id field cleanup
     # it will use signals "sender" field
@@ -46,7 +46,7 @@ def tmp_on_prepare_room_plugin_filter(room, threads, view, **_kwargs):
     return ReadmarkAPI.on_prepare_room_list(room, threads, view, **_kwargs)
 
 
-@dispatch.receiver(thread_signals.prepare_threads)
+@dispatch.receiver(thread_signals.prepare_threads, sender=forum_models.Thread)
 def tmp_on_prepare_threads_plugin_filter(threads, view, **kwargs):
     # TODO this func will be removed with plugin_id field cleanup
     # it will use signals "sender" field
@@ -55,7 +55,7 @@ def tmp_on_prepare_threads_plugin_filter(threads, view, **kwargs):
     return ReadmarkAPI.on_thread_prepare_thread(threads, view, **kwargs)
 
 
-@dispatch.receiver(thread_signals.to_json)
+@dispatch.receiver(thread_signals.to_json, sender=forum_models.Thread)
 def tmp_on_thread_to_json_plugin_filter(instance, view, response, **kwargs):
     # TODO this func will be removed with plugin_id field cleanup
     # it will use signals "sender" field
@@ -66,6 +66,12 @@ def tmp_on_thread_to_json_plugin_filter(instance, view, response, **kwargs):
 
 class VotingAPI(voting.VotingAPI, comments_api.CommentsBase):
     voting_model = forum_models.VotingVote
+
+
+comment_signals.to_json.connect(
+    VotingAPI.on_comment_to_json, sender=forum_models.Comment)
+thread_signals.to_json.connect(
+    VotingAPI.on_thread_to_json, sender=forum_models.Thread)
 
 
 class Search(search.Search, base.VariationMixin):
@@ -93,9 +99,19 @@ class Search(search.Search, base.VariationMixin):
         return comments
 
 
+class Likes(likes.Likes):
+    like_model = forum_models.CommentLike
+    comment_model = forum_models.Comment
+
+
 class Favorites(likes.Favorites):
     comments_class = comments_api.CommentAPI
+    like_model = forum_models.CommentLike
     variations = None
+
+    def comments_query(self):
+        return super(Favorites, self).comments_query().filter(
+            comment__plugin_id=self.comments_class.plugin_id)
 
     def get_view(self, comment):
         view = super(Favorites, self).get_view(comment)

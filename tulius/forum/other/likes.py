@@ -6,13 +6,14 @@ from django.core import exceptions
 from django.db import transaction
 
 from tulius.forum import core
-from tulius.forum import models
+from tulius.forum.other import models
+from tulius.forum.comments import models as comment_models
 from tulius.forum.comments import views
 
 
 class Likes(core.BaseAPIView):
     like_model = models.CommentLike
-    comment_model = models.Comment
+    comment_model = comment_models.Comment
     require_user = False
 
     def get(self, request, *args, **kwargs):
@@ -65,9 +66,12 @@ class Favorites(core.BaseAPIView):
         view.comment = comment
         return view
 
+    def comments_query(self):
+        return self.like_model.objects.select_related('comment').filter(
+            user=self.user)
+
     def get_comments(self):
-        likes = self.like_model.objects.select_related('comment').filter(
-            user=self.user, comment__plugin_id=self.comments_class.plugin_id)
+        likes = self.comments_query()
         comments = [like.comment for like in likes]
         result = []
         for comment in comments:

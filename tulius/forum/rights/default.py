@@ -1,13 +1,14 @@
 from django.db.models.query_utils import Q
 
-from tulius.forum import models
+from tulius.forum.threads import models as thread_models
+from tulius.forum.rights import models
 from tulius.forum.rights import base
 
 
 class DefaultRightsChecker(base.BaseThreadRightsChecker):
     _base_rights_class = base.RightsDescriptor
     rights_model = models.ThreadAccessRight
-    thread_model = models.Thread
+    thread_model = thread_models.Thread
 
     def get_limited_read_list(self, parent_rights):
         persons = [
@@ -28,7 +29,7 @@ class DefaultRightsChecker(base.BaseThreadRightsChecker):
             return read, write, moderate
         if (not self.thread.room) and (
                 self.thread.access_type ==
-                models.THREAD_ACCESS_TYPE_NOT_SET):
+                thread_models.THREAD_ACCESS_TYPE_NOT_SET):
             return read, write, moderate
         rights = self.rights_model.objects.filter(
             thread=self.thread, user=self.user)
@@ -54,7 +55,7 @@ class DefaultRightsChecker(base.BaseThreadRightsChecker):
         author = (not self.user.is_anonymous) and (
             (self.user.id == self.thread.user_id) or self.user.is_superuser)
         parent_rights = self.get_parent_rights()
-        if self.thread.access_type == models.THREAD_ACCESS_TYPE_NO_READ:
+        if self.thread.access_type == thread_models.THREAD_ACCESS_TYPE_NO_READ:
             rights.limited_read = self.get_limited_read_list(parent_rights)
         else:
             rights.limited_read = parent_rights.limited_read
@@ -66,13 +67,14 @@ class DefaultRightsChecker(base.BaseThreadRightsChecker):
                 self.get_granted_rights()
         rights.moderate = parent_rights.moderate or grant_moderate
         rights.read = grant_read or grant_moderate or author or (
-            self.thread.access_type < models.THREAD_ACCESS_TYPE_NO_READ)
+            self.thread.access_type < thread_models.THREAD_ACCESS_TYPE_NO_READ)
         rights.read = rights.read and parent_rights.read
-        if self.thread.access_type == models.THREAD_ACCESS_TYPE_NOT_SET:
+        if self.thread.access_type == thread_models.THREAD_ACCESS_TYPE_NOT_SET:
             rights.write = parent_rights.write
         else:
             rights.write = (
-                self.thread.access_type < models.THREAD_ACCESS_TYPE_NO_WRITE)
+                self.thread.access_type <
+                thread_models.THREAD_ACCESS_TYPE_NO_WRITE)
         rights.write = author or rights.write or grant_write or rights.moderate
         rights.edit = author or rights.moderate
         if self.thread.closed or self.user.is_anonymous:
@@ -93,7 +95,7 @@ class DefaultRightsChecker(base.BaseThreadRightsChecker):
         return moderators, self._rights.limited_read
 
     def _get_free_descendants(self):
-        query = Q(access_type__lt=models.THREAD_ACCESS_TYPE_NO_READ)
+        query = Q(access_type__lt=thread_models.THREAD_ACCESS_TYPE_NO_READ)
         if self.thread and self.user.is_authenticated:
             query = query | Q(user=self.user)
         return self.thread_model.objects.get_descendants(self.thread).filter(
@@ -106,7 +108,7 @@ class DefaultRightsChecker(base.BaseThreadRightsChecker):
             return self.thread_model.objects.get_descendants(
                 self.thread
             ).filter(
-                access_type=models.THREAD_ACCESS_TYPE_NO_READ,
+                access_type=thread_models.THREAD_ACCESS_TYPE_NO_READ,
                 deleted=False)
         rights = self.rights_model.objects.filter(
             user=self.user, thread__tree_id=self.thread.tree_id,

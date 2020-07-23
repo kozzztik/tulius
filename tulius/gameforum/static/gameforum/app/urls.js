@@ -44,6 +44,7 @@ export default function(variation_id) {
             name: 'game_fix_counters',
             params: { id: thread_id, variation_id: variation_id },
         }),
+        likes_api: '/api/game_forum/likes/',
         thread_api: pk => `/api/game_forum/variation/${variation_id}/thread/${pk}/`,
         thread_move_api: pk => `/api/game_forum/variation/${variation_id}/thread/${pk}/move/`,
         thread_fix_api: pk => `/api/game_forum/variation/${variation_id}/thread/${pk}/fix/`,

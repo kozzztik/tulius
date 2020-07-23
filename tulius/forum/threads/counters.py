@@ -2,7 +2,7 @@ from django.core import exceptions
 from django.db import transaction
 
 from tulius.forum import core
-from tulius.forum import models
+from tulius.forum.threads import models
 from tulius.forum.threads import signals
 from tulius.websockets import publisher
 
@@ -46,10 +46,9 @@ class CountersFix(core.BaseAPIView):
         self.result = {}
         threads = self.thread_model.objects.select_for_update()
         if pk:
-            threads = threads.filter(pk=pk, plugin_id=self.plugin_id)
+            threads = threads.filter(pk=pk)
         else:
-            threads = threads.filter(
-                parent=None, deleted=False, plugin_id=self.plugin_id)
+            threads = threads.filter(parent=None, deleted=False)
         for thread in threads:
             self.process_thread(thread, True)
         return {'result': self.result}

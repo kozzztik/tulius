@@ -30,7 +30,7 @@ def validate_image_data(variation, images_data):
     return result
 
 
-@dispatch.receiver(thread_signals.before_create)
+@dispatch.receiver(thread_signals.before_create, sender=models.Thread)
 def before_create_thread(instance, data, view, **_kwargs):
     if (view.plugin_id != consts.GAME_FORUM_SITE_ID) or instance.room:
         return
@@ -41,7 +41,7 @@ def before_create_thread(instance, data, view, **_kwargs):
         view.variation, images_data)
 
 
-@dispatch.receiver(comment_signals.before_add)
+@dispatch.receiver(comment_signals.before_add, sender=models.Comment)
 def before_add_comment(comment, data, view, **_kwargs):
     if view.plugin_id != consts.GAME_FORUM_SITE_ID:
         return
@@ -55,7 +55,7 @@ def before_add_comment(comment, data, view, **_kwargs):
             view.variation, images_data)
 
 
-@dispatch.receiver(comment_signals.on_update)
+@dispatch.receiver(comment_signals.on_update, sender=models.Comment)
 def on_comment_update(comment, data, view, **_kwargs):
     if view.plugin_id != consts.GAME_FORUM_SITE_ID:
         return
@@ -74,7 +74,7 @@ def on_comment_update(comment, data, view, **_kwargs):
             view.obj.media['illustrations'] = images_data
 
 
-@dispatch.receiver(thread_signals.room_to_json)
+@dispatch.receiver(thread_signals.room_to_json, sender=models.Thread)
 def room_to_json(instance, response, view, **_kwargs):
     if instance.plugin_id != consts.GAME_FORUM_SITE_ID:
         return
@@ -100,6 +100,8 @@ def room_to_json(instance, response, view, **_kwargs):
 
 
 class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
+    comment_model = models.Comment
+
     def comment_url(self, comment):
         return urls.reverse(
             'game_forum_api:comment', kwargs={
@@ -152,7 +154,8 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
         return None
 
 
-dispatch.receiver(thread_signals.on_fix_counters)(CommentsBase.on_fix_counters)
+thread_signals.on_fix_counters.connect(
+    CommentsBase.on_fix_counters, sender=models.Thread)
 
 
 def update_role_comments_count(role_id, value):
@@ -166,6 +169,7 @@ class CommentsPageAPI(comments.CommentsPageAPI, CommentsBase):
     def create_comment(cls, data, view):
         comment = super(CommentsPageAPI, cls).create_comment(data, view)
         comment.data1 = view.process_role(None, data)
+        comment.plugin_id = cls.plugin_id
         update_role_comments_count(comment.data1, 1)
         view.variation.comments_count_inc(1)
         return comment
@@ -180,18 +184,20 @@ class CommentsPageAPI(comments.CommentsPageAPI, CommentsBase):
             instance, data, preview, view, **kwargs)
 
 
-dispatch.receiver(thread_signals.after_create)(
-    CommentsPageAPI.on_create_thread)
+thread_signals.after_create.connect(
+    CommentsPageAPI.on_create_thread, sender=models.Thread)
 
 
-@dispatch.receiver(comment_signals.on_delete)
-def on_delete(sender, comment, view, **kwargs):
+@dispatch.receiver(comment_signals.on_delete, sender=models.Comment)
+def on_delete(comment, view, **_kwargs):
     if comment.plugin_id == consts.GAME_FORUM_SITE_ID:
         update_role_comments_count(comment.data1, -1)
         view.variation.comments_count_inc(-1)
 
 
 class CommentAPI(comments.CommentAPI, CommentsBase):
+    comment_delete_mark_model = models.CommentDeleteMark
+
     def get_context_data(self, **kwargs):
         data = super(CommentAPI, self).get_context_data(**kwargs)
         data['thread']['rights'] = self.rights.to_json()
@@ -221,10 +227,11 @@ class CommentAPI(comments.CommentAPI, CommentsBase):
                 instance, data, preview, view, **kwargs)
 
 
-dispatch.receiver(thread_signals.on_update)(CommentAPI.on_thread_update)
+thread_signals.on_update.connect(
+    CommentAPI.on_thread_update, sender=models.Thread)
 
 
-@dispatch.receiver(thread_signals.on_fix_counters)
+@dispatch.receiver(thread_signals.on_fix_counters, sender=models.Thread)
 def tmp_on_fix_plugin_filter(sender, thread, view, **kwargs):
     # TODO this func will be removed with plugin_id field cleanup
     # it will use signals "sender" field

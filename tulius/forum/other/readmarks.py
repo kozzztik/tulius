@@ -2,10 +2,12 @@ import json
 
 from django import dispatch
 
-from tulius.forum import models
+from tulius.forum.other import models
 from tulius.forum.comments import signals as comment_signals
+from tulius.forum.threads import models as thread_models
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.threads import views
+from tulius.forum.comments import models as comment_models
 
 
 @dispatch.receiver(thread_signals.room_to_json)
@@ -25,14 +27,13 @@ def room_to_json(instance, response, view, **_kwargs):
 class ReadmarkAPI(views.BaseThreadView):
     require_user = True
     read_mark_model = models.ThreadReadMark
-    comment_model = models.Comment
+    comment_model = comment_models.Comment
 
     def mark_room_as_read(self, room, room_rights):
         if room:
             threads = room.get_children()
         else:
-            threads = self.thread_model.objects.filter(
-                parent=None, plugin_id=self.plugin_id)
+            threads = self.thread_model.objects.filter(parent=None)
         threads = {
             thread: self._get_rights_checker(
                 thread, parent_rights=room_rights).get_rights()
@@ -46,12 +47,12 @@ class ReadmarkAPI(views.BaseThreadView):
                 self.mark_thread_as_read(thread, None)
 
     def mark_thread_as_read(self, thread, read_id):
-        read_mark = models.ThreadReadMark.objects.filter(
+        read_mark = self.read_mark_model.objects.filter(
             thread=thread, user=self.user).first()
         if not read_mark:
-            read_mark = models.ThreadReadMark(thread=thread, user=self.user)
+            read_mark = self.read_mark_model(thread=thread, user=self.user)
         if read_id:
-            not_read = models.Comment.objects.filter(
+            not_read = self.comment_model.objects.filter(
                 parent=thread, id__gt=read_id, deleted=False
             ).exclude(user=self.user).order_by('id').first()
         else:
@@ -90,11 +91,12 @@ class ReadmarkAPI(views.BaseThreadView):
 
     def delete(self, *args, **kwargs):
         self.get_parent_thread(**kwargs)
-        models.ThreadReadMark.objects.filter(
+        self.read_mark_model.objects.filter(
             thread=self.obj, user=self.user).delete()
         comment = None
         if self.obj.first_comment_id:
-            comment = models.Comment.objects.get(pk=self.obj.first_comment_id)
+            comment = self.comment_model.objects.get(
+                pk=self.obj.first_comment_id)
         return {
             'last_read_id': None,
             'not_read_comment':
@@ -222,46 +224,13 @@ class ReadmarkAPI(views.BaseThreadView):
         response['not_read_comment'] = not_read_comment
 
 
-@dispatch.receiver(comment_signals.on_delete)
-def tmp_on_comment_delete_plugin_filter(sender, comment, view, **kwargs):
-    # TODO this func will be removed with plugin_id field cleanup
-    # it will use signals "sender" field
-    if comment.plugin_id:
-        return None
-    return ReadmarkAPI.on_delete_comment(sender, comment, view, **kwargs)
-
-
-@dispatch.receiver(comment_signals.after_add)
-def tmp_on_after_add_comment_plugin_filter(comment, preview, view, **kwargs):
-    # TODO this func will be removed with plugin_id field cleanup
-    # it will use signals "sender" field
-    if comment.plugin_id:
-        return None
-    return ReadmarkAPI.after_add_comment(comment, preview, view, **kwargs)
-
-
-@dispatch.receiver(thread_signals.prepare_room)
-def tmp_on_prepare_room_plugin_filter(room, threads, view, **_kwargs):
-    # TODO this func will be removed with plugin_id field cleanup
-    # it will use signals "sender" field
-    if room.plugin_id:
-        return None
-    return ReadmarkAPI.on_prepare_room_list(room, threads, view, **_kwargs)
-
-
-@dispatch.receiver(thread_signals.prepare_threads)
-def tmp_on_prepare_threads_plugin_filter(threads, view, **kwargs):
-    # TODO this func will be removed with plugin_id field cleanup
-    # it will use signals "sender" field
-    if view.plugin_id:
-        return None
-    return ReadmarkAPI.on_thread_prepare_thread(threads, view, **kwargs)
-
-
-@dispatch.receiver(thread_signals.to_json)
-def tmp_on_thread_to_json_plugin_filter(instance, view, response, **kwargs):
-    # TODO this func will be removed with plugin_id field cleanup
-    # it will use signals "sender" field
-    if instance.plugin_id:
-        return None
-    return ReadmarkAPI.on_thread_to_json(instance, view, response, **kwargs)
+comment_signals.on_delete.connect(
+    ReadmarkAPI.on_delete_comment, sender=comment_models.Comment)
+comment_signals.after_add.connect(
+    ReadmarkAPI.after_add_comment, sender=comment_models.Comment)
+thread_signals.prepare_room.connect(
+    ReadmarkAPI.on_prepare_room_list, sender=thread_models.Thread)
+thread_signals.prepare_threads.connect(
+    ReadmarkAPI.on_thread_prepare_thread, sender=thread_models.Thread)
+thread_signals.to_json.connect(
+    ReadmarkAPI.on_thread_to_json, sender=thread_models.Thread)

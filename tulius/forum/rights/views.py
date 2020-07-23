@@ -7,7 +7,8 @@ from django.core import exceptions
 from django.db import transaction
 from django.contrib import auth
 
-from tulius.forum import models
+from tulius.forum.rights import models
+from tulius.forum.threads import models as thread_models
 from tulius.forum.threads import views
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.rights import consts
@@ -38,9 +39,9 @@ def before_create_thread(sender, instance, data, **_kwargs):
                 consts.THREAD_HAVE_PR_ROOMS)
 
 
-@dispatch.receiver(thread_signals.after_create)
-def after_create_thread(instance, data, preview, **kwargs):
-    if instance.plugin_id or preview:
+@dispatch.receiver(thread_signals.after_create, sender=thread_models.Thread)
+def after_create_thread(instance, data, preview, **_kwargs):
+    if preview:
         return
     for right in data['granted_rights']:
         models.ThreadAccessRight(
@@ -82,7 +83,7 @@ class BaseGrantedRightsAPI(views.BaseThreadView):
 
 
 def free_access_type(access_type):
-    return access_type < models.THREAD_ACCESS_TYPE_NO_READ
+    return access_type < thread_models.THREAD_ACCESS_TYPE_NO_READ
 
 
 class GrantedRightsAPI(BaseGrantedRightsAPI):
@@ -132,13 +133,8 @@ class GrantedRightsAPI(BaseGrantedRightsAPI):
             thread.protected_threads += consts.THREAD_HAVE_PR_THREADS
 
 
-@dispatch.receiver(thread_signals.on_fix_counters)
-def tmp_on_fix_plugin_filter(sender, thread, view, **kwargs):
-    # TODO this func will be removed with plugin_id field cleanup
-    # it will use signals "sender" field
-    if thread.plugin_id:
-        return None
-    return GrantedRightsAPI.on_fix_counters(sender, thread, view, **kwargs)
+thread_signals.on_fix_counters.connect(
+    GrantedRightsAPI.on_fix_counters, sender=thread_models.Thread)
 
 
 class GrantedRightAPI(BaseGrantedRightsAPI):

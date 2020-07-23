@@ -9,8 +9,9 @@ from django.utils import html, timezone
 from djfw.wysibb.templatetags import bbcodes
 
 from tulius.core.ckeditor import html_converter
-from tulius.forum import models
+from tulius.forum.comments import models
 from tulius.forum.threads import views
+from tulius.forum.threads import models as thread_models
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.comments import pagination
 from tulius.forum.comments import signals as comment_signals
@@ -28,10 +29,8 @@ def prepare_room_list(room, threads, **_kwargs):
             room.last_comment_id = thread.last_comment_id
 
 
-@dispatch.receiver(thread_signals.room_to_json)
+@dispatch.receiver(thread_signals.room_to_json, sender=thread_models.Thread)
 def room_to_json(instance, response, view, **_kwargs):
-    if instance.plugin_id is not None:
-        return
     if instance.last_comment_id is None:
         return
     try:
@@ -147,7 +146,7 @@ class CommentsPageAPI(CommentsBase):
             obj = shortcuts.get_object_or_404(cls.comment_model, pk=reply_id)
             if obj.parent_id != view.obj.id:
                 raise exceptions.PermissionDenied()
-        comment = cls.comment_model(plugin_id=view.obj.plugin_id)
+        comment = cls.comment_model()
         comment.parent = view.obj
         comment.user = view.user
         comment.title = data['title']
@@ -201,14 +200,8 @@ class CommentsPageAPI(CommentsBase):
         return self.get_context_data(page=page, **kwargs)
 
 
-@dispatch.receiver(thread_signals.after_create)
-def tmp_on_create_plugin_filter(instance, data, preview, view, **kwargs):
-    # TODO this func will be removed with plugin_id field cleanup
-    # it will use signals "sender" field
-    if instance.plugin_id:
-        return None
-    return CommentsPageAPI.on_create_thread(
-        instance, data, preview, view, **kwargs)
+thread_signals.after_create.connect(
+    CommentsPageAPI.on_create_thread, sender=thread_models.Thread)
 
 
 class CommentBase(CommentsBase):
@@ -218,8 +211,7 @@ class CommentBase(CommentsBase):
         query = self.comment_model.objects.filter(deleted=False)
         if for_update:
             query = query.select_for_update()
-        self.comment = shortcuts.get_object_or_404(
-            query, id=int(pk), plugin_id=self.plugin_id)
+        self.comment = shortcuts.get_object_or_404(query, id=int(pk))
         self.get_parent_thread(
             pk=self.comment.parent_id, for_update=for_update, **kwargs)
 
@@ -300,20 +292,7 @@ class CommentAPI(CommentBase):
         return self.comment_to_json(self.comment)
 
 
-@dispatch.receiver(thread_signals.on_update)
-def tmp_on_update_plugin_filter(
-        instance, data, preview, view, **kwargs):
-    # TODO this func will be removed with plugin_id field cleanup
-    # it will use signals "sender" field
-    if instance.plugin_id:
-        return None
-    return CommentAPI.on_thread_update(instance, data, preview, view, **kwargs)
-
-
-@dispatch.receiver(thread_signals.on_fix_counters)
-def tmp_on_fix_plugin_filter(sender, thread, view, **kwargs):
-    # TODO this func will be removed with plugin_id field cleanup
-    # it will use signals "sender" field
-    if thread.plugin_id:
-        return None
-    return CommentsPageAPI.on_fix_counters(sender, thread, view, **kwargs)
+thread_signals.on_update.connect(
+    CommentAPI.on_thread_update, sender=thread_models.Thread)
+thread_signals.on_fix_counters.connect(
+    CommentsPageAPI.on_fix_counters, sender=thread_models.Thread)

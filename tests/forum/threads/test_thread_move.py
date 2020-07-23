@@ -68,10 +68,3 @@ def test_thread_move(superuser, user):
     assert response.status_code == 200
     data = response.json()
     assert len(data['rooms']) == 0
-    # check that move between plugins not works
-    source = models.Thread.objects.get(pk=source_room['id'])
-    source.plugin_id = 1
-    source.save()
-    response = superuser.put(
-        room['url'] + 'move/', {'parent_id': source_room['id']})
-    assert response.status_code == 404

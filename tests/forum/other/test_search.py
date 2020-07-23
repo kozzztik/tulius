@@ -2,7 +2,8 @@ from unittest import mock
 
 from django.utils import timezone
 
-from tulius.forum import models
+from tulius.forum.threads import models as thread_models
+from tulius.forum.comments import models
 
 
 def test_options(user, room_group):
@@ -123,7 +124,8 @@ def test_search_access_rights(room_group, thread, admin, user):
     response = admin.put(
         room_group['url'], {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ,
+            'room': False,
+            'access_type': thread_models.THREAD_ACCESS_TYPE_NO_READ,
             'granted_rights': [],
             'important': False, 'media': {}})
     assert response.status_code == 200

@@ -76,7 +76,7 @@ export default LazyComponent('forum_thread_comments', {
             for (var comment of this.comments)
                 comment_ids.push(comment.id);
             if (!this.user.is_anonymous && (comment_ids.length > 0)) {
-                axios.get('/api/forum/likes/', {params: {ids: comment_ids.join(',')}}
+                axios.get(this.urls.likes_api, {params: {ids: comment_ids.join(',')}}
                 ).then(response => {
                     for (comment of this.comments)
                         comment.is_liked = response.data[comment.id];

@@ -53,7 +53,6 @@ class Search(core.BaseAPIView):
         thread_view.get_parent_thread(pk)
         comments = self.comments_class.comment_model.objects.select_related(
             'parent').filter(
-                plugin_id=self.comments_class.plugin_id,
                 parent__tree_id=thread_view.obj.tree_id,
                 parent__lft__gte=thread_view.obj.lft,
                 parent__rght__lte=thread_view.obj.rght)

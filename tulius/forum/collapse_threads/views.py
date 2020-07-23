@@ -1,7 +1,7 @@
 import json
 
 from tulius.forum import core
-from tulius.forum import models
+from tulius.forum.threads import models
 
 
 class CollapseAPIList(core.BaseAPIView):

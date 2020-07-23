@@ -1,6 +1,7 @@
 from django import dispatch
 from django import urls
 
+from tulius.forum import models as forum_models
 from tulius.forum.rights import views
 from tulius.forum.threads import signals as thread_signals
 from tulius.gameforum import consts
@@ -8,7 +9,7 @@ from tulius.gameforum import models
 from tulius.gameforum.threads import views as threads_api
 
 
-@dispatch.receiver(thread_signals.after_create)
+@dispatch.receiver(thread_signals.after_create, sender=forum_models.Thread)
 def after_create_thread(instance, data, preview, view, **_kwargs):
     if (instance.plugin_id != consts.GAME_FORUM_SITE_ID) or preview:
         return
@@ -20,6 +21,7 @@ def after_create_thread(instance, data, preview, view, **_kwargs):
 
 class BaseGrantedRightsAPI(
         views.BaseGrantedRightsAPI, threads_api.BaseThreadAPI):
+    thread_model = forum_models.Thread
     rights_model = models.GameThreadRight
 
     def right_to_json(self, right):
@@ -48,7 +50,7 @@ class BaseGrantedRightsAPI(
         return obj
 
 
-@dispatch.receiver(thread_signals.on_fix_counters)
+@dispatch.receiver(thread_signals.on_fix_counters, sender=forum_models.Thread)
 def tmp_on_fix_plugin_filter(sender, thread, view, **kwargs):
     # TODO this func will be removed with plugin_id field cleanup
     # it will use signals "sender" field

@@ -13,10 +13,11 @@ from django.db.models import query_utils
 from tulius.core.ckeditor import html_converter
 from tulius.forum import core
 from tulius.forum import const
-from tulius.forum import models
 from tulius.forum import rights as forum_rights
 from tulius.forum import online_status as online_status_plugin
+from tulius.forum.threads import models
 from tulius.forum.threads import signals
+from tulius.forum.rights import models as rights_models
 from djfw.wysibb.templatetags import bbcodes
 
 
@@ -46,7 +47,6 @@ def user_to_json(user, detailed=False):
 class BaseThreadView(core.BaseAPIView):
     obj = None
     rights = None
-    plugin_id = None
     thread_model = models.Thread
 
     def _get_rights_checker(self, thread, parent_rights=None):
@@ -58,8 +58,7 @@ class BaseThreadView(core.BaseAPIView):
         query = self.thread_model.objects.filter(deleted=False)
         if for_update:
             query = query.select_for_update()
-        self.obj = shortcuts.get_object_or_404(
-            query, id=thread_id, plugin_id=self.plugin_id)
+        self.obj = shortcuts.get_object_or_404(query, id=thread_id)
         # TODO delete all sub threads and rooms on room delete so it will be
         # TODO not needed to do parent check here
         if self.obj.check_deleted():
@@ -131,8 +130,6 @@ class BaseThreadView(core.BaseAPIView):
     def get_subthreads(self, is_room=False):
         threads = self.thread_model.objects.filter(
             parent=self.obj, room=is_room).exclude(deleted=True)
-        if not self.obj:
-            threads = threads.filter(plugin_id=self.plugin_id)
         if is_room:
             return self.prepare_room_list(self.rights, threads)
         threads = threads.order_by('-last_comment_id')
@@ -176,7 +173,7 @@ class BaseThreadView(core.BaseAPIView):
         return self.thread_model(
             parent=self.obj, room=room,
             title=data['title'], body=data['body'],
-            user=self.user, plugin_id=self.plugin_id,
+            user=self.user,
             important=self.rights.moderate and important,
         )
 
@@ -303,7 +300,7 @@ class ThreadView(BaseThreadView):
 
 
 class IndexView(BaseThreadView):
-    rights_model = models.ThreadAccessRight
+    rights_model = rights_models.ThreadAccessRight
 
     def get_index(self, level):
         children = list(self.get_free_index(level)) + \
@@ -315,14 +312,13 @@ class IndexView(BaseThreadView):
         if self.user.is_superuser:
             return self.thread_model.objects.filter(
                 access_type=models.THREAD_ACCESS_TYPE_NO_READ,
-                plugin_id=self.plugin_id, level=level, deleted=False)
+                level=level, deleted=False)
         if self.user.is_anonymous:
             return []
         query = query_utils.Q(
             thread__level=level,
             thread__access_type=models.THREAD_ACCESS_TYPE_NO_READ,
-            thread__plugin_id=self.plugin_id,
-            access_level__gte=models.THREAD_ACCESS_READ,
+            access_level__gte=rights_models.THREAD_ACCESS_READ,
             user=self.user, thread__deleted=False)
         rights = self.rights_model.objects.filter(query)
         rights = rights.select_related('thread')
@@ -331,7 +327,7 @@ class IndexView(BaseThreadView):
     def get_free_index(self, level):
         threads = self.thread_model.objects.filter(
             access_type__lt=models.THREAD_ACCESS_TYPE_NO_READ,
-            plugin_id=self.plugin_id, level=level, deleted=False)
+            level=level, deleted=False)
         if self.user.is_anonymous:
             return threads
         return threads.filter(query_utils.Q(
