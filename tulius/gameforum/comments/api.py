@@ -30,7 +30,7 @@ def validate_image_data(variation, images_data):
 
 @dispatch.receiver(signals.before_create_thread)
 def before_create_thread(sender, thread, data, **kwargs):
-    if sender.plugin_id != consts.GAME_FORUM_SITE_ID:
+    if (sender.plugin_id != consts.GAME_FORUM_SITE_ID) or thread.room:
         return
     images_data = data['media'].get('illustrations')
     if not images_data:
