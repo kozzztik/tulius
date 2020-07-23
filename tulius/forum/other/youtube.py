@@ -42,3 +42,7 @@ def on_comment_update(comment, data, view, **_kwargs):
             del view.obj.media['youtube']
         elif html_data:
             view.obj.media['youtube'] = html_data
+
+
+def init():
+    pass

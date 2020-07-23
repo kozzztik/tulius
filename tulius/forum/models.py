@@ -166,7 +166,7 @@ class Thread(MPTTModel, SitedModelMixin):
     )
     user = models.ForeignKey(
         User, models.PROTECT,
-        related_name='forum_threads',
+        related_name='forum_threads_old',
         verbose_name=_('author')
     )
     access_type = models.SmallIntegerField(
@@ -298,7 +298,8 @@ class ThreadCollapseStatus(models.Model):
         User, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_('user')
+        verbose_name=_('user'),
+        related_name='forum_collapsed_threads_old',
     )
     collapse_threads = models.BooleanField(
         default=False,
@@ -343,14 +344,14 @@ class Comment(SitedModelMixin):
         User, models.PROTECT,
         null=False,
         blank=False,
-        related_name='forum_comments',
+        related_name='forum_comments_old',
         verbose_name=_('author')
     )
     editor = models.ForeignKey(
         User, models.PROTECT,
         null=True,
         blank=True,
-        related_name='forum_comments_edited',
+        related_name='forum_comments_edited_old',
         verbose_name=_('edited by')
     )
     create_time = models.DateTimeField(
@@ -421,7 +422,7 @@ class ThreadReadMark(models.Model):
         User, models.PROTECT,
         null=False,
         blank=False,
-        related_name='forum_readed_threads',
+        related_name='forum_readed_threads_old',
         verbose_name=_('user'),
     )
     readed_comment = models.ForeignKey(
@@ -449,7 +450,7 @@ class CommentLike(models.Model):
         User, models.PROTECT,
         null=False,
         blank=False,
-        related_name='liked_comments',
+        related_name='liked_comments_old',
         verbose_name=_('user'),
     )
     comment = models.ForeignKey(
@@ -478,7 +479,7 @@ class ThreadDeleteMark(models.Model):
         blank=False,
         null=False,
         verbose_name=_(u'user'),
-        related_name='thread_delete_marks',
+        related_name='thread_delete_marks_old',
     )
     description = models.TextField(
         verbose_name=_(u'description'),
@@ -519,7 +520,7 @@ class CommentDeleteMark(models.Model):
         blank=False,
         null=False,
         verbose_name=_(u'user'),
-        related_name='comments_delete_marks',
+        related_name='comments_delete_marks_old',
     )
     description = models.TextField(
         verbose_name=_(u'description'),
@@ -552,7 +553,7 @@ class OnlineUser(models.Model):
         blank=False,
         null=False,
         verbose_name=_(u'user'),
-        related_name='forum_visit',
+        related_name='forum_visit_old',
     )
     visit_time = models.DateTimeField(
         auto_now_add=True,
@@ -589,7 +590,7 @@ class VotingVote(models.Model):
         null=False,
         blank=False,
         verbose_name=_(u'user'),
-        related_name='voting_votes',
+        related_name='voting_votes_old',
     )
     comment = models.ForeignKey(
         Comment, models.PROTECT,
