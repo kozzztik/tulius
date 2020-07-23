@@ -4,7 +4,6 @@ Forum engine models for Tulius project
 import jsonfield
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey, TreeManager
 
@@ -53,9 +52,6 @@ class UploadedFile(models.Model):
 
     def is_image(self):
         return self.mime[0:5] == 'image'
-
-    def filename(self):
-        return self.name
 
     def __unicode__(self):
         """
@@ -109,54 +105,8 @@ class SitedModelMixin(models.Model):
         verbose_name=_('plugin')
     )
 
-    def get_site_attr(self, attr):
-        if attr in ['plugin', 'plugin_id', '_plugin_cache', '_site']:
-            raise AttributeError()
-        attr_name = self.__class__.__name__ + '_' + attr
-        site = self.site()
-        core = site.core.content
-        if attr_name in core:
-            attr_value = core[attr_name]
-        else:
-            urls = site.urlizer.content
-            if attr_name in urls:
-                attr_value = urls[attr_name]
-            else:
-                raise AttributeError()
-        if callable(attr_value):
-            return attr_value(self)
-        return attr_value
-
-    _site = None
-
-    def site(self):
-        if not self._site:
-            from .sites import sites_manager
-            self._site = sites_manager.get_site(self.plugin_id)
-            if not self._site:
-                raise ImproperlyConfigured(
-                    'Forum site id = %s is not configured' % self.plugin_id)
-        return self._site
-
-    def __getattribute__(self, attr):
-        try:
-            return super(SitedModelMixin, self).__getattribute__(attr)
-        except AttributeError:
-            return self.get_site_attr(attr)
-
 
 class ThreadManager(TreeManager):
-    def rooms(self, parent, plugin=None):
-        if parent and not parent.descendant_count():
-            return []
-        return self.filter(parent=parent, room=True)
-
-    def threads(self, parent):
-        if parent and not parent.descendant_count():
-            return []
-        return self.filter(parent=parent, room=False).order_by(
-            '-important', 'id')
-
     def get_ancestors(self, parent):
         if parent.tree_id:
             return self.filter(
@@ -282,53 +232,11 @@ class Thread(MPTTModel, SitedModelMixin):
             return self.parent.check_deleted()
         return False
 
-    view_user = None
-    _rights_cached_ = False
-    _read_right_ = 0
-    _view_right_ = 1
-    _write_right_ = 2
-    _edit_right_ = 3
-    _move_right_ = 4
-    _moderate_right_ = 5
-
-    def update_rights(self):
-        if self.view_user:
-            self._rights_cached_ = self.get_rights
-
-    def get_right(self, right, user=None):
-        if user:
-            self.view_user = user
-        if not self._rights_cached_:
-            self.update_rights()
-        return self._rights_cached_[right]
-
-    def read_right(self, user=None):
-        return self.get_right(self._read_right_, user)
-
-    def view_right(self, user=None):
-        return self.get_right(self._view_right_, user)
-
-    def write_right(self, user=None):
-        return self.get_right(self._write_right_, user)
-
-    def edit_right(self, user=None):
-        return self.get_right(self._edit_right_, user)
-
-    def move_right(self, user=None):
-        return self.get_right(self._move_right_, user)
-
-    def moderate_right(self, user=None):
-        return self.get_right(self._moderate_right_, user)
-
     def free_access_type(self):
         return self.access_type < THREAD_ACCESS_TYPE_NO_READ
 
     def is_thread(self):
         return not self.room
-
-    def get_delete_mark(self):
-        marks = ThreadDeleteMark.objects.filter(thread_id=self.id)
-        return marks[0] if marks else None
 
     def descendant_count(self):
         return (self.rght - self.lft - 1) / 2
@@ -339,16 +247,6 @@ class Thread(MPTTModel, SitedModelMixin):
         ).aggregate(
             comments_sum=models.Sum('comments_count'))
         return comments['comments_sum']
-
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.site().signals.thread_on_create.send(
-                self.parent, instance=self)
-        else:
-            old_thread = Thread.objects.select_for_update().get(id=self.id)
-            self.site().signals.thread_on_update.send(
-                self, old_thread=old_thread)
-        super(Thread, self).save(*args, **kwargs)
 
 
 class ThreadAccessRight(models.Model):
@@ -497,70 +395,11 @@ class Comment(SitedModelMixin):
     )
     media = jsonfield.JSONField(default=default_media)
 
-    view_user = None
-
     def __str__(self):
         return self.title[:40] if self.title else self.body[:40]
 
-    def get_delete_mark(self):
-        marks = CommentDeleteMark.objects.filter(comment=self)
-        if marks:
-            return marks[0]
-        return None
-
     def is_thread(self):
         return self.id == self.parent.first_comment_id
-
-    def save(
-            self, force_insert=False, force_update=False, using=None,
-            update_fields=None):
-        was_none = self.id is None
-        thread = Thread.objects.select_for_update().get(id=self.parent_id)
-        delete_changed = False
-        # before safe work
-        if not was_none:
-            old_self = Comment.objects.select_for_update().get(id=self.id)
-            if old_self.deleted != self.deleted:
-                delete_changed = True
-                thread = Thread.objects.select_for_update().get(
-                    id=self.parent.id)
-                if old_self.deleted:
-                    self.site().signals.before_add_comment.send(
-                        thread, instance=self, restore=True)
-                else:
-                    self.site().signals.before_delete_comment.send(
-                        self, thread=thread)
-                thread.save()
-            else:
-                self.site().signals.before_save_comment.send(
-                    self, old_comment=old_self)
-        else:
-            # trick to avoid pylint warning
-            reply_id = getattr(self, 'reply_id', None)
-            if (not reply_id) and (
-                    self.parent.first_comment_id != self.id):
-                self.reply_id = self.parent.first_comment_id
-            self.site().signals.before_add_comment.send(
-                thread, instance=self, restore=False)
-        # real safe
-        super(Comment, self).save(
-            force_insert=force_insert, force_update=force_update,
-            using=using, update_fields=update_fields)
-        # after save
-        if was_none:
-            if not thread.first_comment_id:
-                thread.first_comment_id = self.id
-            thread.last_comment_id = self.id
-            thread.save()
-            self.site().signals.after_add_comment.send(
-                self, thread=thread, restore=False)
-        elif delete_changed:
-            if self.deleted:
-                self.site().signals.after_delete_comment.send(
-                    self, thread=thread)
-            else:
-                self.site().signals.after_add_comment.send(
-                    self, thread=thread, restore=True)
 
 
 class ThreadReadMark(models.Model):
@@ -731,100 +570,6 @@ class OnlineUser(models.Model):
         return str(self.user)
 
 
-class Voting(models.Model):
-    """
-    Voting
-    """
-    class Meta:
-        verbose_name = _('voting')
-        verbose_name_plural = _('votings')
-
-    user = models.ForeignKey(
-        User, models.PROTECT,
-        null=False,
-        blank=False,
-        verbose_name=_(u'user'),
-        related_name='create_votings',
-    )
-    comment = models.ForeignKey(
-        Comment, models.PROTECT,
-        null=False,
-        blank=False,
-        related_name='voting_list',
-        verbose_name=_(u'comment'),
-    )
-    voting_name = models.CharField(
-        max_length=255,
-        default='',
-        blank=True,
-        verbose_name=_('name')
-    )
-    voting_body = models.TextField(
-        null=False,
-        blank=False,
-        verbose_name=_(u'voting text'),
-    )
-    closed = models.BooleanField(
-        default=False,
-        blank=True,
-        verbose_name=_(u'closed'),
-    )
-    anonymous = models.BooleanField(
-        default=True,
-        blank=True,
-        verbose_name=_(u'anonymous'),
-    )
-    show_results = models.BooleanField(
-        default=True,
-        blank=True,
-        verbose_name=_(u'show results before close of voting'),
-    )
-    preview_results = models.BooleanField(
-        default=False,
-        blank=True,
-        verbose_name=_(u'add preview results button'),
-    )
-
-    def __unicode__(self):
-        return self.voting_name
-
-    def votes_count(self):
-        return VotingVote.objects.filter(choice__voting_id=self.id).count()
-
-    def user_choice(self, user):
-        votes = VotingVote.objects.filter(user=user, choice__voting=self)
-        if votes.count() > 0:
-            vote = votes[0]
-            return vote.choice
-        return None
-
-
-class VotingChoice(models.Model):
-    """
-    Voting choice
-    """
-    class Meta:
-        verbose_name = _('voting choice')
-        verbose_name_plural = _('voting choices')
-
-    voting = models.ForeignKey(
-        Voting, models.PROTECT,
-        null=False,
-        blank=False,
-        verbose_name=_(u'voting'),
-        related_name='choices',
-    )
-    name = models.CharField(
-        max_length=255,
-        default='',
-        blank=True,
-        verbose_name=_('name')
-    )
-
-    def __unicode__(self):
-        return "%s - %s" % (self.voting.voting_name, self.name)
-
-
 class VotingVote(models.Model):
     """
     Voting choice
@@ -832,14 +577,12 @@ class VotingVote(models.Model):
     class Meta:
         verbose_name = _('voting vote')
         verbose_name_plural = _('voting votes')
-        unique_together = ('choice', 'user')
+        unique_together = ('user', 'comment')
 
-    choice = models.ForeignKey(
-        VotingChoice, models.PROTECT,
-        null=False,
+    choice = models.IntegerField(
         blank=False,
-        verbose_name=_(u'voting'),
-        related_name='voting_choices',
+        null=False,
+        verbose_name=_('choice')
     )
     user = models.ForeignKey(
         User, models.PROTECT,
@@ -848,7 +591,13 @@ class VotingVote(models.Model):
         verbose_name=_(u'user'),
         related_name='voting_votes',
     )
+    comment = models.ForeignKey(
+        Comment, models.PROTECT,
+        null=False,
+        blank=False,
+        related_name='votes',
+        verbose_name=_(u'comment'),
+    )
 
-    def __unicode__(self):
-        return "%s - %s(%s)" % (
-            self.choice.voting.voting_name, self.choice.name, self.user)
+    def __str__(self):
+        return f'{self.comment.title} - {self.choice}({self.user})'

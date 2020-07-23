@@ -1,6 +1,3 @@
-from django.template.response import TemplateResponse
-
-
 # pylint: disable=too-many-branches,too-many-statements
 def get_pagination_context(request, page_num, pages_count, window=4):
     try:
@@ -86,17 +83,3 @@ def get_pagination_context(request, page_num, pages_count, window=4):
         return to_return
     except (KeyError, AttributeError):
         return {}
-
-
-def get_custom_pagination(
-        request, context, template_name='forum/snippets/pagination.haml'):
-    response = TemplateResponse(request, template_name, context=context)
-    response.render()
-    return response.content.decode()
-
-
-def get_pagination(
-        request, page_num, pages_count, window=4,
-        template_name='forum/snippets/pagination.haml'):
-    context = get_pagination_context(request, page_num, pages_count, window)
-    return get_custom_pagination(request, context, template_name)

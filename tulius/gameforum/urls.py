@@ -1,11 +1,11 @@
 from django.conf import urls
 
 from tulius.gameforum import views
-from tulius.gameforum.threads import api as threads
+from tulius.gameforum.threads import views as threads
 from tulius.gameforum import other
 from tulius.gameforum import online_status
-from tulius.gameforum.comments import api as comments
-from tulius.gameforum.rights import api as rights_api
+from tulius.gameforum.comments import views as comments
+from tulius.gameforum.rights import views as rights_api
 from tulius.gameforum.other import trust_marks
 
 
@@ -19,6 +19,9 @@ urlpatterns = [
         r'^thread_redirrect/(?P<pk>\d+)/$',
         views.RedirrectAPI.as_view(), name='thread_redirect'),
     urls.url(
+        r'^game/(?P<pk>\d+)/$',
+        views.GameAPI.as_view(), name='game'),
+    urls.url(
         r'^variation/(?P<variation_id>\d+)/$',
         views.VariationAPI.as_view(), name='variation'),
     urls.url(
@@ -27,6 +30,9 @@ urlpatterns = [
     urls.url(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/$',
         threads.ThreadAPI.as_view(), name='thread'),
+    urls.url(
+        r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/fix/$',
+        threads.CountersFix.as_view(), name='fix_thread_counters'),
     urls.url(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/comments_page/$',
         comments.CommentsPageAPI.as_view(), name='comments_page'),

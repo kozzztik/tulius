@@ -5,19 +5,21 @@ from django import shortcuts
 from django.core import exceptions
 from django.db import transaction
 
-from tulius.forum import plugins
+from tulius.forum import core
 from tulius.forum import models
-from tulius.forum.comments import api
+from tulius.forum.comments import views
 
 
-class Likes(plugins.BaseAPIView):
+class Likes(core.BaseAPIView):
+    like_model = models.CommentLike
+    comment_model = models.Comment
     require_user = False
 
     def get(self, request, *args, **kwargs):
         data = request.GET['ids'].split(',')
         ids = [int(pk) for pk in data]
         response = {pk: False for pk in ids}
-        like_marks = models.CommentLike.objects.filter(
+        like_marks = self.like_model.objects.filter(
             user=request.user, comment_id__in=ids)
         for mark in like_marks:
             response[mark.comment_id] = True
@@ -33,13 +35,13 @@ class Likes(plugins.BaseAPIView):
         except:
             raise http.Http404()
         comment = shortcuts.get_object_or_404(
-            models.Comment.objects.select_for_update(), id=comment_id)
+            self.comment_model.objects.select_for_update(), id=comment_id)
 
-        like_marks = models.CommentLike.objects.filter(
+        like_marks = self.like_model.objects.filter(
             user=request.user, comment=comment)
         if value:
             if not like_marks:
-                like_mark = models.CommentLike(
+                like_mark = self.like_model(
                     user=request.user, comment=comment)
                 like_mark.save()
                 comment.likes += 1
@@ -51,9 +53,10 @@ class Likes(plugins.BaseAPIView):
         return {'value': value}
 
 
-class Favorites(plugins.BaseAPIView):
+class Favorites(core.BaseAPIView):
+    like_model = models.CommentLike
     require_user = True
-    comments_class = api.CommentAPI
+    comments_class = views.CommentAPI
 
     def get_view(self, comment):
         view = self.comments_class()
@@ -63,7 +66,7 @@ class Favorites(plugins.BaseAPIView):
         return view
 
     def get_comments(self):
-        likes = models.CommentLike.objects.select_related('comment').filter(
+        likes = self.like_model.objects.select_related('comment').filter(
             user=self.user, comment__plugin_id=self.comments_class.plugin_id)
         comments = [like.comment for like in likes]
         result = []
@@ -77,14 +80,14 @@ class Favorites(plugins.BaseAPIView):
         return result
 
     @staticmethod
-    def comments_to_json(views):
+    def comments_to_json(view_objects):
         return {
             'groups': [{
                 'name': 'Форум',
                 'items': [{
                     'comment': view.comment_to_json(view.comment),
                     'thread': view.obj_to_json(),
-                } for view in views],
+                } for view in view_objects],
             }],
         }
 

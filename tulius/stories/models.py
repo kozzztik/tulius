@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from django import urls
+from django import dispatch
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import now
@@ -408,10 +409,15 @@ class Variation(SortableModelMixin):
         self.save()
 
     def forumlink(self):
-        return urls.reverse('gameforum:variation', args=(self.pk,))
+        return f'/play/variation/{self.pk}/'
 
     def get_roles(self):
         return Role.objects.filter(variation=self).exclude(deleted=True)
+
+    def comments_count_inc(self, value):
+        Variation.objects.filter(pk=self.pk).update(
+            comments_count=models.F('comments_count') + value)
+        self.comments_count += value
 
 
 class Role(SortableModelMixin):
@@ -635,6 +641,14 @@ class StoryAuthor(models.Model):
         if self.user:
             return str(self.user)
         return None
+
+
+@dispatch.receiver(models.signals.post_delete, sender=StoryAuthor)
+@dispatch.receiver(models.signals.post_save, sender=StoryAuthor)
+def on_story_author_updates(instance, **_kwargs):
+    User.objects.filter(pk=instance.user_id).update(
+        stories_author=StoryAuthor.objects.filter(
+            user_id=instance.user_id).count())
 
 
 class AdditionalMaterial(models.Model):

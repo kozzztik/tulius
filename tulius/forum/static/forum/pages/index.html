@@ -7,6 +7,9 @@
             <b-dropdown-item href="/forums/add_room/" v-if="user.superuser">
                 Добавить комнату
             </b-dropdown-item>
+            <b-dropdown-item href="javascript:void(0);" :to="{name: 'fix_counters_index'}" v-if="user.superuser">
+                Обновить счетчики
+            </b-dropdown-item>
         </b-dropdown>
     </div>
     <div class="content" v-for="group in index.groups" v-if="!loading">

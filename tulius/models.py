@@ -139,7 +139,11 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
         blank=False,
         editable=False,
     )
-
+    stories_author = models.PositiveIntegerField(
+        default=0,
+        blank=False,
+        editable=False,
+    )
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
 
@@ -193,10 +197,6 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
         self.full_stars_cache = 'b' * big_stars + 's' * small_stars + 'e' * (
             stars.stars_count - small_stars)
         return self.full_stars_cache
-
-    def stories_author(self):
-        from tulius.stories.models import StoryAuthor
-        return StoryAuthor.objects.filter(user=self).count()
 
     new_invites_cache = None
 
