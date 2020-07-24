@@ -22,24 +22,11 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(
                     auto_created=True, primary_key=True, serialize=False,
                     verbose_name='ID')),
-                ('not_readed_comment', models.ForeignKey(
-                    blank=True, null=True,
-                    on_delete=django.db.models.deletion.PROTECT,
-                    related_name='not_readed_users',
-                    to='forum_comments.Comment',
-                    verbose_name='not readed comment')),
-                ('readed_comment', models.ForeignKey(
-                    on_delete=django.db.models.deletion.PROTECT,
-                    related_name='readed_users', to='forum_comments.Comment',
-                    verbose_name='readed comment')),
-                ('thread', models.ForeignKey(
-                    on_delete=django.db.models.deletion.PROTECT,
-                    related_name='read_marks', to='forum_threads.Thread',
-                    verbose_name='thread')),
-                ('user', models.ForeignKey(
-                    on_delete=django.db.models.deletion.PROTECT,
-                    related_name='forum_readed_threads',
-                    to=settings.AUTH_USER_MODEL, verbose_name='user')),
+                ('not_readed_comment_id', models.IntegerField(
+                    blank=True, null=True)),
+                ('readed_comment_id', models.IntegerField()),
+                ('thread', models.IntegerField(db_column='thread_id')),
+                ('user', models.IntegerField(db_column='user_id')),
             ],
             options={
                 'verbose_name': 'thread read mark',

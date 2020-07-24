@@ -18,32 +18,20 @@ class ThreadReadMark(models.Model):
 
     thread = models.ForeignKey(
         thread_models.Thread, models.PROTECT,
-        null=False,
-        blank=False,
+        null=False, blank=False,
         related_name='read_marks',
         verbose_name=_('thread'),
     )
     user = models.ForeignKey(
         User, models.PROTECT,
-        null=False,
-        blank=False,
+        null=False, blank=False,
         related_name='forum_readed_threads',
         verbose_name=_('user'),
     )
-    readed_comment = models.ForeignKey(
-        comment_models.Comment, models.PROTECT,
-        null=False,
-        blank=False,
-        related_name='readed_users',
-        verbose_name=_('readed comment'),
-    )
-    not_readed_comment = models.ForeignKey(
-        comment_models.Comment, models.PROTECT,
-        null=True,
-        blank=True,
-        related_name='not_readed_users',
-        verbose_name=_('not readed comment'),
-    )
+    readed_comment_id = models.IntegerField(null=False, blank=False)
+    not_readed_comment_id = models.IntegerField(
+        null=True, blank=True,
+        db_index=True)
 
 
 class CommentLike(models.Model):

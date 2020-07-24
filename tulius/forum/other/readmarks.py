@@ -59,12 +59,13 @@ class ReadmarkAPI(views.BaseThreadView):
             not_read = None
             read_id = thread.last_comment_id
         read_mark.readed_comment_id = read_id
-        read_mark.not_readed_comment = not_read
+        read_mark.not_readed_comment_id = not_read.pk if not_read else None
         read_mark.save()
         return read_mark
 
     @classmethod
-    def not_read_comment_json(cls, comment, user):
+    def not_read_comment_json(cls, comment_id, user):
+        comment = cls.comment_model.objects.get(pk=comment_id)
         return {
             'id': comment.id,
             'page_num': comment.page,
@@ -85,8 +86,8 @@ class ReadmarkAPI(views.BaseThreadView):
         return {
             'last_read_id': read_id,
             'not_read_comment': self.not_read_comment_json(
-                read_mark.not_readed_comment, self.user
-            ) if read_mark and read_mark.not_readed_comment else None
+                read_mark.not_readed_comment_id, self.user
+            ) if read_mark and read_mark.not_readed_comment_id else None
         }
 
     def delete(self, *args, **kwargs):
@@ -101,7 +102,7 @@ class ReadmarkAPI(views.BaseThreadView):
             'last_read_id': None,
             'not_read_comment':
                 self.not_read_comment_json(
-                    comment, self.user) if comment else None
+                    comment.pk, self.user) if comment else None
         }
 
     @classmethod
@@ -113,8 +114,8 @@ class ReadmarkAPI(views.BaseThreadView):
                 parent=thread, deleted=False, id__gt=comment.id).order_by('id')
             new_not_read = comments[0].id if comments else None
             cls.read_mark_model.objects.filter(
-                thread=thread, not_readed_comment=comment.pk
-            ).update(not_readed_comment=new_not_read)
+                thread=thread, not_readed_comment_id=comment.pk
+            ).update(not_readed_comment_id=new_not_read)
 
     @classmethod
     def after_add_comment(cls, comment, preview, view, **_kwargs):
@@ -122,12 +123,12 @@ class ReadmarkAPI(views.BaseThreadView):
             return
         if view.obj.first_comment_id != comment.id:
             cls.read_mark_model.objects.filter(
-                thread=view.obj, not_readed_comment=None
-            ).exclude(user=view.user).update(not_readed_comment=comment)
+                thread=view.obj, not_readed_comment_id=None
+            ).exclude(user=view.user).update(not_readed_comment_id=comment.pk)
         else:
             cls.read_mark_model(
-                user=view.user, thread=view.obj, readed_comment=comment,
-                not_readed_comment=None).save()
+                user=view.user, thread=view.obj, readed_comment_id=comment.pk,
+                not_readed_comment_id=None).save()
 
     @classmethod
     def on_prepare_room_list(cls, room, threads, view, **_kwargs):
@@ -212,14 +213,12 @@ class ReadmarkAPI(views.BaseThreadView):
                 thread=instance, user=view.user).first()
             if readmark:
                 last_read_id = readmark.readed_comment_id
-                if readmark.not_readed_comment:
+                if readmark.not_readed_comment_id:
                     not_read_comment = cls.not_read_comment_json(
-                        readmark.not_readed_comment, view.user)
+                        readmark.not_readed_comment_id, view.user)
             elif instance.first_comment_id:
-                comment = cls.comment_model.objects.get(
-                    pk=instance.first_comment_id)
                 not_read_comment = cls.not_read_comment_json(
-                    comment, view.user)
+                    instance.first_comment_id, view.user)
         response['last_read_id'] = last_read_id
         response['not_read_comment'] = not_read_comment
 

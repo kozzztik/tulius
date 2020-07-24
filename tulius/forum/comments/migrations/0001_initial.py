@@ -4,7 +4,6 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 import jsonfield.fields
-import mptt.fields
 import tulius.forum.comments.models
 
 
@@ -40,24 +39,12 @@ class Migration(migrations.Migration):
                     default=tulius.forum.comments.models.default_json)),
                 ('media', jsonfield.fields.JSONField(
                     default=tulius.forum.comments.models.default_json)),
-                ('editor', models.ForeignKey(
-                    blank=True, null=True,
-                    on_delete=django.db.models.deletion.PROTECT,
-                    related_name='forum_comments_edited',
-                    to=settings.AUTH_USER_MODEL, verbose_name='edited by')),
-                ('parent', mptt.fields.TreeForeignKey(
-                    on_delete=django.db.models.deletion.PROTECT,
-                    related_name='comments', to='forum_threads.Thread',
-                    verbose_name='thread')),
-                ('reply', models.ForeignKey(
-                    blank=True, null=True,
-                    on_delete=django.db.models.deletion.PROTECT,
-                    related_name='answers', to='forum_comments.Comment',
-                    verbose_name='reply to')),
-                ('user', models.ForeignKey(
-                    on_delete=django.db.models.deletion.PROTECT,
-                    related_name='forum_comments', to=settings.AUTH_USER_MODEL,
-                    verbose_name='author')),
+                ('editor', models.IntegerField(
+                    blank=True, null=True, db_column='editor_id')),
+                ('parent', models.IntegerField(db_column='parent_id')),
+                ('reply', models.IntegerField(
+                    blank=True, null=True, db_column='reply_id')),
+                ('user', models.IntegerField(db_column='user_id')),
             ],
             options={
                 'verbose_name': 'comment',

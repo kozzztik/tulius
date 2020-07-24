@@ -86,8 +86,8 @@ def migrate_data(apps, schema_editor):
                 pk=old_item.pk,
                 not_readed_comment_id=old_item.not_readed_comment_id,
                 readed_comment_id=old_item.readed_comment_id,
-                thread_id=old_item.thread_id,
-                user_id=old_item.user_id,
+                thread=old_item.thread_id,
+                user=old_item.user_id,
             )
             new_item.save(force_insert=True)
             count += 1

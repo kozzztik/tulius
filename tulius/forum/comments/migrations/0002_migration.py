@@ -27,10 +27,10 @@ def migrate_data(apps, schema_editor):
                 page=old_item.page,
                 data={},
                 media=old_item.media,
-                editor=old_item.editor,
-                parent_id=old_item.parent_id,
-                reply_id=old_item.reply_id,
-                user_id=old_item.user_id,
+                editor=old_item.editor_id,
+                parent=old_item.parent_id,
+                reply=old_item.reply_id,
+                user=old_item.user_id,
             )
             new_item.save(force_insert=True)
             count += 1
