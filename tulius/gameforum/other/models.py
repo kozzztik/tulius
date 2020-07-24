@@ -2,34 +2,15 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
 
-from tulius.forum.threads import models as thread_models
-from tulius.forum.comments import models as comment_models
+from tulius.forum.other import models as other_models
+from tulius.gameforum.threads import models as thread_models
+from tulius.gameforum.comments import models as comment_models
+
 
 User = get_user_model()
 
 
-class BaseThreadReadMark(models.Model):
-    """
-    Mark on thread, what last post was read
-    """
-    class Meta:
-        verbose_name = _('thread read mark')
-        verbose_name_plural = _('thread read marks')
-        abstract = True
-
-    user = models.ForeignKey(
-        User, models.PROTECT,
-        null=False, blank=False,
-        related_name='%(app_label)s_readed_threads',
-        verbose_name=_('user'),
-    )
-    readed_comment_id = models.IntegerField(null=False, blank=False)
-    not_readed_comment_id = models.IntegerField(
-        null=True, blank=True,
-        db_index=True)
-
-
-class ThreadReadMark(BaseThreadReadMark):
+class ThreadReadMark(other_models.BaseThreadReadMark):
     thread = models.ForeignKey(
         thread_models.Thread, models.PROTECT,
         null=False, blank=False,
@@ -47,7 +28,7 @@ class CommentLike(models.Model):
         User, models.PROTECT,
         null=False,
         blank=False,
-        related_name='liked_comments',
+        related_name='game_liked_comments',
         verbose_name=_('user'),
     )
     comment = models.ForeignKey(
@@ -70,7 +51,7 @@ class OnlineUser(models.Model):
         blank=False,
         null=False,
         verbose_name=_(u'user'),
-        related_name='forum_visit',
+        related_name='game_forum_visit',
     )
     visit_time = models.DateTimeField(
         auto_now_add=True,
@@ -107,7 +88,7 @@ class VotingVote(models.Model):
         null=False,
         blank=False,
         verbose_name=_(u'user'),
-        related_name='voting_votes',
+        related_name='game_voting_votes',
     )
     comment = models.ForeignKey(
         comment_models.Comment, models.PROTECT,

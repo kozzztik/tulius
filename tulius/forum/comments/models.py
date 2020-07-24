@@ -16,7 +16,7 @@ def default_json():
     return {}
 
 
-class Comment(models.Model):
+class BaseComment(models.Model):
     """
     Forum comment
     """
@@ -24,6 +24,7 @@ class Comment(models.Model):
         verbose_name = _('comment')
         verbose_name_plural = _('comments')
         ordering = ['id']
+        abstract = True
 
     title = models.CharField(
         max_length=255,
@@ -35,25 +36,18 @@ class Comment(models.Model):
         verbose_name=_('body')
     )
 
-    parent = mptt_models.TreeForeignKey(
-        thread_models.Thread, models.PROTECT,
-        null=False,
-        blank=False,
-        related_name='comments',
-        verbose_name=_('thread')
-    )
     user = models.ForeignKey(
         User, models.PROTECT,
         null=False,
         blank=False,
-        related_name='forum_comments',
+        related_name='%(app_label)s',
         verbose_name=_('author')
     )
     editor = models.ForeignKey(
         User, models.PROTECT,
         null=True,
         blank=True,
-        related_name='forum_comments_edited',
+        related_name='%(app_label)s_edited',
         verbose_name=_('edited by')
     )
     create_time = models.DateTimeField(
@@ -99,13 +93,24 @@ class Comment(models.Model):
         return self.pk == self.parent.first_comment_id
 
 
-class CommentDeleteMark(models.Model):
+class Comment(BaseComment):
+    parent = mptt_models.TreeForeignKey(
+        thread_models.Thread, models.PROTECT,
+        null=False,
+        blank=False,
+        related_name='comments',
+        verbose_name=_('thread')
+    )
+
+
+class BaseCommentDeleteMark(models.Model):
     class Meta:
         verbose_name = _(u'comment delete mark')
         verbose_name_plural = _(u'comments delete marks')
+        abstract = True
 
     comment = models.ForeignKey(
-        Comment, models.PROTECT,
+        'Comment', models.PROTECT,
         blank=False,
         null=False,
         verbose_name=_(u'comment'),
@@ -116,7 +121,7 @@ class CommentDeleteMark(models.Model):
         blank=False,
         null=False,
         verbose_name=_(u'user'),
-        related_name='comments_delete_marks',
+        related_name='%(app_label)s_delete_marks',
     )
     description = models.TextField(
         verbose_name=_(u'description'),
@@ -136,3 +141,7 @@ class CommentDeleteMark(models.Model):
         return _("%(post)s deleted by %(user)s at %(time)s") % {
             'post': str(self.comment), 'user': str(self.user),
             'time': self.delete_time}
+
+
+class CommentDeleteMark(BaseCommentDeleteMark):
+    pass

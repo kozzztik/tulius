@@ -53,7 +53,7 @@ def default_json():
     return {}
 
 
-class Thread(mptt_models.MPTTModel):
+class BaseThread(mptt_models.MPTTModel):
     """
     Forum thread
     """
@@ -61,6 +61,7 @@ class Thread(mptt_models.MPTTModel):
         verbose_name = _('thread')
         verbose_name_plural = _('threads')
         ordering = ['id']
+        abstract = True
 
     objects = ThreadManager()
 
@@ -82,7 +83,7 @@ class Thread(mptt_models.MPTTModel):
     )
     user = models.ForeignKey(
         User, models.PROTECT,
-        related_name='forum_threads',
+        related_name='%(app_label)s',
         verbose_name=_('author')
     )
     access_type = models.SmallIntegerField(
@@ -146,6 +147,10 @@ class Thread(mptt_models.MPTTModel):
         return (self.rght - self.lft - 1) / 2
 
 
+class Thread(BaseThread):
+    pass
+
+
 class ThreadCollapseStatus(models.Model):
     """
     Collapsing status saver
@@ -176,13 +181,14 @@ class ThreadCollapseStatus(models.Model):
     )
 
 
-class ThreadDeleteMark(models.Model):
+class BaseThreadDeleteMark(models.Model):
     class Meta:
         verbose_name = _(u'thread delete mark')
         verbose_name_plural = _(u'threads delete marks')
+        abstract = True
 
     thread = models.ForeignKey(
-        Thread, models.PROTECT,
+        'Thread', models.PROTECT,
         blank=False, null=False,
         verbose_name=_(u'thread'),
         related_name='delete_marks',
@@ -191,7 +197,7 @@ class ThreadDeleteMark(models.Model):
         User, models.PROTECT,
         blank=False, null=False,
         verbose_name=_(u'user'),
-        related_name='thread_delete_marks',
+        related_name='%(app_label)s_delete_marks',
     )
     description = models.TextField(
         verbose_name=_(u'description'),
@@ -212,3 +218,7 @@ class ThreadDeleteMark(models.Model):
         return _("%(post)s deleted by %(user)s at %(time)s") % \
                {'post': str(self.thread), 'user': str(self.user),
                 'time': self.delete_time}
+
+
+class ThreadDeleteMark(BaseThreadDeleteMark):
+    pass
