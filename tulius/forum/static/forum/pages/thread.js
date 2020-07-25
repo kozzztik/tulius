@@ -25,6 +25,7 @@ export default LazyComponent('forum_thread_page', {
                 return;
             return axios.get(this.urls.thread_api(route.params.id)
             ).then(response => {
+                response.data.online_ids = this.thread.online_ids;
                 this.thread = response.data;
                 this.breadcrumbs = this.$parent.thread_breadcrumbs(this.thread);
                 this.loading = false;
