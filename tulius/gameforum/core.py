@@ -1,14 +1,15 @@
-from tulius.forum import models
-from tulius.gameforum import consts
+from tulius.forum.threads import models as forum_models
+from tulius.gameforum.threads import models
 from tulius.gameforum import models as game_forum_models
+from tulius.gameforum.comments import models as comment_models
 
 
 def create_game_forum(user, variation):
     title = variation.game.name if variation.game else variation.name
     thread = models.Thread(
         title=title, user=user,
-        access_type=models.THREAD_ACCESS_TYPE_OPEN,
-        room=True, plugin_id=consts.GAME_FORUM_SITE_ID)
+        access_type=forum_models.THREAD_ACCESS_TYPE_OPEN,
+        room=True)
     thread.save()
     return thread
 
@@ -22,12 +23,12 @@ def copy_game_post(thread, new_parent, variation, role_links):
         body=old_thread.body, room=old_thread.room, user=old_thread.user,
         access_type=old_thread.access_type,
         create_time=old_thread.create_time, closed=old_thread.closed,
-        important=old_thread.important, plugin_id=consts.GAME_FORUM_SITE_ID,
+        important=old_thread.important,
         media=old_thread.media,
     )
-    role_id = old_thread.data1
+    role_id = old_thread.role_id
     if role_id and (role_id in role_links):
-        thread.data1 = role_links[role_id].id
+        thread.role_id = role_links[role_id].id
     thread.save()
     if not new_parent:
         variation.thread = thread
@@ -44,20 +45,19 @@ def copy_game_post(thread, new_parent, variation, role_links):
 
     if not old_thread.room:
         first_comment = None
-        sub_comments = models.Comment.objects.filter(
+        sub_comments = comment_models.Comment.objects.filter(
             parent=old_thread, deleted=False)
         for comment in sub_comments:
-            new_comment = models.Comment(
+            new_comment = comment_models.Comment(
                 parent=thread, title=comment.title, body=comment.body,
-                plugin_id=consts.GAME_FORUM_SITE_ID,
                 user=comment.user, create_time=comment.create_time,
                 media=comment.media)
             new_comment.reply_id = first_comment
-            if comment.data1 and (comment.data1 in role_links):
-                new_comment.data1 = role_links[comment.data1].id
+            if comment.role_id and (comment.role_id in role_links):
+                new_comment.role_id = role_links[comment.role_id].id
             new_comment.save()
             if not first_comment:
-                first_comment = new_comment.id
+                first_comment = new_comment.pk
     return thread
 
 

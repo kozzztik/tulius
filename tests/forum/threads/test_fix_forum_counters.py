@@ -1,6 +1,6 @@
 import pytest
 
-from tulius.forum import models
+from tulius.forum.threads import models
 from tulius.forum.threads import signals
 
 

@@ -1,12 +1,10 @@
-from tulius.forum import models
 from tulius.forum.other import sitemap
 from tulius.stories import models as stories_models
 from tulius.games import models as games_models
-from tulius.gameforum import consts
+from tulius.gameforum.threads import models
 
 
 class GameForumSitemap(sitemap.ForumSitemap):
-    plugin_id = consts.GAME_FORUM_SITE_ID
     thread_model = models.Thread
 
     def iterate_games(self):

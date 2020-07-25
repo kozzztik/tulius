@@ -1,4 +1,4 @@
-from tulius.forum import models
+from tulius.forum.threads import models
 from tulius.forum.comments import signals
 
 
@@ -239,7 +239,7 @@ def test_broken_last_comment(room_group, thread, user):
     assert 'last_comment' not in data['threads'][0]
 
 
-def _my_receiver(sender, comment, **kwargs):
+def _my_receiver(comment, **_kwargs):
     comment.media['bar'] = 'foo'
     return True
 
@@ -251,7 +251,7 @@ def test_after_update_saves_comment(thread, user):
         response = user.post(
             thread['url'] + 'comments_page/', {
                 'reply_id': thread['first_comment_id'],
-                'title': 'hohoho', 'body': 'happy new year',
+                'title': 'ho ho ho', 'body': 'happy new year',
                 'media': {},
             })
     finally:

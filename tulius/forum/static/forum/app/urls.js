@@ -29,6 +29,7 @@ export default {
         name: 'fix_counters',
         params: { id: thread_id },
     }),
+    likes_api: '/api/forum/likes/',
     thread_api: pk => `/api/forum/thread/${pk}/`,
     thread_move_api: pk => `/api/forum/thread/${pk}/move/`,
     thread_fix_api: pk => `/api/forum/thread/${pk}/fix/`,

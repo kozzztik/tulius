@@ -2,11 +2,11 @@ from django.conf import urls
 
 from tulius.gameforum import views
 from tulius.gameforum.threads import views as threads
-from tulius.gameforum import other
 from tulius.gameforum import online_status
 from tulius.gameforum.comments import views as comments
 from tulius.gameforum.rights import views as rights_api
 from tulius.gameforum.other import trust_marks
+from tulius.gameforum.other import views as other
 
 
 app_name = 'tulius.gameforum'
@@ -24,6 +24,9 @@ urlpatterns = [
     urls.url(
         r'^variation/(?P<variation_id>\d+)/$',
         views.VariationAPI.as_view(), name='variation'),
+    urls.url(
+        r'^variation/(?P<variation_id>\d+)/likes/$',
+        other.Likes.as_view(), name='likes'),
     urls.url(
         r'^variation/(?P<variation_id>\d+)/trust_mark/(?P<role_id>\d+)/$',
         trust_marks.TrustMarkAPI.as_view(), name='trust_mark'),

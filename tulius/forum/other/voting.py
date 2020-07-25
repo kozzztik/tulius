@@ -1,16 +1,17 @@
 import json
 
 from django import http
-from django import dispatch
 from django.core import exceptions
 from django.db import transaction
 from django.utils import html
 
 from tulius.core.ckeditor import html_converter
-from tulius.forum import models
+from tulius.forum.other import models
+from tulius.forum.threads import models as thread_models
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.comments import signals as comment_signals
 from tulius.forum.comments import views
+from tulius.forum.comments import models as comment_models
 from djfw.wysibb.templatetags import bbcodes
 
 
@@ -103,7 +104,7 @@ class VotingAPI(views.CommentBase):
         return data
 
     @classmethod
-    def on_comment_to_json(cls, _, comment, data, view, **_kwargs):
+    def on_comment_to_json(cls, comment, data, view, **_kwargs):
         v = comment.media.get('voting')
         if v:
             data['media']['voting'] = cls.user_voting_data(
@@ -117,7 +118,7 @@ class VotingAPI(views.CommentBase):
                 v, view.user, instance.first_comment_id)
 
     @classmethod
-    def on_before_add_comment(cls, _, comment, data, view, **_kwargs):
+    def on_before_add_comment(cls, comment, data, view, **_kwargs):
         voting_data = data['media'].get('voting')
         if not voting_data:
             return
@@ -127,7 +128,7 @@ class VotingAPI(views.CommentBase):
             view.obj.media['voting'] = voting
 
     @classmethod
-    def on_comment_update(cls, _, comment, data, view, **_kwargs):
+    def on_comment_update(cls, comment, data, view, **_kwargs):
         voting_data = data['media'].get('voting')
         if not voting_data:
             return
@@ -146,39 +147,9 @@ class VotingAPI(views.CommentBase):
             view.obj.media['voting'] = orig_data
 
 
-@dispatch.receiver(comment_signals.to_json)
-def tmp_comment_to_json_plugin_filter(sender, comment, data, view, **kwargs):
-    # TODO this func will be removed with plugin_id field cleanup
-    # it will use signals "sender" field
-    if view.obj.plugin_id:
-        return None
-    return VotingAPI.on_comment_to_json(sender, comment, data, view, **kwargs)
-
-
-@dispatch.receiver(thread_signals.to_json)
-def tmp_thread_view_plugin_filter(instance, response, view, **kwargs):
-    # TODO this func will be removed with plugin_id field cleanup
-    # it will use signals "sender" field
-    if instance.plugin_id:
-        return None
-    return VotingAPI.on_thread_to_json(instance, response, view, **kwargs)
-
-
-@dispatch.receiver(comment_signals.before_add)
-def tmp_on_before_add_comment_plugin_filter(
-        sender, comment, data, view, **kwargs):
-    # TODO this func will be removed with plugin_id field cleanup
-    # it will use signals "sender" field
-    if view.obj.plugin_id:
-        return None
-    return VotingAPI.on_before_add_comment(
-        sender, comment, data, view, **kwargs)
-
-
-@dispatch.receiver(comment_signals.on_update)
-def tmp_on_comment_update_plugin_filter(sender, comment, data, view, **kwargs):
-    # TODO this func will be removed with plugin_id field cleanup
-    # it will use signals "sender" field
-    if view.obj.plugin_id:
-        return None
-    return VotingAPI.on_comment_update(sender, comment, data, view, **kwargs)
+comment_signals.to_json.connect(
+    VotingAPI.on_comment_to_json, sender=comment_models.Comment)
+thread_signals.to_json.connect(
+    VotingAPI.on_thread_to_json, sender=thread_models.Thread)
+comment_signals.before_add.connect(VotingAPI.on_before_add_comment)
+comment_signals.on_update.connect(VotingAPI.on_comment_update)

@@ -2,10 +2,12 @@ import json
 
 from django import dispatch
 
-from tulius.forum import models
+from tulius.forum.other import models
 from tulius.forum.comments import signals as comment_signals
+from tulius.forum.threads import models as thread_models
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.threads import views
+from tulius.forum.comments import models as comment_models
 
 
 @dispatch.receiver(thread_signals.room_to_json)
@@ -25,14 +27,13 @@ def room_to_json(instance, response, view, **_kwargs):
 class ReadmarkAPI(views.BaseThreadView):
     require_user = True
     read_mark_model = models.ThreadReadMark
-    comment_model = models.Comment
+    comment_model = comment_models.Comment
 
     def mark_room_as_read(self, room, room_rights):
         if room:
             threads = room.get_children()
         else:
-            threads = self.thread_model.objects.filter(
-                parent=None, plugin_id=self.plugin_id)
+            threads = self.thread_model.objects.filter(parent=None)
         threads = {
             thread: self._get_rights_checker(
                 thread, parent_rights=room_rights).get_rights()
@@ -46,24 +47,25 @@ class ReadmarkAPI(views.BaseThreadView):
                 self.mark_thread_as_read(thread, None)
 
     def mark_thread_as_read(self, thread, read_id):
-        read_mark = models.ThreadReadMark.objects.filter(
+        read_mark = self.read_mark_model.objects.filter(
             thread=thread, user=self.user).first()
         if not read_mark:
-            read_mark = models.ThreadReadMark(thread=thread, user=self.user)
+            read_mark = self.read_mark_model(thread=thread, user=self.user)
         if read_id:
-            not_read = models.Comment.objects.filter(
+            not_read = self.comment_model.objects.filter(
                 parent=thread, id__gt=read_id, deleted=False
             ).exclude(user=self.user).order_by('id').first()
         else:
             not_read = None
             read_id = thread.last_comment_id
         read_mark.readed_comment_id = read_id
-        read_mark.not_readed_comment = not_read
+        read_mark.not_readed_comment_id = not_read.pk if not_read else None
         read_mark.save()
         return read_mark
 
     @classmethod
-    def not_read_comment_json(cls, comment, user):
+    def not_read_comment_json(cls, comment_id, user):
+        comment = cls.comment_model.objects.get(pk=comment_id)
         return {
             'id': comment.id,
             'page_num': comment.page,
@@ -84,22 +86,23 @@ class ReadmarkAPI(views.BaseThreadView):
         return {
             'last_read_id': read_id,
             'not_read_comment': self.not_read_comment_json(
-                read_mark.not_readed_comment, self.user
-            ) if read_mark and read_mark.not_readed_comment else None
+                read_mark.not_readed_comment_id, self.user
+            ) if read_mark and read_mark.not_readed_comment_id else None
         }
 
     def delete(self, *args, **kwargs):
         self.get_parent_thread(**kwargs)
-        models.ThreadReadMark.objects.filter(
+        self.read_mark_model.objects.filter(
             thread=self.obj, user=self.user).delete()
         comment = None
         if self.obj.first_comment_id:
-            comment = models.Comment.objects.get(pk=self.obj.first_comment_id)
+            comment = self.comment_model.objects.get(
+                pk=self.obj.first_comment_id)
         return {
             'last_read_id': None,
             'not_read_comment':
                 self.not_read_comment_json(
-                    comment, self.user) if comment else None
+                    comment.pk, self.user) if comment else None
         }
 
     @classmethod
@@ -111,8 +114,8 @@ class ReadmarkAPI(views.BaseThreadView):
                 parent=thread, deleted=False, id__gt=comment.id).order_by('id')
             new_not_read = comments[0].id if comments else None
             cls.read_mark_model.objects.filter(
-                thread=thread, not_readed_comment=comment.pk
-            ).update(not_readed_comment=new_not_read)
+                thread=thread, not_readed_comment_id=comment.pk
+            ).update(not_readed_comment_id=new_not_read)
 
     @classmethod
     def after_add_comment(cls, comment, preview, view, **_kwargs):
@@ -120,12 +123,12 @@ class ReadmarkAPI(views.BaseThreadView):
             return
         if view.obj.first_comment_id != comment.id:
             cls.read_mark_model.objects.filter(
-                thread=view.obj, not_readed_comment=None
-            ).exclude(user=view.user).update(not_readed_comment=comment)
+                thread=view.obj, not_readed_comment_id=None
+            ).exclude(user=view.user).update(not_readed_comment_id=comment.pk)
         else:
             cls.read_mark_model(
-                user=view.user, thread=view.obj, readed_comment=comment,
-                not_readed_comment=None).save()
+                user=view.user, thread=view.obj, readed_comment_id=comment.pk,
+                not_readed_comment_id=None).save()
 
     @classmethod
     def on_prepare_room_list(cls, room, threads, view, **_kwargs):
@@ -210,58 +213,23 @@ class ReadmarkAPI(views.BaseThreadView):
                 thread=instance, user=view.user).first()
             if readmark:
                 last_read_id = readmark.readed_comment_id
-                if readmark.not_readed_comment:
+                if readmark.not_readed_comment_id:
                     not_read_comment = cls.not_read_comment_json(
-                        readmark.not_readed_comment, view.user)
+                        readmark.not_readed_comment_id, view.user)
             elif instance.first_comment_id:
-                comment = cls.comment_model.objects.get(
-                    pk=instance.first_comment_id)
                 not_read_comment = cls.not_read_comment_json(
-                    comment, view.user)
+                    instance.first_comment_id, view.user)
         response['last_read_id'] = last_read_id
         response['not_read_comment'] = not_read_comment
 
 
-@dispatch.receiver(comment_signals.on_delete)
-def tmp_on_comment_delete_plugin_filter(sender, comment, view, **kwargs):
-    # TODO this func will be removed with plugin_id field cleanup
-    # it will use signals "sender" field
-    if comment.plugin_id:
-        return None
-    return ReadmarkAPI.on_delete_comment(sender, comment, view, **kwargs)
-
-
-@dispatch.receiver(comment_signals.after_add)
-def tmp_on_after_add_comment_plugin_filter(comment, preview, view, **kwargs):
-    # TODO this func will be removed with plugin_id field cleanup
-    # it will use signals "sender" field
-    if comment.plugin_id:
-        return None
-    return ReadmarkAPI.after_add_comment(comment, preview, view, **kwargs)
-
-
-@dispatch.receiver(thread_signals.prepare_room)
-def tmp_on_prepare_room_plugin_filter(room, threads, view, **_kwargs):
-    # TODO this func will be removed with plugin_id field cleanup
-    # it will use signals "sender" field
-    if room.plugin_id:
-        return None
-    return ReadmarkAPI.on_prepare_room_list(room, threads, view, **_kwargs)
-
-
-@dispatch.receiver(thread_signals.prepare_threads)
-def tmp_on_prepare_threads_plugin_filter(threads, view, **kwargs):
-    # TODO this func will be removed with plugin_id field cleanup
-    # it will use signals "sender" field
-    if view.plugin_id:
-        return None
-    return ReadmarkAPI.on_thread_prepare_thread(threads, view, **kwargs)
-
-
-@dispatch.receiver(thread_signals.to_json)
-def tmp_on_thread_to_json_plugin_filter(instance, view, response, **kwargs):
-    # TODO this func will be removed with plugin_id field cleanup
-    # it will use signals "sender" field
-    if instance.plugin_id:
-        return None
-    return ReadmarkAPI.on_thread_to_json(instance, view, response, **kwargs)
+comment_signals.on_delete.connect(
+    ReadmarkAPI.on_delete_comment, sender=comment_models.Comment)
+comment_signals.after_add.connect(
+    ReadmarkAPI.after_add_comment, sender=comment_models.Comment)
+thread_signals.prepare_room.connect(
+    ReadmarkAPI.on_prepare_room_list, sender=thread_models.Thread)
+thread_signals.prepare_threads.connect(
+    ReadmarkAPI.on_thread_prepare_thread, sender=thread_models.Thread)
+thread_signals.to_json.connect(
+    ReadmarkAPI.on_thread_to_json, sender=thread_models.Thread)

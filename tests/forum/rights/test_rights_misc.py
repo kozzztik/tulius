@@ -1,5 +1,6 @@
-from tulius.forum import models
+from tulius.forum.threads import models
 from tulius.forum.rights import default
+from tulius.forum.rights import models as rights_models
 
 
 def test_limited_read(room_group, thread, superuser, admin, user):
@@ -14,7 +15,7 @@ def test_limited_read(room_group, thread, superuser, admin, user):
     response = superuser.post(
         room_group['url'] + 'granted_rights/', {
             'user': {'id': admin.user.pk},
-            'access_level': models.THREAD_ACCESS_MODERATOR
+            'access_level': rights_models.THREAD_ACCESS_MODERATOR
         }
     )
     assert response.status_code == 200

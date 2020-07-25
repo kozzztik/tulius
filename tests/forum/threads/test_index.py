@@ -1,4 +1,5 @@
-from tulius.forum import models
+from tulius.forum.threads import models
+from tulius.forum.rights import models as right_models
 
 
 def test_index(client, superuser, admin, user):
@@ -30,7 +31,7 @@ def test_index(client, superuser, admin, user):
             'room': True, 'access_type': models.THREAD_ACCESS_TYPE_NO_WRITE,
             'granted_rights': [{
                 'user': {'id': admin.user.pk},
-                'access_level': models.THREAD_ACCESS_WRITE}]})
+                'access_level': right_models.THREAD_ACCESS_WRITE}]})
     assert response.status_code == 200
     group2 = response.json()
     response = superuser.put(
@@ -39,7 +40,7 @@ def test_index(client, superuser, admin, user):
             'room': True, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ,
             'granted_rights': [{
                 'user': {'id': admin.user.pk},
-                'access_level': models.THREAD_ACCESS_READ}]})
+                'access_level': right_models.THREAD_ACCESS_READ}]})
     assert response.status_code == 200
     group3 = response.json()
     #
@@ -57,7 +58,7 @@ def test_index(client, superuser, admin, user):
             'room': True, 'access_type': models.THREAD_ACCESS_TYPE_OPEN,
             'granted_rights': [{
                 'user': {'id': admin.user.pk},
-                'access_level': models.THREAD_ACCESS_READ}]})
+                'access_level': right_models.THREAD_ACCESS_READ}]})
     assert response.status_code == 200
     room1 = response.json()
     response = admin.put(
@@ -98,7 +99,6 @@ def test_index(client, superuser, admin, user):
             'room': False, 'access_type': 0, 'media': {},
             'granted_rights': []})
     assert response.status_code == 200
-    thread1 = response.json()
     #
     # again superuser
     #
