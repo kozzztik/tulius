@@ -65,40 +65,33 @@ class Search(search.Search, base.VariationMixin):
         return comments
 
 
-class Likes(likes.Likes):
+class Likes(likes.Likes, comments_api.CommentsBase):
     like_model = other_models.CommentLike
-    comment_model = comment_models.Comment
+
+    def create_like(self):
+        like = super(Likes, self).create_like()
+        # pylint: disable=E1137
+        like.data['variation'] = {
+            'id': self.variation.pk, 'name': self.variation.name}
+        return like
 
 
 class Favorites(likes.Favorites):
-    comments_class = comments_api.CommentAPI
     like_model = other_models.CommentLike
-    variations = None
-
-    def get_view(self, comment):
-        view = super(Favorites, self).get_view(comment)
-        tree_id = view.comment.parent.tree_id
-        self.variations = self.variations or {}
-        if tree_id not in self.variations:
-            variation = story_models.Variation.objects.get(
-                thread__tree_id=tree_id)
-            self.variations[tree_id] = variation
-        view.variation = self.variations[tree_id]
-        return view
 
     @staticmethod
-    def comments_to_json(view_objects):
+    def like_data_to_json(likes_data):
         variations = {}
-        for api in view_objects:
-            variations.setdefault(api.variation, [])
-            variations[api.variation].append(api)
+        for data in likes_data:
+            variation_id = data['variation']['id']
+            variations.setdefault(variation_id, {
+                'name': data['variation']['name'],
+                'items': []})
+            variations[variation_id]['items'].append(data)
         return {
             'groups': [{
-                'name': variation.name,
-                'variation_id': variation.pk,
-                'items':  [{
-                    'comment': api.comment_to_json(api.comment),
-                    'thread': api.obj_to_json(),
-                } for api in items]
-            } for variation, items in variations.items()]
+                'name': data['name'],
+                'variation_id': variation_id,
+                'items': data['items'],
+            } for variation_id, data in variations.items()]
         }

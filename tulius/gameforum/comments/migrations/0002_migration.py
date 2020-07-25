@@ -31,8 +31,8 @@ def migrate_data(apps, schema_editor):
                 parent=old_item.parent_id,
                 reply=old_item.reply_id,
                 user=old_item.user_id,
-                role_id=old_thread.data1,
-                edit_role_id=old_thread.data2,
+                role_id=old_item.data1,
+                edit_role_id=old_item.data2,
             )
             new_item.save(force_insert=True)
             count += 1

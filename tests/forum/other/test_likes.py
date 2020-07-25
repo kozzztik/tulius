@@ -80,6 +80,18 @@ def test_rights_check_in_favorites(thread, user, superuser):
         }
     )
     assert response.status_code == 200
+    # check we can double like
+    response = user.post(
+        f'/api/forum/likes/', {'id': comment_id, 'value': True})
+    assert response.status_code == 200
+    # check we still can remove like
+    response = user.post(
+        f'/api/forum/likes/', {'id': comment_id, 'value': False})
+    assert response.status_code == 200
+    # but not set it back
+    response = user.post(
+        f'/api/forum/likes/', {'id': comment_id, 'value': True})
+    assert response.status_code == 403
     # check favorites
     response = user.get(f'/api/forum/favorites/')
     assert response.status_code == 200
@@ -92,10 +104,6 @@ def test_liking_not_existing_comment(thread, user):
     # set like mark for not created comment
     response = user.post(
         f'/api/forum/likes/', {'id': comment_id + 1, 'value': True})
-    assert response.status_code == 404
-    # set like mark for incorrect id
-    response = user.post(
-        f'/api/forum/likes/', {'id': 'foo', 'value': True})
     assert response.status_code == 404
 
 

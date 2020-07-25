@@ -24,7 +24,7 @@ def test_game_favorites(game, variation_forum, user, admin, detective):
     assert data['groups'] == []
     # do like
     response = user.post(
-        '/api/game_forum/likes/',
+        base_url + 'likes/',
         {'id': thread['first_comment_id'], 'value': True})
     assert response.status_code == 200
     # check favorites again

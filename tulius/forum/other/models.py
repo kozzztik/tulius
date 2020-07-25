@@ -1,6 +1,9 @@
+import typing
+
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
+import jsonfield
 
 from tulius.forum.threads import models as thread_models
 from tulius.forum.comments import models as comment_models
@@ -8,7 +11,7 @@ from tulius.forum.comments import models as comment_models
 User = get_user_model()
 
 
-class BaseThreadReadMark(models.Model):
+class AbstractThreadReadMark(models.Model):
     """
     Mark on thread, what last post was read
     """
@@ -29,7 +32,7 @@ class BaseThreadReadMark(models.Model):
         db_index=True)
 
 
-class ThreadReadMark(BaseThreadReadMark):
+class ThreadReadMark(AbstractThreadReadMark):
     thread = models.ForeignKey(
         thread_models.Thread, models.PROTECT,
         null=False, blank=False,
@@ -38,10 +41,17 @@ class ThreadReadMark(BaseThreadReadMark):
     )
 
 
-class CommentLike(models.Model):
+def default_json():
+    return {}
+
+
+class AbstractCommentLike(models.Model):
     class Meta:
         verbose_name = _('comment like')
         verbose_name_plural = _('comments likes')
+        abstract = True
+
+    objects = models.Manager()  # linter, be happy
 
     user = models.ForeignKey(
         User, models.PROTECT,
@@ -57,6 +67,11 @@ class CommentLike(models.Model):
         related_name='liked',
         verbose_name=_('comment'),
     )
+    data: typing.Dict = jsonfield.JSONField(default=default_json)
+
+
+class CommentLike(AbstractCommentLike):
+    pass
 
 
 class OnlineUser(models.Model):
@@ -88,7 +103,7 @@ class OnlineUser(models.Model):
         return str(self.user)
 
 
-class VotingVote(models.Model):
+class AbstractVotingVote(models.Model):
     """
     Voting choice
     """
@@ -96,6 +111,7 @@ class VotingVote(models.Model):
         verbose_name = _('voting vote')
         verbose_name_plural = _('voting votes')
         unique_together = ('user', 'comment')
+        abstract = True
 
     choice = models.IntegerField(
         blank=False,
@@ -119,3 +135,7 @@ class VotingVote(models.Model):
 
     def __str__(self):
         return f'{self.comment.title} - {self.choice}({self.user})'
+
+
+class VotingVote(AbstractVotingVote):
+    pass

@@ -41,7 +41,7 @@ export default LazyComponent('forum_comment', {
         do_like() {
             var old_value = this.comment.is_liked;
             this.comment.is_liked = null;
-            axios.post('/api/forum/likes/',
+            axios.post(this.urls.likes_api,
                 {id: this.comment.id, value: !old_value}
             ).then(response => {
                 old_value = response.data.value;

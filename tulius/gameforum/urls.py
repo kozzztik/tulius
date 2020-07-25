@@ -16,9 +16,6 @@ urlpatterns = [
         r'^favorites/$',
         other.Favorites.as_view(), name='favorites'),
     urls.url(
-        r'^likes/$',
-        other.Likes.as_view(), name='likes'),
-    urls.url(
         r'^thread_redirrect/(?P<pk>\d+)/$',
         views.RedirrectAPI.as_view(), name='thread_redirect'),
     urls.url(
@@ -27,6 +24,9 @@ urlpatterns = [
     urls.url(
         r'^variation/(?P<variation_id>\d+)/$',
         views.VariationAPI.as_view(), name='variation'),
+    urls.url(
+        r'^variation/(?P<variation_id>\d+)/likes/$',
+        other.Likes.as_view(), name='likes'),
     urls.url(
         r'^variation/(?P<variation_id>\d+)/trust_mark/(?P<role_id>\d+)/$',
         trust_marks.TrustMarkAPI.as_view(), name='trust_mark'),

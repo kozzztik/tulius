@@ -10,7 +10,7 @@ from tulius.gameforum.comments import models as comment_models
 User = get_user_model()
 
 
-class ThreadReadMark(other_models.BaseThreadReadMark):
+class ThreadReadMark(other_models.AbstractThreadReadMark):
     thread = models.ForeignKey(
         thread_models.Thread, models.PROTECT,
         null=False, blank=False,
@@ -19,11 +19,7 @@ class ThreadReadMark(other_models.BaseThreadReadMark):
     )
 
 
-class CommentLike(models.Model):
-    class Meta:
-        verbose_name = _('comment like')
-        verbose_name_plural = _('comments likes')
-
+class CommentLike(other_models.AbstractCommentLike):
     user = models.ForeignKey(
         User, models.PROTECT,
         null=False,
@@ -69,20 +65,10 @@ class OnlineUser(models.Model):
         return str(self.user)
 
 
-class VotingVote(models.Model):
+class VotingVote(other_models.AbstractVotingVote):
     """
     Voting choice
     """
-    class Meta:
-        verbose_name = _('voting vote')
-        verbose_name_plural = _('voting votes')
-        unique_together = ('user', 'comment')
-
-    choice = models.IntegerField(
-        blank=False,
-        null=False,
-        verbose_name=_('choice')
-    )
     user = models.ForeignKey(
         User, models.PROTECT,
         null=False,
@@ -97,6 +83,3 @@ class VotingVote(models.Model):
         related_name='votes',
         verbose_name=_(u'comment'),
     )
-
-    def __str__(self):
-        return f'{self.comment.title} - {self.choice}({self.user})'
