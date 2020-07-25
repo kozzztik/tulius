@@ -5,8 +5,7 @@ from PIL import Image, ImageDraw
 from django.core.files import uploadedfile
 
 from tulius.stories import models
-from tulius.forum import models as forum_models
-from tulius.gameforum import consts
+from tulius.gameforum.threads import models as thread_models
 from tulius.games import models as game_models
 
 
@@ -71,9 +70,8 @@ def variation_fixture(story):
 
 @pytest.fixture(name='variation_forum')
 def variation_forum_fixture(variation, admin):
-    thread = forum_models.Thread(
-        parent=None, plugin_id=consts.GAME_FORUM_SITE_ID,
-        user=admin.user, title=variation.name, body='', room=True)
+    thread = thread_models.Thread(
+        parent=None, user=admin.user, title=variation.name, body='', room=True)
     thread.save()
     variation.thread = thread
     variation.save()

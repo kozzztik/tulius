@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 
 from djfw.common import CREATION_YEAR_CHOICES
 from djfw.sortable.models import SortableModelMixin
-from tulius.forum.models import Thread
+from tulius.gameforum.threads import models as thread_models
 
 
 User = get_user_model()
@@ -353,7 +353,7 @@ class Variation(SortableModelMixin):
     )
 
     thread = models.ForeignKey(
-        Thread, models.PROTECT,
+        thread_models.Thread, models.PROTECT,
         verbose_name=_(u'new forum'),
         related_name='variations',
         blank=True,

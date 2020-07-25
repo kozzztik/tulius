@@ -11,7 +11,6 @@ class CountersFix(core.BaseAPIView):
     thread_model = models.Thread
     result = None
     notify_user = True
-    plugin_id = None
 
     def process_thread(self, thread, with_descendants):
         thread_calls = signals.on_fix_counters.send(

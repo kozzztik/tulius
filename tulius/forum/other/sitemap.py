@@ -6,7 +6,6 @@ from tulius.forum.threads import models
 class ForumSitemap(sitemaps.Sitemap):
     changefreq = "daily"
     priority = 0.5
-    plugin_id = None
     thread_model = models.Thread
 
     def iterate_threads(self, parent):

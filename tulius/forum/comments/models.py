@@ -26,6 +26,8 @@ class BaseComment(models.Model):
         ordering = ['id']
         abstract = True
 
+    objects = models.Manager()  # linters don't worry, be happy
+
     title = models.CharField(
         max_length=255,
         unique=False,

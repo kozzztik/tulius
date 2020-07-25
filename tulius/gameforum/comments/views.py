@@ -5,12 +5,12 @@ from django.db import models as dj_models
 from django.utils import html
 from djfw.wysibb.templatetags import bbcodes
 
-from tulius.forum import models
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.comments import signals as comment_signals
 from tulius.stories import models as stories_models
-from tulius.gameforum import consts
+from tulius.gameforum.threads import models as thread_models
 from tulius.gameforum.threads import views as threads
+from tulius.gameforum.comments import models as comment_models
 from tulius.forum.comments import views as comments
 
 
@@ -30,9 +30,9 @@ def validate_image_data(variation, images_data):
     return result
 
 
-@dispatch.receiver(thread_signals.before_create, sender=models.Thread)
+@dispatch.receiver(thread_signals.before_create, sender=thread_models.Thread)
 def before_create_thread(instance, data, view, **_kwargs):
-    if (view.plugin_id != consts.GAME_FORUM_SITE_ID) or instance.room:
+    if instance.room:
         return
     images_data = data['media'].get('illustrations')
     if not images_data:
@@ -41,10 +41,8 @@ def before_create_thread(instance, data, view, **_kwargs):
         view.variation, images_data)
 
 
-@dispatch.receiver(comment_signals.before_add, sender=models.Comment)
+@dispatch.receiver(comment_signals.before_add, sender=comment_models.Comment)
 def before_add_comment(comment, data, view, **_kwargs):
-    if view.plugin_id != consts.GAME_FORUM_SITE_ID:
-        return
     images_data = data['media'].get('illustrations')
     if not images_data:
         return
@@ -55,10 +53,8 @@ def before_add_comment(comment, data, view, **_kwargs):
             view.variation, images_data)
 
 
-@dispatch.receiver(comment_signals.on_update, sender=models.Comment)
+@dispatch.receiver(comment_signals.on_update, sender=comment_models.Comment)
 def on_comment_update(comment, data, view, **_kwargs):
-    if view.plugin_id != consts.GAME_FORUM_SITE_ID:
-        return
     images_data = data['media'].get('illustrations')
     orig_data = comment.media.get('illustrations')
     if images_data:
@@ -74,16 +70,14 @@ def on_comment_update(comment, data, view, **_kwargs):
             view.obj.media['illustrations'] = images_data
 
 
-@dispatch.receiver(thread_signals.room_to_json, sender=models.Thread)
+@dispatch.receiver(thread_signals.room_to_json, sender=thread_models.Thread)
 def room_to_json(instance, response, view, **_kwargs):
-    if instance.plugin_id != consts.GAME_FORUM_SITE_ID:
-        return
     if instance.last_comment_id is None:
         return
     try:
-        last_comment = models.Comment.objects.select_related('user').get(
-            id=instance.last_comment_id)
-    except models.Comment.DoesNotExist:
+        last_comment = comment_models.Comment.objects.select_related(
+            'user').get(id=instance.last_comment_id)
+    except comment_models.Comment.DoesNotExist:
         return
     response['last_comment'] = {
         'id': last_comment.id,
@@ -92,7 +86,7 @@ def room_to_json(instance, response, view, **_kwargs):
             'url': view.thread_url(last_comment.parent_id)
         },
         'page': last_comment.page,
-        'user': view.role_to_json(last_comment.data1),
+        'user': view.role_to_json(last_comment.role_id),
         'create_time': last_comment.create_time,
     }
     response['comments_count'] = instance.comments_count
@@ -100,7 +94,7 @@ def room_to_json(instance, response, view, **_kwargs):
 
 
 class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
-    comment_model = models.Comment
+    comment_model = comment_models.Comment
 
     def comment_url(self, comment):
         return urls.reverse(
@@ -120,12 +114,12 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
             'url': self.comment_url(c) if c.id else None,
             'title': html.escape(c.title),
             'body': bbcodes.bbcode(c.body),
-            'user': self.role_to_json(c.data1, detailed=True),
+            'user': self.role_to_json(c.role_id, detailed=True),
             'create_time': c.create_time,
             'edit_right': self.comment_edit_right(c),
             'is_thread': c.is_thread(),
             'edit_time': c.edit_time,
-            'editor': self.role_to_json(c.data2) if c.editor else None,
+            'editor': self.role_to_json(c.edit_role_id) if c.editor else None,
             'media': c.media,
             'reply_id': c.reply_id,
 
@@ -136,7 +130,7 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
 
     @classmethod
     def on_fix_counters(cls, sender, thread, view, **kwargs):
-        if (thread.plugin_id != consts.GAME_FORUM_SITE_ID) or thread.parent_id:
+        if thread.parent_id:
             return None
         variation = stories_models.Variation.objects.select_for_update(
             ).get(thread=thread)
@@ -146,7 +140,7 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
                 ).get(pk=role.pk)
             role.comments_count = cls.comment_model.objects.filter(
                 parent__tree_id=thread.tree_id, deleted=False,
-                data1=role.id).count()
+                role_id=role.id).count()
             role.save()
         variation.comments_count = cls.comment_model.objects.filter(
             parent__tree_id=thread.tree_id, deleted=False).count()
@@ -155,7 +149,7 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
 
 
 thread_signals.on_fix_counters.connect(
-    CommentsBase.on_fix_counters, sender=models.Thread)
+    CommentsBase.on_fix_counters, sender=thread_models.Thread)
 
 
 def update_role_comments_count(role_id, value):
@@ -168,35 +162,24 @@ class CommentsPageAPI(comments.CommentsPageAPI, CommentsBase):
     @classmethod
     def create_comment(cls, data, view):
         comment = super(CommentsPageAPI, cls).create_comment(data, view)
-        comment.data1 = view.process_role(None, data)
-        comment.plugin_id = cls.plugin_id
-        update_role_comments_count(comment.data1, 1)
+        comment.role_id = view.process_role(None, data)
+        update_role_comments_count(comment.role_id, 1)
         view.variation.comments_count_inc(1)
         return comment
 
-    @classmethod
-    def on_create_thread(cls, instance, data, preview, view, **kwargs):
-        # TODO this func will be removed with plugin_id field cleanup
-        # it will use signals "sender" field
-        if instance.plugin_id != consts.GAME_FORUM_SITE_ID:
-            return
-        super(CommentsPageAPI, cls).on_create_thread(
-            instance, data, preview, view, **kwargs)
-
 
 thread_signals.after_create.connect(
-    CommentsPageAPI.on_create_thread, sender=models.Thread)
+    CommentsPageAPI.on_create_thread, sender=thread_models.Thread)
 
 
-@dispatch.receiver(comment_signals.on_delete, sender=models.Comment)
+@dispatch.receiver(comment_signals.on_delete, sender=comment_models.Comment)
 def on_delete(comment, view, **_kwargs):
-    if comment.plugin_id == consts.GAME_FORUM_SITE_ID:
-        update_role_comments_count(comment.data1, -1)
-        view.variation.comments_count_inc(-1)
+    update_role_comments_count(comment.role_id, -1)
+    view.variation.comments_count_inc(-1)
 
 
 class CommentAPI(comments.CommentAPI, CommentsBase):
-    comment_delete_mark_model = models.CommentDeleteMark
+    comment_delete_mark_model = comment_models.CommentDeleteMark
 
     def get_context_data(self, **kwargs):
         data = super(CommentAPI, self).get_context_data(**kwargs)
@@ -207,34 +190,19 @@ class CommentAPI(comments.CommentAPI, CommentsBase):
     def update_comment(cls, comment, data, preview, view):
         super(CommentAPI, cls).update_comment(comment, data, preview, view)
         new_role = data['role_id']
-        if comment.data1 != new_role:
+        if comment.role_id != new_role:
             if new_role not in view.rights.user_write_roles:
                 raise exceptions.PermissionDenied()
             update_role_comments_count(new_role, 1)
-            update_role_comments_count(comment.data1, -1)
-            comment.data1 = new_role
+            update_role_comments_count(comment.role_id, -1)
+            comment.role_id = new_role
         editor_role = data['edit_role_id']
         if editor_role not in view.rights.user_write_roles:
             raise exceptions.PermissionDenied()
-        comment.data2 = editor_role
-
-    @classmethod
-    def on_thread_update(cls, instance, data, preview, view, **kwargs):
-        # TODO this func will be removed with plugin_id field cleanup
-        # it will use signals "sender" field
-        if instance.plugin_id == consts.GAME_FORUM_SITE_ID:
-            super(CommentAPI, cls).on_thread_update(
-                instance, data, preview, view, **kwargs)
+        comment.edit_role_id = editor_role
 
 
 thread_signals.on_update.connect(
-    CommentAPI.on_thread_update, sender=models.Thread)
-
-
-@dispatch.receiver(thread_signals.on_fix_counters, sender=models.Thread)
-def tmp_on_fix_plugin_filter(sender, thread, view, **kwargs):
-    # TODO this func will be removed with plugin_id field cleanup
-    # it will use signals "sender" field
-    if thread.plugin_id != consts.GAME_FORUM_SITE_ID:
-        return None
-    return CommentsPageAPI.on_fix_counters(sender, thread, view, **kwargs)
+    CommentAPI.on_thread_update, sender=thread_models.Thread)
+thread_signals.on_fix_counters.connect(
+    CommentsPageAPI.on_fix_counters, sender=thread_models.Thread)

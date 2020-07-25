@@ -24,7 +24,6 @@ class OnlineStatusAPI(core.BaseAPIView):
     online_user_model = models.OnlineUser
     thread_model = thread_models.Thread
     thread = None
-    plugin_id = None
     online_timeout = 3  # minutes
 
     def update_online_status(self):

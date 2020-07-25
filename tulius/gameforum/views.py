@@ -7,12 +7,11 @@ from django.utils import html
 from django.db import transaction
 from django.db.models import query_utils
 
-from tulius.forum import models
 from tulius.gameforum import base
 from tulius.games import models as game_models
 from tulius.gameforum import models as game_forum_models
-from tulius.gameforum import consts
 from tulius.gameforum import core
+from tulius.gameforum.threads import models as thread_models
 from tulius.gameforum.other import trust_marks
 from tulius.stories import models as stories_models
 
@@ -21,8 +20,7 @@ class RedirrectAPI(generic.View):
     @staticmethod
     def get(*args, **kwargs):
         pk = int(kwargs['pk'])
-        thread = models.Thread.objects.get(
-            pk=pk, plugin_id=consts.GAME_FORUM_SITE_ID)
+        thread = thread_models.Thread.objects.get(pk=pk)
         if thread.parent_id is None:
             variation = stories_models.Variation.objects.get(
                 thread=thread)

@@ -2,7 +2,8 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from tulius.forum import models as forum
+from tulius.forum.rights import models as rights
+from tulius.gameforum.threads import models as thread_models
 from tulius.stories import models as stories
 
 
@@ -16,7 +17,7 @@ class GameThreadRight(models.Model):
         unique_together = ('thread', 'role')
 
     thread = models.ForeignKey(
-        forum.Thread, models.PROTECT,
+        thread_models.Thread, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'thread'),
@@ -31,9 +32,9 @@ class GameThreadRight(models.Model):
     )
 
     access_level = models.SmallIntegerField(
-        default=forum.THREAD_ACCESS_READ + forum.THREAD_ACCESS_WRITE,
+        default=rights.THREAD_ACCESS_READ + rights.THREAD_ACCESS_WRITE,
         verbose_name=_(u'access rights'),
-        choices=forum.THREAD_ACCESS_CHOICES,
+        choices=rights.THREAD_ACCESS_CHOICES,
     )
 
 

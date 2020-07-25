@@ -1,6 +1,8 @@
 from django.db import transaction
 
-from tulius.forum import models
+from tulius.forum.threads import models as forum_threads
+from tulius.forum.rights import models as rights
+from tulius.gameforum.threads import models as thread_models
 from tulius.stories import models as story_models
 from tulius.games import models as game_models
 
@@ -15,7 +17,8 @@ def test_comments_api(
     response = admin.put(
         base_url + f'thread/{variation_forum.id}/', {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NO_WRITE,
+            'room': False,
+            'access_type': forum_threads.THREAD_ACCESS_TYPE_NO_WRITE,
             'granted_rights': [], 'important': False, 'media': {}})
     assert response.status_code == 200
     thread = response.json()
@@ -31,7 +34,7 @@ def test_comments_api(
     response = admin.post(
         thread['url'] + 'granted_rights/', {
             'user': {'id': detective.pk},
-            'access_level': models.THREAD_ACCESS_WRITE
+            'access_level': rights.THREAD_ACCESS_WRITE
         }
     )
     assert response.status_code == 200
@@ -141,7 +144,8 @@ def test_comments_illustrations(
     response = user.put(
         base_url + f'thread/{variation_forum.id}/', {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NOT_SET,
+            'room': False,
+            'access_type': forum_threads.THREAD_ACCESS_TYPE_NOT_SET,
             'granted_rights': [], 'role_id': detective.pk, 'media': {
                 'illustrations': [{
                     'id' : story_illustration.pk,
@@ -237,13 +241,14 @@ def test_broken_last_comment(game, variation_forum, user, detective):
     response = user.put(
         base_url + f'thread/{variation_forum.id}/', {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NOT_SET,
+            'room': False,
+            'access_type': forum_threads.THREAD_ACCESS_TYPE_NOT_SET,
             'granted_rights': [], 'role_id': detective.pk, 'media': {}
         })
     assert response.status_code == 200
     thread = response.json()
     # break last comment
-    obj = models.Thread.objects.get(pk=thread['id'])
+    obj = thread_models.Thread.objects.get(pk=thread['id'])
     obj.last_comment_id += 1
     obj.save()
     # check room view still works

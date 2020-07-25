@@ -1,5 +1,4 @@
 from django import shortcuts
-from django.apps import apps
 from django.contrib import messages
 from django.db import models as django_models
 from django.views import generic
@@ -14,9 +13,9 @@ from tulius.players import models
 from tulius.players import forms
 from tulius.pm import models as pm
 from tulius.stories import models as stories
+from tulius.forum.comments import models as forum_comments
+from tulius.gameforum.comments import models as game_forum_comments
 
-
-game_forum = apps.get_app_config('gameforum')
 
 try:
     models.stars.flush_stars_cache()
@@ -134,10 +133,10 @@ class PlayerHistoryView(generic.TemplateView):
 
 class Statistics:
     def __init__(self, user):
-        self.posts = forum.Comment.objects.filter(
-            user=user, plugin_id=None).count()
-        self.game_posts = forum.Comment.objects.filter(
-            user=user, plugin_id=game_forum.GAME_FORUM_SITE_ID).count()
+        self.posts = forum_comments.Comment.objects.filter(
+            user=user).count()
+        self.game_posts = game_forum_comments.Comment.objects.filter(
+            user=user).count()
         variation_ids = [
             role['variation'] for role in
             stories.Role.objects.filter(

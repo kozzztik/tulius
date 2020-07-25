@@ -5,9 +5,14 @@ from django.utils import timezone
 from tulius.stories import models
 from tulius.forum import online_status
 from tulius.gameforum import base
+from tulius.gameforum.threads import models as thread_models
+from tulius.gameforum.other import models as other_models
 
 
 class OnlineStatusAPI(online_status.OnlineStatusAPI, base.VariationMixin):
+    online_user_model = other_models.OnlineUser
+    thread_model = thread_models.Thread
+
     def update_online_status(self):
         super(OnlineStatusAPI, self).update_online_status()
         if self.variation.game_id and (not self.user.is_anonymous):

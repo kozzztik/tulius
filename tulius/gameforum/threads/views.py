@@ -1,42 +1,22 @@
 from django import urls
-from django.db import transaction
 from django.core import exceptions
 from django.utils import html
 
-from tulius.forum import models
 from tulius.forum.threads import signals
 from tulius.forum.threads import views
 from tulius.forum.threads import counters
 from tulius.gameforum import base
-from tulius.gameforum import consts
 from tulius.gameforum import rights
+from tulius.gameforum.threads import models as thread_models
 from djfw.wysibb.templatetags import bbcodes
 
 
 class CountersFix(counters.CountersFix):
-    thread_model = models.Thread
-    plugin_id = consts.GAME_FORUM_SITE_ID
-
-    @transaction.atomic
-    def post(self, request, pk=None, **kwargs):
-        # TODO remove ALL this when plugin_id will be removed
-        if not request.user.is_superuser:
-            raise exceptions.PermissionDenied()
-        self.result = {}
-        threads = self.thread_model.objects.select_for_update()
-        if pk:
-            threads = threads.filter(pk=pk, plugin_id=self.plugin_id)
-        else:
-            threads = threads.filter(
-                parent=None, deleted=False, plugin_id=self.plugin_id)
-        for thread in threads:
-            self.process_thread(thread, True)
-        return {'result': self.result}
+    thread_model = thread_models.Thread
 
 
 class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
-    thread_model = models.Thread
-    plugin_id = consts.GAME_FORUM_SITE_ID
+    thread_model = thread_models.Thread
 
     def _get_rights_checker(self, thread, parent_rights=None):
         return rights.RightsChecker(
@@ -90,7 +70,7 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
             'deleted': thread.deleted,
             'important': thread.important,
             'closed': thread.closed,
-            'user': self.role_to_json(thread.data1),
+            'user': self.role_to_json(thread.role_id),
             'moderators': [
                 self.role_to_json(user) for user in thread.moderators],
             'accessed_users': None if thread.accessed_users is None else [
@@ -116,27 +96,26 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
 
     def create_thread(self, data):
         obj = super(BaseThreadAPI, self).create_thread(data)
-        obj.data1 = self.process_role(None, data)
-        obj.plugin_id = self.plugin_id
+        obj.role_id = self.process_role(None, data)
         return obj
 
     def update_thread(self, data):
         super(BaseThreadAPI, self).update_thread(data)
-        self.obj.data1 = self.process_role(self.obj.data1, data)
+        self.obj.role_id = self.process_role(self.obj.role_id, data)
         editor_role = data['edit_role_id']
         if editor_role not in self.rights.user_write_roles:
             raise exceptions.PermissionDenied()
-        self.obj.data2 = editor_role
+        self.obj.edit_role_id = editor_role
 
     def obj_to_json(self):
         data = super(BaseThreadAPI, self).obj_to_json()
-        data['user'] = self.role_to_json(self.obj.data1, detailed=True)
-        data['edit_role_id'] = self.obj.data2
+        data['user'] = self.role_to_json(self.obj.role_id, detailed=True)
+        data['edit_role_id'] = self.obj.edit_role_id
         return data
 
 
 class ThreadAPI(views.ThreadView, BaseThreadAPI):
-    delete_mark_model = models.ThreadDeleteMark
+    delete_mark_model = thread_models.ThreadDeleteMark
 
 
 class MoveThreadView(views.MoveThreadView, BaseThreadAPI):
