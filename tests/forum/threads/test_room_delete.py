@@ -1,4 +1,4 @@
-from tulius.forum import models
+from tulius.forum.threads import models
 
 
 def test_room_delete(client, superuser, admin, user):

@@ -1,7 +1,8 @@
 import pytest
 
-from tulius.forum import models
 from tulius.forum.rights import base
+from tulius.forum.rights import models
+from tulius.forum.threads import models as thread_models
 
 
 def test_update_and_moderate(client, superuser, admin, user):
@@ -40,7 +41,7 @@ def test_update_and_moderate(client, superuser, admin, user):
     # check user can't change thread access type
     response = user.put(
         room['url'] + 'granted_rights/',
-        {'access_type': models.THREAD_ACCESS_TYPE_NO_READ})
+        {'access_type': thread_models.THREAD_ACCESS_TYPE_NO_READ})
     assert response.status_code == 403
     # check user can't give privileges
     response = user.post(
@@ -53,7 +54,7 @@ def test_update_and_moderate(client, superuser, admin, user):
     # set it "no read"
     response = admin.put(
         room['url'] + 'granted_rights/',
-        {'access_type': models.THREAD_ACCESS_TYPE_NO_READ})
+        {'access_type': thread_models.THREAD_ACCESS_TYPE_NO_READ})
     assert response.status_code == 200
     # check user now can't access room
     response = user.get(room['url'])

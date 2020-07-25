@@ -1,4 +1,5 @@
-from tulius.forum import models
+from tulius.forum.threads import models
+from tulius.forum.rights import models as rights_models
 
 
 def test_thread_move(superuser, user):
@@ -38,7 +39,7 @@ def test_thread_move(superuser, user):
     response = superuser.post(
         target['url'] + 'granted_rights/', {
             'user': {'id': user.user.pk},
-            'access_level': models.THREAD_ACCESS_WRITE
+            'access_level': rights_models.THREAD_ACCESS_WRITE
         }
     )
     assert response.status_code == 200
@@ -50,7 +51,7 @@ def test_thread_move(superuser, user):
     response = superuser.post(
         room['url'] + 'granted_rights/', {
             'user': {'id': user.user.pk},
-            'access_level': models.THREAD_ACCESS_MODERATE
+            'access_level': rights_models.THREAD_ACCESS_MODERATE
         }
     )
     assert response.status_code == 200

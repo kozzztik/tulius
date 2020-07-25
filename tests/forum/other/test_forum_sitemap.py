@@ -2,7 +2,7 @@ from xml.etree import ElementTree
 
 import pytest
 
-from tulius.forum import models
+from tulius.forum.threads import models
 
 
 @pytest.mark.parametrize('path', ['/sitemap-forum.xml', '/forums/sitemap.xml'])

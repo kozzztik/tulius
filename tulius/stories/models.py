@@ -325,6 +325,8 @@ class Variation(SortableModelMixin):
         verbose_name_plural = _(u'variations')
         ordering = ['order', 'id']
 
+    objects = models.Manager()  # linters don't worry, be happy
+
     story = models.ForeignKey(
         Story, models.PROTECT,
         blank=False,

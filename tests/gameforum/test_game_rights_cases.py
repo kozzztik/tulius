@@ -1,6 +1,7 @@
 from django.db import transaction
 
-from tulius.forum import models
+from tulius.forum.threads import models
+from tulius.forum.rights import models as rights_models
 from tulius.games import models as game_models
 from tulius.stories import models as story_models
 from tulius.gameforum import core
@@ -161,7 +162,7 @@ def test_grant_moderator_rights(game, variation_forum, admin, user, detective):
     response = admin.post(
         thread['url'] + 'granted_rights/', {
             'user': {'id': detective.pk},
-            'access_level': models.THREAD_ACCESS_MODERATE
+            'access_level': rights_models.THREAD_ACCESS_MODERATE
         }
     )
     assert response.status_code == 200
@@ -195,7 +196,7 @@ def test_chain_strict_read(
             'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ,
             'granted_rights': [{
                 'user': {'id': detective.pk},
-                'access_level': models.THREAD_ACCESS_READ
+                'access_level': rights_models.THREAD_ACCESS_READ
             }], 'important': False, 'media': {}})
     assert response.status_code == 200
     thread = response.json()
@@ -218,7 +219,7 @@ def test_chain_strict_read(
     response = admin.post(
         room['url'] + 'granted_rights/', {
             'user': {'id': detective.pk},
-            'access_level': models.THREAD_ACCESS_READ
+            'access_level': rights_models.THREAD_ACCESS_READ
         }
     )
     assert response.status_code == 200
@@ -268,7 +269,7 @@ def test_chain_write_rights(game, variation_forum, admin, user, detective):
             'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ,
             'granted_rights': [{
                 'user': {'id': detective.pk},
-                'access_level': models.THREAD_ACCESS_READ
+                'access_level': rights_models.THREAD_ACCESS_READ
             }], 'important': False, 'media': {}})
     assert response.status_code == 200
     thread = response.json()
@@ -287,7 +288,7 @@ def test_chain_write_rights(game, variation_forum, admin, user, detective):
     response = admin.post(
         room2['url'] + 'granted_rights/', {
             'user': {'id': detective.pk},
-            'access_level': models.THREAD_ACCESS_WRITE
+            'access_level': rights_models.THREAD_ACCESS_WRITE
         }
     )
     assert response.status_code == 200

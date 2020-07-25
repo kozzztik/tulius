@@ -1,4 +1,5 @@
-from tulius.forum import models
+from tulius.forum.threads import models
+from tulius.forum.rights import models as rights_models
 
 
 def test_update_and_moderate(client, superuser, admin, user):
@@ -55,7 +56,7 @@ def test_update_and_moderate(client, superuser, admin, user):
     response = superuser.post(
         thread['url'] + 'granted_rights/', {
             'user': {'id': admin.user.pk},
-            'access_level': models.THREAD_ACCESS_MODERATE
+            'access_level': rights_models.THREAD_ACCESS_MODERATE
         }
     )
     assert response.status_code == 200

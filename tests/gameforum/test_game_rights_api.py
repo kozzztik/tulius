@@ -1,6 +1,7 @@
 from django.db import transaction
 
-from tulius.forum import models
+from tulius.forum.threads import models
+from tulius.forum.rights import models as rights_models
 from tulius.games import models as game_models
 
 
@@ -34,7 +35,7 @@ def test_thread_rights_api(
     response = admin.post(
         thread['url'] + 'granted_rights/', {
             'user': {'id': detective.pk},
-            'access_level': models.THREAD_ACCESS_READ
+            'access_level': rights_models.THREAD_ACCESS_READ
         }
     )
     assert response.status_code == 200
@@ -46,7 +47,7 @@ def test_thread_rights_api(
     assert rights['granted_rights'][0]['user']['id'] == detective.pk
     assert rights['granted_rights'][0]['user']['title'] == detective.name
     assert rights['granted_rights'][0][
-        'access_level'] == models.THREAD_ACCESS_READ
+        'access_level'] == rights_models.THREAD_ACCESS_READ
     # check user now see it in room
     response = user.get(base_url + f'thread/{variation_forum.id}/')
     assert response.status_code == 200
@@ -71,7 +72,7 @@ def test_thread_rights_api(
             'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ,
             'granted_rights': [{
                 'user': {'id': detective.pk},
-                'access_level': models.THREAD_ACCESS_READ
+                'access_level': rights_models.THREAD_ACCESS_READ
             }],
             'important': True, 'closed': True, 'media': {}})
     assert response.status_code == 200
