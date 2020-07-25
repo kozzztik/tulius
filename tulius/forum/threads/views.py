@@ -7,6 +7,7 @@ from django import urls
 from django.core import exceptions
 from django.core.cache import cache
 from django.utils import html
+from django.utils import timezone
 from django.db import transaction
 from django.db.models import query_utils
 
@@ -223,8 +224,6 @@ dispatch.receiver(signals.on_fix_counters)(BaseThreadView.on_fix_counters)
 
 
 class ThreadView(BaseThreadView):
-    delete_mark_model = models.ThreadDeleteMark
-
     def get_context_data(self, **kwargs):
         super(ThreadView, self).get_context_data(**kwargs)
         if self.obj is None:
@@ -246,12 +245,12 @@ class ThreadView(BaseThreadView):
         if not self.rights.edit:
             raise exceptions.PermissionDenied()
         self.obj.deleted = True
-        delete_mark = self.delete_mark_model(
-            thread=self.obj,
-            user=self.user,
-            description=request.GET['comment'])
+        self.obj.data['deleted'] = {
+            'user_id': self.user.pk,
+            'time': timezone.now().isoformat(),
+            'description': request.GET['comment'],
+        }
         self.obj.save()
-        delete_mark.save()
         return {'result': True}
 
     def put(self, request, **kwargs):

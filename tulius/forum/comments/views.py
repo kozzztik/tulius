@@ -133,7 +133,7 @@ class CommentsPageAPI(CommentsBase):
         }
 
     @classmethod
-    def on_create_thread(cls, instance, data, preview, view, **kwargs):
+    def on_create_thread(cls, instance, data, preview, view, **_kwargs):
         if not instance.room:
             cls.create_comment_process(data, preview, view)
             if not preview:
@@ -217,8 +217,6 @@ class CommentBase(CommentsBase):
 
 
 class CommentAPI(CommentBase):
-    comment_delete_mark_model = models.CommentDeleteMark
-
     def get_context_data(self, **kwargs):
         self.get_comment(**kwargs)
         data = self.comment_to_json(self.comment)
@@ -231,21 +229,21 @@ class CommentAPI(CommentBase):
         return data
 
     @transaction.atomic
-    def delete(self, *args, **kwargs):
+    def delete(self, request, **kwargs):
         self.get_comment(for_update=True, **kwargs)
         if self.comment.is_thread():
             raise exceptions.PermissionDenied()
         if not self.comment_edit_right(self.comment):
             raise exceptions.PermissionDenied()
         self.comment.deleted = True
-        delete_mark = self.comment_delete_mark_model(
-            comment=self.comment,
-            user=self.user,
-            description=self.request.GET['comment'])
+        self.comment.data['deleted'] = {
+            'user_id': self.user.pk,
+            'time': timezone.now().isoformat(),
+            'description': request.GET['comment'],
+        }
         comment_signals.on_delete.send(
             self.comment_model, comment=self.comment, view=self)
         self.comment.save()
-        delete_mark.save()
         # update page nums
         self.on_fix_counters(self.comment_model, self.obj, self)
         self.obj.save()
@@ -263,7 +261,7 @@ class CommentAPI(CommentBase):
             preview=preview, view=view)
 
     @classmethod
-    def on_thread_update(cls, instance, data, preview, view, **kwargs):
+    def on_thread_update(cls, instance, data, preview, view, **_kwargs):
         if not instance.room:
             comment = cls.comment_model.objects.select_for_update().get(
                 id=instance.first_comment_id)

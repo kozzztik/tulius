@@ -428,6 +428,8 @@ class Role(SortableModelMixin):
         verbose_name_plural = _(u'roles')
         ordering = ['order', 'id']
 
+    objects = models.Manager()  # linters don't worry, be happy
+
     variation = models.ForeignKey(
         Variation, models.PROTECT,
         blank=False,
@@ -658,6 +660,8 @@ class AdditionalMaterial(models.Model):
         verbose_name = _(u'additional material')
         verbose_name_plural = _(u'additional materials')
 
+    objects = models.Manager()  # linters don't worry, be happy
+
     story = models.ForeignKey(
         Story, models.PROTECT,
         blank=True,
@@ -735,6 +739,8 @@ ILLUSTRATION_PATH = 'stories/illustrations/'
 
 
 class Illustration(models.Model):
+    objects = models.Manager()  # linters don't worry, be happy
+
     story = models.ForeignKey(
         Story, models.PROTECT,
         blank=True,

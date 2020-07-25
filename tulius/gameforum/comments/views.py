@@ -179,8 +179,6 @@ def on_delete(comment, view, **_kwargs):
 
 
 class CommentAPI(comments.CommentAPI, CommentsBase):
-    comment_delete_mark_model = comment_models.CommentDeleteMark
-
     def get_context_data(self, **kwargs):
         data = super(CommentAPI, self).get_context_data(**kwargs)
         data['thread']['rights'] = self.rights.to_json()

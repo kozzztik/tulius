@@ -16,7 +16,7 @@ def default_json():
     return {}
 
 
-class BaseComment(models.Model):
+class AbstractComment(models.Model):
     """
     Forum comment
     """
@@ -95,7 +95,7 @@ class BaseComment(models.Model):
         return self.pk == self.parent.first_comment_id
 
 
-class Comment(BaseComment):
+class Comment(AbstractComment):
     parent = mptt_models.TreeForeignKey(
         thread_models.Thread, models.PROTECT,
         null=False,
@@ -103,47 +103,3 @@ class Comment(BaseComment):
         related_name='comments',
         verbose_name=_('thread')
     )
-
-
-class BaseCommentDeleteMark(models.Model):
-    class Meta:
-        verbose_name = _(u'comment delete mark')
-        verbose_name_plural = _(u'comments delete marks')
-        abstract = True
-
-    comment = models.ForeignKey(
-        'Comment', models.PROTECT,
-        blank=False,
-        null=False,
-        verbose_name=_(u'comment'),
-        related_name='delete_marks',
-    )
-    user = models.ForeignKey(
-        User, models.PROTECT,
-        blank=False,
-        null=False,
-        verbose_name=_(u'user'),
-        related_name='%(app_label)s_delete_marks',
-    )
-    description = models.TextField(
-        verbose_name=_(u'description'),
-        blank=True,
-        null=True,
-    )
-    deleted = models.BooleanField(
-        default=True,
-        verbose_name=_(u'deleted')
-    )
-    delete_time = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name=_('deleted at'),
-    )
-
-    def __str__(self):
-        return _("%(post)s deleted by %(user)s at %(time)s") % {
-            'post': str(self.comment), 'user': str(self.user),
-            'time': self.delete_time}
-
-
-class CommentDeleteMark(BaseCommentDeleteMark):
-    pass

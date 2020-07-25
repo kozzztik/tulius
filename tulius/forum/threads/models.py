@@ -53,7 +53,7 @@ def default_json():
     return {}
 
 
-class BaseThread(mptt_models.MPTTModel):
+class AbstractThread(mptt_models.MPTTModel):
     """
     Forum thread
     """
@@ -147,7 +147,7 @@ class BaseThread(mptt_models.MPTTModel):
         return (self.rght - self.lft - 1) / 2
 
 
-class Thread(BaseThread):
+class Thread(AbstractThread):
     pass
 
 
@@ -179,46 +179,3 @@ class ThreadCollapseStatus(models.Model):
         default=False,
         null=False, blank=False,
     )
-
-
-class BaseThreadDeleteMark(models.Model):
-    class Meta:
-        verbose_name = _(u'thread delete mark')
-        verbose_name_plural = _(u'threads delete marks')
-        abstract = True
-
-    thread = models.ForeignKey(
-        'Thread', models.PROTECT,
-        blank=False, null=False,
-        verbose_name=_(u'thread'),
-        related_name='delete_marks',
-    )
-    user = models.ForeignKey(
-        User, models.PROTECT,
-        blank=False, null=False,
-        verbose_name=_(u'user'),
-        related_name='%(app_label)s_delete_marks',
-    )
-    description = models.TextField(
-        verbose_name=_(u'description'),
-        blank=True, null=True,
-    )
-
-    deleted = models.BooleanField(
-        default=True,
-        verbose_name=_(u'deleted')
-    )
-
-    delete_time = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name=_('deleted at'),
-    )
-
-    def __str__(self):
-        return _("%(post)s deleted by %(user)s at %(time)s") % \
-               {'post': str(self.thread), 'user': str(self.user),
-                'time': self.delete_time}
-
-
-class ThreadDeleteMark(BaseThreadDeleteMark):
-    pass

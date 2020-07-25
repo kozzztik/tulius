@@ -115,7 +115,7 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
 
 
 class ThreadAPI(views.ThreadView, BaseThreadAPI):
-    delete_mark_model = thread_models.ThreadDeleteMark
+    pass
 
 
 class MoveThreadView(views.MoveThreadView, BaseThreadAPI):

@@ -6,7 +6,7 @@ from tulius.forum.comments import models as comment_models
 from tulius.gameforum.threads import models as thread_models
 
 
-class Comment(comment_models.BaseComment):
+class Comment(comment_models.AbstractComment):
     role_id = models.IntegerField(blank=True, null=True)
     edit_role_id = models.IntegerField(blank=True, null=True)
     parent = mptt_models.TreeForeignKey(
@@ -16,7 +16,3 @@ class Comment(comment_models.BaseComment):
         related_name='comments',
         verbose_name=_('thread')
     )
-
-
-class CommentDeleteMark(comment_models.BaseCommentDeleteMark):
-    pass

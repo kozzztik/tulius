@@ -7,10 +7,6 @@ from tulius.forum.threads import models as thread_models
 User = get_user_model()
 
 
-class Thread(thread_models.BaseThread):
+class Thread(thread_models.AbstractThread):
     role_id = models.IntegerField(blank=True, null=True)
     edit_role_id = models.IntegerField(blank=True, null=True)
-
-
-class ThreadDeleteMark(thread_models.BaseThreadDeleteMark):
-    pass
