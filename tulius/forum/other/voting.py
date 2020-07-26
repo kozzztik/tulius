@@ -124,7 +124,7 @@ class VotingAPI(views.CommentBase):
             return
         voting = create_voting(voting_data)
         comment.media['voting'] = voting
-        if (not view.obj.pk) or (comment.id == view.obj.first_comment_id):
+        if (not view.obj.pk) or comment.is_thread():
             view.obj.media['voting'] = voting
 
     @classmethod
@@ -136,14 +136,14 @@ class VotingAPI(views.CommentBase):
         if not orig_data:
             voting = create_voting(voting_data)
             comment.media['voting'] = voting
-            if view.obj.first_comment_id == comment.id:
+            if comment.is_thread():
                 view.obj.media['voting'] = voting
             return
         orig_data['name'] = html_converter.html_to_bb(voting_data['name'])
         orig_data['body'] = html_converter.html_to_bb(voting_data['body'])
         orig_data['show_results'] = bool(voting_data['show_results'])
         orig_data['preview_results'] = voting_data['preview_results']
-        if comment.id == view.obj.first_comment_id:
+        if comment.is_thread():
             view.obj.media['voting'] = orig_data
 
 

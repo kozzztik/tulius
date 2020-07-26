@@ -36,7 +36,8 @@ def notify_user_about_fixes(user, data):
             'data': data,
         })
 
-def notify_thread_about_new_comment(sender, thread, comment):
+
+def notify_thread_about_new_comment(sender, thread, comment, page):
     publish_message(
         consts.THREAD_COMMENTS_CHANNEL.format(thread_id=thread.id),
         {
@@ -45,5 +46,5 @@ def notify_thread_about_new_comment(sender, thread, comment):
             'id': comment.id,
             'parent_id': thread.id,
             'url': sender.comment_url(comment),
-            'page': comment.page,
+            'page': page,
         })

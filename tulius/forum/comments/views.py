@@ -29,6 +29,10 @@ def prepare_room_list(room, threads, **_kwargs):
             room.last_comment_id = thread.last_comment_id
 
 
+def order_to_page(order):
+    return int(order / CommentsBase.COMMENTS_ON_PAGE) + 1
+
+
 @dispatch.receiver(thread_signals.room_to_json, sender=thread_models.Thread)
 def room_to_json(instance, response, view, **_kwargs):
     if instance.last_comment_id is None:
@@ -44,7 +48,7 @@ def room_to_json(instance, response, view, **_kwargs):
             'id': last_comment.parent_id,
             'url': view.thread_url(last_comment.parent_id)
         },
-        'page': last_comment.page,
+        'page': order_to_page(last_comment.order),
         'user': views.user_to_json(last_comment.user),
         'create_time': last_comment.create_time,
     }
@@ -58,8 +62,7 @@ class CommentsBase(views.BaseThreadView):
 
     @classmethod
     def pages_count(cls, thread):
-        return int(
-            (thread.comments_count - 1) / cls.COMMENTS_ON_PAGE + 1) or 1
+        return order_to_page(thread.comments_count - 1)
 
     @staticmethod
     def comment_url(comment):
@@ -79,7 +82,7 @@ class CommentsBase(views.BaseThreadView):
         for comment in comments.order_by('id'):
             comment = cls.comment_model.objects.select_for_update(
                 ).get(pk=comment.pk)
-            comment.page = int(thread.comments_count / cls.COMMENTS_ON_PAGE) + 1
+            comment.order = thread.comments_count
             comment.save()
             thread.comments_count += 1
             if not thread.first_comment_id:
@@ -96,7 +99,7 @@ class CommentsBase(views.BaseThreadView):
                 'id': c.parent_id,
                 'url': self.thread_url(c.parent_id)
             },
-            'page': c.page,
+            'page': order_to_page(c.order),
             'url': self.comment_url(c) if c.pk else None,
             'title': html.escape(c.title),
             'body': bbcodes.bbcode(c.body),
@@ -119,8 +122,11 @@ class CommentsPageAPI(CommentsBase):
         self.get_parent_thread(**kwargs)
         page_num = kwargs.get('page') or int(self.request.GET.get('page', 1))
         comments = self.comment_model.objects.select_related('user')
-        comments = comments.filter(
-            parent=self.obj, page=page_num).exclude(deleted=True)
+        comments = comments.exclude(deleted=True).filter(
+            parent=self.obj,
+            order__gte=CommentsBase.COMMENTS_ON_PAGE * (page_num - 1),
+            order__lt=CommentsBase.COMMENTS_ON_PAGE * page_num
+        )
         for comment in comments:
             # TODO remove it. needed only for c.is_thread() call
             comment.parent = self.obj
@@ -152,21 +158,19 @@ class CommentsPageAPI(CommentsBase):
         comment.title = data['title']
         comment.body = data['body']
         comment.reply_id = reply_id
+        comment.media = {}
+        comment.order = view.obj.comments_count
         return comment
 
     @classmethod
     def create_comment_process(cls, data, preview, view):
         comment = cls.create_comment(data, view=view)
-        comment.media = {}
         comment_signals.before_add.send(
             cls.comment_model, comment=comment, data=data, preview=preview,
             view=view)
-        comments_count = cls.comment_model.objects.filter(
-            parent=view.obj, deleted=False).count()
-        comment.page = int(comments_count / cls.COMMENTS_ON_PAGE) + 1
         if not preview:
             comment.save()
-        view.obj.comments_count = comments_count + 1
+        view.obj.comments_count += 1
         if not view.obj.first_comment_id:
             view.obj.first_comment_id = comment.pk
         view.obj.last_comment_id = comment.pk
@@ -193,8 +197,9 @@ class CommentsPageAPI(CommentsBase):
             # before comment will be accessible in DB
             self.obj.save()
             transaction.commit()
-            publisher.notify_thread_about_new_comment(self, self.obj, comment)
-            page = comment.page
+            page = order_to_page(comment.order)
+            publisher.notify_thread_about_new_comment(
+                self, self.obj, comment, page)
         else:
             page = self.pages_count(self.obj)
         return self.get_context_data(page=page, **kwargs)

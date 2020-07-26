@@ -334,6 +334,9 @@ class IndexView(BaseThreadView):
         ) | query_utils.Q(user=self.user))  # TODO: move it to protected #97
 
     def room_group_unreaded(self, rooms):
+        # TODO move all it to read marks module
+        # pylint: disable=cyclic-import
+        from tulius.forum.comments import views as comment_views
         unreaded = None
         for room in rooms:
             if room.unreaded:
@@ -345,7 +348,7 @@ class IndexView(BaseThreadView):
                 'id': unreaded.parent_id,
                 'url': self.thread_url(unreaded.parent_id),
             },
-            'page': unreaded.page
+            'page': comment_views.order_to_page(unreaded.order)
         } if unreaded else None
 
     def get_context_data(self, **kwargs):

@@ -23,7 +23,7 @@ def before_add_comment(comment, data, view, **_kwargs):
     html_data = data['media'].get('youtube')
     if (not html_data) or (not regexp.match(html_data)):
         return
-    if view.obj.first_comment_id == comment.id:
+    if comment.is_thread():
         comment.media['youtube'] = view.obj.media['youtube']
     else:
         comment.media['youtube'] = html_data
@@ -37,7 +37,7 @@ def on_comment_update(comment, data, view, **_kwargs):
         del comment.media['youtube']
     elif html_data:
         comment.media['youtube'] = html_data
-    if view.obj.first_comment_id == comment.id:
+    if comment.is_thread():
         if (not html_data) and ('youtube' in view.obj.media):
             del view.obj.media['youtube']
         elif html_data:

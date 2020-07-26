@@ -25,7 +25,7 @@ def before_add_comment(comment, data, view, **_kwargs):
     html_data = data['media'].get('html')
     if (not html_data) or (not view.user.is_superuser):
         return
-    if view.obj.first_comment_id == comment.id:
+    if comment.is_thread():
         comment.media['html'] = view.obj.media['html']
     else:
         comment.media['html'] = html_data
@@ -41,7 +41,7 @@ def on_comment_update(comment, data, view, **_kwargs):
         del comment.media['html']
     elif html_data:
         comment.media['html'] = html_data
-    if view.obj.first_comment_id == comment.id:
+    if comment.is_thread():
         if (not html_data) and ('html' in view.obj.media):
             del view.obj.media['html']
         elif html_data:

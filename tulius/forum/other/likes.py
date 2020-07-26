@@ -40,13 +40,14 @@ class Likes(views.CommentBase):
                 self.get_comment(comment_id, for_update=True)
                 like_mark = self.create_like()
                 like_mark.save()
-                self.comment.likes += 1
-                self.comment.save()
+                comment = self.comment
+                comment.media['likes'] = comment.media.get('likes', 0) + 1
+                comment.save()
         else:
             comment = self.comment_model.objects.select_for_update().get(
                 pk=comment_id)
             like_marks.delete()
-            comment.likes -= 1
+            comment.media['likes'] = comment.media.get('likes', 0) - 1
             comment.save()
         return {'value': value}
 

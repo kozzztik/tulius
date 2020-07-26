@@ -51,7 +51,7 @@ def copy_game_post(thread, new_parent, variation, role_links):
             new_comment = comment_models.Comment(
                 parent=thread, title=comment.title, body=comment.body,
                 user=comment.user, create_time=comment.create_time,
-                media=comment.media)
+                media=comment.media, order=comment.order)
             new_comment.reply_id = first_comment
             if comment.role_id and (comment.role_id in role_links):
                 new_comment.role_id = role_links[comment.role_id].id

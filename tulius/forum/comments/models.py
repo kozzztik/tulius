@@ -28,6 +28,13 @@ class AbstractComment(models.Model):
 
     objects = models.Manager()  # linters don't worry, be happy
 
+    parent = mptt_models.TreeForeignKey(
+        thread_models.Thread, models.PROTECT,
+        null=False,
+        blank=False,
+        related_name='comments',
+        verbose_name=_('thread')
+    )
     title = models.CharField(
         max_length=255,
         unique=False,
@@ -72,19 +79,11 @@ class AbstractComment(models.Model):
         default=False,
         verbose_name=_(u'deleted')
     )
-    likes = models.IntegerField(
+    order = models.IntegerField(
         null=False,
         blank=False,
-        default=0,
-        verbose_name=_(u'likes'),
+        verbose_name=_(u'order'),
     )
-    page = models.IntegerField(
-        null=False,
-        blank=False,
-        default=0,
-        verbose_name=_(u'page'),
-    )
-
     data = jsonfield.JSONField(default=default_json)
     media = jsonfield.JSONField(default=default_json)
 
@@ -92,14 +91,8 @@ class AbstractComment(models.Model):
         return self.title[:40] if self.title else self.body[:40]
 
     def is_thread(self):
-        return self.pk == self.parent.first_comment_id
+        return not self.order
 
 
 class Comment(AbstractComment):
-    parent = mptt_models.TreeForeignKey(
-        thread_models.Thread, models.PROTECT,
-        null=False,
-        blank=False,
-        related_name='comments',
-        verbose_name=_('thread')
-    )
+    pass

@@ -46,7 +46,7 @@ def before_add_comment(comment, data, view, **_kwargs):
     images_data = data['media'].get('illustrations')
     if not images_data:
         return
-    if view.obj.first_comment_id == comment.id:
+    if comment.is_thread():
         comment.media['illustrations'] = view.obj.media['illustrations']
     else:
         comment.media['illustrations'] = validate_image_data(
@@ -63,7 +63,7 @@ def on_comment_update(comment, data, view, **_kwargs):
         del comment.media['illustrations']
     elif images_data:
         comment.media['illustrations'] = images_data
-    if view.obj.first_comment_id == comment.id:
+    if comment.is_thread():
         if (not images_data) and ('illustrations' in view.obj.media):
             del view.obj.media['illustrations']
         elif images_data:
@@ -85,7 +85,7 @@ def room_to_json(instance, response, view, **_kwargs):
             'id': last_comment.parent_id,
             'url': view.thread_url(last_comment.parent_id)
         },
-        'page': last_comment.page,
+        'page': comments.order_to_page(last_comment.order),
         'user': view.role_to_json(last_comment.role_id),
         'create_time': last_comment.create_time,
     }
@@ -110,7 +110,7 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
                 'id': c.parent_id,
                 'url': self.thread_url(c.parent_id)
             },
-            'page': c.page,
+            'page': comments.order_to_page(c.order),
             'url': self.comment_url(c) if c.id else None,
             'title': html.escape(c.title),
             'body': bbcodes.bbcode(c.body),
