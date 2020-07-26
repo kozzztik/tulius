@@ -9,7 +9,7 @@ def create_game_forum(user, variation):
     thread = models.Thread(
         title=title, user=user,
         access_type=forum_models.THREAD_ACCESS_TYPE_OPEN,
-        room=True)
+        room=True, variation_id=variation.pk)
     thread.save()
     return thread
 
@@ -24,7 +24,7 @@ def copy_game_post(thread, new_parent, variation, role_links):
         access_type=old_thread.access_type,
         create_time=old_thread.create_time, closed=old_thread.closed,
         important=old_thread.important,
-        media=old_thread.media,
+        media=old_thread.media, variation_id=variation.pk,
     )
     role_id = old_thread.role_id
     if role_id and (role_id in role_links):

@@ -10,3 +10,4 @@ User = get_user_model()
 class Thread(thread_models.AbstractThread):
     role_id = models.IntegerField(blank=True, null=True)
     edit_role_id = models.IntegerField(blank=True, null=True)
+    variation_id = models.IntegerField(blank=False, null=False)

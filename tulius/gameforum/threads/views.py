@@ -97,6 +97,7 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
     def create_thread(self, data):
         obj = super(BaseThreadAPI, self).create_thread(data)
         obj.role_id = self.process_role(None, data)
+        obj.variation_id = self.variation.pk
         return obj
 
     def update_thread(self, data):

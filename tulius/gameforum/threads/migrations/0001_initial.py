@@ -55,6 +55,7 @@ class Migration(migrations.Migration):
                     default=tulius.forum.threads.models.default_json)),
                 ('role_id', models.IntegerField(blank=True, null=True)),
                 ('edit_role_id', models.IntegerField(blank=True, null=True)),
+                ('variation_id', models.IntegerField(blank=False, null=False)),
                 ('lft', models.PositiveIntegerField(
                     db_index=True, editable=False)),
                 ('rght', models.PositiveIntegerField(
