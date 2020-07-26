@@ -3,7 +3,6 @@ import json
 from django import dispatch
 from django import http
 from django import shortcuts
-from django import urls
 from django.core import exceptions
 from django.core.cache import cache
 from django.utils import html
@@ -15,34 +14,10 @@ from tulius.core.ckeditor import html_converter
 from tulius.forum import core
 from tulius.forum import const
 from tulius.forum import rights as forum_rights
-from tulius.forum import online_status as online_status_plugin
 from tulius.forum.threads import models
 from tulius.forum.threads import signals
 from tulius.forum.rights import models as rights_models
 from djfw.wysibb.templatetags import bbcodes
-
-
-def user_to_json(user, detailed=False):
-    data = {
-        'id': user.id,
-        'title': html.escape(user.username),
-        'url': user.get_absolute_url(),
-    }
-    if detailed:
-        if user.show_online_status:
-            online_status = online_status_plugin.get_user_status(user.id)
-        else:
-            online_status = False
-        data.update({
-            'sex': user.sex,
-            'avatar': user.avatar.url if user.avatar else '',
-            'full_stars': user.full_stars(),  # TODO optimize it
-            'rank': html.escape(user.rank),
-            'stories_author': user.stories_author,
-            'signature': bbcodes.bbcode(user.signature),
-            'online_status': bool(online_status)
-        })
-    return data
 
 
 class BaseThreadView(core.BaseAPIView):
@@ -143,10 +118,6 @@ class BaseThreadView(core.BaseAPIView):
             self.thread_model, threads=threads, view=self)
         return threads
 
-    @staticmethod
-    def thread_url(thread_id):
-        return urls.reverse('forum_api:thread', kwargs={'pk': thread_id})
-
     def room_to_json(self, thread):
         data = {
             'id': thread.pk,
@@ -156,10 +127,10 @@ class BaseThreadView(core.BaseAPIView):
             'deleted': thread.deleted,
             'important': thread.important,
             'closed': thread.closed,
-            'user': user_to_json(thread.user),
-            'moderators': [user_to_json(user) for user in thread.moderators],
+            'user': thread.user.to_json(),
+            'moderators': [user.to_json() for user in thread.moderators],
             'accessed_users': None if thread.accessed_users is None else [
-                user_to_json(user) for user in thread.accessed_users
+                user.to_json() for user in thread.accessed_users
             ],
             'threads_count': thread.threads_count if thread.room else None,
             'url': thread.get_absolute_url(),
@@ -211,7 +182,7 @@ class BaseThreadView(core.BaseAPIView):
         else:
             data['closed'] = self.obj.closed
             data['important'] = self.obj.important
-            data['user'] = user_to_json(self.obj.user, detailed=True)
+            data['user'] = self.obj.user.to_json(detailed=True)
             data['media'] = self.obj.media
         return data
 

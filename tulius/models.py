@@ -1,16 +1,20 @@
 import re
 
 from django import urls
+from django import dispatch
 from django.db import models
 from django.contrib.auth import models as auth_models
 from django.core.mail import send_mail
 from django.core import validators
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _, pgettext
+from django.utils import html
+from django.utils.translation import ugettext_lazy as _
 
+from tulius import signals
 from tulius.core.autocomplete.models import add_autocomplete_widget
 from tulius.vk.models import VK_Profile
 from tulius.pm.signals import private_message_created
+from djfw.wysibb.templatetags import bbcodes
 
 
 USER_SEX_UNDEFINED = 0
@@ -153,7 +157,7 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
         verbose_name = _('user')
         verbose_name_plural = _('users')
 
-    def __unicode__(self):
+    def __str__(self):
         v = self.username
         return u'%s' % (v, )
 
@@ -223,22 +227,30 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
             self.last_read_pm_id = last[0].pk
         self.save()
 
-    def get_forum_reply_str(self):
-        if self.sex == USER_SEX_MALE:
-            s = pgettext('He', '%s said')
-        elif self.sex == USER_SEX_FEMALE:
-            s = pgettext('She', '%s said')
-        else:
-            s = pgettext('Someone', '%s said')
-        return s % self.username
+    def to_json(self, detailed=False):
+        data = {
+            'id': self.pk,
+            'title': html.escape(self.username),
+            'url': self.get_absolute_url(),
+        }
+        if detailed:
+            data.update({
+                'sex': self.sex,
+                'avatar': self.avatar.url if self.avatar else '',
+                'full_stars': self.full_stars(),  # TODO optimize it
+                'rank': html.escape(self.rank),
+                'stories_author': self.stories_author,
+                'signature': bbcodes.bbcode(self.signature),
+            })
+        signals.user_to_json.send(
+            User, instance=self, response=data, detailed=detailed)
+        return data
 
 
 User.autocomplete_widget = add_autocomplete_widget(
     User, User.objects.all(), User.USERNAME_FIELD)
 
 
-def on_pm_create(sender, **kwargs):
+@dispatch.receiver(private_message_created)
+def on_pm_create(sender, **_kwargs):
     sender.receiver.update_not_readed()
-
-
-private_message_created.connect(on_pm_create)

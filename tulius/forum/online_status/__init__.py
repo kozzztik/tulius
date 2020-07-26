@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from django import dispatch
 from django.core.cache import cache
 from django.utils.timezone import now
 from django.utils import html
@@ -8,6 +9,17 @@ from tulius.forum import core
 from tulius.forum.threads import models as thread_models
 from tulius.forum.other import models
 from tulius.forum import const
+from tulius import signals
+
+
+@dispatch.receiver(signals.user_to_json)
+def user_to_json(instance, response, detailed, **_kwargs):
+    if detailed:
+        if instance.show_online_status:
+            online_status = get_user_status(instance.id)
+        else:
+            online_status = False
+        response['online_status'] = bool(online_status)
 
 
 def set_user_status(user_id, thread_id):

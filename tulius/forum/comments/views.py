@@ -47,7 +47,7 @@ def room_to_json(instance, response, view, **_kwargs):
             'id': last_comment.parent_id,
         },
         'page': order_to_page(last_comment.order),
-        'user': views.user_to_json(last_comment.user),
+        'user': last_comment.user.to_json(),
         'create_time': last_comment.create_time,
     }
     response['comments_count'] = instance.comments_count
@@ -97,12 +97,12 @@ class CommentsBase(views.BaseThreadView):
             'url': c.get_absolute_url() if c.pk else None,
             'title': html.escape(c.title),
             'body': bbcodes.bbcode(c.body),
-            'user': views.user_to_json(c.user, detailed=True),
+            'user': c.user.to_json(detailed=True),
             'create_time': c.create_time,
             'edit_right': self.comment_edit_right(c),
             'is_thread': c.is_thread(),
             'edit_time': c.edit_time,
-            'editor': views.user_to_json(c.editor) if c.editor else None,
+            'editor': c.editor.to_json() if c.editor else None,
             'media': c.media,
             'reply_id': c.reply_id,
         }
