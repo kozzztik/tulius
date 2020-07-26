@@ -1,3 +1,4 @@
+from django import urls
 from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -16,14 +17,14 @@ class GameThreadRight(models.Model):
         verbose_name_plural = _('game thread rights')
         unique_together = ('thread', 'role')
 
-    thread = models.ForeignKey(
+    thread: thread_models.Thread = models.ForeignKey(
         thread_models.Thread, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'thread'),
         related_name='access_roles',
     )
-    role = models.ForeignKey(
+    role: stories.Role = models.ForeignKey(
         stories.Role, models.PROTECT,
         null=False,
         blank=False,
@@ -36,6 +37,25 @@ class GameThreadRight(models.Model):
         verbose_name=_(u'access rights'),
         choices=rights.THREAD_ACCESS_CHOICES,
     )
+
+    def get_absolute_url(self):
+        return urls.reverse(
+            'game_forum_api:thread_right', kwargs={
+                'pk': self.thread_id,
+                'right_id': self.pk,
+                'variation_id': self.thread.variation_id
+            })
+
+    def to_json(self):
+        return {
+            'id': self.pk,
+            'user': {
+                'id': self.role.pk,
+                'title': self.role.name,
+            },
+            'access_level': self.access_level,
+            'url': self.get_absolute_url(),
+        }
 
 
 class Trustmark(models.Model):

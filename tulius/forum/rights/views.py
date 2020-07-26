@@ -2,7 +2,6 @@ import json
 
 from django import dispatch
 from django import shortcuts
-from django import urls
 from django.core import exceptions
 from django.db import transaction
 from django.contrib import auth
@@ -53,19 +52,6 @@ class BaseGrantedRightsAPI(views.BaseThreadView):
     rights_model = models.ThreadAccessRight
     require_user = True
 
-    def right_to_json(self, right):
-        return {
-            'id': right.pk,
-            'user': {
-                'id': right.user.pk,
-                'title': right.user.username,
-            },
-            'access_level': right.access_level,
-            'url': urls.reverse(
-                'forum_api:thread_right',
-                kwargs={'pk': self.obj.id, 'right_id': right.pk})
-        }
-
     def create_right(self, data):
         obj = self.rights_model.objects.get_or_create(
             thread=self.obj, user_id=data['user']['id'],
@@ -93,7 +79,7 @@ class GrantedRightsAPI(BaseGrantedRightsAPI):
             raise exceptions.PermissionDenied()
         objs = self.rights_model.objects.filter(thread=self.obj).order_by('id')
         return {
-            'granted_rights': [self.right_to_json(r) for r in objs]
+            'granted_rights': [r.to_json() for r in objs]
         }
 
     def post(self, request, **kwargs):
@@ -103,7 +89,7 @@ class GrantedRightsAPI(BaseGrantedRightsAPI):
         data = json.loads(request.body)
         obj = self.create_right(data)
         obj.save()
-        return self.right_to_json(obj)
+        return obj.to_json()
 
     @transaction.atomic
     def put(self, request, **kwargs):
@@ -143,7 +129,7 @@ class GrantedRightAPI(BaseGrantedRightsAPI):
         if not self.rights.edit:
             raise exceptions.PermissionDenied()
         obj = self.rights_model.objects.get(pk=kwargs['right_id'])
-        return self.right_to_json(obj)
+        return obj.to_json()
 
     def delete(self, *args, right_id=None, **kwargs):
         self.get_parent_thread(**kwargs)
@@ -162,4 +148,4 @@ class GrantedRightAPI(BaseGrantedRightsAPI):
                 self.rights_model.objects.select_for_update(), pk=right_id)
             obj.access_level = data['access_level']
             obj.save()
-        return self.right_to_json(obj)
+        return obj.to_json()

@@ -1,5 +1,4 @@
 from django import dispatch
-from django import urls
 
 from tulius.forum.rights import views
 from tulius.forum.threads import signals as thread_signals
@@ -22,23 +21,6 @@ class BaseGrantedRightsAPI(
         views.BaseGrantedRightsAPI, threads_api.BaseThreadAPI):
     thread_model = thread_models.Thread
     rights_model = models.GameThreadRight
-
-    def right_to_json(self, right):
-        return {
-            'id': right.pk,
-            'user': {
-                'id': right.role.pk,
-                'title': right.role.name,
-            },
-            'access_level': right.access_level,
-            'url': urls.reverse(
-                'game_forum_api:thread_right',
-                kwargs={
-                    'pk': self.obj.id,
-                    'right_id': right.pk,
-                    'variation_id': self.variation.pk
-                }),
-        }
 
     def create_right(self, data):
         obj = self.rights_model.objects.get_or_create(
