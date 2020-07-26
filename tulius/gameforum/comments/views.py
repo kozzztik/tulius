@@ -1,5 +1,4 @@
 from django import dispatch
-from django import urls
 from django.core import exceptions
 from django.db import models as dj_models
 from django.utils import html
@@ -83,7 +82,6 @@ def room_to_json(instance, response, view, **_kwargs):
         'id': last_comment.id,
         'thread': {
             'id': last_comment.parent_id,
-            'url': view.thread_url(last_comment.parent_id)
         },
         'page': comments.order_to_page(last_comment.order),
         'user': view.role_to_json(last_comment.role_id),
@@ -96,22 +94,15 @@ def room_to_json(instance, response, view, **_kwargs):
 class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
     comment_model = comment_models.Comment
 
-    def comment_url(self, comment):
-        return urls.reverse(
-            'game_forum_api:comment', kwargs={
-                'pk': comment.id,
-                'variation_id': self.variation.id,
-            })
-
     def comment_to_json(self, c):
         data = {
             'id': c.id,
             'thread': {
                 'id': c.parent_id,
-                'url': self.thread_url(c.parent_id)
+                'url': c.parent.get_absolute_url(),
             },
             'page': comments.order_to_page(c.order),
-            'url': self.comment_url(c) if c.id else None,
+            'url': c.get_absolute_url() if c.id else None,
             'title': html.escape(c.title),
             'body': bbcodes.bbcode(c.body),
             'user': self.role_to_json(c.role_id, detailed=True),

@@ -2,7 +2,6 @@ import json
 
 from django import dispatch
 from django import shortcuts
-from django import urls
 from django.core import exceptions
 from django.db import transaction
 from django.utils import html, timezone
@@ -46,7 +45,6 @@ def room_to_json(instance, response, view, **_kwargs):
         'id': last_comment.id,
         'thread': {
             'id': last_comment.parent_id,
-            'url': view.thread_url(last_comment.parent_id)
         },
         'page': order_to_page(last_comment.order),
         'user': views.user_to_json(last_comment.user),
@@ -63,10 +61,6 @@ class CommentsBase(views.BaseThreadView):
     @classmethod
     def pages_count(cls, thread):
         return order_to_page(thread.comments_count - 1)
-
-    @staticmethod
-    def comment_url(comment):
-        return urls.reverse('forum_api:comment', kwargs={'pk': comment.id})
 
     def comment_edit_right(self, comment):
         return (comment.user == self.user) or self.rights.moderate
@@ -97,10 +91,10 @@ class CommentsBase(views.BaseThreadView):
             'id': c.id,
             'thread': {
                 'id': c.parent_id,
-                'url': self.thread_url(c.parent_id)
+                'url': c.parent.get_absolute_url()
             },
             'page': order_to_page(c.order),
-            'url': self.comment_url(c) if c.pk else None,
+            'url': c.get_absolute_url() if c.pk else None,
             'title': html.escape(c.title),
             'body': bbcodes.bbcode(c.body),
             'user': views.user_to_json(c.user, detailed=True),
@@ -219,7 +213,7 @@ class CommentBase(CommentsBase):
         self.comment = shortcuts.get_object_or_404(query, id=int(pk))
         self.get_parent_thread(
             pk=self.comment.parent_id, for_update=for_update, **kwargs)
-
+        self.comment.parent = self.obj  # for speedup
 
 class CommentAPI(CommentBase):
     def get_context_data(self, **kwargs):
@@ -229,7 +223,7 @@ class CommentAPI(CommentBase):
         data['thread']['parents'] = [{
             'id': parent.id,
             'title': parent.title,
-            'url': self.thread_url(parent.pk),
+            'url': parent.get_absolute_url(),
         } for parent in self.obj.get_ancestors()]
         return data
 

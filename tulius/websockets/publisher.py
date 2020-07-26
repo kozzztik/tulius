@@ -45,6 +45,6 @@ def notify_thread_about_new_comment(sender, thread, comment, page):
             '.action': 'new_comment',
             'id': comment.id,
             'parent_id': thread.id,
-            'url': sender.comment_url(comment),
+            'url': comment.get_absolute_url(),
             'page': page,
         })

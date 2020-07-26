@@ -2,6 +2,7 @@
 Forum engine base Thread entity
 """
 import jsonfield
+from django import urls
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
@@ -145,6 +146,9 @@ class AbstractThread(mptt_models.MPTTModel):
 
     def descendant_count(self):
         return (self.rght - self.lft - 1) / 2
+
+    def get_absolute_url(self):
+        return urls.reverse('forum_api:thread', kwargs={'pk': self.pk})
 
 
 class Thread(AbstractThread):

@@ -19,7 +19,6 @@ def room_to_json(instance, response, view, **_kwargs):
         'id': instance.unreaded.id,
         'thread': {
             'id': instance.unreaded.parent_id,
-            'url': view.thread_url(instance.unreaded.parent_id),
         },
         'page': comment_views.order_to_page(instance.unreaded.order),
     } if instance.unreaded else None
@@ -162,8 +161,7 @@ class ReadmarkAPI(views.BaseThreadView):
                                     room.unreaded_id)):
                             room.unreaded_id = thread.first_comment_id
         if room.unreaded_id:
-            room.unreaded = cls.comment_model.objects.select_related(
-                'parent').get(id=room.unreaded_id)
+            room.unreaded = cls.comment_model.objects.get(id=room.unreaded_id)
 
     @classmethod
     def on_thread_prepare_thread(cls, threads, view, **_kwargs):

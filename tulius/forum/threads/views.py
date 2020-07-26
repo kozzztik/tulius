@@ -162,7 +162,7 @@ class BaseThreadView(core.BaseAPIView):
                 user_to_json(user) for user in thread.accessed_users
             ],
             'threads_count': thread.threads_count if thread.room else None,
-            'url': self.thread_url(thread.pk),
+            'url': thread.get_absolute_url(),
         }
         signals.room_to_json.send(
             self.thread_model, instance=thread, response=data, view=self)
@@ -193,11 +193,11 @@ class BaseThreadView(core.BaseAPIView):
             'body': bbcodes.bbcode(self.obj.body),
             'room': self.obj.room,
             'deleted': self.obj.deleted,
-            'url': self.thread_url(self.obj.pk) if self.obj.pk else None,
+            'url': self.obj.get_absolute_url() if self.obj.pk else None,
             'parents': [{
                 'id': parent.id,
                 'title': parent.title,
-                'url': self.thread_url(parent.pk),
+                'url': parent.get_absolute_url(),
             } for parent in self.obj.get_ancestors()] if self.obj.pk else None,
             'rights': self.rights.to_json(),
             'access_type': self.obj.access_type,
@@ -346,7 +346,7 @@ class IndexView(BaseThreadView):
             'id': unreaded.id,
             'thread': {
                 'id': unreaded.parent_id,
-                'url': self.thread_url(unreaded.parent_id),
+                'url': unreaded.parent.get_absolute_url(),
             },
             'page': comment_views.order_to_page(unreaded.order)
         } if unreaded else None
@@ -367,7 +367,7 @@ class IndexView(BaseThreadView):
                 'id': group.id,
                 'title': group.title,
                 'rooms': [self.room_to_json(thread) for thread in group.rooms],
-                'url': self.thread_url(group.id),
+                'url': group.get_absolute_url(),
                 'unreaded': self.room_group_unreaded(group.rooms),
             } for group in groups]
         }
@@ -391,7 +391,7 @@ class IndexView(BaseThreadView):
             view=self)
         transaction.commit()
         # TODO notify clients
-        return {'id': thread.pk, 'url': self.thread_url(thread.pk)}
+        return {'id': thread.pk, 'url': thread.get_absolute_url()}
 
 
 class MoveThreadView(BaseThreadView):

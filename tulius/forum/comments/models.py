@@ -1,7 +1,8 @@
 """
-Forum engine models for Tulius project
+Forum comment models for Tulius project
 """
 import jsonfield
+from django import urls
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
@@ -92,6 +93,9 @@ class AbstractComment(models.Model):
 
     def is_thread(self):
         return not self.order
+
+    def get_absolute_url(self):
+        return urls.reverse('forum_api:comment', kwargs={'pk': self.pk})
 
 
 class Comment(AbstractComment):
