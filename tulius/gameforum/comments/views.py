@@ -91,6 +91,15 @@ def room_to_json(instance, response, view, **_kwargs):
     response['pages_count'] = CommentsBase.pages_count(instance)
 
 
+@dispatch.receiver(
+    comment_signals.on_thread_delete, sender=thread_models.Thread)
+def on_thread_delete(instance, **_kwargs):
+    counts = instance.comments.filter(deleted=False).values(
+        'role_id').annotate(count=dj_models.Count('role_id')).order_by('id')
+    for item in counts:
+        update_role_comments_count(item['role_id'], -item['count'])
+
+
 class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
     comment_model = comment_models.Comment
 

@@ -20,3 +20,4 @@ on_update = dispatch.Signal(
 prepare_room = dispatch.Signal(providing_args=['room', 'threads', 'view'])
 prepare_threads = dispatch.Signal(providing_args=['threads', 'view'])
 room_to_json = dispatch.Signal(providing_args=['instance', 'response', 'view'])
+apply_mutation = dispatch.Signal(providing_args=['mutation', 'instance'])

@@ -256,3 +256,54 @@ def test_broken_last_comment(game, variation_forum, user, detective):
     assert response.status_code == 200
     data = response.json()
     assert 'last_comment' not in data['threads'][0]
+
+
+def test_delete_game_comments_with_thread(
+        game, variation_forum, detective, murderer, admin):
+    game.status = game_models.GAME_STATUS_IN_PROGRESS
+    with transaction.atomic():
+        game.save()
+    # create room
+    response = admin.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'thread', 'body': 'thread description',
+            'room': True,
+            'access_type': forum_threads.THREAD_ACCESS_TYPE_NOT_SET,
+            'granted_rights': []})
+    assert response.status_code == 200
+    room = response.json()
+    # create thread
+    response = admin.put(
+        room['url'], {
+            'title': 'thread', 'body': 'thread description',
+            'room': False,
+            'access_type': forum_threads.THREAD_ACCESS_TYPE_NOT_SET,
+            'granted_rights': [], 'role_id': detective.pk, 'media': {}
+        })
+    assert response.status_code == 200
+    thread = response.json()
+    # create second detective comment
+    response = admin.post(
+        thread['url'] + 'comments_page/', {
+            'reply_id': thread['first_comment_id'],
+            'title': 'Hello', 'body': 'my comment is awesome',
+            'role_id': detective.pk,
+            'media': {}})
+    assert response.status_code == 200
+    # create murderer comment
+    response = admin.post(
+        thread['url'] + 'comments_page/', {
+            'reply_id': thread['first_comment_id'],
+            'title': 'Hello', 'body': 'my comment is awesome',
+            'role_id': murderer.pk,
+            'media': {}})
+    assert response.status_code == 200
+    # check comments counts
+    assert story_models.Role.objects.get(pk=detective.pk).comments_count == 2
+    assert story_models.Role.objects.get(pk=murderer.pk).comments_count == 1
+    # delete room
+    response = admin.delete(room['url'] + '?comment=die')
+    assert response.status_code == 200
+    # check comments counts
+    assert story_models.Role.objects.get(pk=detective.pk).comments_count == 0
+    assert story_models.Role.objects.get(pk=murderer.pk).comments_count == 0
