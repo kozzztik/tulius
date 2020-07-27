@@ -14,6 +14,7 @@ def migrate_data(apps, schema_editor):
     print(f'start migrating {total_count} comments')
     for old_thread in OldThread.objects.filter(plugin_id=1).iterator(
             chunk_size=1000):
+        order = 0
         for old_item in OldComment.objects.filter(parent=old_thread).order_by(
                 'id').iterator(chunk_size=1000):
             new_item = Comment(
@@ -23,8 +24,7 @@ def migrate_data(apps, schema_editor):
                 create_time=old_item.create_time,
                 edit_time=old_item.edit_time,
                 deleted=old_item.deleted,
-                likes=old_item.likes,
-                page=old_item.page,
+                order=order,
                 data={},
                 media=old_item.media,
                 editor=old_item.editor_id,
@@ -34,7 +34,10 @@ def migrate_data(apps, schema_editor):
                 role_id=old_item.data1,
                 edit_role_id=old_item.data2,
             )
+            new_item.media['likes'] = old_item.likes
             new_item.save(force_insert=True)
+            if not new_item.deleted:
+                order += 1
             count += 1
         threads_count += 1
         gc.collect()

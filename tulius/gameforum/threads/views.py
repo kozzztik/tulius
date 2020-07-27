@@ -1,4 +1,3 @@
-from django import urls
 from django.core import exceptions
 from django.utils import html
 
@@ -55,12 +54,6 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
             })
         return data
 
-    def thread_url(self, thread_id):
-        return urls.reverse(
-            'game_forum_api:thread',
-            kwargs={
-                'variation_id': self.variation.id, 'pk': thread_id})
-
     def room_to_json(self, thread):
         data = {
             'id': thread.pk,
@@ -77,7 +70,7 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
                 self.role_to_json(user) for user in thread.accessed_users
             ],
             'threads_count': thread.threads_count if thread.room else None,
-            'url': self.thread_url(thread.pk),
+            'url': thread.get_absolute_url(),
         }
         signals.room_to_json.send(
             self.thread_model, instance=thread, response=data, view=self)
@@ -97,6 +90,7 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
     def create_thread(self, data):
         obj = super(BaseThreadAPI, self).create_thread(data)
         obj.role_id = self.process_role(None, data)
+        obj.variation_id = self.variation.pk
         return obj
 
     def update_thread(self, data):

@@ -32,8 +32,7 @@ class Migration(migrations.Migration):
                     blank=True, null=True, verbose_name='edited at')),
                 ('deleted', models.BooleanField(
                     default=False, verbose_name='deleted')),
-                ('likes', models.IntegerField(default=0, verbose_name='likes')),
-                ('page', models.IntegerField(default=0, verbose_name='page')),
+                ('order', models.IntegerField(verbose_name='order')),
                 ('data', jsonfield.fields.JSONField(
                     default=tulius.forum.comments.models.default_json)),
                 ('media', jsonfield.fields.JSONField(

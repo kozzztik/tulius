@@ -21,14 +21,8 @@ class RedirrectAPI(generic.View):
     def get(*args, **kwargs):
         pk = int(kwargs['pk'])
         thread = thread_models.Thread.objects.get(pk=pk)
-        if thread.parent_id is None:
-            variation = stories_models.Variation.objects.get(
-                thread=thread)
-        else:
-            variation = stories_models.Variation.objects.get(
-                thread__tree_id=thread.tree_id)
         return http.JsonResponse({
-            'variation_id': variation.id,
+            'variation_id': thread.variation_id,
             'room': thread.room,
         })
 

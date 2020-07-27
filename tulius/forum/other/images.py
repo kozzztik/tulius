@@ -34,7 +34,7 @@ def before_add_comment(comment, data, view, **_kwargs):
     images_data = data['media'].get('images')
     if not images_data:
         return
-    if view.obj.first_comment_id == comment.id:
+    if comment.is_thread():
         comment.media['images'] = view.obj.media['images']
     else:
         comment.media['images'] = validate_image_data(images_data)
@@ -50,7 +50,7 @@ def on_comment_update(comment, data, view, **_kwargs):
         del comment.media['images']
     elif images_data:
         comment.media['images'] = images_data
-    if view.obj.first_comment_id == comment.id:
+    if comment.is_thread():
         if (not images_data) and ('images' in view.obj.media):
             del view.obj.media['images']
         elif images_data:

@@ -71,7 +71,8 @@ def variation_fixture(story):
 @pytest.fixture(name='variation_forum')
 def variation_forum_fixture(variation, admin):
     thread = thread_models.Thread(
-        parent=None, user=admin.user, title=variation.name, body='', room=True)
+        parent=None, user=admin.user, title=variation.name, body='', room=True,
+        variation_id=variation.pk)
     thread.save()
     variation.thread = thread
     variation.save()

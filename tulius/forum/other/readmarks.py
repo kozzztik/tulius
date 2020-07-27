@@ -8,6 +8,7 @@ from tulius.forum.threads import models as thread_models
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.threads import views
 from tulius.forum.comments import models as comment_models
+from tulius.forum.comments import views as comment_views
 
 
 @dispatch.receiver(thread_signals.room_to_json)
@@ -18,9 +19,8 @@ def room_to_json(instance, response, view, **_kwargs):
         'id': instance.unreaded.id,
         'thread': {
             'id': instance.unreaded.parent_id,
-            'url': view.thread_url(instance.unreaded.parent_id),
         },
-        'page': instance.unreaded.page
+        'page': comment_views.order_to_page(instance.unreaded.order),
     } if instance.unreaded else None
 
 
@@ -68,7 +68,7 @@ class ReadmarkAPI(views.BaseThreadView):
         comment = cls.comment_model.objects.get(pk=comment_id)
         return {
             'id': comment.id,
-            'page_num': comment.page,
+            'page_num': comment_views.order_to_page(comment.order),
             'count': cls.comment_model.objects.filter(
                 parent_id=comment.parent_id, deleted=False, id__gt=comment.id
             ).exclude(user=user).count() + 1
@@ -94,22 +94,18 @@ class ReadmarkAPI(views.BaseThreadView):
         self.get_parent_thread(**kwargs)
         self.read_mark_model.objects.filter(
             thread=self.obj, user=self.user).delete()
-        comment = None
-        if self.obj.first_comment_id:
-            comment = self.comment_model.objects.get(
-                pk=self.obj.first_comment_id)
+        comment_id = self.obj.first_comment_id
         return {
             'last_read_id': None,
             'not_read_comment':
                 self.not_read_comment_json(
-                    comment.pk, self.user) if comment else None
+                    comment_id, self.user) if comment_id else None
         }
 
     @classmethod
     def on_delete_comment(cls, sender, comment, view, **_kwargs):
         thread = view.obj
-        if (comment.pk != thread.first_comment_id) and (
-                thread.last_comment_id <= comment.pk):
+        if (not comment.is_thread()) and (thread.last_comment_id <= comment.pk):
             comments = sender.objects.filter(
                 parent=thread, deleted=False, id__gt=comment.id).order_by('id')
             new_not_read = comments[0].id if comments else None
@@ -121,7 +117,7 @@ class ReadmarkAPI(views.BaseThreadView):
     def after_add_comment(cls, comment, preview, view, **_kwargs):
         if preview:
             return
-        if view.obj.first_comment_id != comment.id:
+        if not comment.is_thread():
             cls.read_mark_model.objects.filter(
                 thread=view.obj, not_readed_comment_id=None
             ).exclude(user=view.user).update(not_readed_comment_id=comment.pk)
@@ -165,8 +161,7 @@ class ReadmarkAPI(views.BaseThreadView):
                                     room.unreaded_id)):
                             room.unreaded_id = thread.first_comment_id
         if room.unreaded_id:
-            room.unreaded = cls.comment_model.objects.select_related(
-                'parent').get(id=room.unreaded_id)
+            room.unreaded = cls.comment_model.objects.get(id=room.unreaded_id)
 
     @classmethod
     def on_thread_prepare_thread(cls, threads, view, **_kwargs):

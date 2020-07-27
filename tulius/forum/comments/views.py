@@ -2,7 +2,6 @@ import json
 
 from django import dispatch
 from django import shortcuts
-from django import urls
 from django.core import exceptions
 from django.db import transaction
 from django.utils import html, timezone
@@ -29,6 +28,10 @@ def prepare_room_list(room, threads, **_kwargs):
             room.last_comment_id = thread.last_comment_id
 
 
+def order_to_page(order):
+    return int(order / CommentsBase.COMMENTS_ON_PAGE) + 1
+
+
 @dispatch.receiver(thread_signals.room_to_json, sender=thread_models.Thread)
 def room_to_json(instance, response, view, **_kwargs):
     if instance.last_comment_id is None:
@@ -42,10 +45,9 @@ def room_to_json(instance, response, view, **_kwargs):
         'id': last_comment.id,
         'thread': {
             'id': last_comment.parent_id,
-            'url': view.thread_url(last_comment.parent_id)
         },
-        'page': last_comment.page,
-        'user': views.user_to_json(last_comment.user),
+        'page': order_to_page(last_comment.order),
+        'user': last_comment.user.to_json(),
         'create_time': last_comment.create_time,
     }
     response['comments_count'] = instance.comments_count
@@ -58,12 +60,7 @@ class CommentsBase(views.BaseThreadView):
 
     @classmethod
     def pages_count(cls, thread):
-        return int(
-            (thread.comments_count - 1) / cls.COMMENTS_ON_PAGE + 1) or 1
-
-    @staticmethod
-    def comment_url(comment):
-        return urls.reverse('forum_api:comment', kwargs={'pk': comment.id})
+        return order_to_page(thread.comments_count - 1)
 
     def comment_edit_right(self, comment):
         return (comment.user == self.user) or self.rights.moderate
@@ -79,7 +76,7 @@ class CommentsBase(views.BaseThreadView):
         for comment in comments.order_by('id'):
             comment = cls.comment_model.objects.select_for_update(
                 ).get(pk=comment.pk)
-            comment.page = int(thread.comments_count / cls.COMMENTS_ON_PAGE) + 1
+            comment.order = thread.comments_count
             comment.save()
             thread.comments_count += 1
             if not thread.first_comment_id:
@@ -94,18 +91,18 @@ class CommentsBase(views.BaseThreadView):
             'id': c.id,
             'thread': {
                 'id': c.parent_id,
-                'url': self.thread_url(c.parent_id)
+                'url': c.parent.get_absolute_url()
             },
-            'page': c.page,
-            'url': self.comment_url(c) if c.pk else None,
+            'page': order_to_page(c.order),
+            'url': c.get_absolute_url() if c.pk else None,
             'title': html.escape(c.title),
             'body': bbcodes.bbcode(c.body),
-            'user': views.user_to_json(c.user, detailed=True),
+            'user': c.user.to_json(detailed=True),
             'create_time': c.create_time,
             'edit_right': self.comment_edit_right(c),
             'is_thread': c.is_thread(),
             'edit_time': c.edit_time,
-            'editor': views.user_to_json(c.editor) if c.editor else None,
+            'editor': c.editor.to_json() if c.editor else None,
             'media': c.media,
             'reply_id': c.reply_id,
         }
@@ -119,8 +116,11 @@ class CommentsPageAPI(CommentsBase):
         self.get_parent_thread(**kwargs)
         page_num = kwargs.get('page') or int(self.request.GET.get('page', 1))
         comments = self.comment_model.objects.select_related('user')
-        comments = comments.filter(
-            parent=self.obj, page=page_num).exclude(deleted=True)
+        comments = comments.exclude(deleted=True).filter(
+            parent=self.obj,
+            order__gte=CommentsBase.COMMENTS_ON_PAGE * (page_num - 1),
+            order__lt=CommentsBase.COMMENTS_ON_PAGE * page_num
+        )
         for comment in comments:
             # TODO remove it. needed only for c.is_thread() call
             comment.parent = self.obj
@@ -152,21 +152,19 @@ class CommentsPageAPI(CommentsBase):
         comment.title = data['title']
         comment.body = data['body']
         comment.reply_id = reply_id
+        comment.media = {}
+        comment.order = view.obj.comments_count
         return comment
 
     @classmethod
     def create_comment_process(cls, data, preview, view):
         comment = cls.create_comment(data, view=view)
-        comment.media = {}
         comment_signals.before_add.send(
             cls.comment_model, comment=comment, data=data, preview=preview,
             view=view)
-        comments_count = cls.comment_model.objects.filter(
-            parent=view.obj, deleted=False).count()
-        comment.page = int(comments_count / cls.COMMENTS_ON_PAGE) + 1
         if not preview:
             comment.save()
-        view.obj.comments_count = comments_count + 1
+        view.obj.comments_count += 1
         if not view.obj.first_comment_id:
             view.obj.first_comment_id = comment.pk
         view.obj.last_comment_id = comment.pk
@@ -193,8 +191,9 @@ class CommentsPageAPI(CommentsBase):
             # before comment will be accessible in DB
             self.obj.save()
             transaction.commit()
-            publisher.notify_thread_about_new_comment(self, self.obj, comment)
-            page = comment.page
+            page = order_to_page(comment.order)
+            publisher.notify_thread_about_new_comment(
+                self, self.obj, comment, page)
         else:
             page = self.pages_count(self.obj)
         return self.get_context_data(page=page, **kwargs)
@@ -214,7 +213,7 @@ class CommentBase(CommentsBase):
         self.comment = shortcuts.get_object_or_404(query, id=int(pk))
         self.get_parent_thread(
             pk=self.comment.parent_id, for_update=for_update, **kwargs)
-
+        self.comment.parent = self.obj  # for speedup
 
 class CommentAPI(CommentBase):
     def get_context_data(self, **kwargs):
@@ -224,7 +223,7 @@ class CommentAPI(CommentBase):
         data['thread']['parents'] = [{
             'id': parent.id,
             'title': parent.title,
-            'url': self.thread_url(parent.pk),
+            'url': parent.get_absolute_url(),
         } for parent in self.obj.get_ancestors()]
         return data
 
