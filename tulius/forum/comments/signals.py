@@ -10,6 +10,7 @@ after_add = dispatch.Signal(
     providing_args=['comment', 'data', 'preview', 'view'])
 
 on_delete = dispatch.Signal(providing_args=['comment', 'view'])
+on_thread_delete = dispatch.Signal(providing_args=['instance', 'mutation'])
 on_update = dispatch.Signal(
     providing_args=['comment', 'data', 'preview', 'view'])
 

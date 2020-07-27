@@ -131,13 +131,6 @@ class AbstractThread(mptt_models.MPTTModel):
     def __str__(self):
         return (self.title or self.body)[:40]
 
-    def check_deleted(self):
-        if self.deleted:
-            return True
-        if self.parent:
-            return self.parent.check_deleted()
-        return False
-
     def free_access_type(self):
         return self.access_type < THREAD_ACCESS_TYPE_NO_READ
 

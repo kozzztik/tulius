@@ -6,7 +6,6 @@ from django import shortcuts
 from django.core import exceptions
 from django.core.cache import cache
 from django.utils import html
-from django.utils import timezone
 from django.db import transaction
 from django.db.models import query_utils
 
@@ -16,6 +15,7 @@ from tulius.forum import const
 from tulius.forum import rights as forum_rights
 from tulius.forum.threads import models
 from tulius.forum.threads import signals
+from tulius.forum.threads import mutations
 from tulius.forum.rights import models as rights_models
 from djfw.wysibb.templatetags import bbcodes
 
@@ -29,15 +29,13 @@ class BaseThreadView(core.BaseAPIView):
         return forum_rights.default.DefaultRightsChecker(
             thread, self.user, parent_rights=parent_rights)
 
-    def get_parent_thread(self, pk=None, for_update=False, **kwargs):
+    def get_parent_thread(self, pk=None, for_update=False, **_kwargs):
         thread_id = int(pk)
         query = self.thread_model.objects.filter(deleted=False)
         if for_update:
             query = query.select_for_update()
         self.obj = shortcuts.get_object_or_404(query, id=thread_id)
-        # TODO delete all sub threads and rooms on room delete so it will be
-        # TODO not needed to do parent check here
-        if self.obj.check_deleted():
+        if self.obj.deleted:
             raise http.Http404('Post was deleted')
         self.rights = self._get_rights_checker(self.obj).get_rights()
         if not self.rights.read:
@@ -57,39 +55,7 @@ class BaseThreadView(core.BaseAPIView):
         readable = room.rights_checker.get_readable_descendants()
         room_list = [thread for thread in readable if thread.room]
         threads = [thread for thread in readable if not thread.room]
-        new_room_list = []
-        # TODO remove: looks like all this magic is needed just for case
-        # TODO of filtering children of deleted rooms
-        while room_list:
-            tested_room = room_list.pop(0)
-            parent_id = tested_room.parent_id
-            found_parent = (parent_id == room.id)
-            if not found_parent:
-                for tmp in room_list:
-                    if tmp.id == parent_id:
-                        found_parent = True
-                        break
-            if not found_parent:
-                for tmp in new_room_list:
-                    if tmp.id == parent_id:
-                        found_parent = True
-                        break
-            if not found_parent:
-                lft = tested_room.lft
-                rght = tested_room.rght
-                room_list = [
-                    tmp for tmp in room_list if
-                    not ((tmp.lft > lft) and (tmp.rght < rght))]
-                new_room_list = [
-                    tmp for tmp in new_room_list if
-                    not ((tmp.lft > lft) and (tmp.rght < rght))]
-            else:
-                new_room_list += [tested_room]
-        room_ids = [tmp.id for tmp in new_room_list]
-        threads = [
-            thread for thread in threads if
-            (thread.parent_id == room.id) or (thread.parent_id in room_ids)]
-        return new_room_list, threads
+        return room_list, threads
 
     def prepare_room_list(self, parent_rights, rooms):
         rooms = self._thread_list_apply_rights(parent_rights, rooms)
@@ -215,13 +181,8 @@ class ThreadView(BaseThreadView):
         self.get_parent_thread(for_update=True, **kwargs)
         if not self.rights.edit:
             raise exceptions.PermissionDenied()
-        self.obj.deleted = True
-        self.obj.data['deleted'] = {
-            'user_id': self.user.pk,
-            'time': timezone.now().isoformat(),
-            'description': request.GET['comment'],
-        }
-        self.obj.save()
+        mutations.ThreadDeleteMutation(
+            self.obj, self.user, request.GET['comment']).apply()
         return {'result': True}
 
     def put(self, request, **kwargs):

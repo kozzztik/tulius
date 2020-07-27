@@ -1,6 +1,7 @@
 from unittest import mock
 
 from tulius.forum.comments import views
+from tulius.forum.comments import models
 
 
 def test_delete_comments_pagination(room_group, thread, user):
@@ -41,3 +42,11 @@ def test_delete_comments_pagination(room_group, thread, user):
     data = response.json()
     assert len(data['comments']) == 1
     assert data['comments'][0]['id'] == comment2['id']
+
+
+def test_comment_delete_mutation(room_group, thread, superuser):
+    response = superuser.delete(room_group['url'] + '?comment=wow')
+    assert response.status_code == 200
+    obj = models.Comment.objects.get(pk=thread['first_comment_id'])
+    assert obj.deleted
+    assert obj.parent.deleted
