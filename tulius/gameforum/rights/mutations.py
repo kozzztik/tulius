@@ -1,7 +1,7 @@
 from tulius.forum.threads import mutations as base_mutations
 from tulius.forum.threads import models as forum_models
 from tulius.forum.rights import mutations
-from tulius.gameforum.rights import models as rights_models
+from tulius.gameforum import models as rights_models
 from tulius.stories import models as stories_models
 from tulius.games import models as game_models
 
@@ -34,15 +34,6 @@ class VariationMutationMixin(base_mutations.Mutation):
 
 class UpdateRights(mutations.UpdateRights, VariationMutationMixin):
     def _process_variation(self, rights):
-        if self.variation.game:
-            if self.variation.game.status == \
-                    game_models.GAME_STATUS_COMPLETED_OPEN:
-                rights['all'] |= forum_models.ACCESS_READ
-            if self.variation.game.status > game_models.GAME_STATUS_FINISHING:
-                rights['role_all'] &= ~forum_models.ACCESS_WRITE
-                rights['role_all'] &= ~forum_models.ACCESS_EDIT
-            if self.variation.game.status >= game_models.GAME_STATUS_FINISHING:
-                rights['role_all'] |= forum_models.ACCESS_READ
         for user_id in self.admins:
             rights['users'][user_id] = \
                 forum_models.ACCESS_OWN + forum_models.ACCESS_MODERATE
@@ -99,14 +90,32 @@ class UpdateRights(mutations.UpdateRights, VariationMutationMixin):
                     rights['users'].get(user_id, 0) | access_level
 
     def _process_author(self, instance, rights):
-        if not instance.role_id:
-            return
-        rights['roles'][instance.role_id] = \
-            rights['roles'].get(instance.role_id, 0) | forum_models.ACCESS_OWN
-        user_id = self.all_roles[instance.role_id].user_id
-        if user_id:
-            rights['users'][user_id] = \
-                rights['users'].get(user_id, 0) | forum_models.ACCESS_OWN
+        if instance.role_id:
+            rights['roles'][instance.role_id] = \
+                rights['roles'].get(
+                    instance.role_id, 0) | forum_models.ACCESS_OWN
+            user_id = self.all_roles[instance.role_id].user_id
+            if user_id:
+                rights['users'][user_id] = \
+                    rights['users'].get(user_id, 0) | forum_models.ACCESS_OWN
+        # process game specific rules that overrides all exceptions
+        if self.variation.game:
+            if self.variation.game.status == \
+                    game_models.GAME_STATUS_COMPLETED_OPEN:
+                rights['all'] |= forum_models.ACCESS_READ
+            if self.variation.game.status > game_models.GAME_STATUS_FINISHING:
+                block = forum_models.ACCESS_WRITE | forum_models.ACCESS_EDIT
+                rights['role_all'] &= ~block
+                rights['all'] &= ~block
+                rights['users'] = {
+                    pk: right & ~block
+                    for pk, right in rights['users'].items()}
+            if self.variation.game.status >= game_models.GAME_STATUS_FINISHING:
+                rights['role_all'] |= forum_models.ACCESS_READ
+                for role in self.all_roles.values():
+                    if role.user_id:
+                        rights['users'][role.user_id] = rights['users'].get(
+                            role.user_id, 0) | forum_models.ACCESS_READ
 
 
 class UpdateRightsOnThreadCreate(

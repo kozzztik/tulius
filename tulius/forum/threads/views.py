@@ -12,7 +12,6 @@ from django.db.models import query_utils
 from tulius.core.ckeditor import html_converter
 from tulius.forum import core
 from tulius.forum import const
-from tulius.forum import rights as forum_rights
 from tulius.forum.threads import models
 from tulius.forum.threads import signals
 from tulius.forum.threads import mutations
@@ -22,12 +21,7 @@ from djfw.wysibb.templatetags import bbcodes
 
 class BaseThreadView(core.BaseAPIView):
     obj = None
-    rights = None
     thread_model = models.Thread
-
-    def _get_rights_checker(self, thread, parent_rights=None):
-        return forum_rights.default.DefaultRightsChecker(
-            thread, self.user, parent_rights=parent_rights)
 
     def get_parent_thread(self, pk=None, for_update=False, **_kwargs):
         thread_id = int(pk)
@@ -37,7 +31,6 @@ class BaseThreadView(core.BaseAPIView):
         self.obj = shortcuts.get_object_or_404(query, id=thread_id)
         if self.obj.deleted:
             raise http.Http404('Post was deleted')
-        self.rights = self._get_rights_checker(self.obj).get_rights()
         if not self.obj.read_right(self.user):
             raise exceptions.PermissionDenied()
 
@@ -104,7 +97,13 @@ class BaseThreadView(core.BaseAPIView):
             parent=self.obj, room=room,
             title=data['title'], body=data['body'],
             user=self.user,
-            important=self.rights.moderate and important,
+            data={
+                'rights': {
+                    'all': 0,
+                    'users': {},
+                }
+            },
+            important=important and self.obj.moderate_right(self.user),
         )
 
     def update_thread(self, data):
@@ -128,7 +127,7 @@ class BaseThreadView(core.BaseAPIView):
                 'title': parent.title,
                 'url': parent.get_absolute_url(),
             } for parent in self.obj.get_ancestors()] if self.obj.pk else None,
-            'rights': self.rights.to_json(),
+            'rights': self.obj.rights_to_json(self.user),
             'access_type': self.obj.access_type,
             'first_comment_id': self.obj.first_comment_id,
         }
@@ -171,7 +170,7 @@ class ThreadView(BaseThreadView):
     @transaction.atomic
     def delete(self, request, **kwargs):
         self.get_parent_thread(for_update=True, **kwargs)
-        if not self.rights.edit:
+        if not self.obj.edit_right(self.user):
             raise exceptions.PermissionDenied()
         mutations.ThreadDeleteMutation(
             self.obj, self.user, request.GET['comment']).apply()
@@ -184,7 +183,7 @@ class ThreadView(BaseThreadView):
         preview = data.pop('preview', False)
         transaction.set_autocommit(False)
         self.get_parent_thread(for_update=not preview, **kwargs)
-        if not self.rights.write:
+        if not self.obj.write_right(self.user):
             raise exceptions.PermissionDenied()
         self.obj = self.create_thread(data)
         signals.before_create.send(
@@ -209,7 +208,7 @@ class ThreadView(BaseThreadView):
         data['body'] = html_converter.html_to_bb(data['body'])
         preview = data.pop('preview', False)
         self.get_parent_thread(for_update=True, **kwargs)
-        if not self.rights.edit:
+        if not self.obj.edit_right(self.user):
             raise exceptions.PermissionDenied()
         self.update_thread(data)
         signals.on_update.send(
@@ -279,7 +278,6 @@ class IndexView(BaseThreadView):
     def get_context_data(self, **kwargs):
         all_rooms = list(self.get_index(1))
         groups = self.get_index(0)
-        self.rights = self._get_rights_checker(None).get_rights_for_root()
         for group in groups:
             group.rooms = [
                 thread for thread in all_rooms if thread.parent_id == group.id]
@@ -299,8 +297,7 @@ class IndexView(BaseThreadView):
 
     def put(self, request, **_kwargs):
         transaction.set_autocommit(False)
-        self.rights = self._get_rights_checker(None).get_rights_for_root()
-        if not self.rights.moderate:
+        if not self.user.is_superuser:
             raise exceptions.PermissionDenied()
         data = json.loads(request.body)
         data['title'] = html_converter.html_to_bb(data['title'])
@@ -326,11 +323,11 @@ class MoveThreadView(BaseThreadView):
         data = json.loads(request.body)
         parent_id = data['parent_id']
         self.get_parent_thread(parent_id, for_update=True)
-        if not self.rights.write:
+        if not self.obj.write_right(self.user):
             raise exceptions.PermissionDenied('No target write right')
         new_parent = self.obj
         self.get_parent_thread(for_update=True, **kwargs)
-        if not self.rights.edit:
+        if not self.obj.edit_right(self.user):
             raise exceptions.PermissionDenied('No source edit right')
         if new_parent.is_descendant_of(self.obj, include_self=True):
             raise exceptions.PermissionDenied('Cant move inside yourself')

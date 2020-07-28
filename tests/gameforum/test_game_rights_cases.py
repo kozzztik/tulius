@@ -243,10 +243,9 @@ def test_chain_write_rights(game, variation_forum, admin, user, detective):
     game.status = game_models.GAME_STATUS_IN_PROGRESS
     with transaction.atomic():
         game.save()
-    base_url = f'/api/game_forum/variation/{game.variation.pk}/'
     # create thread room with read limits
     response = admin.put(
-        base_url + f'thread/{variation_forum.id}/', {
+        variation_forum.get_absolute_url(), {
             'title': 'room', 'body': 'room description',
             'room': True, 'access_type': models.THREAD_ACCESS_TYPE_NO_WRITE,
             'granted_rights': [], 'media': {}})
@@ -290,16 +289,14 @@ def test_chain_write_rights(game, variation_forum, admin, user, detective):
         }
     )
     assert response.status_code == 200
-    # and now can write
+    # and now still cant write
     response = user.post(
         thread['url'] + 'comments_page/', {
             'reply_id': thread['first_comment_id'],
             'title': 'Hello', 'body': 'my comment is awesome',
             'media': {}, 'role_id': detective.pk,
         })
-    assert response.status_code == 200
-    data = response.json()
-    assert len(data['comments']) == 2
+    assert response.status_code == 403
 
 
 def test_broken_tree_rights(game, variation_forum, admin):

@@ -171,6 +171,10 @@ class AbstractThread(mptt_models.MPTTModel):
         return bool(
             user.is_superuser or (self._rights(user.pk) & ACCESS_MODERATE))
 
+    def edit_right(self, user):
+        return bool(
+            user.is_superuser or (self._rights(user.pk) & ACCESS_EDIT))
+
     @property
     def moderators(self):
         return User.objects.filter(pk__in=[
@@ -184,6 +188,14 @@ class AbstractThread(mptt_models.MPTTModel):
         return User.objects.filter(pk__in=[
             pk for pk, right in self.data['rights']['users'].items()
             if right & ACCESS_READ])
+
+    def rights_to_json(self, user):
+        return {
+            'write': self.write_right(user),
+            'moderate': self.moderate_right(user),
+            'edit': self.edit_right(user),
+            'move': self.edit_right(user),
+        }
 
 
 class Thread(AbstractThread):

@@ -4,9 +4,10 @@ from django.utils import html
 from tulius.forum.threads import signals
 from tulius.forum.threads import views
 from tulius.forum.threads import counters
+from tulius.forum.threads import models as forum_models
 from tulius.gameforum import base
-from tulius.gameforum import rights
 from tulius.gameforum.threads import models as thread_models
+from tulius.stories import models as stories_models
 from djfw.wysibb.templatetags import bbcodes
 
 
@@ -16,16 +17,30 @@ class CountersFix(counters.CountersFix):
 
 class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
     thread_model = thread_models.Thread
+    all_roles = None
 
     def get_parent_thread(self, pk=None, for_update=False, **_kwargs):
         super(BaseThreadAPI, self).get_parent_thread(
             pk=pk, for_update=for_update, **_kwargs)
         if self.obj.variation_id != self.variation.pk:
             raise exceptions.PermissionDenied('Wrong variation')
+        self.all_roles = {
+            role.id: role for role in stories_models.Role.objects.filter(
+                variation=self.variation)}
 
-    def _get_rights_checker(self, thread, parent_rights=None):
-        return rights.RightsChecker(
-            self.variation, thread, self.user, parent_rights=parent_rights)
+    def write_roles(self):
+        rights = self.obj.data['rights']['roles']
+        result = []
+        admin = self.variation.edit_right(self.user)
+        if admin:
+            result.append(None)
+        for role in self.all_roles.values():
+            r = self.obj.data['rights']['role_all'] | rights.get(
+                str(role.pk), 0) | rights.get(role.pk, 0)
+            r &= forum_models.ACCESS_WRITE
+            if admin or ((role.user_id == self.user.pk) and r):
+                result.append(role.pk)
+        return result
 
     def role_to_json(self, role_id, detailed=False):
         if role_id is None:
@@ -39,7 +54,7 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
                 'trust': None,
                 'show_trust_marks': False,
             }
-        role = self.rights.all_roles[role_id]
+        role = self.all_roles[role_id]
         data = {
             'id': role.id,
             'title': html.escape(role.name),
@@ -85,11 +100,11 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
     def process_role(self, init_role_id, data):
         role_id = data.get('role_id')
         if role_id:
-            if role_id not in self.rights.all_roles:
+            if role_id not in self.all_roles:
                 raise exceptions.PermissionDenied('Role does not exist')
             if role_id == init_role_id:
                 return role_id
-        if role_id not in self.rights.user_write_roles:
+        if role_id not in self.write_roles():
             raise exceptions.PermissionDenied('Role is not accessible here')
         return role_id
 
@@ -103,7 +118,7 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
         super(BaseThreadAPI, self).update_thread(data)
         self.obj.role_id = self.process_role(self.obj.role_id, data)
         editor_role = data['edit_role_id']
-        if editor_role not in self.rights.user_write_roles:
+        if editor_role not in self.write_roles():
             raise exceptions.PermissionDenied()
         self.obj.edit_role_id = editor_role
 

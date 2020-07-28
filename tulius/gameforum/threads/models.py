@@ -32,3 +32,11 @@ class Thread(thread_models.AbstractThread):
         return [
             int(pk) for pk, right in self.data['rights']['roles'].items()
             if right & thread_models.ACCESS_READ]
+
+    def rights_to_json(self, user):
+        return {
+            'write': self.write_right(user),
+            'moderate': self.moderate_right(user),
+            'edit': self.edit_right(user),
+            'move': self.moderate_right(user),
+        }

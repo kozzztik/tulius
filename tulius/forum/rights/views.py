@@ -52,7 +52,7 @@ class BaseGrantedRightsAPI(views.BaseThreadView):
 class GrantedRightsAPI(BaseGrantedRightsAPI):
     def get_context_data(self, **kwargs):
         self.get_parent_thread(**kwargs)
-        if not self.rights.edit:
+        if not self.obj.edit_right(self.user):
             raise exceptions.PermissionDenied()
         objs = self.rights_model.objects.filter(thread=self.obj).order_by('id')
         return {
@@ -62,7 +62,7 @@ class GrantedRightsAPI(BaseGrantedRightsAPI):
     @transaction.atomic
     def post(self, request, **kwargs):
         self.get_parent_thread(for_update=True, **kwargs)
-        if not self.rights.edit:
+        if not self.obj.edit_right(self.user):
             raise exceptions.PermissionDenied()
         data = json.loads(request.body)
         obj = self.create_right(data)
@@ -74,7 +74,7 @@ class GrantedRightsAPI(BaseGrantedRightsAPI):
     def put(self, request, **kwargs):
         data = json.loads(request.body)
         self.get_parent_thread(for_update=True, **kwargs)
-        if not self.rights.edit:
+        if not self.obj.edit_right(self.user):
             raise exceptions.PermissionDenied()
         self.obj.access_type = data['access_type']
         self.get_mutation(self.obj).apply()
@@ -92,7 +92,7 @@ thread_signals.on_fix_counters.connect(
 class GrantedRightAPI(BaseGrantedRightsAPI):
     def get_context_data(self, **kwargs):
         self.get_parent_thread(**kwargs)
-        if not self.rights.edit:
+        if not self.obj.edit_right(self.user):
             raise exceptions.PermissionDenied()
         obj = self.rights_model.objects.get(pk=kwargs['right_id'])
         return obj.to_json()
@@ -100,7 +100,7 @@ class GrantedRightAPI(BaseGrantedRightsAPI):
     @transaction.atomic
     def delete(self, *_args, right_id=None, **kwargs):
         self.get_parent_thread(for_update=True, **kwargs)
-        if not self.rights.edit:
+        if not self.obj.edit_right(self.user):
             raise exceptions.PermissionDenied()
         count = self.rights_model.objects.filter(pk=right_id).delete()
         if count:
@@ -110,7 +110,7 @@ class GrantedRightAPI(BaseGrantedRightsAPI):
     @transaction.atomic
     def post(self, request, right_id=None, **kwargs):
         self.get_parent_thread(for_update=True, **kwargs)
-        if not self.rights.edit:
+        if not self.obj.edit_right(self.user):
             raise exceptions.PermissionDenied()
         data = json.loads(request.body)
         obj = shortcuts.get_object_or_404(
