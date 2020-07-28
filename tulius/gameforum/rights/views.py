@@ -1,4 +1,5 @@
 from django import dispatch
+from django.db import models as dj_models
 
 from tulius.forum.rights import views
 from tulius.forum.threads import signals as thread_signals
@@ -7,6 +8,7 @@ from tulius.gameforum.threads import models as thread_models
 from tulius.gameforum.threads import views as threads_api
 from tulius.gameforum.rights import mutations
 from tulius.games import signals as game_signals
+from tulius.games import models as game_models
 from tulius.stories import models as stories_models
 
 
@@ -29,6 +31,26 @@ def game_status_changed(sender, **_kwargs):
     variation = sender.variation
     if variation.thread:
         mutations.UpdateRights(variation.thread, variation).apply()
+
+
+@dispatch.receiver(dj_models.signals.post_delete, sender=game_models.GameAdmin)
+@dispatch.receiver(dj_models.signals.post_save, sender=game_models.GameAdmin)
+@dispatch.receiver(dj_models.signals.post_delete, sender=game_models.GameGuest)
+@dispatch.receiver(dj_models.signals.post_save, sender=game_models.GameGuest)
+def on_game_models_updates(instance, **_kwargs):
+    variation = instance.game.variation
+    if variation.thread:
+        mutations.UpdateRights(variation.thread, variation).apply()
+
+
+@dispatch.receiver(
+    dj_models.signals.post_delete, sender=stories_models.StoryAdmin)
+@dispatch.receiver(
+    dj_models.signals.post_save, sender=stories_models.StoryAdmin)
+def on_stories_models_updates(instance, **_kwargs):
+    for variation in instance.story.variations.all():
+        if variation.thread:
+            mutations.UpdateRights(variation.thread, variation).apply()
 
 
 class BaseGrantedRightsAPI(

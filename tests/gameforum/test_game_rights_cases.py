@@ -318,3 +318,58 @@ def test_broken_tree_rights(game, variation_forum, admin):
     # now get thread. Previously it caused 500 on tree rights check.
     response = admin.get(thread['url'])
     assert response.status_code == 200
+
+
+def test_grant_rights_to_variation(variation, variation_forum, user):
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 403
+    # grant rights
+    admin = story_models.StoryAdmin(story=variation.story, user=user.user)
+    admin.save()
+    # check
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 200
+    # delete
+    admin.delete()
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 403
+
+
+def test_grant_rights_to_game(game, variation_forum, user):
+    game.status = game_models.GAME_STATUS_IN_PROGRESS
+    with transaction.atomic():
+        game.save()
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 403
+    # grant rights
+    admin = game_models.GameAdmin(game=game, user=user.user)
+    admin.save()
+    # check
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 200
+    response = user.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'access_type': models.THREAD_ACCESS_TYPE_NO_WRITE,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    # delete
+    admin.delete()
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 403
+    # grant guest rights
+    guest = game_models.GameGuest(game=game, user=user.user)
+    guest.save()
+    # check
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 200
+    response = user.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'access_type': models.THREAD_ACCESS_TYPE_NO_WRITE,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 403
+    # delete
+    guest.delete()
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 403
