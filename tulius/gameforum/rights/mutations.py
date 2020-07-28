@@ -84,7 +84,8 @@ class UpdateRights(mutations.UpdateRights, VariationMutationMixin):
             if access_level & forum_models.ACCESS_MODERATE:
                 access_level |= forum_models.ACCESS_OWN
             rights['roles'][right.role_id] = access_level
-            user_id = self.all_roles[right.role_id].user_id
+            role = self.all_roles.get(right.role_id)
+            user_id = role.user_id if role else None
             if user_id:
                 rights['users'][user_id] = \
                     rights['users'].get(user_id, 0) | access_level

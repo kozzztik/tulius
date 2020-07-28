@@ -1,7 +1,6 @@
 import json
 
 from django import dispatch
-from django import http
 from django import shortcuts
 from django.core import exceptions
 from django.core.cache import cache
@@ -29,8 +28,6 @@ class BaseThreadView(core.BaseAPIView):
         if for_update:
             query = query.select_for_update()
         self.obj = shortcuts.get_object_or_404(query, id=thread_id)
-        if self.obj.deleted:
-            raise http.Http404('Post was deleted')
         if not self.obj.read_right(self.user):
             raise exceptions.PermissionDenied()
 
@@ -39,10 +36,9 @@ class BaseThreadView(core.BaseAPIView):
             thread for thread in thread_list if thread.read_right(self.user)]
 
     def room_descendants(self, room):
-        if room.rght - room.lft <= 1:
+        if not room.descendant_count():
             return [], []
-        threads = self.thread_model.objects.get_descendants(room).filter(
-            deleted=False)
+        threads = room.get_descendants().filter(deleted=False)
         readable = [t for t in threads if t.read_right(self.user)]
         room_list = [thread for thread in readable if thread.room]
         threads = [thread for thread in readable if not thread.room]

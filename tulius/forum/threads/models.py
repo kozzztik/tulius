@@ -38,29 +38,7 @@ default_rights = {
 
 
 class ThreadManager(mptt_models.TreeManager):
-    def get_ancestors(self, parent):
-        if parent.tree_id:
-            return self.filter(
-                tree_id=parent.tree_id, lft__lt=parent.lft,
-                rght__gt=parent.rght)
-        if not parent.parent_id:
-            return self.none()
-        return self.filter(
-            tree_id=parent.parent.tree_id,
-            lft__lte=parent.parent.lft, rght__gte=parent.parent.rght)
-
-    def get_descendants(self, parent):
-        if parent.get_descendant_count():
-            return self.filter(
-                tree_id=parent.tree_id, lft__gt=parent.lft,
-                rght__lt=parent.rght, deleted=False)
-        return self.none()
-
-    def get_protected_descendants(self, parent):
-        if parent.get_descendant_count():
-            return self.get_descendants(parent).exclude(
-                access_type__lt=THREAD_ACCESS_TYPE_NO_READ)
-        return self.none()
+    pass
 
 
 def default_json():
@@ -143,12 +121,6 @@ class AbstractThread(mptt_models.MPTTModel):
 
     def __str__(self):
         return (self.title or self.body)[:40]
-
-    def free_access_type(self):
-        return self.access_type < THREAD_ACCESS_TYPE_NO_READ
-
-    def is_thread(self):
-        return not self.room
 
     def descendant_count(self):
         return (self.rght - self.lft - 1) / 2
