@@ -10,47 +10,28 @@ from tulius.forum.rights import models
 from tulius.forum.threads import models as thread_models
 from tulius.forum.threads import views
 from tulius.forum.threads import signals as thread_signals
-from tulius.forum.rights import consts
+from tulius.forum.rights import mutations
 
 
-@dispatch.receiver(thread_signals.before_create)
-def before_create_thread(sender, instance, data, **_kwargs):
-    instance.access_type = int(data['access_type'])
-    ancestors = sender.objects.get_ancestors(instance)
-    if (not free_access_type(instance.access_type)) and instance.parent_id:
-        if instance.room:
-            ancestors.filter(
-                protected_threads=consts.THREAD_NO_PR
-            ).update(protected_threads=consts.THREAD_HAVE_PR_ROOMS)
-            ancestors.filter(
-                protected_threads=consts.THREAD_HAVE_PR_THREADS
-            ).update(
-                protected_threads=consts.THREAD_HAVE_PR_THREADS +
-                consts.THREAD_HAVE_PR_ROOMS)
-        else:
-            ancestors.filter(
-                protected_threads=consts.THREAD_NO_PR
-            ).update(protected_threads=consts.THREAD_HAVE_PR_THREADS)
-            ancestors.filter(
-                protected_threads=consts.THREAD_HAVE_PR_ROOMS
-            ).update(
-                protected_threads=consts.THREAD_HAVE_PR_THREADS +
-                consts.THREAD_HAVE_PR_ROOMS)
+@dispatch.receiver(thread_signals.before_create, sender=thread_models.Thread)
+def before_create_thread(instance, data, preview, **_kwargs):
+    if not preview:
+        mutations.UpdateRightsOnThreadCreate(instance, data).apply()
 
 
 @dispatch.receiver(thread_signals.after_create, sender=thread_models.Thread)
 def after_create_thread(instance, data, preview, **_kwargs):
-    if preview:
-        return
-    for right in data['granted_rights']:
-        models.ThreadAccessRight(
-            thread=instance, user_id=int(right['user']['id']),
-            access_level=right['access_level']).save()
+    if not preview:
+        mutations.UpdateRightsOnThreadCreate(instance, data).save_exceptions()
 
 
 class BaseGrantedRightsAPI(views.BaseThreadView):
     rights_model = models.ThreadAccessRight
     require_user = True
+
+    @staticmethod
+    def get_mutation(thread):
+        return mutations.UpdateRights(thread)
 
     def create_right(self, data):
         obj = self.rights_model.objects.get_or_create(
@@ -68,10 +49,6 @@ class BaseGrantedRightsAPI(views.BaseThreadView):
         }
 
 
-def free_access_type(access_type):
-    return access_type < thread_models.THREAD_ACCESS_TYPE_NO_READ
-
-
 class GrantedRightsAPI(BaseGrantedRightsAPI):
     def get_context_data(self, **kwargs):
         self.get_parent_thread(**kwargs)
@@ -82,13 +59,15 @@ class GrantedRightsAPI(BaseGrantedRightsAPI):
             'granted_rights': [r.to_json() for r in objs]
         }
 
+    @transaction.atomic
     def post(self, request, **kwargs):
-        self.get_parent_thread(**kwargs)
+        self.get_parent_thread(for_update=True, **kwargs)
         if not self.rights.edit:
             raise exceptions.PermissionDenied()
         data = json.loads(request.body)
         obj = self.create_right(data)
         obj.save()
+        self.get_mutation(self.obj).apply()
         return obj.to_json()
 
     @transaction.atomic
@@ -97,26 +76,13 @@ class GrantedRightsAPI(BaseGrantedRightsAPI):
         self.get_parent_thread(for_update=True, **kwargs)
         if not self.rights.edit:
             raise exceptions.PermissionDenied()
-        old = self.obj.access_type
         self.obj.access_type = data['access_type']
-        if free_access_type(old) != free_access_type(data['access_type']):
-            # TODO guess that is not enough and its needed to fix have_PR flags
-            # on parents
-            self.on_fix_counters(self.thread_model, self.obj, self)
-        self.obj.save()
+        self.get_mutation(self.obj).apply()
         return {'access_type': self.obj.access_type}
 
     @classmethod
     def on_fix_counters(cls, sender, thread, view, **kwargs):
-        pr_rooms = sender.objects.get_protected_descendants(
-            thread).filter(room=True)
-        pr_threads = sender.objects.get_protected_descendants(
-            thread).filter(room=False)
-        thread.protected_threads = consts.THREAD_NO_PR
-        if pr_rooms:
-            thread.protected_threads += consts.THREAD_HAVE_PR_ROOMS
-        if pr_threads:
-            thread.protected_threads += consts.THREAD_HAVE_PR_THREADS
+        cls.get_mutation(thread).apply()
 
 
 thread_signals.on_fix_counters.connect(
@@ -131,21 +97,25 @@ class GrantedRightAPI(BaseGrantedRightsAPI):
         obj = self.rights_model.objects.get(pk=kwargs['right_id'])
         return obj.to_json()
 
-    def delete(self, *args, right_id=None, **kwargs):
-        self.get_parent_thread(**kwargs)
+    @transaction.atomic
+    def delete(self, *_args, right_id=None, **kwargs):
+        self.get_parent_thread(for_update=True, **kwargs)
         if not self.rights.edit:
             raise exceptions.PermissionDenied()
         count = self.rights_model.objects.filter(pk=right_id).delete()
+        if count:
+            self.get_mutation(self.obj).apply()
         return {'count': count}
 
+    @transaction.atomic
     def post(self, request, right_id=None, **kwargs):
-        self.get_parent_thread(**kwargs)
+        self.get_parent_thread(for_update=True, **kwargs)
         if not self.rights.edit:
             raise exceptions.PermissionDenied()
         data = json.loads(request.body)
-        with transaction.atomic():
-            obj = shortcuts.get_object_or_404(
-                self.rights_model.objects.select_for_update(), pk=right_id)
-            obj.access_level = data['access_level']
-            obj.save()
+        obj = shortcuts.get_object_or_404(
+            self.rights_model.objects.select_for_update(), pk=right_id)
+        obj.access_level = data['access_level']
+        obj.save()
+        self.get_mutation(self.obj).apply()
         return obj.to_json()

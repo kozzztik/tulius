@@ -38,7 +38,7 @@ class BaseThreadView(core.BaseAPIView):
         if self.obj.deleted:
             raise http.Http404('Post was deleted')
         self.rights = self._get_rights_checker(self.obj).get_rights()
-        if not self.rights.read:
+        if not self.obj.read_right(self.user):
             raise exceptions.PermissionDenied()
 
     def _thread_list_apply_rights(self, parent_rights, thread_list):
@@ -46,7 +46,8 @@ class BaseThreadView(core.BaseAPIView):
             thread.rights_checker = self._get_rights_checker(
                 thread, parent_rights=parent_rights)
             thread.rights = thread.rights_checker.get_rights()
-        return [thread for thread in thread_list if thread.rights.read]
+        return [
+            thread for thread in thread_list if thread.read_right(self.user)]
 
     @staticmethod
     def room_descendants(room):
@@ -118,7 +119,7 @@ class BaseThreadView(core.BaseAPIView):
     def update_thread(self, data):
         self.obj.title = data['title']
         self.obj.body = data['body']
-        if self.rights.moderate and not self.obj.room:
+        if self.obj.moderate_right(self.user) and not self.obj.room:
             self.obj.important = bool(data['important'])
             self.obj.closed = bool(data['closed'])
 
@@ -196,7 +197,8 @@ class ThreadView(BaseThreadView):
             raise exceptions.PermissionDenied()
         self.obj = self.create_thread(data)
         signals.before_create.send(
-            self.thread_model, instance=self.obj, data=data, view=self)
+            self.thread_model, instance=self.obj, data=data, view=self,
+            preview=preview)
         if not preview:
             self.obj.save()
         signals.after_create.send(
@@ -316,7 +318,8 @@ class IndexView(BaseThreadView):
             raise exceptions.PermissionDenied()
         thread = self.create_thread(data)
         signals.before_create.send(
-            self.thread_model, instance=thread, data=data, view=self)
+            self.thread_model, instance=thread, data=data, view=self,
+            preview=False)
         thread.save()
         signals.after_create.send(
             self.thread_model, instance=thread, data=data, preview=False,

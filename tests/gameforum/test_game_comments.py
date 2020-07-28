@@ -15,7 +15,7 @@ def test_comments_api(
     base_url = f'/api/game_forum/variation/{game.variation.id}/'
     # create thread with "no read" and no role
     response = admin.put(
-        base_url + f'thread/{variation_forum.id}/', {
+        variation_forum.get_absolute_url(), {
             'title': 'thread', 'body': 'thread description',
             'room': False,
             'access_type': forum_threads.THREAD_ACCESS_TYPE_NO_WRITE,

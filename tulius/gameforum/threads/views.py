@@ -17,6 +17,12 @@ class CountersFix(counters.CountersFix):
 class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
     thread_model = thread_models.Thread
 
+    def get_parent_thread(self, pk=None, for_update=False, **_kwargs):
+        super(BaseThreadAPI, self).get_parent_thread(
+            pk=pk, for_update=for_update, **_kwargs)
+        if self.obj.variation_id != self.variation.pk:
+            raise exceptions.PermissionDenied('Wrong variation')
+
     def _get_rights_checker(self, thread, parent_rights=None):
         return rights.RightsChecker(
             self.variation, thread, self.user, parent_rights=parent_rights)

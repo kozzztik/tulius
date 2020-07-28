@@ -23,6 +23,19 @@ THREAD_ACCESS_TYPE_CHOICES = (
     (THREAD_ACCESS_TYPE_NO_READ, _(u'private(no access)')),
 )
 
+ACCESS_READ = 1
+ACCESS_WRITE = 2
+ACCESS_MODERATE = 4
+ACCESS_EDIT = 8
+
+ACCESS_OWN = ACCESS_READ + ACCESS_WRITE + ACCESS_EDIT
+
+default_rights = {
+    THREAD_ACCESS_TYPE_NO_READ: 0,
+    THREAD_ACCESS_TYPE_NO_WRITE: ACCESS_READ,
+    THREAD_ACCESS_TYPE_OPEN: ACCESS_READ + ACCESS_WRITE,
+}
+
 
 class ThreadManager(mptt_models.TreeManager):
     def get_ancestors(self, parent):
@@ -142,6 +155,21 @@ class AbstractThread(mptt_models.MPTTModel):
 
     def get_absolute_url(self):
         return urls.reverse('forum_api:thread', kwargs={'pk': self.pk})
+
+    def _rights(self, user_id):
+        rights = self.data['rights']
+        return rights['all'] | rights['users'].get(str(user_id), 0)
+
+    def read_right(self, user):
+        return bool(
+            user.is_superuser or (self._rights(user.pk) & ACCESS_READ))
+
+    def write_right(self, user):
+        return bool(user.is_superuser or (self._rights(user.pk) & ACCESS_WRITE))
+
+    def moderate_right(self, user):
+        return bool(
+            user.is_superuser or (self._rights(user.pk) & ACCESS_MODERATE))
 
 
 class Thread(AbstractThread):
