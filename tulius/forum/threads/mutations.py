@@ -9,7 +9,7 @@ class Mutation:
     with_descendants = False
     with_parent = False
 
-    def __init__(self, thread):
+    def __init__(self, thread, **kwargs):
         self.thread = thread
 
     def process_thread(self, instance):
@@ -19,6 +19,8 @@ class Mutation:
         pass
 
     def process_descendant(self, instance, parent):
+        # instance should see all changes done on parent
+        instance.parent = parent
         self.process_thread(instance)
 
     def apply(self):

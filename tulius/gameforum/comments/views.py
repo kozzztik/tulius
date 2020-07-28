@@ -181,7 +181,7 @@ def on_delete(comment, view, **_kwargs):
 class CommentAPI(comments.CommentAPI, CommentsBase):
     def get_context_data(self, **kwargs):
         data = super(CommentAPI, self).get_context_data(**kwargs)
-        data['thread']['rights'] = self.rights.to_json()
+        data['thread']['rights'] = self.obj.rights_to_json(self.user)
         return data
 
     @classmethod
@@ -189,13 +189,13 @@ class CommentAPI(comments.CommentAPI, CommentsBase):
         super(CommentAPI, cls).update_comment(comment, data, preview, view)
         new_role = data['role_id']
         if comment.role_id != new_role:
-            if new_role not in view.rights.user_write_roles:
+            if new_role not in view.write_roles():
                 raise exceptions.PermissionDenied()
             update_role_comments_count(new_role, 1)
             update_role_comments_count(comment.role_id, -1)
             comment.role_id = new_role
         editor_role = data['edit_role_id']
-        if editor_role not in view.rights.user_write_roles:
+        if editor_role not in view.write_roles():
             raise exceptions.PermissionDenied()
         comment.edit_role_id = editor_role
 

@@ -36,22 +36,13 @@ class CommentLike(other_models.AbstractCommentLike):
     )
 
 
-class OnlineUser(models.Model):
-    class Meta:
-        verbose_name = _(u'online user')
-        verbose_name_plural = _(u'online users')
-        unique_together = ['user', 'thread']
-
+class OnlineUser(other_models.AbstractOnlineUser):
     user = models.ForeignKey(
         User, models.PROTECT,
         blank=False,
         null=False,
         verbose_name=_(u'user'),
         related_name='game_forum_visit',
-    )
-    visit_time = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name=_('visit time'),
     )
     thread = models.ForeignKey(
         thread_models.Thread, models.PROTECT,
@@ -60,9 +51,6 @@ class OnlineUser(models.Model):
         verbose_name=_(u'thread'),
         related_name='visit_marks',
     )
-
-    def __str__(self):
-        return str(self.user)
 
 
 class VotingVote(other_models.AbstractVotingVote):

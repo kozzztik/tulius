@@ -29,20 +29,16 @@ class ReadmarkAPI(views.BaseThreadView):
     read_mark_model = models.ThreadReadMark
     comment_model = comment_models.Comment
 
-    def mark_room_as_read(self, room, room_rights):
+    def mark_room_as_read(self, room):
         if room:
             threads = room.get_children()
         else:
             threads = self.thread_model.objects.filter(parent=None)
-        threads = {
-            thread: self._get_rights_checker(
-                thread, parent_rights=room_rights).get_rights()
-            for thread in threads}
-        for thread, rights in threads.items():
-            if not rights.read:
+        for thread in threads:
+            if not thread.read_right(self.user):
                 continue
             if thread.room:
-                self.mark_room_as_read(thread, rights)
+                self.mark_room_as_read(thread)
             else:
                 self.mark_thread_as_read(thread, None)
 
@@ -80,7 +76,7 @@ class ReadmarkAPI(views.BaseThreadView):
         read_id = json.loads(self.request.body)['comment_id']
         read_mark = None
         if (not self.obj) or self.obj.room:
-            self.mark_room_as_read(self.obj, self.rights)
+            self.mark_room_as_read(self.obj)
         else:
             read_mark = self.mark_thread_as_read(self.obj, read_id)
         return {

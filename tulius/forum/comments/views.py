@@ -63,7 +63,8 @@ class CommentsBase(views.BaseThreadView):
         return order_to_page(thread.comments_count - 1)
 
     def comment_edit_right(self, comment):
-        return (comment.user == self.user) or self.rights.moderate
+        return (comment.user == self.user) or \
+            self.obj.moderate_right(self.user)
 
     @classmethod
     def on_fix_counters(cls, sender, thread, view, **kwargs):
@@ -178,7 +179,7 @@ class CommentsPageAPI(CommentsBase):
     def post(self, request, **kwargs):
         transaction.set_autocommit(False)
         self.get_parent_thread(for_update=True, **kwargs)
-        if not self.rights.write:
+        if not self.obj.write_right(self.user):
             raise exceptions.PermissionDenied()
         data = json.loads(request.body)
         data['body'] = html_converter.html_to_bb(data['body'])

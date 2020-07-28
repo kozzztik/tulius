@@ -2,14 +2,20 @@ from tulius.forum.threads import models as forum_models
 from tulius.gameforum.threads import models
 from tulius.gameforum import models as game_forum_models
 from tulius.gameforum.comments import models as comment_models
+from tulius.gameforum.rights import mutations
 
 
 def create_game_forum(user, variation):
     title = variation.game.name if variation.game else variation.name
     thread = models.Thread(
         title=title, user=user,
-        access_type=forum_models.THREAD_ACCESS_TYPE_OPEN,
         room=True, variation_id=variation.pk)
+    mutations.UpdateRightsOnThreadCreate(
+        thread, {
+            'access_type': forum_models.THREAD_ACCESS_TYPE_OPEN,
+            'granted_rights': []
+        },
+        variation=variation).apply()
     thread.save()
     return thread
 
@@ -67,5 +73,5 @@ def copy_game_forum(variation, rolelinks, user):
         variation.save()
     thread = copy_game_post(variation.thread, None, variation, rolelinks)
     thread.title = variation.game.name
-    thread.save()
+    mutations.UpdateRights(thread, variation).apply()
     return thread

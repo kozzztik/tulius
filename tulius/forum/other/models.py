@@ -74,11 +74,12 @@ class CommentLike(AbstractCommentLike):
     pass
 
 
-class OnlineUser(models.Model):
+class AbstractOnlineUser(models.Model):
     class Meta:
         verbose_name = _(u'online user')
         verbose_name_plural = _(u'online users')
         unique_together = ['user', 'thread']
+        abstract = True
 
     user = models.ForeignKey(
         User, models.PROTECT,
@@ -101,6 +102,10 @@ class OnlineUser(models.Model):
 
     def __str__(self):
         return str(self.user)
+
+
+class OnlineUser(AbstractOnlineUser):
+    pass
 
 
 class AbstractVotingVote(models.Model):

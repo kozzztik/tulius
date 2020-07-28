@@ -17,6 +17,8 @@ class GameThreadRight(models.Model):
         verbose_name_plural = _('game thread rights')
         unique_together = ('thread', 'role')
 
+    objects = models.Manager()  # linters, be happy
+
     thread: thread_models.Thread = models.ForeignKey(
         thread_models.Thread, models.PROTECT,
         null=False,

@@ -23,31 +23,22 @@ THREAD_ACCESS_TYPE_CHOICES = (
     (THREAD_ACCESS_TYPE_NO_READ, _(u'private(no access)')),
 )
 
+ACCESS_READ = 1
+ACCESS_WRITE = 2
+ACCESS_MODERATE = 4
+ACCESS_EDIT = 8
+
+ACCESS_OWN = ACCESS_READ + ACCESS_WRITE + ACCESS_EDIT
+
+default_rights = {
+    THREAD_ACCESS_TYPE_NO_READ: 0,
+    THREAD_ACCESS_TYPE_NO_WRITE: ACCESS_READ,
+    THREAD_ACCESS_TYPE_OPEN: ACCESS_READ + ACCESS_WRITE,
+}
+
 
 class ThreadManager(mptt_models.TreeManager):
-    def get_ancestors(self, parent):
-        if parent.tree_id:
-            return self.filter(
-                tree_id=parent.tree_id, lft__lt=parent.lft,
-                rght__gt=parent.rght)
-        if not parent.parent_id:
-            return self.none()
-        return self.filter(
-            tree_id=parent.parent.tree_id,
-            lft__lte=parent.parent.lft, rght__gte=parent.parent.rght)
-
-    def get_descendants(self, parent):
-        if parent.get_descendant_count():
-            return self.filter(
-                tree_id=parent.tree_id, lft__gt=parent.lft,
-                rght__lt=parent.rght, deleted=False)
-        return self.none()
-
-    def get_protected_descendants(self, parent):
-        if parent.get_descendant_count():
-            return self.get_descendants(parent).exclude(
-                access_type__lt=THREAD_ACCESS_TYPE_NO_READ)
-        return self.none()
+    pass
 
 
 def default_json():
@@ -131,17 +122,52 @@ class AbstractThread(mptt_models.MPTTModel):
     def __str__(self):
         return (self.title or self.body)[:40]
 
-    def free_access_type(self):
-        return self.access_type < THREAD_ACCESS_TYPE_NO_READ
-
-    def is_thread(self):
-        return not self.room
-
     def descendant_count(self):
         return (self.rght - self.lft - 1) / 2
 
     def get_absolute_url(self):
         return urls.reverse('forum_api:thread', kwargs={'pk': self.pk})
+
+    def _rights(self, user_id):
+        rights = self.data['rights']
+        return rights['all'] | rights['users'].get(str(user_id), 0)
+
+    def read_right(self, user):
+        return bool(
+            user.is_superuser or (self._rights(user.pk) & ACCESS_READ))
+
+    def write_right(self, user):
+        return bool(user.is_superuser or (self._rights(user.pk) & ACCESS_WRITE))
+
+    def moderate_right(self, user):
+        return bool(
+            user.is_superuser or (self._rights(user.pk) & ACCESS_MODERATE))
+
+    def edit_right(self, user):
+        return bool(
+            user.is_superuser or (self._rights(user.pk) & ACCESS_EDIT))
+
+    @property
+    def moderators(self):
+        return User.objects.filter(pk__in=[
+            pk for pk, right in self.data['rights']['users'].items()
+            if right & ACCESS_MODERATE])
+
+    @property
+    def accessed_users(self):
+        if self.access_type != THREAD_ACCESS_TYPE_NO_READ:
+            return None
+        return User.objects.filter(pk__in=[
+            pk for pk, right in self.data['rights']['users'].items()
+            if right & ACCESS_READ])
+
+    def rights_to_json(self, user):
+        return {
+            'write': self.write_right(user),
+            'moderate': self.moderate_right(user),
+            'edit': self.edit_right(user),
+            'move': self.edit_right(user),
+        }
 
 
 class Thread(AbstractThread):

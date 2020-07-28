@@ -1,5 +1,4 @@
 from tulius.forum.threads import models
-from tulius.forum.rights import default
 from tulius.forum.rights import models as rights_models
 
 
@@ -33,25 +32,3 @@ def test_limited_read(room_group, thread, superuser, admin, user):
     limited_read = data['threads'][0]['accessed_users']
     assert len(limited_read) == 1
     assert limited_read[0]['id'] == admin.user.pk
-
-
-def test_rights_for_deleted_thread(thread, superuser, admin, user):
-    # delete thread
-    response = admin.delete(thread['url'] + '?comment=wow')
-    assert response.status_code == 200
-    obj = models.Thread.objects.get(pk=thread['id'])
-    # check rights for superuser
-    rights = default.DefaultRightsChecker(obj, superuser.user).get_rights()
-    assert rights.read
-    assert not rights.write
-    assert rights.moderate
-    # check rights for owner
-    rights = default.DefaultRightsChecker(obj, admin.user).get_rights()
-    assert rights.read
-    assert not rights.write
-    assert not rights.moderate
-    # check rights for simple user
-    rights = default.DefaultRightsChecker(obj, user.user).get_rights()
-    assert not rights.read
-    assert not rights.write
-    assert not rights.moderate

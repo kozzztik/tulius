@@ -50,7 +50,7 @@ class UploadedFile(models.Model):
     def is_image(self):
         return self.mime[0:5] == 'image'
 
-    def __unicode__(self):
+    def __str__(self):
         """
         Provides unicode string post representation
         """
