@@ -18,3 +18,17 @@ class Thread(thread_models.AbstractThread):
             'game_forum_api:thread',
             kwargs={
                 'variation_id': self.variation_id, 'pk': self.pk})
+
+    @property
+    def moderators(self):
+        return [
+            int(pk) for pk, right in self.data['rights']['roles'].items()
+            if right & thread_models.ACCESS_MODERATE]
+
+    @property
+    def accessed_users(self):
+        if self.access_type != thread_models.THREAD_ACCESS_TYPE_NO_READ:
+            return None
+        return [
+            int(pk) for pk, right in self.data['rights']['roles'].items()
+            if right & thread_models.ACCESS_READ]

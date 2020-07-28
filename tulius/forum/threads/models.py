@@ -171,6 +171,20 @@ class AbstractThread(mptt_models.MPTTModel):
         return bool(
             user.is_superuser or (self._rights(user.pk) & ACCESS_MODERATE))
 
+    @property
+    def moderators(self):
+        return User.objects.filter(pk__in=[
+            pk for pk, right in self.data['rights']['users'].items()
+            if right & ACCESS_MODERATE])
+
+    @property
+    def accessed_users(self):
+        if self.access_type != THREAD_ACCESS_TYPE_NO_READ:
+            return None
+        return User.objects.filter(pk__in=[
+            pk for pk, right in self.data['rights']['users'].items()
+            if right & ACCESS_READ])
+
 
 class Thread(AbstractThread):
     pass

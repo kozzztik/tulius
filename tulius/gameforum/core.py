@@ -73,5 +73,5 @@ def copy_game_forum(variation, rolelinks, user):
         variation.save()
     thread = copy_game_post(variation.thread, None, variation, rolelinks)
     thread.title = variation.game.name
-    thread.save()
+    mutations.UpdateRights(thread, variation).apply()
     return thread
