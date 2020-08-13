@@ -42,7 +42,7 @@ def test_fix_parent_call(room_group, superuser):
     response = superuser.put(
         room_group['url'], {
             'title': 'group', 'body': 'group description',
-            'room': True, 'access_type': 0, 'granted_rights': []})
+            'room': True, 'default_rights': None, 'granted_rights': []})
     assert response.status_code == 200
     room = response.json()
     # create thread
@@ -50,7 +50,7 @@ def test_fix_parent_call(room_group, superuser):
         room['url'], {
             'title': 'thread', 'body': 'thread description',
             'room': False,
-            'access_type': models.THREAD_ACCESS_TYPE_NOT_SET,
+            'default_rights': None,
             'granted_rights': [], 'important': False, 'media': {}})
     assert response.status_code == 200
     thread = response.json()

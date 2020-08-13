@@ -13,7 +13,7 @@ def test_fix_game_counters(game, variation_forum, user, detective, superuser):
     response = user.put(
         base_url + f'thread/{variation_forum.id}/', {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': 0, 'role_id': detective.pk,
+            'room': False, 'default_rights': None, 'role_id': detective.pk,
             'granted_rights': [], 'important': False, 'media': {}})
     assert response.status_code == 200
     obj = stories_models.Role.objects.get(pk=detective.pk)

@@ -7,13 +7,13 @@ def test_comments_api(client, superuser, admin, user):
     response = superuser.put(
         '/api/forum/', {
             'title': 'group', 'body': 'group description',
-            'room': True, 'access_type': 0, 'granted_rights': []})
+            'room': True, 'default_rights': None, 'granted_rights': []})
     assert response.status_code == 200
     group = response.json()
     response = admin.put(
         group['url'], {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ,
+            'room': False, 'default_rights': models.NO_ACCESS,
             'granted_rights': [], 'media': {}})
     assert response.status_code == 200
     thread = response.json()
@@ -31,7 +31,7 @@ def test_comments_api(client, superuser, admin, user):
     # make thread readable
     response = admin.put(
         thread['url'] + 'granted_rights/', {
-            'access_type': models.THREAD_ACCESS_TYPE_NO_WRITE
+            'default_rights': models.ACCESS_READ
         })
     assert response.status_code == 200
     # check user now can read comments
@@ -57,10 +57,7 @@ def test_comments_api(client, superuser, admin, user):
 
     # make thread opened
     response = admin.put(
-        thread['url'] + 'granted_rights/', {
-            'access_type': models.THREAD_ACCESS_TYPE_NOT_SET
-        }
-    )
+        thread['url'] + 'granted_rights/', {'default_rights': None})
     assert response.status_code == 200
     # check comment preview works
     response = user.post(
@@ -198,7 +195,7 @@ def test_comments_api(client, superuser, admin, user):
     response = admin.put(
         group['url'], {
             'title': 'thread2', 'body': 'thread2 description',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NOT_SET,
+            'room': False, 'default_rights': None,
             'granted_rights': [], 'media': {}})
     assert response.status_code == 200
     thread2 = response.json()

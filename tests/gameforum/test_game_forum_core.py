@@ -3,7 +3,6 @@ import re
 from django.test import client as django_client
 
 from tulius.forum.threads import models
-from tulius.forum.rights import models as rights_models
 from tulius.stories import models as stories_models
 
 
@@ -14,7 +13,7 @@ def test_copy_game_forum(
     response = admin.put(
         base_url + f'thread/{variation_forum.id}/', {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ,
+            'room': False, 'default_rights': models.NO_ACCESS,
             'granted_rights': [],
             'important': True, 'media': {}})
     assert response.status_code == 200
@@ -22,7 +21,7 @@ def test_copy_game_forum(
     response = admin.put(
         base_url + f'thread/{variation_forum.id}/', {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ,
+            'room': False, 'default_rights': models.NO_ACCESS,
             'granted_rights': [], 'role_id': detective.pk,
             'important': True, 'media': {}})
     assert response.status_code == 200
@@ -30,7 +29,7 @@ def test_copy_game_forum(
     response = admin.post(
         thread1['url'] + 'granted_rights/', {
             'user': {'id': detective.pk},
-            'access_level': rights_models.THREAD_ACCESS_READ
+            'access_level': models.ACCESS_READ
         }
     )
     assert response.status_code == 200

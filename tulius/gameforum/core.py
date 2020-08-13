@@ -12,7 +12,7 @@ def create_game_forum(user, variation):
         room=True, variation_id=variation.pk)
     mutations.UpdateRightsOnThreadCreate(
         thread, {
-            'access_type': forum_models.THREAD_ACCESS_TYPE_OPEN,
+            'default_rights': forum_models.ACCESS_OPEN,
             'granted_rights': []
         },
         variation=variation).apply()
@@ -27,7 +27,7 @@ def copy_game_post(thread, new_parent, variation, role_links):
     thread = models.Thread(
         title=old_thread.title, parent=new_parent,
         body=old_thread.body, room=old_thread.room, user=old_thread.user,
-        access_type=old_thread.access_type,
+        default_rights=old_thread.default_rights,
         create_time=old_thread.create_time, closed=old_thread.closed,
         important=old_thread.important,
         media=old_thread.media, variation_id=variation.pk,

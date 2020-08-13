@@ -1,5 +1,4 @@
 from tulius.forum.threads import models
-from tulius.forum.rights import models as right_models
 
 
 def test_index(client, superuser, admin, user):
@@ -9,7 +8,7 @@ def test_index(client, superuser, admin, user):
     response = user.put(
         '/api/forum/', {
             'title': 'group1', 'body': 'group1 description',
-            'room': True, 'access_type': 0, 'granted_rights': []})
+            'room': True, 'default_rights': None, 'granted_rights': []})
     assert response.status_code == 403
     #
     #   superuser actions
@@ -17,30 +16,30 @@ def test_index(client, superuser, admin, user):
     response = superuser.put(
         '/api/forum/', {
             'title': 'group1', 'body': 'group1 description',
-            'room': False, 'access_type': 0, 'granted_rights': []})
+            'room': False, 'default_rights': None, 'granted_rights': []})
     assert response.status_code == 403
     response = superuser.put(
         '/api/forum/', {
             'title': 'group1', 'body': 'group1 description',
-            'room': True, 'access_type': 0, 'granted_rights': []})
+            'room': True, 'default_rights': None, 'granted_rights': []})
     assert response.status_code == 200
     group1 = response.json()
     response = superuser.put(
         '/api/forum/', {
             'title': 'group2', 'body': 'group2 description',
-            'room': True, 'access_type': models.THREAD_ACCESS_TYPE_NO_WRITE,
+            'room': True, 'default_rights': models.ACCESS_READ,
             'granted_rights': [{
                 'user': {'id': admin.user.pk},
-                'access_level': right_models.THREAD_ACCESS_WRITE}]})
+                'access_level': models.ACCESS_WRITE}]})
     assert response.status_code == 200
     group2 = response.json()
     response = superuser.put(
         '/api/forum/', {
             'title': 'group3', 'body': 'group3 description',
-            'room': True, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ,
+            'room': True, 'default_rights': models.NO_ACCESS,
             'granted_rights': [{
                 'user': {'id': admin.user.pk},
-                'access_level': right_models.THREAD_ACCESS_READ}]})
+                'access_level': models.ACCESS_READ}]})
     assert response.status_code == 200
     group3 = response.json()
     #
@@ -55,23 +54,23 @@ def test_index(client, superuser, admin, user):
     response = admin.put(
         f"/api/forum/thread/{group1['id']}/", {
             'title': 'room1', 'body': 'room1 description',
-            'room': True, 'access_type': models.THREAD_ACCESS_TYPE_OPEN,
+            'room': True, 'default_rights': models.ACCESS_OPEN,
             'granted_rights': [{
                 'user': {'id': admin.user.pk},
-                'access_level': right_models.THREAD_ACCESS_READ}]})
+                'access_level': models.ACCESS_READ}]})
     assert response.status_code == 200
     room1 = response.json()
     response = admin.put(
         f"/api/forum/thread/{group2['id']}/", {
             'title': 'room2', 'body': 'room2 description',
-            'room': True, 'access_type': 0,
+            'room': True, 'default_rights': None,
             'granted_rights': []})
     assert response.status_code == 200
     room2 = response.json()
     response = admin.put(
         f"/api/forum/thread/{group3['id']}/", {
             'title': 'room3', 'body': 'room3 description',
-            'room': True, 'access_type': 0,
+            'room': True, 'default_rights': None,
             'granted_rights': []})
     assert response.status_code == 403
     #
@@ -90,13 +89,13 @@ def test_index(client, superuser, admin, user):
     response = user.put(
         f"/api/forum/thread/{group2['id']}/", {
             'title': 'thread1', 'body': 'thread1 description',
-            'room': False, 'access_type': 0,
+            'room': False, 'default_rights': None,
             'granted_rights': []})
     assert response.status_code == 403
     response = user.put(
         f"/api/forum/thread/{group1['id']}/", {
             'title': 'thread1', 'body': 'thread1 description',
-            'room': False, 'access_type': 0, 'media': {},
+            'room': False, 'default_rights': None, 'media': {},
             'granted_rights': []})
     assert response.status_code == 200
     #

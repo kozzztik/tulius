@@ -11,7 +11,7 @@ def test_sitemap(room_group, thread, client, path, superuser):
     response = superuser.put(
         room_group['url'], {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ,
+            'room': False, 'default_rights': models.NO_ACCESS,
             'granted_rights': [], 'important': True, 'media': {}})
     assert response.status_code == 200
     thread2 = response.json()

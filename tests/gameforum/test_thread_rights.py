@@ -13,14 +13,14 @@ def test_user_thread_api_rights(
     response = user.put(
         base_url + f'thread/{variation_forum.id}/', {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': 0, 'granted_rights': [],
+            'room': False, 'default_rights': None, 'granted_rights': [],
             'important': True, 'closed': True, 'media': {}})
     assert response.status_code == 403
     # try to create thread with not existing role
     response = user.put(
         base_url + f'thread/{variation_forum.id}/', {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': 0, 'granted_rights': [],
+            'room': False, 'default_rights': None, 'granted_rights': [],
             'role_id': detective.pk + 1,
             'important': True, 'closed': True, 'media': {}})
     assert response.status_code == 403
@@ -28,7 +28,7 @@ def test_user_thread_api_rights(
     response = user.put(
         base_url + f'thread/{variation_forum.id}/', {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': 0, 'granted_rights': [],
+            'room': False, 'default_rights': None, 'granted_rights': [],
             'role_id': detective.pk,
             'important': True, 'closed': True, 'media': {}})
     assert response.status_code == 200
@@ -73,7 +73,7 @@ def test_user_thread_api_rights(
     response = user.put(
         base_url + f'thread/{variation_forum.id}/', {
             'title': 'room', 'body': 'room description',
-            'room': True, 'access_type': 0, 'granted_rights': [],
+            'room': True, 'default_rights': None, 'granted_rights': [],
             'role_id': detective.pk, 'media': {}})
     assert response.status_code == 200
     room = response.json()

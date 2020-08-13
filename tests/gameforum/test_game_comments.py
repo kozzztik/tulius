@@ -1,7 +1,6 @@
 from django.db import transaction
 
 from tulius.forum.threads import models as forum_threads
-from tulius.forum.rights import models as rights
 from tulius.gameforum.threads import models as thread_models
 from tulius.stories import models as story_models
 from tulius.games import models as game_models
@@ -18,7 +17,7 @@ def test_comments_api(
         variation_forum.get_absolute_url(), {
             'title': 'thread', 'body': 'thread description',
             'room': False,
-            'access_type': forum_threads.THREAD_ACCESS_TYPE_NO_WRITE,
+            'default_rights': forum_threads.ACCESS_READ,
             'granted_rights': [], 'important': False, 'media': {}})
     assert response.status_code == 200
     thread = response.json()
@@ -34,7 +33,7 @@ def test_comments_api(
     response = admin.post(
         thread['url'] + 'granted_rights/', {
             'user': {'id': detective.pk},
-            'access_level': rights.THREAD_ACCESS_WRITE
+            'access_level': forum_threads.ACCESS_WRITE
         }
     )
     assert response.status_code == 200
@@ -145,7 +144,7 @@ def test_comments_illustrations(
         base_url + f'thread/{variation_forum.id}/', {
             'title': 'thread', 'body': 'thread description',
             'room': False,
-            'access_type': forum_threads.THREAD_ACCESS_TYPE_NOT_SET,
+            'default_rights': None,
             'granted_rights': [], 'role_id': detective.pk, 'media': {
                 'illustrations': [{
                     'id' : story_illustration.pk,
@@ -242,7 +241,7 @@ def test_broken_last_comment(game, variation_forum, user, detective):
         base_url + f'thread/{variation_forum.id}/', {
             'title': 'thread', 'body': 'thread description',
             'room': False,
-            'access_type': forum_threads.THREAD_ACCESS_TYPE_NOT_SET,
+            'default_rights': None,
             'granted_rights': [], 'role_id': detective.pk, 'media': {}
         })
     assert response.status_code == 200
@@ -268,7 +267,7 @@ def test_delete_game_comments_with_thread(
         variation_forum.get_absolute_url(), {
             'title': 'thread', 'body': 'thread description',
             'room': True,
-            'access_type': forum_threads.THREAD_ACCESS_TYPE_NOT_SET,
+            'default_rights': None,
             'granted_rights': []})
     assert response.status_code == 200
     room = response.json()
@@ -277,7 +276,7 @@ def test_delete_game_comments_with_thread(
         room['url'], {
             'title': 'thread', 'body': 'thread description',
             'room': False,
-            'access_type': forum_threads.THREAD_ACCESS_TYPE_NOT_SET,
+            'default_rights': None,
             'granted_rights': [], 'role_id': detective.pk, 'media': {}
         })
     assert response.status_code == 200

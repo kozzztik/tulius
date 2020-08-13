@@ -28,11 +28,13 @@ class Migration(migrations.Migration):
                 ('body', models.TextField(verbose_name='body')),
                 ('room', models.BooleanField(
                     default=False, verbose_name='room')),
-                ('access_type', models.SmallIntegerField(
-                    choices=[
-                        (0, 'access not set'), (1, 'free access'),
-                        (2, 'read only access'), (3, 'private(no access)')],
-                    default=0, verbose_name='access type')),
+                ('default_rights', models.SmallIntegerField(
+                    blank=True, choices=[
+                        (None, 'access not set'), (3, 'free access'),
+                        (1, 'read only access'),
+                        (17, 'read only access(no inherit)'),
+                        (0, 'private(no access)')
+                    ], default=0, null=True, verbose_name='access type')),
                 ('create_time', models.DateTimeField(
                     auto_now_add=True, verbose_name='created at')),
                 ('closed', models.BooleanField(
@@ -41,8 +43,6 @@ class Migration(migrations.Migration):
                     default=False, verbose_name='important')),
                 ('deleted', models.BooleanField(
                     default=False, verbose_name='deleted')),
-                ('protected_threads', models.SmallIntegerField(
-                    default=0, verbose_name='protected threads')),
                 ('first_comment_id', models.IntegerField(
                     blank=True, null=True, verbose_name='first comment')),
                 ('last_comment_id', models.IntegerField(

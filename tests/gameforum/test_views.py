@@ -194,7 +194,7 @@ def test_redirect_api(variation, variation_forum, admin, client):
     response = admin.put(
         base_url + f'thread/{variation_forum.id}/', {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': 0, 'granted_rights': [],
+            'room': False, 'default_rights': None, 'granted_rights': [],
             'important': False, 'media': {}})
     assert response.status_code == 200
     thread = response.json()

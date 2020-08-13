@@ -13,7 +13,7 @@ def test_game_favorites(game, variation_forum, user, admin, detective):
     response = admin.put(
         base_url + f'thread/{variation_forum.id}/', {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NOT_SET,
+            'room': False, 'default_rights': None,
             'granted_rights': [], 'important': False, 'media': {}})
     assert response.status_code == 200
     thread = response.json()

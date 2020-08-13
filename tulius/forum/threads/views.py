@@ -6,7 +6,6 @@ from django.core import exceptions
 from django.core.cache import cache
 from django.utils import html
 from django.db import transaction
-from django.db.models import query_utils
 
 from tulius.core.ckeditor import html_converter
 from tulius.forum import core
@@ -124,7 +123,7 @@ class BaseThreadView(core.BaseAPIView):
                 'url': parent.get_absolute_url(),
             } for parent in self.obj.get_ancestors()] if self.obj.pk else None,
             'rights': self.obj.rights_to_json(self.user),
-            'access_type': self.obj.access_type,
+            'default_rights': self.obj.default_rights,
             'first_comment_id': self.obj.first_comment_id,
         }
         if self.obj.room:
@@ -222,36 +221,8 @@ class IndexView(BaseThreadView):
     rights_model = rights_models.ThreadAccessRight
 
     def get_index(self, level):
-        children = list(self.get_free_index(level)) + \
-            list(self.get_readable_protected_index(level))
-        children = [thread for thread in children if thread.room]
-        return sorted(children, key=lambda x: x.id)
-
-    def get_readable_protected_index(self, level):
-        if self.user.is_superuser:
-            return self.thread_model.objects.filter(
-                access_type=models.THREAD_ACCESS_TYPE_NO_READ,
-                level=level, deleted=False)
-        if self.user.is_anonymous:
-            return []
-        query = query_utils.Q(
-            thread__level=level,
-            thread__access_type=models.THREAD_ACCESS_TYPE_NO_READ,
-            access_level__gte=rights_models.THREAD_ACCESS_READ,
-            user=self.user, thread__deleted=False)
-        rights = self.rights_model.objects.filter(query)
-        rights = rights.select_related('thread')
-        return [right.thread for right in rights]
-
-    def get_free_index(self, level):
-        threads = self.thread_model.objects.filter(
-            access_type__lt=models.THREAD_ACCESS_TYPE_NO_READ,
-            level=level, deleted=False)
-        if self.user.is_anonymous:
-            return threads
-        return threads.filter(query_utils.Q(
-            access_type__lt=models.THREAD_ACCESS_TYPE_NO_READ
-        ) | query_utils.Q(user=self.user))  # TODO: move it to protected #97
+        threads = self.thread_model.objects.filter(level=level, deleted=False)
+        return self._thread_list_apply_rights(threads)
 
     def room_group_unreaded(self, rooms):
         # TODO move all it to read marks module
