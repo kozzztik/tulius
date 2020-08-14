@@ -9,6 +9,8 @@ class UpdateRights(mutations.Mutation):
     def _rights_for_root(self, instance, rights):
         if rights['all'] is None:
             rights['all'] = models.ACCESS_OPEN
+        if rights['all'] & models.ACCESS_NO_INHERIT:
+            rights['all_inherit'] = models.ACCESS_OPEN
         self._process_granted_exceptions(instance, rights)
         self._process_author(instance, rights)
 
@@ -31,16 +33,22 @@ class UpdateRights(mutations.Mutation):
 
     @staticmethod
     def _process_parent_rights(instance, rights, parent_rights):
+        parent_all = parent_rights['all']
+        if parent_all & models.ACCESS_NO_INHERIT:
+            parent_all = parent_rights['all_inherit']
         if rights['all'] is None:
-            rights['all'] = parent_rights['all']
-        rights['all'] &= parent_rights['all']
+            rights['all'] = parent_all
+        rights['all'] &= parent_all | models.ACCESS_NO_INHERIT
+        if rights['all'] & models.ACCESS_NO_INHERIT:
+            rights['all_inherit'] = parent_all
         # process parent exceptions
         for user_id, right in parent_rights['users'].items():
             if (not right & models.ACCESS_MODERATE) and \
                     instance.default_rights is not None:
                 right &= instance.default_rights
             if right:
-                rights['users'][int(user_id)] = right
+                rights['users'][int(user_id)] = \
+                    rights['users'].get(int(user_id), 0) | right
 
     def process_thread(self, instance):
         instance.data['rights'] = rights = {

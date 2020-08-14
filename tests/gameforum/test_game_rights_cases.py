@@ -372,3 +372,116 @@ def test_grant_rights_to_game(game, variation_forum, user):
     guest.delete()
     response = user.get(variation_forum.get_absolute_url())
     assert response.status_code == 403
+
+
+def test_not_inherited_read_only_root(
+        game, variation_forum, user, admin, detective):
+    response = admin.put(
+        variation_forum.get_absolute_url() + 'granted_rights/',
+        {'default_rights': models.ACCESS_READ + models.ACCESS_NO_INHERIT})
+    assert response.status_code == 200
+    # create sub room
+    response = admin.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': None,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    room = response.json()
+    # start game. Reload game to update thread caches.
+    game = game_models.Game.objects.get(pk=game.pk)
+    game.status = game_models.GAME_STATUS_IN_PROGRESS
+    with transaction.atomic():
+        game.save()
+    # check user can read and can't write at root
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 200
+    response = user.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': None, 'role_id': detective.pk,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 403
+    # check we can read and write in sub room
+    response = user.get(room['url'])
+    assert response.status_code == 200
+    response = user.put(
+        room['url'], {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': None, 'role_id': detective.pk,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+
+
+def test_not_inherited_read_only_room(
+        game, variation_forum, user, admin, detective):
+    # create sub room
+    response = admin.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'room', 'body': 'room description',
+            'room': True,
+            'default_rights': models.ACCESS_READ + models.ACCESS_NO_INHERIT,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    room1 = response.json()
+    # create sub sub room
+    response = admin.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': None,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    room2 = response.json()
+    # start game
+    game.status = game_models.GAME_STATUS_IN_PROGRESS
+    with transaction.atomic():
+        game.save()
+    # check we can read and write in root
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 200
+    response = user.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': None, 'role_id': detective.pk,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    # check user can read and can't write at room
+    response = user.get(room1['url'])
+    assert response.status_code == 200
+    response = user.put(
+        room1['url'], {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': None, 'role_id': detective.pk,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 403
+    # check we can read and write in sub room
+    response = user.get(room2['url'])
+    assert response.status_code == 200
+    response = user.put(
+        room2['url'], {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': None, 'role_id': detective.pk,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+
+
+def test_not_defined_rights_on_root(
+        game, variation_forum, user, admin, detective):
+    response = admin.put(
+        variation_forum.get_absolute_url() + 'granted_rights/',
+        {'default_rights': None})
+    assert response.status_code == 200
+    # start game. Reload game to update thread caches.
+    game = game_models.Game.objects.get(pk=game.pk)
+    game.status = game_models.GAME_STATUS_IN_PROGRESS
+    with transaction.atomic():
+        game.save()
+    # check user can read and write at root
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 200
+    response = user.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': None, 'role_id': detective.pk,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200

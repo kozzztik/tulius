@@ -53,6 +53,8 @@ class UpdateRights(mutations.UpdateRights, VariationMutationMixin):
         rights['role_all'] = rights['all']
         if rights['role_all'] is None:
             rights['role_all'] = forum_models.ACCESS_OPEN
+        if rights['role_all'] & forum_models.ACCESS_NO_INHERIT:
+            rights['role_all_inherit'] = forum_models.ACCESS_OPEN
         rights['all'] = 0
         rights['roles'] = {}
         self._process_variation(rights)
@@ -60,9 +62,14 @@ class UpdateRights(mutations.UpdateRights, VariationMutationMixin):
 
     def _process_parent_rights(self, instance, rights, parent_rights):
         rights['role_all'] = instance.default_rights
+        parent_all = parent_rights['role_all']
+        if parent_all & forum_models.ACCESS_NO_INHERIT:
+            parent_all = parent_rights['role_all_inherit']
         if rights['role_all'] is None:
-            rights['role_all'] = parent_rights['role_all']
-        rights['role_all'] &= parent_rights['role_all']
+            rights['role_all'] = parent_all
+        rights['role_all'] &= parent_all | forum_models.ACCESS_NO_INHERIT
+        if rights['role_all'] & forum_models.ACCESS_NO_INHERIT:
+            rights['role_all_inherit'] = parent_all
         rights['roles'] = {}
         self._process_variation(rights)
         super(UpdateRights, self)._process_parent_rights(
