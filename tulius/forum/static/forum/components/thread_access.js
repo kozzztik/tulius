@@ -24,11 +24,12 @@ export default LazyComponent('forum_thread_access', {
                 {value: 2, text: "только запись"},
                 {value: 5, text: "чтение и модерирование"},
             ],
-            access_types: [
-                {value: 0, text: "доступ не задан"},
-                {value: 1, text: "свободный доступ"},
-                {value: 2, text: "только чтение"},
-                {value: 3, text: "доступ только по списку"},
+            thread_default_rights: [
+                {value: null, text: "доступ не задан"},
+                {value: 1+2, text: "свободный доступ"},
+                {value: 1, text: "только чтение"},
+                {value: 1+16, text: "только чтение(только в корне)"},
+                {value: 0, text: "доступ только по списку"},
             ],
             user_options: [],
         }
@@ -139,7 +140,7 @@ export default LazyComponent('forum_thread_access', {
             this.thread_loading = true;
             axios.put(
                 this.thread.url + 'granted_rights/',
-                {'access_type': this.thread.access_type}
+                {'default_rights': this.thread.default_rights}
             ).then(response => {}).catch(error => this.$root.add_message(error, "error"))
             .then(() => {
                 this.thread_loading = false;

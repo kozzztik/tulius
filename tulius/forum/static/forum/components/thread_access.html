@@ -3,8 +3,8 @@
         <label class="col-5 col-form-label" for="thread_access_level">
             <b>Для всех:</b>
         </label>
-        <b-form-select :options="access_types" class="col-6"
-                    v-model="thread.access_type" id="thread_access_level" @change="change_thread_type()">
+        <b-form-select :options="thread_default_rights" class="col-6"
+                    v-model="thread.default_rights" id="thread_access_level" @change="change_thread_type()">
         </b-form-select>
         <div class="col-1">
             <div class="spinner-border text-warning" role="status"
