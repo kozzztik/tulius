@@ -53,7 +53,8 @@ class ReadmarkAPI(views.BaseThreadView):
             ).exclude(user=self.user).order_by('id').first()
         else:
             not_read = None
-            read_id = thread.last_comment_id
+            read_id = comment_models.get_param(
+                'last_comment', thread, self.user)
         read_mark.readed_comment_id = read_id
         read_mark.not_readed_comment_id = not_read.pk if not_read else None
         read_mark.save()
@@ -90,7 +91,7 @@ class ReadmarkAPI(views.BaseThreadView):
         self.get_parent_thread(**kwargs)
         self.read_mark_model.objects.filter(
             thread=self.obj, user=self.user).delete()
-        comment_id = self.obj.first_comment_id
+        comment_id = self.obj.data['first_comment_id']
         return {
             'last_read_id': None,
             'not_read_comment':
@@ -101,7 +102,8 @@ class ReadmarkAPI(views.BaseThreadView):
     @classmethod
     def on_delete_comment(cls, sender, comment, view, **_kwargs):
         thread = view.obj
-        if (not comment.is_thread()) and (thread.last_comment_id <= comment.pk):
+        last_comment_id = thread.data['last_comment']['all']
+        if (not comment.is_thread()) and (last_comment_id <= comment.pk):
             comments = sender.objects.filter(
                 parent=thread, deleted=False, id__gt=comment.id).order_by('id')
             new_not_read = comments[0].id if comments else None
@@ -150,12 +152,12 @@ class ReadmarkAPI(views.BaseThreadView):
                 if view.user.is_anonymous:
                     room.unreaded_id = False
                 else:
-                    if thread.first_comment_id:
+                    if thread.data.get('first_comment_id'):
                         if (
                                 (not room.unreaded_id) or (
-                                    thread.first_comment_id <
+                                    thread.data['first_comment_id'] <
                                     room.unreaded_id)):
-                            room.unreaded_id = thread.first_comment_id
+                            room.unreaded_id = thread.data['first_comment_id']
         if room.unreaded_id:
             room.unreaded = cls.comment_model.objects.get(id=room.unreaded_id)
 
@@ -175,8 +177,8 @@ class ReadmarkAPI(views.BaseThreadView):
                 if read_mark:
                     thread.unreaded_id = read_mark.not_readed_comment_id
                 else:
-                    if thread.first_comment_id:
-                        thread.unreaded_id = thread.first_comment_id
+                    if thread.data.get('first_comment_id'):
+                        thread.unreaded_id = thread.data['first_comment_id']
                 if thread.unreaded_id:
                     thread.unreaded = cls.comment_model.objects.get(
                         id=thread.unreaded_id)
@@ -207,9 +209,9 @@ class ReadmarkAPI(views.BaseThreadView):
                 if readmark.not_readed_comment_id:
                     not_read_comment = cls.not_read_comment_json(
                         readmark.not_readed_comment_id, view.user)
-            elif instance.first_comment_id:
+            elif instance.data.get('first_comment_id'):
                 not_read_comment = cls.not_read_comment_json(
-                    instance.first_comment_id, view.user)
+                    instance.data['first_comment_id'], view.user)
         response['last_read_id'] = last_read_id
         response['not_read_comment'] = not_read_comment
 

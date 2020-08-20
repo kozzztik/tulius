@@ -73,7 +73,7 @@ class AbstractThread(mptt_models.MPTTModel):
         verbose_name=_('author')
     )
     default_rights = models.SmallIntegerField(
-        default=0, blank=True, null=True,
+        default=None, blank=True, null=True,
         verbose_name=_(u'access type'),
         choices=DEFAULT_RIGHTS_CHOICES,
     )
@@ -92,10 +92,6 @@ class AbstractThread(mptt_models.MPTTModel):
     deleted = models.BooleanField(
         default=False,
         verbose_name=_(u'deleted')
-    )
-    first_comment_id = models.IntegerField(
-        null=True, blank=True,
-        verbose_name=_(u'first comment')
     )
     last_comment_id = models.IntegerField(
         null=True, blank=True,
@@ -118,25 +114,28 @@ class AbstractThread(mptt_models.MPTTModel):
     def get_absolute_url(self):
         return urls.reverse('forum_api:thread', kwargs={'pk': self.pk})
 
-    def _rights(self, user_id):
+    def rights(self, user_id):
         rights = self.data['rights']
-        return rights['all'] | rights['users'].get(str(user_id), 0)
+        result = rights['all']
+        if user_id:
+            result |= rights['users'].get(str(user_id), 0)
+        return result
 
     def read_right(self, user):
         return bool(
-            user.is_superuser or (self._rights(user.pk) & ACCESS_READ))
+            user.is_superuser or (self.rights(user.pk) & ACCESS_READ))
 
     def write_right(self, user):
         return bool(
-            user.is_superuser or (self._rights(user.pk) & ACCESS_WRITE))
+            user.is_superuser or (self.rights(user.pk) & ACCESS_WRITE))
 
     def moderate_right(self, user):
         return bool(
-            user.is_superuser or (self._rights(user.pk) & ACCESS_MODERATE))
+            user.is_superuser or (self.rights(user.pk) & ACCESS_MODERATE))
 
     def edit_right(self, user):
         return bool(
-            user.is_superuser or (self._rights(user.pk) & ACCESS_EDIT))
+            user.is_superuser or (self.rights(user.pk) & ACCESS_EDIT))
 
     @property
     def moderators(self):

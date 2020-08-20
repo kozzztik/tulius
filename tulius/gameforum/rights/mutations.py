@@ -1,7 +1,9 @@
 from tulius.forum.threads import mutations as base_mutations
 from tulius.forum.threads import models as forum_models
 from tulius.forum.rights import mutations
+from tulius.forum.threads import signals
 from tulius.gameforum import models as rights_models
+from tulius.gameforum.threads import mutations as thread_mutations
 from tulius.stories import models as stories_models
 from tulius.games import models as game_models
 
@@ -51,7 +53,7 @@ class UpdateRights(mutations.UpdateRights, VariationMutationMixin):
 
     def _rights_for_root(self, instance, rights):
         rights['role_all'] = rights['all']
-        if rights['role_all'] is None:
+        if not rights['role_all']:
             rights['role_all'] = forum_models.ACCESS_OPEN
         if rights['role_all'] & forum_models.ACCESS_NO_INHERIT:
             rights['role_all_inherit'] = forum_models.ACCESS_OPEN
@@ -121,6 +123,15 @@ class UpdateRights(mutations.UpdateRights, VariationMutationMixin):
                     if role.user_id:
                         rights['users'][role.user_id] = rights['users'].get(
                             role.user_id, 0) | forum_models.ACCESS_READ
+
+
+def on_fix_counters(instance, **_kwargs):
+    variation = stories_models.Variation.objects.get(pk=instance.variation_id)
+    return UpdateRights(instance, variation)
+
+
+signals.apply_mutation.connect(
+    on_fix_counters, sender=thread_mutations.ThreadFixCounters)
 
 
 class UpdateRightsOnThreadCreate(

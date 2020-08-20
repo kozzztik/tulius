@@ -38,10 +38,11 @@ def migrate_data(apps, schema_editor):
             closed=old_thread.closed,
             important=old_thread.important,
             deleted=old_thread.deleted,
-            first_comment_id=old_thread.first_comment_id,
             last_comment_id=old_thread.last_comment_id,
             comments_count=old_thread.comments_count,
-            data={},
+            data={
+                'first_comment_id': old_thread.first_comment_id
+            },
             media=old_thread.media,
             lft=old_thread.lft,
             rght=old_thread.rght,

@@ -3,6 +3,7 @@ from tulius.forum.threads import models
 from tulius.forum.rights import models as rights_models
 
 
+@mutations.on_mutation(mutations.ThreadFixCounters)
 class UpdateRights(mutations.Mutation):
     with_descendants = True
 

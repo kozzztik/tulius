@@ -1,6 +1,5 @@
 import json
 
-from django import dispatch
 from django import shortcuts
 from django.core import exceptions
 from django.core.cache import cache
@@ -124,7 +123,6 @@ class BaseThreadView(core.BaseAPIView):
             } for parent in self.obj.get_ancestors()] if self.obj.pk else None,
             'rights': self.obj.rights_to_json(self.user),
             'default_rights': self.obj.default_rights,
-            'first_comment_id': self.obj.first_comment_id,
         }
         if self.obj.room:
             data['rooms'] = [
@@ -137,13 +135,6 @@ class BaseThreadView(core.BaseAPIView):
             data['user'] = self.obj.user.to_json(detailed=True)
             data['media'] = self.obj.media
         return data
-
-    @classmethod
-    def on_fix_counters(cls, sender, thread, view, **kwargs):
-        sender.objects.partial_rebuild(thread.tree_id)
-
-
-dispatch.receiver(signals.on_fix_counters)(BaseThreadView.on_fix_counters)
 
 
 class ThreadView(BaseThreadView):
@@ -285,6 +276,8 @@ class IndexView(BaseThreadView):
 
 
 class MoveThreadView(BaseThreadView):
+    fix_mutation = mutations.ThreadFixCounters
+
     @transaction.atomic
     def put(self, request, **kwargs):
         data = json.loads(request.body)
@@ -305,13 +298,11 @@ class MoveThreadView(BaseThreadView):
                 old_parent.tree_id != new_parent.tree_id)):
             obj = self.thread_model.objects.get(
                 tree_id=old_parent.tree_id, parent=None)
-            self.on_fix_counters(self.thread_model, obj, self)
-            obj.save()
+            self.fix_mutation(obj).apply()
         if new_parent:
             obj = self.thread_model.objects.get(
                 tree_id=new_parent.tree_id, parent=None)
-            self.on_fix_counters(self.thread_model, obj, self)
-            obj.save()
+            self.fix_mutation(obj).apply()
         response = self.obj_to_json()
         signals.to_json.send(
             self.thread_model, instance=self.obj, response=response, view=self)

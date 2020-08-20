@@ -71,11 +71,18 @@ def on_comment_update(comment, data, view, **_kwargs):
 
 @dispatch.receiver(thread_signals.room_to_json, sender=thread_models.Thread)
 def room_to_json(instance, response, view, **_kwargs):
-    if instance.last_comment_id is None:
+    last_comment_id = comment_models.get_param(
+        'last_comment', instance, view.user.pk)
+    comments_count = comment_models.get_param(
+        'comments_count', instance, view.user.pk)
+    response['comments_count'] = comments_count
+    if not instance.room:
+        response['pages_count'] = comments.order_to_page(comments_count - 1)
+    if last_comment_id is None:
         return
     try:
         last_comment = comment_models.Comment.objects.select_related(
-            'user').get(id=instance.last_comment_id)
+            'user').get(id=last_comment_id)
     except comment_models.Comment.DoesNotExist:
         return
     response['last_comment'] = {
@@ -87,8 +94,6 @@ def room_to_json(instance, response, view, **_kwargs):
         'user': view.role_to_json(last_comment.role_id),
         'create_time': last_comment.create_time,
     }
-    response['comments_count'] = instance.comments_count
-    response['pages_count'] = CommentsBase.pages_count(instance)
 
 
 @dispatch.receiver(
@@ -127,29 +132,6 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
         comment_signals.to_json.send(
             self.comment_model, comment=c, data=data, view=self)
         return data
-
-    @classmethod
-    def on_fix_counters(cls, sender, thread, view, **kwargs):
-        if thread.parent_id:
-            return None
-        variation = stories_models.Variation.objects.select_for_update(
-            ).get(thread=thread)
-        roles = stories_models.Role.objects.filter(variation=variation)
-        for role in roles:
-            role = stories_models.Role.objects.select_for_update(
-                ).get(pk=role.pk)
-            role.comments_count = cls.comment_model.objects.filter(
-                parent__tree_id=thread.tree_id, deleted=False,
-                role_id=role.id).count()
-            role.save()
-        variation.comments_count = cls.comment_model.objects.filter(
-            parent__tree_id=thread.tree_id, deleted=False).count()
-        variation.save()
-        return None
-
-
-thread_signals.on_fix_counters.connect(
-    CommentsBase.on_fix_counters, sender=thread_models.Thread)
 
 
 def update_role_comments_count(role_id, value):
@@ -202,5 +184,3 @@ class CommentAPI(comments.CommentAPI, CommentsBase):
 
 thread_signals.on_update.connect(
     CommentAPI.on_thread_update, sender=thread_models.Thread)
-thread_signals.on_fix_counters.connect(
-    CommentsPageAPI.on_fix_counters, sender=thread_models.Thread)

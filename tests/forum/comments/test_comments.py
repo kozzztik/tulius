@@ -227,7 +227,7 @@ def test_broken_last_comment(room_group, thread, user):
     assert last_comment['id'] == thread['first_comment_id']
     # break it
     obj = models.Thread.objects.get(pk=thread['id'])
-    obj.last_comment_id += 1
+    obj.data['last_comment']['all'] += 1
     obj.save()
     # check it not breaks original view
     response = user.get(room_group['url'])

@@ -248,7 +248,7 @@ def test_broken_last_comment(game, variation_forum, user, detective):
     thread = response.json()
     # break last comment
     obj = thread_models.Thread.objects.get(pk=thread['id'])
-    obj.last_comment_id += 1
+    obj.data['last_comment']['all'] += 1
     obj.save()
     # check room view still works
     response = user.get(base_url + f'thread/{variation_forum.id}/')

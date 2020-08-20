@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
                         (1, 'read only access'),
                         (17, 'read only access(no inherit)'),
                         (0, 'private(no access)')
-                    ], default=0, null=True, verbose_name='access type')),
+                    ], default=None, null=True, verbose_name='access type')),
                 ('create_time', models.DateTimeField(
                     auto_now_add=True, verbose_name='created at')),
                 ('closed', models.BooleanField(
@@ -43,8 +43,6 @@ class Migration(migrations.Migration):
                     default=False, verbose_name='important')),
                 ('deleted', models.BooleanField(
                     default=False, verbose_name='deleted')),
-                ('first_comment_id', models.IntegerField(
-                    blank=True, null=True, verbose_name='first comment')),
                 ('last_comment_id', models.IntegerField(
                     blank=True, null=True, verbose_name='last comment')),
                 ('comments_count', models.IntegerField(

@@ -80,14 +80,6 @@ class GrantedRightsAPI(BaseGrantedRightsAPI):
         self.get_mutation(self.obj).apply()
         return {'default_rights': self.obj.default_rights}
 
-    @classmethod
-    def on_fix_counters(cls, sender, thread, view, **kwargs):
-        cls.get_mutation(thread).apply()
-
-
-thread_signals.on_fix_counters.connect(
-    GrantedRightsAPI.on_fix_counters, sender=thread_models.Thread)
-
 
 class GrantedRightAPI(BaseGrantedRightsAPI):
     def get_context_data(self, **kwargs):
