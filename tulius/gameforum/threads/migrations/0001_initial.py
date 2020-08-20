@@ -43,10 +43,6 @@ class Migration(migrations.Migration):
                     default=False, verbose_name='important')),
                 ('deleted', models.BooleanField(
                     default=False, verbose_name='deleted')),
-                ('last_comment_id', models.IntegerField(
-                    blank=True, null=True, verbose_name='last comment')),
-                ('comments_count', models.IntegerField(
-                    default=0, verbose_name='first comment')),
                 ('data', jsonfield.fields.JSONField(
                     default=tulius.forum.threads.models.default_json)),
                 ('media', jsonfield.fields.JSONField(

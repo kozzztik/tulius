@@ -5,6 +5,12 @@ from django.db import migrations, transaction
 from tulius.gameforum.threads import models
 from tulius.gameforum.rights import mutations
 from tulius.stories import models as stories_models
+from tulius.gameforum.comments import views
+
+
+class Tmp(views.CommentAPI):
+    # just to use views module, originally it is needed to connect mutations
+    pass
 
 
 def migrate_data(apps, schema_editor):
@@ -27,6 +33,7 @@ class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('game_forum_threads', '0005_deleted_threads'),
+        ('game_forum_comments', '0006_deleted_comments'),
 
     ]
 

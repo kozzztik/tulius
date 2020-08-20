@@ -57,7 +57,6 @@ class BaseThreadView(core.BaseAPIView):
             parent=self.obj, room=is_room).exclude(deleted=True)
         if is_room:
             return self.prepare_room_list(threads)
-        threads = threads.order_by('-last_comment_id')
         threads = self._thread_list_apply_rights(threads)
         signals.prepare_threads.send(
             self.thread_model, threads=threads, view=self)

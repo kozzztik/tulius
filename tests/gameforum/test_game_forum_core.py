@@ -23,7 +23,7 @@ def test_copy_game_forum(
             'title': 'thread', 'body': 'thread description',
             'room': False, 'default_rights': models.NO_ACCESS,
             'granted_rights': [], 'role_id': detective.pk,
-            'important': True, 'media': {}})
+            'important': False, 'media': {}})
     assert response.status_code == 200
     # grant rights to read thread by detective
     response = admin.post(

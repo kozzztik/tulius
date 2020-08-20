@@ -93,15 +93,6 @@ class AbstractThread(mptt_models.MPTTModel):
         default=False,
         verbose_name=_(u'deleted')
     )
-    last_comment_id = models.IntegerField(
-        null=True, blank=True,
-        verbose_name=_(u'last comment')
-    )
-    comments_count = models.IntegerField(
-        null=False, blank=False,
-        default=0,
-        verbose_name=_(u'first comment')
-    )
     data = jsonfield.JSONField(default=default_json)
     media = jsonfield.JSONField(default=default_json)
 

@@ -4,6 +4,9 @@ from django.conf import settings
 from django.db import migrations, transaction
 from tulius.forum.threads import models
 from tulius.forum.rights import mutations
+from tulius.forum.comments import mutations as comments_mutations
+
+comments_mutations.init()
 
 
 def migrate_data(apps, schema_editor):
@@ -24,7 +27,7 @@ class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('forum_threads', '0005_deleted_threads'),
-
+        ('forum_comments', '0006_deleted_comments'),
     ]
 
     atomic = False

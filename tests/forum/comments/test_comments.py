@@ -306,3 +306,43 @@ def test_comment_counters_on_rights_change(room_group, admin, client):
     data = response.json()
     assert 'last_comment' not in data['rooms'][0]
     assert data['rooms'][0]['comments_count'] == 0
+
+
+def test_thread_ordering_by_last_comment(room_group, admin):
+    # create thread 1
+    response = admin.put(
+        room_group['url'], {
+            'title': 'thread1', 'body': 'thread1 description',
+            'room': False, 'default_rights': None,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    thread1 = response.json()
+    # create thread 2
+    response = admin.put(
+        room_group['url'], {
+            'title': 'thread2', 'body': 'thread2 description',
+            'room': False, 'default_rights': None,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    thread2 = response.json()
+    # check ordering
+    response = admin.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data['threads']) == 2
+    assert data['threads'][0]['id'] == thread2['id']
+    assert data['threads'][1]['id'] == thread1['id']
+    # post comment to thread 1
+    response = admin.post(
+        thread1['url'] + 'comments_page/', {
+            'reply_id': thread1['first_comment_id'],
+            'title': 'ho ho ho', 'body': 'happy new year',
+            'media': {},
+        })
+    # check now it goes first
+    response = admin.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data['threads']) == 2
+    assert data['threads'][0]['id'] == thread1['id']
+    assert data['threads'][1]['id'] == thread2['id']

@@ -163,6 +163,10 @@ class ReadmarkAPI(views.BaseThreadView):
 
     @classmethod
     def on_thread_prepare_thread(cls, threads, view, **_kwargs):
+        for thread in threads:
+            thread.last_comment_id = comment_models.get_param(
+                'last_comment', thread, view.user.pk) or 0
+        threads.sort(key=lambda t: t.last_comment_id, reverse=True)
         if not view.user.is_anonymous:
             read_marks = cls.read_mark_model.objects.filter(
                 thread__parent=view.obj, user=view.user)
