@@ -11,6 +11,13 @@ from tulius.gameforum.threads import models as thread_models
 from tulius.gameforum.threads import views as threads
 from tulius.gameforum.comments import models as comment_models
 from tulius.forum.comments import views as comments
+from tulius.forum.comments import mutations
+from tulius.forum.threads import mutations as base_mutations
+from tulius.gameforum.rights import mutations as rights_mutations
+
+
+base_mutations.on_mutation(rights_mutations.UpdateRights)(
+    mutations.FixCountersOnRights)
 
 
 def validate_image_data(variation, images_data):

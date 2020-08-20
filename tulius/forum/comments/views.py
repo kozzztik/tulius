@@ -49,7 +49,8 @@ def room_to_json(instance, response, view, **_kwargs):
 
 @dispatch.receiver(thread_signals.to_json)
 def thread_to_json(instance, response, **_kwargs):
-    response['first_comment_id'] = instance.data.get('first_comment_id')
+    if not instance.room:
+        response['first_comment_id'] = instance.data.get('first_comment_id')
 
 
 class CommentsBase(views.BaseThreadView):

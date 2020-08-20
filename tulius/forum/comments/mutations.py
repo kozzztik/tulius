@@ -5,18 +5,6 @@ from tulius.forum.comments import models as comment_models
 from tulius.forum.rights import mutations as right_mutations
 
 
-@mutations.on_mutation(mutations.ThreadDeleteMutation)
-class ThreadCommentDelete(mutations.Mutation):
-    with_descendants = True
-
-    def process_thread(self, instance):
-        #TODO check
-        if not instance.room:
-            signals.on_thread_delete.send(
-                instance.__class__, instance=instance, mutation=self)
-            instance.comments.update(deleted=True)
-
-
 class ThreadCommentAdd(mutations.Mutation):
     with_parent = True
     comment = None
@@ -45,7 +33,7 @@ class ThreadCommentAdd(mutations.Mutation):
 
     def process_parent(self, instance, updated_child):
         last_comment = self.get_last_comment(instance)
-        comments_count = self.get_last_comment(instance)
+        comments_count = self.get_comments_count(instance)
         if updated_child.rights(None) & models.ACCESS_READ:
             last_comment['all'] = self.comment.pk
             last_comment['users'] = {
@@ -54,7 +42,7 @@ class ThreadCommentAdd(mutations.Mutation):
             for u, count in comments_count['users'].items():
                 comments_count['users'][u] = count + 1
         else:
-            for user, right in self.thread.data['rights']['users'].values():
+            for user, right in self.thread.data['rights']['users'].items():
                 if right & models.ACCESS_READ:
                     last_comment['users'][str(user)] = self.comment.pk
                     comments_count['users'][str(user)] = \
@@ -99,13 +87,15 @@ class FixCounters(mutations.Mutation):
                         new_pk = comment_models.get_param(
                             'last_comment', c, user)
                         if (not pk) or (new_pk > pk):
-                            last_comment['users'][user] = pk
+                            last_comment['users'][user] = new_pk
                         comments_count['users'][str(user)] = \
                             comment_models.get_param(
                                 'comments_count', instance, user) + \
                             comment_models.get_param('comments_count', c, user)
 
     def post_process(self, instance, children):
+        if instance.deleted:
+            return
         if instance.room:
             self.fix_room(instance, children)
             return
@@ -142,8 +132,19 @@ mutations.signals.apply_mutation.connect(
 
 
 @mutations.on_mutation(right_mutations.UpdateRights)
-class FixCountersOnRights(mutations.Mutation):
+class FixCountersOnRights(FixCounters):
     with_comments = False
+
+
+@mutations.on_mutation(mutations.ThreadDeleteMutation)
+class ThreadCommentDelete(FixCounters):
+    with_descendants = True
+
+    def process_thread(self, instance):
+        if not instance.room:
+            signals.on_thread_delete.send(
+                instance.__class__, instance=instance, mutation=self)
+            instance.comments.update(deleted=True)
 
 
 def init():

@@ -46,7 +46,7 @@ class MutationController:
         mutations = list(map(lambda x: x[1], mutations))
         # order is important - original mutation applied first.
         self.mutations = [mutation] + [c for c in mutations if c]
-        self.parent_mutations = [m for m in mutations if m.with_parent]
+        self.parent_mutations = [m for m in self.mutations if m.with_parent]
         self.instance = instance
 
     def _apply_descendants(self, instance, mutations):
@@ -72,15 +72,15 @@ class MutationController:
     def _apply_parents(self, instance, parents, mutations):
         post_process = [m for m in mutations if m.with_post_process]
         while parents:
-            parent = parents.pop()  # TODO check ordering
+            parent = parents.pop()
             for mutation in mutations:
                 mutation.process_parent(parent, instance)
-            parent.save()
             instance = parent
             if post_process:
                 children = instance.children.filter(deleted=False)
                 for mutation in post_process:
                     mutation.post_process(instance, children)
+            instance.save()
 
     def apply(self):
         parents = None

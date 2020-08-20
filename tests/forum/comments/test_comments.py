@@ -259,3 +259,50 @@ def test_after_update_saves_comment(thread, user):
     assert response.status_code == 200
     comment = response.json()
     assert comment['media']['bar'] == 'foo'
+
+
+def test_comment_counters_on_rights_change(room_group, admin, client):
+    # Create room in root room
+    response = admin.put(
+        room_group['url'], {
+            'title': 'room1', 'body': 'room1 description',
+            'room': True, 'default_rights': None,
+            'granted_rights': []})
+    assert response.status_code == 200
+    room = response.json()
+    # create thread
+    response = admin.put(
+        room['url'], {
+            'title': 'thread1', 'body': 'thread1 description',
+            'room': False, 'default_rights': None,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    thread = response.json()
+    # check initial state
+    response = admin.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['last_comment']['id']
+    assert data['rooms'][0]['comments_count'] == 1
+    response = client.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['last_comment']['id']
+    assert data['rooms'][0]['comments_count'] == 1
+    # close thread
+    response = admin.put(
+        thread['url'] + 'granted_rights/', {
+            'default_rights': models.NO_ACCESS})
+    assert response.status_code == 200
+    # check counters, admin still see
+    response = admin.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['last_comment']['id']
+    assert data['rooms'][0]['comments_count'] == 1
+    # but anonymous user is not
+    response = client.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert 'last_comment' not in data['rooms'][0]
+    assert data['rooms'][0]['comments_count'] == 0
