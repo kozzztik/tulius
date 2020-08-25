@@ -68,6 +68,10 @@ def test_copy_game_forum(
     assert room_data['threads'][1]['user']['title'] == detective.name
     assert room_data['threads'][1]['user']['id'] != detective.pk
     new_thread = room_data['threads'][0]
+    # check counters are correct
+    assert new_thread['last_comment']['id'] > comment['id']
+    assert new_thread['last_comment']['user']['title'] == detective.name
+    assert new_thread['comments_count'] == 2
     # get thread rights
     response = superuser.get(
         base_url + f'thread/{new_thread["id"]}/granted_rights/')

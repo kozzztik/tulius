@@ -308,6 +308,71 @@ def test_comment_counters_on_rights_change(room_group, admin, client):
     assert data['rooms'][0]['comments_count'] == 0
 
 
+def test_comment_counters_on_rights_combination(room_group, admin, user):
+    # Create room in root room
+    response = admin.put(
+        room_group['url'], {
+            'title': 'room1', 'body': 'room1 description',
+            'room': True, 'default_rights': None,
+            'granted_rights': []})
+    assert response.status_code == 200
+    room = response.json()
+    # create thread1 - closed
+    response = admin.put(
+        room['url'], {
+            'title': 'thread1', 'body': 'thread1 description',
+            'room': False, 'default_rights': models.NO_ACCESS,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    thread1 = response.json()
+    # check state
+    response = admin.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['last_comment']['id'] == \
+        thread1['first_comment_id']
+    response = user.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert 'last_comment' not in data['rooms'][0]
+    # add opened thread
+    response = admin.put(
+        room['url'], {
+            'title': 'thread2', 'body': 'thread1 description',
+            'room': False, 'default_rights': None,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    thread2 = response.json()
+    # check it now
+    response = admin.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['last_comment']['id'] == \
+        thread2['first_comment_id']
+    assert data['rooms'][0]['comments_count'] == 2
+    response = user.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['last_comment']['id'] == \
+        thread2['first_comment_id']
+    assert data['rooms'][0]['comments_count'] == 1
+    # grant rights
+    response = admin.post(
+        thread1['url'] + 'granted_rights/',
+        {
+            'user': {'id': user.user.pk},
+            'access_level': models.ACCESS_READ
+        })
+    assert response.status_code == 200
+    # counters fixed correctly
+    response = user.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['last_comment']['id'] == \
+        thread2['first_comment_id']
+    assert data['rooms'][0]['comments_count'] == 2
+
+
 def test_thread_ordering_by_last_comment(room_group, admin):
     # create thread 1
     response = admin.put(
