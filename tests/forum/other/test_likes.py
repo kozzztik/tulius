@@ -75,9 +75,7 @@ def test_rights_check_in_favorites(thread, user, superuser):
     assert data['groups'][0]['items'][0]['thread']['id'] == thread['id']
     # remove read rights
     response = superuser.put(
-        thread['url'] + 'granted_rights/', {
-            'access_type': models.THREAD_ACCESS_TYPE_NO_READ
-        }
+        thread['url'] + 'granted_rights/', {'default_rights': models.NO_ACCESS}
     )
     assert response.status_code == 200
     # check we can double like

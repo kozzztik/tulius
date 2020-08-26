@@ -8,27 +8,21 @@ from tulius.forum.threads import models as thread_models
 User = get_user_model()
 
 
-THREAD_ACCESS_READ = 1
-THREAD_ACCESS_WRITE = 2
-THREAD_ACCESS_MODERATE = 4
-THREAD_ACCESS_MODERATOR = THREAD_ACCESS_READ + THREAD_ACCESS_WRITE + \
-                          THREAD_ACCESS_MODERATE
-
 THREAD_ACCESS_CHOICES = (
     (
-        THREAD_ACCESS_READ + THREAD_ACCESS_WRITE,
+        thread_models.ACCESS_READ + thread_models.ACCESS_WRITE,
         _(u'read and write rights')),
     (
-        THREAD_ACCESS_READ,
+        thread_models.ACCESS_READ,
         _(u'read right')),
     (
-        THREAD_ACCESS_READ + THREAD_ACCESS_WRITE + THREAD_ACCESS_MODERATE,
+        thread_models.ACCESS_MODERATOR,
         _(u'read, write and moderate')),
     (
-        THREAD_ACCESS_WRITE,
+        thread_models.ACCESS_WRITE,
         _(u'write only right')),
     (
-        THREAD_ACCESS_READ + THREAD_ACCESS_MODERATE,
+        thread_models.ACCESS_READ + thread_models.ACCESS_MODERATE,
         _(u'read and moderate right(no write)')),
 )
 
@@ -59,7 +53,7 @@ class ThreadAccessRight(models.Model):
         verbose_name=_('user')
     )
     access_level = models.SmallIntegerField(
-        default=THREAD_ACCESS_READ + THREAD_ACCESS_WRITE,
+        default=thread_models.ACCESS_READ + thread_models.ACCESS_WRITE,
         verbose_name=_(u'access rights'),
         choices=THREAD_ACCESS_CHOICES,
     )

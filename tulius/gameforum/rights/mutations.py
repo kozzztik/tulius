@@ -1,7 +1,9 @@
 from tulius.forum.threads import mutations as base_mutations
 from tulius.forum.threads import models as forum_models
 from tulius.forum.rights import mutations
+from tulius.forum.threads import signals
 from tulius.gameforum import models as rights_models
+from tulius.gameforum.threads import mutations as thread_mutations
 from tulius.stories import models as stories_models
 from tulius.games import models as game_models
 
@@ -51,30 +53,34 @@ class UpdateRights(mutations.UpdateRights, VariationMutationMixin):
 
     def _rights_for_root(self, instance, rights):
         rights['role_all'] = rights['all']
+        if not rights['role_all']:
+            rights['role_all'] = forum_models.ACCESS_OPEN
+        if rights['role_all'] & forum_models.ACCESS_NO_INHERIT:
+            rights['role_all_inherit'] = forum_models.ACCESS_OPEN
         rights['all'] = 0
         rights['roles'] = {}
         self._process_variation(rights)
         super(UpdateRights, self)._rights_for_root(instance, rights)
 
     def _process_parent_rights(self, instance, rights, parent_rights):
-        rights['role_all'] = forum_models.default_rights[
-            max(instance.access_type, forum_models.THREAD_ACCESS_TYPE_OPEN)]
-        rights['role_all'] &= parent_rights['role_all']
-        rights['role_all'] |= rights['all']
+        rights['role_all'] = instance.default_rights
+        parent_all = parent_rights['role_all']
+        if parent_all & forum_models.ACCESS_NO_INHERIT:
+            parent_all = parent_rights['role_all_inherit']
+        if rights['role_all'] is None:
+            rights['role_all'] = parent_all
+        rights['role_all'] &= parent_all | forum_models.ACCESS_NO_INHERIT
+        if rights['role_all'] & forum_models.ACCESS_NO_INHERIT:
+            rights['role_all_inherit'] = parent_all
         rights['roles'] = {}
         self._process_variation(rights)
         super(UpdateRights, self)._process_parent_rights(
             instance, rights, parent_rights)
         # process parent role exceptions
         for role_id, right in parent_rights['roles'].items():
-            if not right & forum_models.ACCESS_MODERATE:
-                if instance.access_type >= \
-                        forum_models.THREAD_ACCESS_TYPE_NO_WRITE:
-                    right &= ~right & forum_models.ACCESS_WRITE
-                if instance.access_type == \
-                        forum_models.THREAD_ACCESS_TYPE_NO_READ:
-                    right &= ~forum_models.ACCESS_READ
-                right &= ~right & forum_models.ACCESS_EDIT
+            if (not right & forum_models.ACCESS_MODERATE) and \
+                    instance.default_rights is not None:
+                right &= instance.default_rights
             rights['roles'][role_id] = right
 
     def _process_granted_exceptions(self, instance, rights):
@@ -117,6 +123,15 @@ class UpdateRights(mutations.UpdateRights, VariationMutationMixin):
                     if role.user_id:
                         rights['users'][role.user_id] = rights['users'].get(
                             role.user_id, 0) | forum_models.ACCESS_READ
+
+
+def on_fix_counters(instance, **_kwargs):
+    variation = stories_models.Variation.objects.get(pk=instance.variation_id)
+    return UpdateRights(instance, variation)
+
+
+signals.apply_mutation.connect(
+    on_fix_counters, sender=thread_mutations.ThreadFixCounters)
 
 
 class UpdateRightsOnThreadCreate(

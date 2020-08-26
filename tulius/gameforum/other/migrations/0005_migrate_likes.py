@@ -49,6 +49,7 @@ class Migration(migrations.Migration):
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('game_forum_other', '0004_commentlike_data'),
         ('tulius', '0003_user_stories_author'),
+        ('game_forum_threads', '0006_rights_checker'),
     ]
 
     atomic = False

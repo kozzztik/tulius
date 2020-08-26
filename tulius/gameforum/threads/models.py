@@ -27,7 +27,7 @@ class Thread(thread_models.AbstractThread):
 
     @property
     def accessed_users(self):
-        if self.access_type != thread_models.THREAD_ACCESS_TYPE_NO_READ:
+        if self.default_rights != thread_models.NO_ACCESS:
             return None
         return [
             int(pk) for pk, right in self.data['rights']['roles'].items()

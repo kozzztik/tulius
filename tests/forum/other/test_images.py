@@ -41,7 +41,7 @@ def test_images_media_on_thread(user, room_group):
     response = user.put(
         room_group['url'], {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': 0, 'granted_rights': [],
+            'room': False, 'default_rights': None, 'granted_rights': [],
             'media': {'images': [
                 {'id': image['id'], 'foo': 'bar'},
                 {'id': image['id'], 'bar': 'foo'},

@@ -125,7 +125,7 @@ def test_search_access_rights(room_group, thread, admin, user):
         room_group['url'], {
             'title': 'thread', 'body': 'thread description',
             'room': False,
-            'access_type': thread_models.THREAD_ACCESS_TYPE_NO_READ,
+            'default_rights': thread_models.NO_ACCESS,
             'granted_rights': [],
             'important': False, 'media': {}})
     assert response.status_code == 200

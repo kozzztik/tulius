@@ -35,7 +35,7 @@ def test_voting_create_and_edit_on_thread(room_group, user):
     response = user.put(
         room_group['url'], {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': 0, 'granted_rights': [],
+            'room': False, 'default_rights': None, 'granted_rights': [],
             'preview': True,
             'media': {'voting': voting_data}})
     assert response.status_code == 200
@@ -49,7 +49,7 @@ def test_voting_create_and_edit_on_thread(room_group, user):
     response = user.put(
         room_group['url'], {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': 0, 'granted_rights': [],
+            'room': False, 'default_rights': None, 'granted_rights': [],
             'media': {'voting': voting_data}})
     assert response.status_code == 200
     thread = response.json()

@@ -70,14 +70,7 @@ class BaseGrantedRightsAPI(
 
 
 class GrantedRightsAPI(views.GrantedRightsAPI, BaseGrantedRightsAPI):
-    @classmethod
-    def on_fix_counters(cls, sender, thread, view, **kwargs):
-        variation = stories_models.Variation.objects.get(pk=thread.variation_id)
-        mutations.UpdateRights(thread, variation).apply()
-
-
-thread_signals.on_fix_counters.connect(
-    GrantedRightsAPI.on_fix_counters, sender=thread_models.Thread)
+    pass
 
 
 class GrantedRightAPI(views.GrantedRightAPI, BaseGrantedRightsAPI):

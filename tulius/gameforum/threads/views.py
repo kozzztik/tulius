@@ -7,12 +7,14 @@ from tulius.forum.threads import counters
 from tulius.forum.threads import models as forum_models
 from tulius.gameforum import base
 from tulius.gameforum.threads import models as thread_models
+from tulius.gameforum.threads import mutations
 from tulius.stories import models as stories_models
 from djfw.wysibb.templatetags import bbcodes
 
 
 class CountersFix(counters.CountersFix):
     thread_model = thread_models.Thread
+    mutation = mutations.ThreadFixCounters
 
 
 class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
@@ -134,4 +136,4 @@ class ThreadAPI(views.ThreadView, BaseThreadAPI):
 
 
 class MoveThreadView(views.MoveThreadView, BaseThreadAPI):
-    pass
+    fix_mutation = mutations.ThreadFixCounters

@@ -76,7 +76,7 @@ class VotingAPI(views.CommentBase):
 
     @classmethod
     def user_choice(cls, choices, user, comment_id):
-        if user.is_anonymous:
+        if user.is_anonymous or not comment_id:
             return None
         choice = cls.voting_model.objects.filter(
             user=user, comment_id=comment_id).first()
@@ -115,7 +115,7 @@ class VotingAPI(views.CommentBase):
         v = instance.media.get('voting')
         if v:
             response['media']['voting'] = cls.user_voting_data(
-                v, view.user, instance.first_comment_id)
+                v, view.user, instance.data.get('first_comment_id'))
 
     @classmethod
     def on_before_add_comment(cls, comment, data, view, **_kwargs):

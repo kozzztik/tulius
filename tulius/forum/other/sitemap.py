@@ -1,5 +1,4 @@
 from django.contrib import sitemaps
-
 from tulius.forum.threads import models
 
 
@@ -10,8 +9,8 @@ class ForumSitemap(sitemaps.Sitemap):
 
     def iterate_threads(self, parent):
         items = self.thread_model.objects.filter(
-            parent=parent, deleted=False,
-            access_type__lt=models.THREAD_ACCESS_TYPE_NO_READ)
+            parent=parent, deleted=False).exclude(
+                default_rights=models.NO_ACCESS)
         for obj in items:
             if obj.room:
                 yield from self.iterate_threads(obj)

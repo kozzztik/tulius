@@ -11,30 +11,24 @@ from mptt import models as mptt_models
 
 User = get_user_model()
 
-THREAD_ACCESS_TYPE_NOT_SET = 0
-THREAD_ACCESS_TYPE_OPEN = 1
-THREAD_ACCESS_TYPE_NO_WRITE = 2
-THREAD_ACCESS_TYPE_NO_READ = 3
-
-THREAD_ACCESS_TYPE_CHOICES = (
-    (THREAD_ACCESS_TYPE_NOT_SET, _(u'access not set')),
-    (THREAD_ACCESS_TYPE_OPEN, _(u'free access')),
-    (THREAD_ACCESS_TYPE_NO_WRITE, _(u'read only access')),
-    (THREAD_ACCESS_TYPE_NO_READ, _(u'private(no access)')),
-)
-
+NO_ACCESS = 0
 ACCESS_READ = 1
 ACCESS_WRITE = 2
 ACCESS_MODERATE = 4
 ACCESS_EDIT = 8
+ACCESS_NO_INHERIT = 16
 
 ACCESS_OWN = ACCESS_READ + ACCESS_WRITE + ACCESS_EDIT
+ACCESS_OPEN = ACCESS_READ + ACCESS_WRITE
+ACCESS_MODERATOR = ACCESS_READ + ACCESS_WRITE + ACCESS_MODERATE
 
-default_rights = {
-    THREAD_ACCESS_TYPE_NO_READ: 0,
-    THREAD_ACCESS_TYPE_NO_WRITE: ACCESS_READ,
-    THREAD_ACCESS_TYPE_OPEN: ACCESS_READ + ACCESS_WRITE,
-}
+DEFAULT_RIGHTS_CHOICES = (
+    (None, _(u'access not set')),
+    (ACCESS_READ + ACCESS_WRITE, _(u'free access')),
+    (ACCESS_READ, _(u'read only access')),
+    (ACCESS_READ + ACCESS_NO_INHERIT, _(u'read only access(no inherit)')),
+    (NO_ACCESS, _(u'private(no access)')),
+)
 
 
 class ThreadManager(mptt_models.TreeManager):
@@ -78,10 +72,10 @@ class AbstractThread(mptt_models.MPTTModel):
         related_name='%(app_label)s',
         verbose_name=_('author')
     )
-    access_type = models.SmallIntegerField(
-        default=0,
+    default_rights = models.SmallIntegerField(
+        default=None, blank=True, null=True,
         verbose_name=_(u'access type'),
-        choices=THREAD_ACCESS_TYPE_CHOICES,
+        choices=DEFAULT_RIGHTS_CHOICES,
     )
     create_time = models.DateTimeField(
         auto_now_add=True,
@@ -99,23 +93,6 @@ class AbstractThread(mptt_models.MPTTModel):
         default=False,
         verbose_name=_(u'deleted')
     )
-    protected_threads = models.SmallIntegerField(
-        default=0,
-        verbose_name=_(u'protected threads')
-    )
-    first_comment_id = models.IntegerField(
-        null=True, blank=True,
-        verbose_name=_(u'first comment')
-    )
-    last_comment_id = models.IntegerField(
-        null=True, blank=True,
-        verbose_name=_(u'last comment')
-    )
-    comments_count = models.IntegerField(
-        null=False, blank=False,
-        default=0,
-        verbose_name=_(u'first comment')
-    )
     data = jsonfield.JSONField(default=default_json)
     media = jsonfield.JSONField(default=default_json)
 
@@ -128,24 +105,28 @@ class AbstractThread(mptt_models.MPTTModel):
     def get_absolute_url(self):
         return urls.reverse('forum_api:thread', kwargs={'pk': self.pk})
 
-    def _rights(self, user_id):
+    def rights(self, user_id):
         rights = self.data['rights']
-        return rights['all'] | rights['users'].get(str(user_id), 0)
+        result = rights['all']
+        if user_id:
+            result |= rights['users'].get(str(user_id), 0)
+        return result
 
     def read_right(self, user):
         return bool(
-            user.is_superuser or (self._rights(user.pk) & ACCESS_READ))
+            user.is_superuser or (self.rights(user.pk) & ACCESS_READ))
 
     def write_right(self, user):
-        return bool(user.is_superuser or (self._rights(user.pk) & ACCESS_WRITE))
+        return bool(
+            user.is_superuser or (self.rights(user.pk) & ACCESS_WRITE))
 
     def moderate_right(self, user):
         return bool(
-            user.is_superuser or (self._rights(user.pk) & ACCESS_MODERATE))
+            user.is_superuser or (self.rights(user.pk) & ACCESS_MODERATE))
 
     def edit_right(self, user):
         return bool(
-            user.is_superuser or (self._rights(user.pk) & ACCESS_EDIT))
+            user.is_superuser or (self.rights(user.pk) & ACCESS_EDIT))
 
     @property
     def moderators(self):
@@ -155,7 +136,7 @@ class AbstractThread(mptt_models.MPTTModel):
 
     @property
     def accessed_users(self):
-        if self.access_type != THREAD_ACCESS_TYPE_NO_READ:
+        if self.default_rights != NO_ACCESS:
             return None
         return User.objects.filter(pk__in=[
             pk for pk, right in self.data['rights']['users'].items()

@@ -76,17 +76,9 @@ class GrantedRightsAPI(BaseGrantedRightsAPI):
         self.get_parent_thread(for_update=True, **kwargs)
         if not self.obj.edit_right(self.user):
             raise exceptions.PermissionDenied()
-        self.obj.access_type = data['access_type']
+        self.obj.default_rights = data['default_rights']
         self.get_mutation(self.obj).apply()
-        return {'access_type': self.obj.access_type}
-
-    @classmethod
-    def on_fix_counters(cls, sender, thread, view, **kwargs):
-        cls.get_mutation(thread).apply()
-
-
-thread_signals.on_fix_counters.connect(
-    GrantedRightsAPI.on_fix_counters, sender=thread_models.Thread)
+        return {'default_rights': self.obj.default_rights}
 
 
 class GrantedRightAPI(BaseGrantedRightsAPI):

@@ -22,7 +22,7 @@ def test_sitemap(game, variation_forum, client, path, superuser, status):
     response = superuser.put(
         base_url + f'thread/{variation_forum.id}/', {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NOT_SET,
+            'room': False, 'default_rights': None,
             'granted_rights': [], 'important': True, 'media': {}})
     assert response.status_code == 200
     thread = response.json()
@@ -30,7 +30,7 @@ def test_sitemap(game, variation_forum, client, path, superuser, status):
     response = superuser.put(
         base_url + f'thread/{variation_forum.id}/', {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ,
+            'room': False, 'default_rights': models.NO_ACCESS,
             'granted_rights': [], 'important': True, 'media': {}})
     assert response.status_code == 200
     thread2 = response.json()

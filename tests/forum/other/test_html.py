@@ -52,7 +52,7 @@ def test_user_cant_set_html_on_threads(user, room_group):
     response=user.put(
         room_group['url'], {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': 0, 'granted_rights': [],
+            'room': False, 'default_rights': None, 'granted_rights': [],
             'media': {'html': '<textarea></textarea>'}})
     assert response.status_code == 200
     thread = response.json()
@@ -73,7 +73,7 @@ def test_html_media_on_threads(room_group, superuser):
     response=superuser.put(
         room_group['url'], {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': 0, 'granted_rights': [],
+            'room': False, 'default_rights': None, 'granted_rights': [],
             'important': False,
             'media': {'html': '<textarea></textarea>'}})
     assert response.status_code == 200

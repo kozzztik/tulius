@@ -3,6 +3,16 @@ import gc
 from django.conf import settings
 from django.db import migrations
 
+ACCESS_READ = 1
+ACCESS_WRITE = 2
+
+access_to_default_rights = {
+    3: 0,  # THREAD_ACCESS_TYPE_NO_READ
+    2: ACCESS_READ,  # THREAD_ACCESS_TYPE_NO_WRITE
+    1: ACCESS_READ + ACCESS_WRITE,  # THREAD_ACCESS_TYPE_OPEN
+    0: None,  # THREAD_ACCESS_TYPE_NOT_SET
+}
+
 
 def migrate_data(apps, schema_editor):
     OldThread = apps.get_model('forum', 'Thread')
@@ -16,16 +26,14 @@ def migrate_data(apps, schema_editor):
             title=old_thread.title,
             body=old_thread.body,
             room=old_thread.room,
-            access_type=old_thread.access_type,
+            default_rights=access_to_default_rights[old_thread.access_type],
             create_time=old_thread.create_time,
             closed=old_thread.closed,
             important=old_thread.important,
             deleted=old_thread.deleted,
-            protected_threads=old_thread.protected_threads,
-            first_comment_id=old_thread.first_comment_id,
-            last_comment_id=old_thread.last_comment_id,
-            comments_count=old_thread.comments_count,
-            data={},
+            data={
+                'first_comment_id': old_thread.first_comment_id
+            },
             media=old_thread.media,
             lft=old_thread.lft,
             rght=old_thread.rght,

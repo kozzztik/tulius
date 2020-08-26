@@ -1,7 +1,6 @@
 from django.db import transaction
 
 from tulius.forum.threads import models as forum_threads
-from tulius.forum.rights import models as rights
 from tulius.gameforum.threads import models as thread_models
 from tulius.stories import models as story_models
 from tulius.games import models as game_models
@@ -18,7 +17,7 @@ def test_comments_api(
         variation_forum.get_absolute_url(), {
             'title': 'thread', 'body': 'thread description',
             'room': False,
-            'access_type': forum_threads.THREAD_ACCESS_TYPE_NO_WRITE,
+            'default_rights': forum_threads.ACCESS_READ,
             'granted_rights': [], 'important': False, 'media': {}})
     assert response.status_code == 200
     thread = response.json()
@@ -34,7 +33,7 @@ def test_comments_api(
     response = admin.post(
         thread['url'] + 'granted_rights/', {
             'user': {'id': detective.pk},
-            'access_level': rights.THREAD_ACCESS_WRITE
+            'access_level': forum_threads.ACCESS_WRITE
         }
     )
     assert response.status_code == 200
@@ -145,7 +144,7 @@ def test_comments_illustrations(
         base_url + f'thread/{variation_forum.id}/', {
             'title': 'thread', 'body': 'thread description',
             'room': False,
-            'access_type': forum_threads.THREAD_ACCESS_TYPE_NOT_SET,
+            'default_rights': None,
             'granted_rights': [], 'role_id': detective.pk, 'media': {
                 'illustrations': [{
                     'id' : story_illustration.pk,
@@ -242,14 +241,14 @@ def test_broken_last_comment(game, variation_forum, user, detective):
         base_url + f'thread/{variation_forum.id}/', {
             'title': 'thread', 'body': 'thread description',
             'room': False,
-            'access_type': forum_threads.THREAD_ACCESS_TYPE_NOT_SET,
+            'default_rights': None,
             'granted_rights': [], 'role_id': detective.pk, 'media': {}
         })
     assert response.status_code == 200
     thread = response.json()
     # break last comment
     obj = thread_models.Thread.objects.get(pk=thread['id'])
-    obj.last_comment_id += 1
+    obj.data['last_comment']['all'] += 1
     obj.save()
     # check room view still works
     response = user.get(base_url + f'thread/{variation_forum.id}/')
@@ -268,7 +267,7 @@ def test_delete_game_comments_with_thread(
         variation_forum.get_absolute_url(), {
             'title': 'thread', 'body': 'thread description',
             'room': True,
-            'access_type': forum_threads.THREAD_ACCESS_TYPE_NOT_SET,
+            'default_rights': None,
             'granted_rights': []})
     assert response.status_code == 200
     room = response.json()
@@ -277,7 +276,7 @@ def test_delete_game_comments_with_thread(
         room['url'], {
             'title': 'thread', 'body': 'thread description',
             'room': False,
-            'access_type': forum_threads.THREAD_ACCESS_TYPE_NOT_SET,
+            'default_rights': None,
             'granted_rights': [], 'role_id': detective.pk, 'media': {}
         })
     assert response.status_code == 200
@@ -307,3 +306,95 @@ def test_delete_game_comments_with_thread(
     # check comments counts
     assert story_models.Role.objects.get(pk=detective.pk).comments_count == 0
     assert story_models.Role.objects.get(pk=murderer.pk).comments_count == 0
+
+
+def test_game_comment_counters_on_rights_change(
+        game, variation_forum, user, detective, admin):
+    game.status = game_models.GAME_STATUS_IN_PROGRESS
+    with transaction.atomic():
+        game.save()
+    # create room
+    response = admin.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'room', 'body': 'thread description',
+            'room': True,
+            'default_rights': None,
+            'granted_rights': [], 'role_id': None, 'media': {}})
+    assert response.status_code == 200
+    room = response.json()
+    # create room
+    response = admin.put(
+        room['url'], {
+            'title': 'thread', 'body': 'thread description',
+            'room': False,
+            'default_rights': None,
+            'granted_rights': [], 'role_id': None, 'media': {}})
+    assert response.status_code == 200
+    thread = response.json()
+    # check initial state
+    response = admin.get(variation_forum.get_absolute_url())
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['last_comment']['id']
+    assert data['rooms'][0]['comments_count'] == 1
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['last_comment']['id']
+    assert data['rooms'][0]['comments_count'] == 1
+    # close thread
+    response = admin.put(
+        thread['url'] + 'granted_rights/', {
+            'default_rights': forum_threads.NO_ACCESS})
+    assert response.status_code == 200
+    # check counters, admin still see
+    response = admin.get(variation_forum.get_absolute_url())
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['last_comment']['id']
+    assert data['rooms'][0]['comments_count'] == 1
+    # but anonymous user is not
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 200
+    data = response.json()
+    assert 'last_comment' not in data['rooms'][0]
+    assert data['rooms'][0]['comments_count'] == 0
+
+
+def test_game_comment_counters_on_thread_delete(
+        game, variation_forum, user, detective, admin):
+    game.status = game_models.GAME_STATUS_IN_PROGRESS
+    with transaction.atomic():
+        game.save()
+
+    # Create room in root room
+    response = admin.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'room1', 'body': 'room1 description',
+            'room': True, 'default_rights': None, 'role_id': None,
+            'granted_rights': []})
+    assert response.status_code == 200
+    room = response.json()
+    # create thread
+    response = admin.put(
+        room['url'], {
+            'title': 'thread1', 'body': 'thread1 description',
+            'room': False, 'default_rights': None, 'role_id': None,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    thread = response.json()
+    # check initial state
+    response = admin.get(variation_forum.get_absolute_url())
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['last_comment']['id']
+    assert data['rooms'][0]['comments_count'] == 1
+    # delete thread
+    response = admin.delete(thread['url'] + '?comment=wow')
+    assert response.status_code == 200
+    # check counters
+    response = admin.get(variation_forum.get_absolute_url())
+    assert response.status_code == 200
+    data = response.json()
+    assert 'last_comment' not in data['rooms'][0]
+    assert data['rooms'][0]['comments_count'] == 0

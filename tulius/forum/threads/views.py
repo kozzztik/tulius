@@ -1,12 +1,10 @@
 import json
 
-from django import dispatch
 from django import shortcuts
 from django.core import exceptions
 from django.core.cache import cache
 from django.utils import html
 from django.db import transaction
-from django.db.models import query_utils
 
 from tulius.core.ckeditor import html_converter
 from tulius.forum import core
@@ -59,7 +57,6 @@ class BaseThreadView(core.BaseAPIView):
             parent=self.obj, room=is_room).exclude(deleted=True)
         if is_room:
             return self.prepare_room_list(threads)
-        threads = threads.order_by('-last_comment_id')
         threads = self._thread_list_apply_rights(threads)
         signals.prepare_threads.send(
             self.thread_model, threads=threads, view=self)
@@ -124,8 +121,7 @@ class BaseThreadView(core.BaseAPIView):
                 'url': parent.get_absolute_url(),
             } for parent in self.obj.get_ancestors()] if self.obj.pk else None,
             'rights': self.obj.rights_to_json(self.user),
-            'access_type': self.obj.access_type,
-            'first_comment_id': self.obj.first_comment_id,
+            'default_rights': self.obj.default_rights,
         }
         if self.obj.room:
             data['rooms'] = [
@@ -138,13 +134,6 @@ class BaseThreadView(core.BaseAPIView):
             data['user'] = self.obj.user.to_json(detailed=True)
             data['media'] = self.obj.media
         return data
-
-    @classmethod
-    def on_fix_counters(cls, sender, thread, view, **kwargs):
-        sender.objects.partial_rebuild(thread.tree_id)
-
-
-dispatch.receiver(signals.on_fix_counters)(BaseThreadView.on_fix_counters)
 
 
 class ThreadView(BaseThreadView):
@@ -222,36 +211,8 @@ class IndexView(BaseThreadView):
     rights_model = rights_models.ThreadAccessRight
 
     def get_index(self, level):
-        children = list(self.get_free_index(level)) + \
-            list(self.get_readable_protected_index(level))
-        children = [thread for thread in children if thread.room]
-        return sorted(children, key=lambda x: x.id)
-
-    def get_readable_protected_index(self, level):
-        if self.user.is_superuser:
-            return self.thread_model.objects.filter(
-                access_type=models.THREAD_ACCESS_TYPE_NO_READ,
-                level=level, deleted=False)
-        if self.user.is_anonymous:
-            return []
-        query = query_utils.Q(
-            thread__level=level,
-            thread__access_type=models.THREAD_ACCESS_TYPE_NO_READ,
-            access_level__gte=rights_models.THREAD_ACCESS_READ,
-            user=self.user, thread__deleted=False)
-        rights = self.rights_model.objects.filter(query)
-        rights = rights.select_related('thread')
-        return [right.thread for right in rights]
-
-    def get_free_index(self, level):
-        threads = self.thread_model.objects.filter(
-            access_type__lt=models.THREAD_ACCESS_TYPE_NO_READ,
-            level=level, deleted=False)
-        if self.user.is_anonymous:
-            return threads
-        return threads.filter(query_utils.Q(
-            access_type__lt=models.THREAD_ACCESS_TYPE_NO_READ
-        ) | query_utils.Q(user=self.user))  # TODO: move it to protected #97
+        threads = self.thread_model.objects.filter(level=level, deleted=False)
+        return self._thread_list_apply_rights(threads)
 
     def room_group_unreaded(self, rooms):
         # TODO move all it to read marks module
@@ -314,6 +275,8 @@ class IndexView(BaseThreadView):
 
 
 class MoveThreadView(BaseThreadView):
+    fix_mutation = mutations.ThreadFixCounters
+
     @transaction.atomic
     def put(self, request, **kwargs):
         data = json.loads(request.body)
@@ -334,13 +297,11 @@ class MoveThreadView(BaseThreadView):
                 old_parent.tree_id != new_parent.tree_id)):
             obj = self.thread_model.objects.get(
                 tree_id=old_parent.tree_id, parent=None)
-            self.on_fix_counters(self.thread_model, obj, self)
-            obj.save()
+            self.fix_mutation(obj).apply()
         if new_parent:
             obj = self.thread_model.objects.get(
                 tree_id=new_parent.tree_id, parent=None)
-            self.on_fix_counters(self.thread_model, obj, self)
-            obj.save()
+            self.fix_mutation(obj).apply()
         response = self.obj_to_json()
         signals.to_json.send(
             self.thread_model, instance=self.obj, response=response, view=self)
