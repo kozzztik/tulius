@@ -3,10 +3,16 @@ import gc
 from django.conf import settings
 from django.db import migrations, transaction
 from tulius.forum.threads import models
-from tulius.forum.rights import mutations
+from tulius.forum.threads import mutations
+from tulius.forum.rights import mutations as rights_mutations
 from tulius.forum.comments import mutations as comments_mutations
 
 comments_mutations.init()
+
+
+class Tmp(rights_mutations.UpdateRights):
+    # to make usage of rights for linters
+    pass
 
 
 def migrate_data(apps, schema_editor):
@@ -15,7 +21,7 @@ def migrate_data(apps, schema_editor):
     for thread in models.Thread.objects.filter(parent=None).iterator(
             chunk_size=1000):
         with transaction.atomic():
-            mutations.UpdateRights(thread).apply()
+            mutations.ThreadFixCounters(thread).apply()
         count += 1
         if count % 10 == 0:
             gc.collect()

@@ -1,3 +1,5 @@
+import pytest
+
 from tulius.forum.threads import models
 from tulius.forum.comments import signals
 
@@ -404,6 +406,7 @@ def test_thread_ordering_by_last_comment(room_group, admin):
             'title': 'ho ho ho', 'body': 'happy new year',
             'media': {},
         })
+    assert response.status_code == 200
     # check now it goes first
     response = admin.get(room_group['url'])
     assert response.status_code == 200
@@ -411,3 +414,29 @@ def test_thread_ordering_by_last_comment(room_group, admin):
     assert len(data['threads']) == 2
     assert data['threads'][0]['id'] == thread1['id']
     assert data['threads'][1]['id'] == thread2['id']
+
+
+@pytest.mark.parametrize('default_rights', [models.NO_ACCESS, None])
+def test_fix_counters_public_thread_and_empty_room(
+        superuser, room_group, user, default_rights):
+    # create public thread
+    response = superuser.put(
+        room_group['url'], {
+            'title': 'thread', 'body': 'thread description',
+            'room': False, 'default_rights': None, 'important': 'False',
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    # create room with no comments
+    response = superuser.put(
+        room_group['url'], {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': default_rights,
+            'granted_rights': [{
+                'user': {'id': user.user.pk},
+                'access_level': models.ACCESS_READ}]})
+    assert response.status_code == 200
+    # fix_counters
+    response = superuser.post(room_group['url'] + 'fix/')
+    assert response.status_code == 200
+    data = response.json()
+    assert data['result']['threads'] == 3

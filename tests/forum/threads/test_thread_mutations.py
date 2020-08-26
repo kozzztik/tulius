@@ -4,7 +4,7 @@ from tulius.forum.threads import models
 from tulius.forum.threads import mutations
 
 
-class TestMutation(mutations.Mutation):
+class FooMutation(mutations.Mutation):
     with_parent = True
     with_post_process = True  # to cover default implementation
 
@@ -16,7 +16,7 @@ def test_mutation_parent_on_not_saved_thread(user):
     parent = models.Thread(title='foo', user=user.user)
     parent.save()
     thread = models.Thread(title='bar', parent=parent, user=user.user)
-    mutation = TestMutation(thread)
+    mutation = FooMutation(thread)
     with transaction.atomic():
         mutation.apply()
     parent = models.Thread.objects.get(pk=parent.pk)

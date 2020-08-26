@@ -69,7 +69,9 @@ class FixCounters(mutations.Mutation):
         for c in children:
             if c.rights(None) & models.ACCESS_READ:
                 pk = c.data['last_comment']['all']
-                if (not last_comment['all']) or (pk > last_comment['all']):
+                if pk and (
+                        (not last_comment['all']) or
+                        (pk > last_comment['all'])):
                     last_comment['all'] = pk
                 for u, l_pk in last_comment['users'].items():
                     if l_pk < pk:
@@ -86,7 +88,7 @@ class FixCounters(mutations.Mutation):
                             'last_comment', instance, user)
                         new_pk = comment_models.get_param(
                             'last_comment', c, user)
-                        if (not pk) or (new_pk > pk):
+                        if new_pk and ((not pk) or (new_pk > pk)):
                             last_comment['users'][user] = new_pk
                         comments_count['users'][str(user)] = \
                             comment_models.get_param(
