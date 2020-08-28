@@ -1,21 +1,13 @@
 from settings import *
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'tulius_{}'.format(env),
-        'HOST': '127.0.0.1' if env == 'dev' else 'tulius_mysql',
-        'USER': 'tulius_{}'.format(env),
-        'PASSWORD': '< ADD DB PASSWORD HERE >',
-        'PORT': '',
-        'CONN_MAX_AGE': 20,
-    }
-}
-
 import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
 
-sentry_sdk.init(
-    dsn="",
-    integrations=[DjangoIntegration()]
-)
+RAVEN_CONFIG['dsn'] = ""
+
+DATABASES['default']['PASSWORD'] = 'db_password'
+
+ALLOWED_HOSTS += []
+
+sentry_sdk.init(**RAVEN_CONFIG)
+
+DEBUG = False

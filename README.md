@@ -45,7 +45,7 @@ Repo for http://tulius.com project.
 7. If you not restored mysql from lib files, it will create empty database with random root password. 
     You can recognize it from docker logs:
     ```bash
-    docker logs tulius_mysql
+    docker logs tulius_mysql 2>&1 | grep GENERATED
      ```
     Enter Mysql console:
     ```bash
@@ -53,7 +53,7 @@ Repo for http://tulius.com project.
     ```
     Change root password:
     ```sql
-    ALTER USER root@'localhost' PASSWORD 'new root password';
+    ALTER USER root@'localhost' IDENTIFIED BY 'new root password';
     ```
     Create necessary databases and users:
     ```sql
