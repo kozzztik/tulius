@@ -11,6 +11,7 @@ kozzztik/tulius:${BRANCH_NAME} /opt/tulius/travis_test.sh
 
 if [[ $BRANCH_NAME = dev ]] || [[ $BRANCH_NAME = master ]]
 then
+    docker push kozzztik/tulius:$BRANCH_NAME
     ssh -i /mnt/big/jenkins/travis_rsa travis@$BRANCH_NAME.tulius.co-de.org -p 22 "cd ~/$BRANCH_NAME && git fetch --all && git reset --hard && git pull --rebase"
 	  ssh -i /mnt/big/jenkins/travis_rsa travis@$BRANCH_NAME.tulius.co-de.org -p 22 "cd ~/$BRANCH_NAME && . scripts/on_update.sh $BRANCH_NAME"
 fi
