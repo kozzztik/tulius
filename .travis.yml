@@ -8,7 +8,9 @@ before_script:
 script:
   - docker run -e TULIUS_BRANCH=test -e TRAVIS_JOB_ID="$TRAVIS_JOB_ID"  -e COV_BRANCH="$TRAVIS_BRANCH" --net="host" tulius_test /opt/tulius/travis_test.sh
 addons:
-  ssh_known_hosts: tulius.co-de.org:22
+  ssh_known_hosts:
+    - master.tulius.co-de.org:22
+    - dev.tulius.co-de.org:22
 before_deploy:
   - docker login -u kozzztik -p "$docker_api_key"
   - docker push kozzztik/tulius
