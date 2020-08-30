@@ -485,3 +485,39 @@ def test_not_defined_rights_on_root(
             'room': True, 'default_rights': None, 'role_id': detective.pk,
             'granted_rights': [], 'media': {}})
     assert response.status_code == 200
+
+
+def test_rights_override(game, variation_forum, user, admin, detective):
+    game.status = game_models.GAME_STATUS_IN_PROGRESS
+    with transaction.atomic():
+        game.save()
+    response = admin.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': models.ACCESS_READ,
+            'role_id': None,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    room1 = response.json()
+    response = admin.put(
+        room1['url'], {
+            'title': 'room2', 'body': 'room2 description',
+            'room': True, 'default_rights': models.ACCESS_OPEN,
+            'role_id': None,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    room2 = response.json()
+    # check no write room1
+    response = user.put(
+        room1['url'], {
+            'title': 'thread', 'body': 'thread description',
+            'room': False, 'default_rights': None, 'role_id': detective.pk,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 403
+    # check write room2
+    response = user.put(
+        room2['url'], {
+            'title': 'thread', 'body': 'thread description',
+            'room': False, 'default_rights': None, 'role_id': detective.pk,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
