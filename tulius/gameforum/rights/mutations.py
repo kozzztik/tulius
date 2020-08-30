@@ -69,7 +69,6 @@ class UpdateRights(mutations.UpdateRights, VariationMutationMixin):
             parent_all = parent_rights['role_all_inherit']
         if rights['role_all'] is None:
             rights['role_all'] = parent_all
-        rights['role_all'] &= parent_all | forum_models.ACCESS_NO_INHERIT
         if rights['role_all'] & forum_models.ACCESS_NO_INHERIT:
             rights['role_all_inherit'] = parent_all
         rights['roles'] = {}

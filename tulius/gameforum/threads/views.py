@@ -128,6 +128,7 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
         data = super(BaseThreadAPI, self).obj_to_json()
         data['user'] = self.role_to_json(self.obj.role_id, detailed=True)
         data['edit_role_id'] = self.obj.edit_role_id
+        data['rights']['user_write_roles'] = self.write_roles()
         return data
 
 
