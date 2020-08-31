@@ -7,6 +7,13 @@ export default function(variation_id) {
                 variation_id: variation_id
             },
         }),
+        deleted_threads: room_id => ({
+            name: 'game_deleted_threads',
+            params: {
+                id: room_id,
+                variation_id: variation_id
+            },
+        }),
         add_room: room_id => ({
             name: 'game_add_room',
             params: {id: room_id, variation_id: variation_id}

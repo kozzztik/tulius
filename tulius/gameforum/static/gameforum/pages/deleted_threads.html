@@ -1,0 +1,73 @@
+<div v-if="!loading">
+    <div class="story-banner d-none d-md-block" v-if="variation.game">
+        <img :src="variation.game.top_banner_url"  v-if="variation.game.top_banner_url" style="width: 100%">
+    </div>
+    <game_forum_thread_actions :variation="variation" :thread="thread" :upper="true" ref="thread_actions"></game_forum_thread_actions>
+
+    <div v-if="thread.rooms.length > 0" class="content">
+        <div class="caption" align="center">
+            <div class="captionleft"></div>
+            <div class="captioncontent">
+                Удаленные комнаты
+            </div>
+            <div class="captionright"></div>
+        </div>
+        <forum_room_list :rooms="thread.rooms">
+            <template v-slot:moderators="slotProps">
+                <h6 v-if="slotProps.room.moderators.length > 0" class="moderators">Модераторы:</h6>
+                <ul v-if="slotProps.room.moderators" class="moderators">
+                    <li v-for="moderator in slotProps.room.moderators">
+                        <a href="javascript:void(0)" @click="show_role_modal(moderator.id)" v-if="role_with_link(moderator.id)">{{ moderator.title }}</a>
+                        <span v-else>{{ moderator.title }}</span>
+                    </li>
+                </ul>
+            </template>
+            <template v-slot:accessed_users="slotProps">
+                <h6 v-if="slotProps.room.accessed_users" class="moderators">Открыта для:</h6>
+                <ul v-if="slotProps.room.accessed_users" class="moderators">
+                    <li v-for="accessed_user in slotProps.room.accessed_users">
+                        <a href="javascript:void(0)" @click="show_role_modal(accessed_user.id)" v-if="role_with_link(accessed_user.id)">{{ accessed_user.title }}</a>
+                        <span v-else>{{ accessed_user.title }}</span>
+                    </li>
+                </ul>
+            </template>
+        </forum_room_list>
+    </div>
+    <div v-if="thread.threads.length > 0" class="content">
+        <div class="caption" align="center">
+            <div class="captionleft"></div>
+            <div class="captioncontent">
+                Удаленные темы
+            </div>
+            <div class="captionright"></div>
+        </div>
+        <forum_thread_list :threads="thread.threads">
+            <template v-slot:author="slotProps">
+                <div v-if="slotProps.thread.user">
+                    <a href="javascript:void(0)" @click="show_role_modal(slotProps.thread.user.id)" v-if="role_with_link(slotProps.thread.user.id)">{{ slotProps.thread.user.title }}</a>
+                    <span v-else>{{ slotProps.thread.user.title }}</span>
+                </div>
+            </template>
+            <template v-slot:accessed_users="slotProps">
+                <h6 v-if="slotProps.thread.accessed_users" class="moderators">Открыта для:</h6>
+                <ul v-if="slotProps.thread.accessed_users" class="moderators">
+                    <li v-for="accessed_user in slotProps.thread.accessed_users">
+                        <a href="javascript:void(0)" @click="show_role_modal(accessed_user.id)" v-if="role_with_link(accessed_user.id)">{{ accessed_user.title }}</a>
+                        <span v-else>{{ accessed_user.title }}</span>
+                    </li>
+                </ul>
+            </template>
+        </forum_thread_list>
+    </div>
+    <div v-if="(thread.rooms.length == 0) && (thread.threads.length == 0)" class="content">
+        <br>
+        В этой комнате нет удаленных подкомнат или тем
+        <br>
+        <br>
+    </div>
+    <game_forum_online_status :variation="variation" :thread="thread"></game_forum_online_status>
+    <game_forum_thread_actions :variation="variation" :thread="thread" :upper="false"></game_forum_thread_actions>
+    <div class="story-banner d-none d-md-block" v-if="variation.game">
+        <img :src="variation.game.bottom_banner_url"  v-if="variation.game.bottom_banner_url" style="width: 100%">
+    </div>
+</div>

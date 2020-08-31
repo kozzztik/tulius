@@ -54,7 +54,11 @@ class BaseThreadView(core.BaseAPIView):
 
     def get_subthreads(self, is_room=False, deleted=False):
         threads = self.thread_model.objects.filter(
-            parent=self.obj, room=is_room, deleted=deleted)
+            parent=self.obj, room=is_room)
+        if deleted:
+            threads = threads.filter(deleted=True)
+        else:
+            threads = threads.exclude(deleted=True)
         if is_room:
             return self.prepare_room_list(threads)
         threads = self._thread_list_apply_rights(threads)
