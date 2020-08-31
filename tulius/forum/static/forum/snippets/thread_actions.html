@@ -32,6 +32,9 @@
         <b-dropdown-item href="javascript:void(0);" :to="urls.thread_fix(thread.id)" v-if="user.superuser">
             Обновить счетчики
         </b-dropdown-item>
+        <b-dropdown-item href="javascript:void(0);" :to="urls.deleted_threads(thread.id)" v-if="thread.room && user.superuser">
+            Удаленные комнаты и темы
+        </b-dropdown-item>
         <b-dropdown-item :to="urls.extended_search(thread.id)">
             Расширенный поиск
         </b-dropdown-item>

@@ -22,7 +22,8 @@ class Thread(thread_models.AbstractThread):
     @property
     def moderators(self):
         return [
-            int(pk) for pk, right in self.data['rights']['roles'].items()
+            int(pk) for pk, right in
+            self.data.get('rights', {}).get('roles', {}).items()
             if right & thread_models.ACCESS_MODERATE]
 
     @property
@@ -30,7 +31,8 @@ class Thread(thread_models.AbstractThread):
         if self.default_rights != thread_models.NO_ACCESS:
             return None
         return [
-            int(pk) for pk, right in self.data['rights']['roles'].items()
+            int(pk) for pk, right in
+            self.data.get('rights', {}).get('roles', {}).items()
             if right & thread_models.ACCESS_READ]
 
     def rights_to_json(self, user):

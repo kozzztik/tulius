@@ -124,8 +124,8 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
             raise exceptions.PermissionDenied()
         self.obj.edit_role_id = editor_role
 
-    def obj_to_json(self):
-        data = super(BaseThreadAPI, self).obj_to_json()
+    def obj_to_json(self, deleted=False):
+        data = super(BaseThreadAPI, self).obj_to_json(deleted=deleted)
         data['user'] = self.role_to_json(self.obj.role_id, detailed=True)
         data['edit_role_id'] = self.obj.edit_role_id
         data['rights']['user_write_roles'] = self.write_roles()

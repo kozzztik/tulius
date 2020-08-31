@@ -1,5 +1,6 @@
 export default {
     room: room_id => ({name: 'forum_room', params: {id: room_id},}),
+    deleted_threads: room_id => ({name: 'forum_deleted_threads', params: {id: room_id},}),
     add_room: room_id => room_id ? {name: 'forum_add_room', params: {id: room_id}
         } : {name: 'forum_add_root_room'},
     thread: (thread_id, page) => ({
