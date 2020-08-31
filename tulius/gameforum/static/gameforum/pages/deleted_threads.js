@@ -41,6 +41,16 @@ export default LazyComponent('game_room_page_deleted', {
         show_role_modal(role_id) {
             this.$refs.thread_actions.show_char_modal(role_id);
         },
+        restore_thread(thread_id) {
+            this.loading = true;
+            axios.put(this.urls.thread_restore_api(thread_id)
+            ).then(response => {
+                if (response.data['room'])
+                    this.$router.push(this.urls.room(thread_id))
+                else
+                    this.$router.push(this.urls.thread(thread_id));
+            })
+        },
         mark_all_as_read() {
             this.$parent.loading_start();
             axios.post(

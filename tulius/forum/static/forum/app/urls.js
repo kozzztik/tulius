@@ -33,6 +33,7 @@ export default {
     likes_api: '/api/forum/likes/',
     thread_api: pk => `/api/forum/thread/${pk}/`,
     thread_move_api: pk => `/api/forum/thread/${pk}/move/`,
+    thread_restore_api: pk => `/api/forum/thread/${pk}/restore/`,
     thread_fix_api: pk => `/api/forum/thread/${pk}/fix/`,
     forum_fix_api: pk => `/api/forum/fix/`,
     comment_api: pk => `/api/forum/comment/${pk}/`,

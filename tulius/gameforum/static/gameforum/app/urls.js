@@ -54,6 +54,7 @@ export default function(variation_id) {
         likes_api: `/api/game_forum/variation/${variation_id}/likes/`,
         thread_api: pk => `/api/game_forum/variation/${variation_id}/thread/${pk}/`,
         thread_move_api: pk => `/api/game_forum/variation/${variation_id}/thread/${pk}/move/`,
+        thread_restore_api: pk => `/api/game_forum/variation/${variation_id}/thread/${pk}/restore/`,
         thread_fix_api: pk => `/api/game_forum/variation/${variation_id}/thread/${pk}/fix/`,
         comment_api: pk => `/api/game_forum/variation/${variation_id}/comment/${pk}/`,
         root_api: '/api/forum/',

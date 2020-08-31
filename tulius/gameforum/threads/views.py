@@ -21,9 +21,10 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
     thread_model = thread_models.Thread
     all_roles = None
 
-    def get_parent_thread(self, pk=None, for_update=False, **_kwargs):
+    def get_parent_thread(
+            self, pk=None, for_update=False, deleted=False, **_kwargs):
         super(BaseThreadAPI, self).get_parent_thread(
-            pk=pk, for_update=for_update, **_kwargs)
+            pk=pk, for_update=for_update, deleted=deleted, **_kwargs)
         if self.obj.variation_id != self.variation.pk:
             raise exceptions.PermissionDenied('Wrong variation')
         self.all_roles = {
@@ -143,4 +144,8 @@ class ThreadAPI(views.ThreadView, BaseThreadAPI):
 
 
 class MoveThreadView(views.MoveThreadView, BaseThreadAPI):
+    fix_mutation = mutations.ThreadFixCounters
+
+
+class RestoreThreadView(views.RestoreThreadView, BaseThreadAPI):
     fix_mutation = mutations.ThreadFixCounters

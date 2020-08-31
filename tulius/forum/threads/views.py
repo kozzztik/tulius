@@ -20,9 +20,10 @@ class BaseThreadView(core.BaseAPIView):
     obj = None
     thread_model = models.Thread
 
-    def get_parent_thread(self, pk=None, for_update=False, **_kwargs):
+    def get_parent_thread(
+            self, pk=None, for_update=False, deleted=False, **_kwargs):
         thread_id = int(pk)
-        query = self.thread_model.objects.filter(deleted=False)
+        query = self.thread_model.objects.filter(deleted=deleted)
         if for_update:
             query = query.select_for_update()
         self.obj = shortcuts.get_object_or_404(query, id=thread_id)
@@ -315,3 +316,17 @@ class MoveThreadView(BaseThreadView):
         signals.to_json.send(
             self.thread_model, instance=self.obj, response=response, view=self)
         return response
+
+
+class RestoreThreadView(BaseThreadView):
+    fix_mutation = mutations.ThreadFixCounters
+    restore_mutation = mutations.RestoreThread
+
+    @transaction.atomic
+    def put(self, _, **kwargs):
+        if not self.user.is_superuser:
+            raise exceptions.PermissionDenied()
+        self.get_parent_thread(for_update=True, deleted=True, **kwargs)
+        self.restore_mutation(self.obj).apply()
+        self.fix_mutation(self.obj).apply()
+        return self.obj_to_json()

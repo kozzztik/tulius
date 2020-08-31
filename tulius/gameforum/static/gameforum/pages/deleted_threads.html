@@ -31,6 +31,9 @@
                     </li>
                 </ul>
             </template>
+            <template v-slot:latest_post="slotProps">
+                <button v-if="!loading" @click="restore_thread(slotProps.room.id)">Восстановить</button>
+            </template>
         </forum_room_list>
     </div>
     <div v-if="thread.threads.length > 0" class="content">
@@ -56,6 +59,9 @@
                         <span v-else>{{ accessed_user.title }}</span>
                     </li>
                 </ul>
+            </template>
+            <template v-slot:latest_post="slotProps">
+                <button v-if="!loading" @click="restore_thread(slotProps.thread.id)">Восстановить</button>
             </template>
         </forum_thread_list>
     </div>

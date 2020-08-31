@@ -54,7 +54,9 @@
             </td>
             <td class="d-none d-sm-table-cell" v-html="thread.comments_count"></td>
             <td class="d-none d-sm-table-cell">
-                <forum_latest_post :comment="thread.last_comment"></forum_latest_post>
+                <slot v-bind:thread="thread" name="latest_post">
+                    <forum_latest_post :comment="thread.last_comment"></forum_latest_post>
+                </slot>
             </td>
         </tr>
     </tbody>

@@ -27,6 +27,16 @@ export default LazyComponent('forum_room_page_deleted', {
                 this.loading = false;
             })
         },
+        restore_thread(thread_id) {
+            this.loading = true;
+            axios.put(this.urls.thread_restore_api(thread_id)
+            ).then(response => {
+                if (response.data['room'])
+                    this.$router.push(this.urls.room(thread_id))
+                else
+                    this.$router.push(this.urls.thread(thread_id));
+            })
+        },
         mark_all_as_readed() {
             this.$parent.loading_start();
             axios.post(

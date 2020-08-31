@@ -8,7 +8,11 @@
             </div>
             <div class="captionright"></div>
         </div>
-        <forum_room_list :rooms="thread.rooms"></forum_room_list>
+        <forum_room_list :rooms="thread.rooms">
+            <template v-slot:latest_post="slotProps">
+                <button v-if="!loading" @click="restore_thread(slotProps.room.id)">Восстановить</button>
+            </template>
+        </forum_room_list>
     </div>
     <div v-if="thread.threads.length > 0" class="content">
         <div class="caption" align="center">
@@ -18,7 +22,11 @@
             </div>
             <div class="captionright"></div>
         </div>
-        <forum_thread_list :threads="thread.threads"></forum_thread_list>
+        <forum_thread_list :threads="thread.threads">
+            <template v-slot:latest_post="slotProps">
+                <button v-if="!loading" @click="restore_thread(slotProps.thread.id)">Восстановить</button>
+            </template>
+        </forum_thread_list>
     </div>
     <div v-if="!loading && (thread.rooms.length == 0) && (thread.threads.length == 0)" class="content">
         <br>
