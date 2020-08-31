@@ -119,6 +119,7 @@ class VariationAPI(base.VariationMixin):
                 'title': html.escape(role.name),
                 'avatar': role.avatar.image.url if role.avatar else None,
                 'comments_count': role.comments_count,
+                'assigned': role.user_id == self.user.pk,
             } for role in roles_list],
             'materials': [{
                 'id': m.id,
