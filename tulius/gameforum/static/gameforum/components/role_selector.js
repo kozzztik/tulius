@@ -11,10 +11,17 @@ export default LazyComponent('game_forum_role_selector', {
 		},
     },
     created() {
+        var assigned = [];
+        for (var role of this.variation.roles)
+            if (role.assigned) assigned.push(role.id);
         if (!(this.thread.rights.user_write_roles.length > 0))
             return
-        var val = this.thread.rights.user_write_roles[0]
-
+        var assigned_write = []
+        for (var role_id of assigned)
+            if (this.thread.rights.user_write_roles.indexOf(role_id) >= 0)
+                assigned_write.push(role_id);
+        var val = assigned_write.length > 0 ?
+            assigned_write[0] : this.thread.rights.user_write_roles[0];
         if (!this.form.id) {
             this.form.role_id = val
         } else {

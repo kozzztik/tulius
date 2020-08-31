@@ -129,6 +129,12 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
         data['user'] = self.role_to_json(self.obj.role_id, detailed=True)
         data['edit_role_id'] = self.obj.edit_role_id
         data['rights']['user_write_roles'] = self.write_roles()
+        data['rights']['strict_read'] = None
+        rights = self.obj.data['rights']
+        if not rights['role_all'] & forum_models.ACCESS_READ:
+            data['rights']['strict_read'] = [
+                int(key) for key, right in rights['roles'].items()
+                if right & forum_models.ACCESS_READ]
         return data
 
 
