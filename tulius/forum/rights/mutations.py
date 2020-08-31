@@ -39,7 +39,6 @@ class UpdateRights(mutations.Mutation):
             parent_all = parent_rights['all_inherit']
         if rights['all'] is None:
             rights['all'] = parent_all
-        rights['all'] &= parent_all | models.ACCESS_NO_INHERIT
         if rights['all'] & models.ACCESS_NO_INHERIT:
             rights['all_inherit'] = parent_all
         # process parent exceptions
