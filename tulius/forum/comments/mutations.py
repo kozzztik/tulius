@@ -73,14 +73,14 @@ class FixCounters(mutations.Mutation):
                         (not last_comment['all']) or
                         (pk > last_comment['all'])):
                     last_comment['all'] = pk
-                for u, l_pk in last_comment['users'].items():
-                    if l_pk < pk:
-                        last_comment['users'][u] = pk
-                comments_count['all'] += \
-                    c.data['comments_count']['all']
-                comments_count['all'] += 1
+                if pk:
+                    for u, l_pk in last_comment['users'].items():
+                        if l_pk < pk:
+                            last_comment['users'][u] = pk
+                child_count = c.data['comments_count']['all']
+                comments_count['all'] += child_count
                 for u, count in comments_count['users'].items():
-                    comments_count['users'][u] = count + 1
+                    comments_count['users'][u] = count + child_count
             else:
                 for user, right in c.data['rights']['users'].items():
                     if right & models.ACCESS_READ:
@@ -147,6 +147,18 @@ class ThreadCommentDelete(FixCounters):
             signals.on_thread_delete.send(
                 instance.__class__, instance=instance, mutation=self)
             instance.comments.update(deleted=True)
+
+
+@mutations.on_mutation(mutations.RestoreThread)
+class ThreadRestore(mutations.Mutation):
+    with_descendants = True
+
+    def process_thread(self, instance):
+        if not instance.room:
+            for comment in instance.comments.filter(deleted=True):
+                if 'deleted' not in comment.data:
+                    instance.comments.filter(pk=comment.pk).update(
+                        deleted=False)
 
 
 def init():

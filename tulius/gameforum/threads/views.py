@@ -21,9 +21,10 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
     thread_model = thread_models.Thread
     all_roles = None
 
-    def get_parent_thread(self, pk=None, for_update=False, **_kwargs):
+    def get_parent_thread(
+            self, pk=None, for_update=False, deleted=False, **_kwargs):
         super(BaseThreadAPI, self).get_parent_thread(
-            pk=pk, for_update=for_update, **_kwargs)
+            pk=pk, for_update=for_update, deleted=deleted, **_kwargs)
         if self.obj.variation_id != self.variation.pk:
             raise exceptions.PermissionDenied('Wrong variation')
         self.all_roles = {
@@ -124,8 +125,8 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
             raise exceptions.PermissionDenied()
         self.obj.edit_role_id = editor_role
 
-    def obj_to_json(self):
-        data = super(BaseThreadAPI, self).obj_to_json()
+    def obj_to_json(self, deleted=False):
+        data = super(BaseThreadAPI, self).obj_to_json(deleted=deleted)
         data['user'] = self.role_to_json(self.obj.role_id, detailed=True)
         data['edit_role_id'] = self.obj.edit_role_id
         data['rights']['user_write_roles'] = self.write_roles()
@@ -143,4 +144,8 @@ class ThreadAPI(views.ThreadView, BaseThreadAPI):
 
 
 class MoveThreadView(views.MoveThreadView, BaseThreadAPI):
+    fix_mutation = mutations.ThreadFixCounters
+
+
+class RestoreThreadView(views.RestoreThreadView, BaseThreadAPI):
     fix_mutation = mutations.ThreadFixCounters

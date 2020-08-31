@@ -45,7 +45,9 @@
             <td class="d-none d-md-table-cell">{{ room.threads_count }}</td>
             <td class="d-none d-sm-table-cell">{{ room.comments_count }}</td>
             <td class="d-none d-sm-table-cell">
-                <forum_latest_post :comment="room.last_comment"></forum_latest_post>
+                <slot v-bind:room="room" name="latest_post">
+                    <forum_latest_post :comment="room.last_comment"></forum_latest_post>
+                </slot>
             </td>
         </tr>
     </tbody>

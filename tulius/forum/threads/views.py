@@ -20,9 +20,10 @@ class BaseThreadView(core.BaseAPIView):
     obj = None
     thread_model = models.Thread
 
-    def get_parent_thread(self, pk=None, for_update=False, **_kwargs):
+    def get_parent_thread(
+            self, pk=None, for_update=False, deleted=False, **_kwargs):
         thread_id = int(pk)
-        query = self.thread_model.objects.filter(deleted=False)
+        query = self.thread_model.objects.filter(deleted=deleted)
         if for_update:
             query = query.select_for_update()
         self.obj = shortcuts.get_object_or_404(query, id=thread_id)
@@ -52,9 +53,13 @@ class BaseThreadView(core.BaseAPIView):
                 self.thread_model, room=room, threads=threads, view=self)
         return rooms
 
-    def get_subthreads(self, is_room=False):
+    def get_subthreads(self, is_room=False, deleted=False):
         threads = self.thread_model.objects.filter(
-            parent=self.obj, room=is_room).exclude(deleted=True)
+            parent=self.obj, room=is_room)
+        if deleted:
+            threads = threads.filter(deleted=True)
+        else:
+            threads = threads.exclude(deleted=True)
         if is_room:
             return self.prepare_room_list(threads)
         threads = self._thread_list_apply_rights(threads)
@@ -106,7 +111,7 @@ class BaseThreadView(core.BaseAPIView):
             self.obj.important = bool(data['important'])
             self.obj.closed = bool(data['closed'])
 
-    def obj_to_json(self):
+    def obj_to_json(self, deleted=False):
         data = {
             'id': self.obj.pk,
             'tree_id': self.obj.tree_id,
@@ -125,9 +130,11 @@ class BaseThreadView(core.BaseAPIView):
         }
         if self.obj.room:
             data['rooms'] = [
-                self.room_to_json(t) for t in self.get_subthreads(True)]
+                self.room_to_json(t)
+                for t in self.get_subthreads(True, deleted)]
             data['threads'] = [
-                self.room_to_json(t) for t in self.get_subthreads(False)]
+                self.room_to_json(t)
+                for t in self.get_subthreads(False, deleted)]
         else:
             data['closed'] = self.obj.closed
             data['important'] = self.obj.important
@@ -147,7 +154,10 @@ class ThreadView(BaseThreadView):
                 user_id=self.user.id, thread_id=self.obj.pk),
             'r', const.USER_THREAD_RIGHTS_PERIOD * 60
         )
-        response = self.obj_to_json()
+        deleted = self.request.GET.get('deleted')
+        if deleted and not self.user.is_superuser:
+            raise exceptions.PermissionDenied()
+        response = self.obj_to_json(deleted=deleted)
         signals.to_json.send(
             self.thread_model, instance=self.obj, response=response, view=self)
         return response
@@ -306,3 +316,17 @@ class MoveThreadView(BaseThreadView):
         signals.to_json.send(
             self.thread_model, instance=self.obj, response=response, view=self)
         return response
+
+
+class RestoreThreadView(BaseThreadView):
+    fix_mutation = mutations.ThreadFixCounters
+    restore_mutation = mutations.RestoreThread
+
+    @transaction.atomic
+    def put(self, _, **kwargs):
+        if not self.user.is_superuser:
+            raise exceptions.PermissionDenied()
+        self.get_parent_thread(for_update=True, deleted=True, **kwargs)
+        self.restore_mutation(self.obj).apply()
+        self.fix_mutation(self.obj).apply()
+        return self.obj_to_json()

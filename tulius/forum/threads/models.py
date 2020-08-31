@@ -131,7 +131,8 @@ class AbstractThread(mptt_models.MPTTModel):
     @property
     def moderators(self):
         return User.objects.filter(pk__in=[
-            pk for pk, right in self.data['rights']['users'].items()
+            pk for pk, right in
+            self.data.get('rights', {}).get('users', {}).items()
             if right & ACCESS_MODERATE])
 
     @property
@@ -139,7 +140,8 @@ class AbstractThread(mptt_models.MPTTModel):
         if self.default_rights != NO_ACCESS:
             return None
         return User.objects.filter(pk__in=[
-            pk for pk, right in self.data['rights']['users'].items()
+            pk for pk, right in
+            self.data.get('rights', {}).get('users', {}).items()
             if right & ACCESS_READ])
 
     def rights_to_json(self, user):

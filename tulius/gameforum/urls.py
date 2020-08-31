@@ -59,6 +59,9 @@ urlpatterns = [
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/move/$',
         threads.MoveThreadView.as_view(), name='thread_move'),
     urls.url(
+        r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/restore/$',
+        threads.RestoreThreadView.as_view(), name='restore_thread'),
+    urls.url(
         r'^variation/(?P<variation_id>\d+)/comment/(?P<pk>\d+)/$',
         comments.CommentAPI.as_view(), name='comment'),
     urls.url(

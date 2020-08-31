@@ -66,6 +66,9 @@ urlpatterns = [
         r'^thread/(?P<pk>\d+)/move/$',
         threads_api.MoveThreadView.as_view(), name='thread_move'),
     urls.url(
+        r'^thread/(?P<pk>\d+)/restore/$',
+        threads_api.RestoreThreadView.as_view(), name='restore_thread'),
+    urls.url(
         r'^comment/(?P<pk>\d+)/$',
         comments_api.CommentAPI.as_view(), name='comment'),
     urls.url(

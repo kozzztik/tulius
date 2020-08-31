@@ -27,7 +27,7 @@ def room_to_json(instance, response, view, **_kwargs):
     last_comment_id = models.get_param('last_comment', instance, view.user.pk)
     comments_count = models.get_param('comments_count', instance, view.user.pk)
     response['comments_count'] = comments_count
-    if not instance.room:
+    if (not instance.room) and (comments_count is not None):
         response['pages_count'] = order_to_page(comments_count - 1)
     if last_comment_id is None:
         return
