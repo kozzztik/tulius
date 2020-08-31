@@ -77,11 +77,10 @@ class FixCounters(mutations.Mutation):
                     for u, l_pk in last_comment['users'].items():
                         if l_pk < pk:
                             last_comment['users'][u] = pk
-                comments_count['all'] += \
-                    c.data['comments_count']['all']
-                comments_count['all'] += 1
+                child_count = c.data['comments_count']['all']
+                comments_count['all'] += child_count
                 for u, count in comments_count['users'].items():
-                    comments_count['users'][u] = count + 1
+                    comments_count['users'][u] = count + child_count
             else:
                 for user, right in c.data['rights']['users'].items():
                     if right & models.ACCESS_READ:
