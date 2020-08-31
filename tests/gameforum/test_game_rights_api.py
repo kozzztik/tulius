@@ -57,12 +57,14 @@ def test_thread_rights_api(
     assert data['threads'][0]['url'] == thread['url']
     assert data['rights']['user_write_roles'] == [detective.pk]
     assert data['rights']['write']
+    assert data['rights']['strict_read'] is None
     # check user can access
     response = user.get(thread['url'])
     assert response.status_code == 200
     data = response.json()
     assert data['rights']['user_write_roles'] == []
     assert not data['rights']['write']
+    assert data['rights']['strict_read'] == [detective.pk]
     # now drop rights
     response = admin.delete(rights['granted_rights'][0]['url'])
     assert response.status_code == 200
