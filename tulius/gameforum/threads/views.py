@@ -125,10 +125,7 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
             raise exceptions.PermissionDenied()
         self.obj.edit_role_id = editor_role
 
-    def obj_to_json(self, deleted=False):
-        data = super(BaseThreadAPI, self).obj_to_json(deleted=deleted)
-        data['user'] = self.role_to_json(self.obj.role_id, detailed=True)
-        data['edit_role_id'] = self.obj.edit_role_id
+    def _rights_strict_roles(self, data):
         data['rights']['user_write_roles'] = self.write_roles()
         data['rights']['strict_read'] = None
         rights = self.obj.data['rights']
@@ -136,6 +133,12 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
             data['rights']['strict_read'] = [
                 int(key) for key, right in rights['roles'].items()
                 if right & forum_models.ACCESS_READ]
+
+    def obj_to_json(self, deleted=False):
+        data = super(BaseThreadAPI, self).obj_to_json(deleted=deleted)
+        data['user'] = self.role_to_json(self.obj.role_id, detailed=True)
+        data['edit_role_id'] = self.obj.edit_role_id
+        self._rights_strict_roles(data)
         return data
 
 
