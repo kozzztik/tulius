@@ -1,4 +1,4 @@
-from tulius.forum import models
+from tulius.forum.threads import models
 
 
 def test_thread_move(superuser, user):
@@ -6,7 +6,7 @@ def test_thread_move(superuser, user):
     response = superuser.put(
         '/api/forum/', {
             'title': 'source', 'body': 'source description',
-            'room': True, 'access_type': models.THREAD_ACCESS_TYPE_NO_WRITE,
+            'room': True, 'default_rights': models.ACCESS_READ,
             'granted_rights': []})
     assert response.status_code == 200
     source_room = response.json()
@@ -14,7 +14,7 @@ def test_thread_move(superuser, user):
     response = superuser.put(
         '/api/forum/', {
             'title': 'target', 'body': 'target description',
-            'room': True, 'access_type': models.THREAD_ACCESS_TYPE_NO_WRITE,
+            'room': True, 'default_rights': models.ACCESS_READ,
             'granted_rights': []})
     assert response.status_code == 200
     target = response.json()
@@ -22,7 +22,7 @@ def test_thread_move(superuser, user):
     response = superuser.put(
         source_room['url'], {
             'title': 'room', 'body': 'room description',
-            'room': True, 'access_type': 0, 'granted_rights': []})
+            'room': True, 'default_rights': None, 'granted_rights': []})
     assert response.status_code == 200
     room = response.json()
     # check can't move inside yourself
@@ -38,7 +38,7 @@ def test_thread_move(superuser, user):
     response = superuser.post(
         target['url'] + 'granted_rights/', {
             'user': {'id': user.user.pk},
-            'access_level': models.THREAD_ACCESS_WRITE
+            'access_level': models.ACCESS_WRITE
         }
     )
     assert response.status_code == 200
@@ -50,7 +50,7 @@ def test_thread_move(superuser, user):
     response = superuser.post(
         room['url'] + 'granted_rights/', {
             'user': {'id': user.user.pk},
-            'access_level': models.THREAD_ACCESS_MODERATE
+            'access_level': models.ACCESS_MODERATE
         }
     )
     assert response.status_code == 200
@@ -68,10 +68,3 @@ def test_thread_move(superuser, user):
     assert response.status_code == 200
     data = response.json()
     assert len(data['rooms']) == 0
-    # check that move between plugins not works
-    source = models.Thread.objects.get(pk=source_room['id'])
-    source.plugin_id = 1
-    source.save()
-    response = superuser.put(
-        room['url'] + 'move/', {'parent_id': source_room['id']})
-    assert response.status_code == 404

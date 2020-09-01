@@ -1,6 +1,6 @@
 from django.db import transaction
 
-from tulius.forum import models
+from tulius.forum.threads import models
 from tulius.games import models as game_models
 
 
@@ -14,6 +14,6 @@ def test_room_smoke(
     response = admin.put(
         base_url + f'thread/{variation_forum.id}/', {
             'title': 'room', 'body': 'room description',
-            'room': True, 'access_type': models.THREAD_ACCESS_TYPE_NO_WRITE,
+            'room': True, 'default_rights': models.ACCESS_READ,
             'granted_rights': []})
     assert response.status_code == 200

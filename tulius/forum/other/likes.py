@@ -1,93 +1,75 @@
 import json
 
-from django import http
-from django import shortcuts
-from django.core import exceptions
 from django.db import transaction
 
-from tulius.forum import plugins
-from tulius.forum import models
-from tulius.forum.comments import api
+from tulius.forum import core
+from tulius.forum.other import models
+from tulius.forum.comments import views
 
 
-class Likes(plugins.BaseAPIView):
-    require_user = False
+class Likes(views.CommentBase):
+    like_model = models.CommentLike
+    require_user = True
 
     def get(self, request, *args, **kwargs):
         data = request.GET['ids'].split(',')
         ids = [int(pk) for pk in data]
         response = {pk: False for pk in ids}
-        like_marks = models.CommentLike.objects.filter(
+        like_marks = self.like_model.objects.filter(
             user=request.user, comment_id__in=ids)
         for mark in like_marks:
             response[mark.comment_id] = True
         return response
 
+    def create_like(self):
+        like_mark = self.like_model(user=self.user, comment=self.comment)
+        # pylint: disable=E1137
+        like_mark.data['comment'] = self.comment_to_json(self.comment)
+        like_mark.data['thread'] = self.obj_to_json()  # pylint: disable=E1137
+        return like_mark
+
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
-        comment_id = data['id']
+        comment_id = int(data['id'])
         value = data['value'] in ['true', True]
-        try:
-            comment_id = int(comment_id)
-        except:
-            raise http.Http404()
-        comment = shortcuts.get_object_or_404(
-            models.Comment.objects.select_for_update(), id=comment_id)
-
-        like_marks = models.CommentLike.objects.filter(
-            user=request.user, comment=comment)
+        like_marks = self.like_model.objects.filter(
+            user=request.user, comment_id=comment_id)
         if value:
             if not like_marks:
-                like_mark = models.CommentLike(
-                    user=request.user, comment=comment)
+                self.get_comment(comment_id, for_update=True)
+                like_mark = self.create_like()
                 like_mark.save()
-                comment.likes += 1
+                comment = self.comment
+                comment.media['likes'] = comment.media.get('likes', 0) + 1
                 comment.save()
         else:
+            comment = self.comment_model.objects.select_for_update().get(
+                pk=comment_id)
             like_marks.delete()
-            comment.likes -= 1
+            comment.media['likes'] = comment.media.get('likes', 0) - 1
             comment.save()
         return {'value': value}
 
 
-class Favorites(plugins.BaseAPIView):
+class Favorites(core.BaseAPIView):
+    like_model = models.CommentLike
     require_user = True
-    comments_class = api.CommentAPI
 
-    def get_view(self, comment):
-        view = self.comments_class()
-        view.setup(self.request)
-        view.user = self.user
-        view.comment = comment
-        return view
-
-    def get_comments(self):
-        likes = models.CommentLike.objects.select_related('comment').filter(
-            user=self.user, comment__plugin_id=self.comments_class.plugin_id)
-        comments = [like.comment for like in likes]
-        result = []
-        for comment in comments:
-            view = self.get_view(comment)
-            try:
-                view.get_parent_thread(pk=comment.parent_id)
-            except exceptions.PermissionDenied:
-                continue
-            result.append(view)
-        return result
+    def get_likes(self):
+        likes = self.like_model.objects.select_related('comment').filter(
+            user=self.user)
+        return [like.data for like in likes]
 
     @staticmethod
-    def comments_to_json(views):
+    def like_data_to_json(likes_data):
         return {
             'groups': [{
                 'name': 'Форум',
-                'items': [{
-                    'comment': view.comment_to_json(view.comment),
-                    'thread': view.obj_to_json(),
-                } for view in views],
+                'items': likes_data,
             }],
         }
 
     def get_context_data(self, **kwargs):
-        comments = self.get_comments()
-        return self.comments_to_json(comments)
+        likes_data = self.get_likes()
+        return self.like_data_to_json(likes_data)

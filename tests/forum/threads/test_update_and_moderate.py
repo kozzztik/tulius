@@ -1,4 +1,4 @@
-from tulius.forum import models
+from tulius.forum.threads import models
 
 
 def test_update_and_moderate(client, superuser, admin, user):
@@ -6,14 +6,14 @@ def test_update_and_moderate(client, superuser, admin, user):
     response = superuser.put(
         '/api/forum/', {
             'title': 'group', 'body': 'group description',
-            'room': True, 'access_type': 0, 'granted_rights': []})
+            'room': True, 'default_rights': None, 'granted_rights': []})
     assert response.status_code == 200
     group = response.json()
     # check that for privileged user important works, but not closed
     response = superuser.put(
         group['url'], {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': 0, 'granted_rights': [],
+            'room': False, 'default_rights': None, 'granted_rights': [],
             'important': True, 'closed': True, 'media': {}})
     assert response.status_code == 200
     su_thread = response.json()
@@ -24,7 +24,7 @@ def test_update_and_moderate(client, superuser, admin, user):
     response = admin.put(
         group['url'], {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': 0, 'granted_rights': [],
+            'room': False, 'default_rights': None, 'granted_rights': [],
             'important': True, 'closed': True, 'media': {}})
     assert response.status_code == 200
     thread = response.json()
@@ -34,7 +34,7 @@ def test_update_and_moderate(client, superuser, admin, user):
     response = admin.post(
         thread['url'], {
             'title': 'thread(updated)', 'body': 'thread description2',
-            'access_type': models.THREAD_ACCESS_TYPE_NO_READ,
+            'default_rights': models.NO_ACCESS,
             'granted_rights': [],
             'important': True, 'closed': True, 'media': {}})
     assert response.status_code == 200
@@ -43,25 +43,25 @@ def test_update_and_moderate(client, superuser, admin, user):
     assert not updated['closed']
     assert updated['title'] == 'thread(updated)'
     assert updated['body'] == 'thread description2'
-    assert updated['access_type'] == 0
+    assert updated['default_rights'] is None
     # check that not privileged user can't edit thread
     response = user.post(
         thread['url'], {
             'title': 'thread(updated)', 'body': 'thread description3',
-            'access_type': 0, 'granted_rights': [],
+            'default_rights': None, 'granted_rights': [],
             'important': True, 'closed': True, 'media': {}})
     assert response.status_code == 403
     # add privileges
     response = superuser.post(
         thread['url'] + 'granted_rights/', {
             'user': {'id': admin.user.pk},
-            'access_level': models.THREAD_ACCESS_MODERATE
+            'access_level': models.ACCESS_MODERATE
         }
     )
     assert response.status_code == 200
     response = superuser.put(
         thread['url'] + 'granted_rights/', {
-            'access_type': models.THREAD_ACCESS_TYPE_NO_READ
+            'default_rights': models.NO_ACCESS
         }
     )
     assert response.status_code == 200
@@ -102,10 +102,10 @@ def test_update_and_moderate(client, superuser, admin, user):
     response = superuser.post(
         group['url'], {
             'title': 'group(updated)', 'body': 'group description(updated)',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ})
+            'room': False, 'default_rights': models.NO_ACCESS})
     assert response.status_code == 200
     data = response.json()
     assert data['title'] == 'group(updated)'
     assert data['body'] == 'group description(updated)'
     assert data['room']
-    assert data['access_type'] == 0
+    assert data['default_rights'] is None

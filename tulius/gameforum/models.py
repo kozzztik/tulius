@@ -1,8 +1,11 @@
+from django import urls
 from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from tulius.forum import models as forum
+from tulius.forum.threads import models as forum_models
+from tulius.forum.rights import models as rights
+from tulius.gameforum.threads import models as thread_models
 from tulius.stories import models as stories
 
 
@@ -15,14 +18,16 @@ class GameThreadRight(models.Model):
         verbose_name_plural = _('game thread rights')
         unique_together = ('thread', 'role')
 
-    thread = models.ForeignKey(
-        forum.Thread, models.PROTECT,
+    objects = models.Manager()  # linters, be happy
+
+    thread: thread_models.Thread = models.ForeignKey(
+        thread_models.Thread, models.PROTECT,
         null=False,
         blank=False,
         verbose_name=_(u'thread'),
         related_name='access_roles',
     )
-    role = models.ForeignKey(
+    role: stories.Role = models.ForeignKey(
         stories.Role, models.PROTECT,
         null=False,
         blank=False,
@@ -31,10 +36,29 @@ class GameThreadRight(models.Model):
     )
 
     access_level = models.SmallIntegerField(
-        default=forum.THREAD_ACCESS_READ + forum.THREAD_ACCESS_WRITE,
+        default=forum_models.ACCESS_READ + forum_models.ACCESS_WRITE,
         verbose_name=_(u'access rights'),
-        choices=forum.THREAD_ACCESS_CHOICES,
+        choices=rights.THREAD_ACCESS_CHOICES,
     )
+
+    def get_absolute_url(self):
+        return urls.reverse(
+            'game_forum_api:thread_right', kwargs={
+                'pk': self.thread_id,
+                'right_id': self.pk,
+                'variation_id': self.thread.variation_id
+            })
+
+    def to_json(self):
+        return {
+            'id': self.pk,
+            'user': {
+                'id': self.role.pk,
+                'title': self.role.name,
+            },
+            'access_level': self.access_level,
+            'url': self.get_absolute_url(),
+        }
 
 
 class Trustmark(models.Model):

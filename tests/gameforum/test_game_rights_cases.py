@@ -1,8 +1,9 @@
 from django.db import transaction
 
-from tulius.forum import models
+from tulius.forum.threads import models
 from tulius.games import models as game_models
 from tulius.stories import models as story_models
+from tulius.gameforum import core
 
 
 def test_thread_with_wrong_variation(
@@ -26,12 +27,11 @@ def test_guest_access_to_game(game, variation_forum, admin, game_guest):
     game.status = game_models.GAME_STATUS_IN_PROGRESS
     with transaction.atomic():
         game.save()
-    base_url = f'/api/game_forum/variation/{game.variation.pk}/'
     # create thread with "no read" and no role
     response = admin.put(
-        base_url + f'thread/{variation_forum.id}/', {
+        variation_forum.get_absolute_url(), {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ,
+            'room': False, 'default_rights': models.NO_ACCESS,
             'granted_rights': [],
             'important': True, 'closed': True, 'media': {}})
     assert response.status_code == 200
@@ -48,21 +48,20 @@ def test_finishing_game_rights(
     game.status = game_models.GAME_STATUS_IN_PROGRESS
     with transaction.atomic():
         game.save()
-    base_url = f'/api/game_forum/variation/{game.variation.pk}/'
     # create thread with "no read" and no role
     response = admin.put(
-        base_url + f'thread/{variation_forum.id}/', {
+        variation_forum.get_absolute_url(), {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ,
+            'room': False, 'default_rights': models.NO_ACCESS,
             'granted_rights': [],
             'important': False, 'media': {}})
     assert response.status_code == 200
     thread = response.json()
     # create own user thread
     response = user.put(
-        base_url + f'thread/{variation_forum.id}/', {
+        variation_forum.get_absolute_url(), {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ,
+            'room': False, 'default_rights': models.NO_ACCESS,
             'granted_rights': [], 'role_id': detective.pk, 'media': {}})
     assert response.status_code == 200
     thread2 = response.json()
@@ -132,7 +131,7 @@ def test_grant_moderator_rights(game, variation_forum, admin, user, detective):
     response = admin.put(
         base_url + f'thread/{variation_forum.id}/', {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_OPEN,
+            'room': False, 'default_rights': models.ACCESS_OPEN,
             'granted_rights': [], 'important': False, 'media': {}})
     assert response.status_code == 200
     thread = response.json()
@@ -160,7 +159,7 @@ def test_grant_moderator_rights(game, variation_forum, admin, user, detective):
     response = admin.post(
         thread['url'] + 'granted_rights/', {
             'user': {'id': detective.pk},
-            'access_level': models.THREAD_ACCESS_MODERATE
+            'access_level': models.ACCESS_MODERATE
         }
     )
     assert response.status_code == 200
@@ -178,12 +177,11 @@ def test_chain_strict_read(
     game.status = game_models.GAME_STATUS_IN_PROGRESS
     with transaction.atomic():
         game.save()
-    base_url = f'/api/game_forum/variation/{game.variation.pk}/'
     # create room with read limits
     response = admin.put(
-        base_url + f'thread/{variation_forum.id}/', {
+        variation_forum.get_absolute_url(), {
             'title': 'room', 'body': 'room description',
-            'room': True, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ,
+            'room': True, 'default_rights': models.NO_ACCESS,
             'granted_rights': [], 'media': {}})
     assert response.status_code == 200
     room = response.json()
@@ -191,25 +189,26 @@ def test_chain_strict_read(
     response = admin.put(
         room['url'], {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ,
+            'room': False, 'default_rights': models.NO_ACCESS,
             'granted_rights': [{
                 'user': {'id': detective.pk},
-                'access_level': models.THREAD_ACCESS_READ
+                'access_level': models.ACCESS_READ
             }], 'important': False, 'media': {}})
     assert response.status_code == 200
     thread = response.json()
-    # check user cant read thread, because have no access to room
+    # check user can read thread, because have exceptions, even have no access
+    # to parent room.
     response = user.get(thread['url'])
-    assert response.status_code == 403
+    assert response.status_code == 200
     # and user don't see room
-    response = user.get(base_url + f'thread/{variation_forum.id}/')
+    response = user.get(variation_forum.get_absolute_url())
     assert response.status_code == 200
     data = response.json()
     assert not data['rooms']
     # but admin see it even if he play
     murderer.user = admin.user
     murderer.save()
-    response = admin.get(base_url + f'thread/{variation_forum.id}/')
+    response = admin.get(variation_forum.get_absolute_url())
     assert response.status_code == 200
     data = response.json()
     assert len(data['rooms']) == 1
@@ -217,7 +216,7 @@ def test_chain_strict_read(
     response = admin.post(
         room['url'] + 'granted_rights/', {
             'user': {'id': detective.pk},
-            'access_level': models.THREAD_ACCESS_READ
+            'access_level': models.ACCESS_READ
         }
     )
     assert response.status_code == 200
@@ -227,7 +226,7 @@ def test_chain_strict_read(
     data = response.json()
     assert data['body'] == 'thread description'
     # check root
-    response = user.get(base_url + f'thread/{variation_forum.id}/')
+    response = user.get(variation_forum.get_absolute_url())
     assert response.status_code == 200
     data = response.json()
     assert len(data['rooms']) == 1
@@ -239,16 +238,15 @@ def test_chain_strict_read(
     assert data['threads'][0]['accessed_users'][0]['title'] == detective.name
 
 
-def test_chain_write_rights( game, variation_forum, admin, user, detective):
+def test_chain_write_rights(game, variation_forum, admin, user, detective):
     game.status = game_models.GAME_STATUS_IN_PROGRESS
     with transaction.atomic():
         game.save()
-    base_url = f'/api/game_forum/variation/{game.variation.pk}/'
     # create thread room with read limits
     response = admin.put(
-        base_url + f'thread/{variation_forum.id}/', {
+        variation_forum.get_absolute_url(), {
             'title': 'room', 'body': 'room description',
-            'room': True, 'access_type': models.THREAD_ACCESS_TYPE_NO_WRITE,
+            'room': True, 'default_rights': models.ACCESS_READ,
             'granted_rights': [], 'media': {}})
     assert response.status_code == 200
     room = response.json()
@@ -256,7 +254,7 @@ def test_chain_write_rights( game, variation_forum, admin, user, detective):
     response = admin.put(
         room['url'], {
             'title': 'room', 'body': 'room description',
-            'room': True, 'access_type': models.THREAD_ACCESS_TYPE_NOT_SET,
+            'room': True, 'default_rights': None,
             'granted_rights': [], 'media': {}})
     assert response.status_code == 200
     room2 = response.json()
@@ -264,10 +262,10 @@ def test_chain_write_rights( game, variation_forum, admin, user, detective):
     response = admin.put(
         room2['url'], {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ,
+            'room': False, 'default_rights': models.NO_ACCESS,
             'granted_rights': [{
                 'user': {'id': detective.pk},
-                'access_level': models.THREAD_ACCESS_READ
+                'access_level': models.ACCESS_READ
             }], 'important': False, 'media': {}})
     assert response.status_code == 200
     thread = response.json()
@@ -286,17 +284,240 @@ def test_chain_write_rights( game, variation_forum, admin, user, detective):
     response = admin.post(
         room2['url'] + 'granted_rights/', {
             'user': {'id': detective.pk},
-            'access_level': models.THREAD_ACCESS_WRITE
+            'access_level': models.ACCESS_WRITE
         }
     )
     assert response.status_code == 200
-    # and now can write
+    # and now still cant write
     response = user.post(
         thread['url'] + 'comments_page/', {
             'reply_id': thread['first_comment_id'],
             'title': 'Hello', 'body': 'my comment is awesome',
             'media': {}, 'role_id': detective.pk,
         })
+    assert response.status_code == 403
+
+
+def test_broken_tree_rights(game, variation_forum, admin):
+    game.status = game_models.GAME_STATUS_IN_PROGRESS
+    with transaction.atomic():
+        game.save()
+    base_url = f'/api/game_forum/variation/{game.variation.pk}/'
+    # create thread room with read limits
+    response = admin.put(
+        base_url + f'thread/{variation_forum.id}/', {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': models.ACCESS_READ,
+            'granted_rights': [], 'media': {}})
     assert response.status_code == 200
-    data = response.json()
-    assert len(data['comments']) == 2
+    thread = response.json()
+    # break forum tree
+    game.variation.thread = core.create_game_forum(admin.user, game.variation)
+    game.variation.save()
+    # now get thread. Previously it caused 500 on tree rights check.
+    response = admin.get(thread['url'])
+    assert response.status_code == 200
+
+
+def test_grant_rights_to_variation(variation, variation_forum, user):
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 403
+    # grant rights
+    admin = story_models.StoryAdmin(story=variation.story, user=user.user)
+    admin.save()
+    # check
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 200
+    # delete
+    admin.delete()
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 403
+
+
+def test_grant_rights_to_game(game, variation_forum, user):
+    game.status = game_models.GAME_STATUS_IN_PROGRESS
+    with transaction.atomic():
+        game.save()
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 403
+    # grant rights
+    admin = game_models.GameAdmin(game=game, user=user.user)
+    admin.save()
+    # check
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 200
+    response = user.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': models.ACCESS_READ,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    # delete
+    admin.delete()
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 403
+    # grant guest rights
+    guest = game_models.GameGuest(game=game, user=user.user)
+    guest.save()
+    # check
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 200
+    response = user.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': models.ACCESS_READ,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 403
+    # delete
+    guest.delete()
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 403
+
+
+def test_not_inherited_read_only_root(
+        game, variation_forum, user, admin, detective):
+    response = admin.put(
+        variation_forum.get_absolute_url() + 'granted_rights/',
+        {'default_rights': models.ACCESS_READ + models.ACCESS_NO_INHERIT})
+    assert response.status_code == 200
+    # create sub room
+    response = admin.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': None,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    room = response.json()
+    # start game. Reload game to update thread caches.
+    game = game_models.Game.objects.get(pk=game.pk)
+    game.status = game_models.GAME_STATUS_IN_PROGRESS
+    with transaction.atomic():
+        game.save()
+    # check user can read and can't write at root
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 200
+    response = user.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': None, 'role_id': detective.pk,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 403
+    # check we can read and write in sub room
+    response = user.get(room['url'])
+    assert response.status_code == 200
+    response = user.put(
+        room['url'], {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': None, 'role_id': detective.pk,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+
+
+def test_not_inherited_read_only_room(
+        game, variation_forum, user, admin, detective):
+    # create sub room
+    response = admin.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'room', 'body': 'room description',
+            'room': True,
+            'default_rights': models.ACCESS_READ + models.ACCESS_NO_INHERIT,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    room1 = response.json()
+    # create sub sub room
+    response = admin.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': None,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    room2 = response.json()
+    # start game
+    game.status = game_models.GAME_STATUS_IN_PROGRESS
+    with transaction.atomic():
+        game.save()
+    # check we can read and write in root
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 200
+    response = user.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': None, 'role_id': detective.pk,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    # check user can read and can't write at room
+    response = user.get(room1['url'])
+    assert response.status_code == 200
+    response = user.put(
+        room1['url'], {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': None, 'role_id': detective.pk,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 403
+    # check we can read and write in sub room
+    response = user.get(room2['url'])
+    assert response.status_code == 200
+    response = user.put(
+        room2['url'], {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': None, 'role_id': detective.pk,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+
+
+def test_not_defined_rights_on_root(
+        game, variation_forum, user, admin, detective):
+    response = admin.put(
+        variation_forum.get_absolute_url() + 'granted_rights/',
+        {'default_rights': None})
+    assert response.status_code == 200
+    # start game. Reload game to update thread caches.
+    game = game_models.Game.objects.get(pk=game.pk)
+    game.status = game_models.GAME_STATUS_IN_PROGRESS
+    with transaction.atomic():
+        game.save()
+    # check user can read and write at root
+    response = user.get(variation_forum.get_absolute_url())
+    assert response.status_code == 200
+    response = user.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': None, 'role_id': detective.pk,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+
+
+def test_rights_override(game, variation_forum, user, admin, detective):
+    game.status = game_models.GAME_STATUS_IN_PROGRESS
+    with transaction.atomic():
+        game.save()
+    response = admin.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': models.ACCESS_READ,
+            'role_id': None,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    room1 = response.json()
+    response = admin.put(
+        room1['url'], {
+            'title': 'room2', 'body': 'room2 description',
+            'room': True, 'default_rights': models.ACCESS_OPEN,
+            'role_id': None,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    room2 = response.json()
+    # check no write room1
+    response = user.put(
+        room1['url'], {
+            'title': 'thread', 'body': 'thread description',
+            'room': False, 'default_rights': None, 'role_id': detective.pk,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 403
+    # check write room2
+    response = user.put(
+        room2['url'], {
+            'title': 'thread', 'body': 'thread description',
+            'room': False, 'default_rights': None, 'role_id': detective.pk,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200

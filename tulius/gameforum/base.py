@@ -1,8 +1,8 @@
-from tulius.forum import plugins
+from tulius.forum import core
 from tulius.stories import models as stories_models
 
 
-class VariationMixin(plugins.BaseAPIView):
+class VariationMixin(core.BaseAPIView):
     variation = None
 
     def dispatch(self, request, *args, **kwargs):

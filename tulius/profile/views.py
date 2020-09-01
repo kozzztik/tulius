@@ -67,7 +67,7 @@ class PlayerSubscriptionsView(LoginTemplateView):
     template_name = 'profile/subscriptions.haml'
 
     def get_context_data(self, **kwargs):
-        notifications = [n for n in Notification.objects.all()]
+        notifications = list(Notification.objects.all())
         user_n = UserNotification.objects.filter(user=self.request.user)
         user_n = [n.notification for n in user_n if not n.enabled]
         forms = []
@@ -80,7 +80,7 @@ class PlayerSubscriptionsView(LoginTemplateView):
 
     @decorators.method_decorator(auth_decorators.login_required)
     def post(self, request):
-        notifications = [n for n in Notification.objects.all()]
+        notifications = list(Notification.objects.all())
         forms = []
         for n in notifications:
             form = NotificationForm(prefix='n'+str(n.id), data=request.POST)

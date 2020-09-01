@@ -1,1 +1,0 @@
-GAME_FORUM_SITE_ID = 1

@@ -465,8 +465,7 @@ class EditRequestsView(BaseEditGameView):
 class GameForumView(BaseEditGameView):
     def get(self, request, *args, **kwargs):
         obj = self.get_object()
-        return http.HttpResponseRedirect(
-            urls.reverse('gameforum:game', args=(obj.pk,)))
+        return http.HttpResponseRedirect(f'/play/game/{obj.pk}/')
 
 
 class BaseGameFormsetView(

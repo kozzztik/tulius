@@ -16,14 +16,15 @@ export default LazyComponent('forum_add_room_page', {
             room: true,
             title: '',
             body: '',
-            access_type: 0,
+            default_rights: null,
             granted_rights: [],
         },
-        access_types: [
-            {value: 0, text: "доступ не задан"},
-            {value: 1, text: "свободный доступ"},
-            {value: 2, text: "только чтение"},
-            {value: 3, text: "доступ только по списку"},
+        thread_default_rights: [
+            {value: null, text: "доступ не задан"},
+            {value: 1+2, text: "свободный доступ"},
+            {value: 1, text: "только чтение"},
+            {value: 1+16, text: "только чтение(только в корне)"},
+            {value: 0, text: "доступ только по списку"},
         ],
         parent_thread: {},
     }),
@@ -34,7 +35,7 @@ export default LazyComponent('forum_add_room_page', {
         load_api(route) {
             this.title = '';
             this.body = '';
-            this.access_type = 0;
+            this.default_rights = null;
             this.granted_rights = [];
             if (!route.params.id) {
                 this.parent_thread = {};

@@ -1,5 +1,5 @@
-export default Vue.component('button-counter', {
-    template: '/static/forum/pages/room.html',
+export default Vue.component('game_thread_redirect', {
+    template: '<div></div>',
     data: function () {
         return {}
     },

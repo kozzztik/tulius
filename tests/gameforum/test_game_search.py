@@ -1,6 +1,6 @@
 from django.db import transaction
 
-from tulius.forum import models
+from tulius.forum.threads import models
 from tulius.games import models as game_models
 
 
@@ -13,7 +13,7 @@ def test_game_search(game, variation_forum, user, admin, detective, murderer):
     response = admin.put(
         base_url + f'thread/{variation_forum.id}/', {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NOT_SET,
+            'room': False, 'default_rights': None,
             'granted_rights': [], 'important': False, 'media': {}})
     assert response.status_code == 200
     thread = response.json()

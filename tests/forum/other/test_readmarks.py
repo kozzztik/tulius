@@ -1,4 +1,4 @@
-from tulius.forum import models
+from tulius.forum.threads import models
 
 
 def test_read_marks(room_group, admin, user):
@@ -6,14 +6,14 @@ def test_read_marks(room_group, admin, user):
     response = admin.put(
         room_group['url'], {
             'title': 'group1', 'body': 'group1 description',
-            'room': True, 'access_type': 0, 'granted_rights': []})
+            'room': True, 'default_rights': None, 'granted_rights': []})
     assert response.status_code == 200
     room = response.json()
     # make a thread for room
     response = admin.put(
         room['url'], {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': 0, 'granted_rights': [],
+            'room': False, 'default_rights': None, 'granted_rights': [],
             'important': False, 'media': {}})
     assert response.status_code == 200
     thread = response.json()
@@ -111,14 +111,14 @@ def test_readmark_rights(room_group, admin, user):
     response = admin.put(
         room_group['url'], {
             'title': 'group1', 'body': 'group1 description',
-            'room': True, 'access_type': 0, 'granted_rights': []})
+            'room': True, 'default_rights': None, 'granted_rights': []})
     assert response.status_code == 200
     room = response.json()
     # make a thread for room
     response = admin.put(
         room['url'], {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': models.THREAD_ACCESS_TYPE_NO_READ,
+            'room': False, 'default_rights': models.NO_ACCESS,
             'granted_rights': [], 'important': False, 'media': {}})
     assert response.status_code == 200
     thread = response.json()
@@ -135,10 +135,7 @@ def test_readmark_rights(room_group, admin, user):
     assert data['not_read_comment'] is None
     # open thread
     response = admin.put(
-        thread['url'] + 'granted_rights/', {
-            'access_type': models.THREAD_ACCESS_TYPE_NOT_SET
-        }
-    )
+        thread['url'] + 'granted_rights/', {'default_rights': None})
     assert response.status_code == 200
     # check how it looks now on index
     response = user.get('/api/forum/')
@@ -164,3 +161,11 @@ def test_thread_author_notified(room_group, thread, admin, user):
     assert response.status_code == 200
     room = response.json()
     assert room['threads'][0]['unreaded']['id'] == comment['id']
+    # delete user comment
+    response = user.delete(comment['url'] + '?comment=foo')
+    assert response.status_code == 200
+    # check on room
+    response = admin.get(room_group['url'])
+    assert response.status_code == 200
+    room = response.json()
+    assert room['threads'][0]['unreaded'] is None

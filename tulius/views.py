@@ -71,6 +71,10 @@ def logic_time(x):
     return x.exec_time - time
 
 
+class IndexVue(generic.TemplateView):
+    template_name = 'base_vue.html'
+
+
 class StatisticsView(generic.TemplateView):
     template_name = 'statistics.haml'
 

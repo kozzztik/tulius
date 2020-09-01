@@ -3,7 +3,6 @@ import json
 from django import http
 from django import shortcuts
 from django import urls
-from django.apps import apps
 from django.views import generic
 from django.contrib.auth import decorators
 from django.utils.translation import ugettext_lazy as _
@@ -12,16 +11,14 @@ from djfw import subviews
 from djfw import views as djfw_views
 from djfw.sortable import views as sortable_views
 
-from tulius.forum import models as forum
 from tulius.games import views as games_views
 from tulius.stories import models
 from tulius.stories import edit_variation_forms
 from tulius.stories import edit_variation_catalog as catalog
 from tulius.stories import materials_forms
 from tulius.stories import materials_views
-
-
-GAME_FORUM_SITE_ID = apps.get_app_config('gameforum').GAME_FORUM_SITE_ID
+from tulius.gameforum.threads import models as thread_models
+from tulius.gameforum.comments import models as comment_models
 
 
 class VarRightsMixin(djfw_views.RightsDetailMixin):
@@ -226,8 +223,7 @@ def add_variation_illustration(request, variation_id):
 @decorators.login_required
 def edit_variation_forum(request, variation_id):
     (_, variation) = get_variation(request.user, variation_id)
-    return http.HttpResponseRedirect(
-        urls.reverse('gameforum:variation', args=(variation.pk,)))
+    return http.HttpResponseRedirect(f'/play/variation/{variation.pk}/')
 
 
 # pylint: disable=too-many-branches
@@ -252,9 +248,8 @@ def delete_role(request, variation_id):
                 tree_id = (
                     variation.thread.tree_id if variation.thread else None)
                 if tree_id:
-                    threads = forum.Thread.objects.filter(
-                        tree_id=tree_id, data1=role.id, deleted=True,
-                        plugin_id=GAME_FORUM_SITE_ID)
+                    threads = thread_models.Thread.objects.filter(
+                        tree_id=tree_id, role_id=role.id, deleted=True)
                     threads = [
                         thread for thread in threads
                         if not thread.check_deleted()]
@@ -265,9 +260,9 @@ def delete_role(request, variation_id):
                         "Role cant be deleted - it has threads on game forum.")
                 else:
                     if tree_id:
-                        comments = forum.Comment.objects.filter(
-                            parent__tree_id=tree_id, data1=role.id,
-                            deleted=True, plugin_id=GAME_FORUM_SITE_ID)
+                        comments = comment_models.Comment.objects.filter(
+                            parent__tree_id=tree_id, role_id=role.id,
+                            deleted=True)
                         comments = [
                             comment for comment in comments
                             if not comment.parent.check_deleted()]

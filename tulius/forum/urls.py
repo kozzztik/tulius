@@ -1,10 +1,11 @@
 from django.conf import urls
 
-from tulius.forum.threads import api as threads_api
+from tulius.forum.threads import views as threads_api
+from tulius.forum.threads import counters
 from tulius.forum.collapse_threads import views as collapse_views
 from tulius.forum import online_status
-from tulius.forum.comments import api as comments_api
-from tulius.forum.rights import api as rights_api
+from tulius.forum.comments import views as comments_api
+from tulius.forum.rights import views as rights_api
 from tulius.forum.other import likes
 from tulius.forum.other import voting
 from tulius.forum.other import readmarks
@@ -16,6 +17,7 @@ app_name = 'tulius.forum'
 
 urlpatterns = [
     urls.url(r'^$', threads_api.IndexView.as_view(), name='index'),
+    urls.url(r'^fix/$', counters.CountersFix.as_view(), name='fix_counters'),
     urls.url(r'^favorites/$', likes.Favorites.as_view(), name='favorites'),
     urls.url(r'^images/$', images.Images.as_view(), name='images'),
     urls.url(
@@ -43,6 +45,9 @@ urlpatterns = [
         r'^thread/(?P<pk>\d+)/$',
         threads_api.ThreadView.as_view(), name='thread'),
     urls.url(
+        r'^thread/(?P<pk>\d+)/fix/$',
+        counters.CountersFix.as_view(), name='fix_thread_counters'),
+    urls.url(
         r'^thread/(?P<pk>\d+)/comments_page/$',
         comments_api.CommentsPageAPI.as_view(), name='comments_page'),
     urls.url(
@@ -60,6 +65,9 @@ urlpatterns = [
     urls.url(
         r'^thread/(?P<pk>\d+)/move/$',
         threads_api.MoveThreadView.as_view(), name='thread_move'),
+    urls.url(
+        r'^thread/(?P<pk>\d+)/restore/$',
+        threads_api.RestoreThreadView.as_view(), name='restore_thread'),
     urls.url(
         r'^comment/(?P<pk>\d+)/$',
         comments_api.CommentAPI.as_view(), name='comment'),

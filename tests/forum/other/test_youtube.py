@@ -2,7 +2,7 @@ def test_youtube_media_on_threads(room_group, user):
     response=user.put(
         room_group['url'], {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': 0, 'granted_rights': [],
+            'room': False, 'default_rights': None, 'granted_rights': [],
             'important': False,
             'media': {'youtube': 'sp_lN9FNjGs'}})
     assert response.status_code == 200

@@ -1,7 +1,6 @@
 from django import shortcuts
 from django import http
 from django import urls
-from django.apps import apps
 from django.contrib import messages
 from django.views import generic
 from django.contrib.auth import decorators
@@ -21,6 +20,7 @@ from tulius.stories import materials_forms
 from tulius.stories import materials_views
 from tulius.stories import models
 from tulius.stories import story_edit_forms
+from tulius.gameforum import core as game_forum_core
 
 
 class StoryAdminMixin(djfw_views.RightsDetailMixin):
@@ -191,8 +191,7 @@ class AddVariationView(BaseStoryAddView):
         variation = form.save(commit=False)
         variation.story = self.parent_object
         variation.save()
-        gameforum = apps.get_app_config('gameforum').site
-        variation.thread = gameforum.core.create_gameforum(
+        variation.thread = game_forum_core.create_game_forum(
             self.request.user, variation)
         variation.save()
         characters = models.Character.objects.filter(story=self.parent_object)

@@ -1,6 +1,5 @@
 import pytest
-
-from tulius.forum import models
+from django.core import exceptions
 
 
 voting_data = {
@@ -36,18 +35,21 @@ def test_voting_create_and_edit_on_thread(room_group, user):
     response = user.put(
         room_group['url'], {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': 0, 'granted_rights': [],
+            'room': False, 'default_rights': None, 'granted_rights': [],
             'preview': True,
             'media': {'voting': voting_data}})
     assert response.status_code == 200
     thread = response.json()
     assert not thread['id']
-    assert thread['media']['voting'] == voting_data
+    assert thread['media']['voting']['name'] == voting_data['name']
+    assert thread['media']['voting']['body'] == voting_data['body']
+    assert len(thread['media']['voting']['choices']['items']) \
+        == len(voting_data['choices']['items'])
     # create thread with voting
     response = user.put(
         room_group['url'], {
             'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': 0, 'granted_rights': [],
+            'room': False, 'default_rights': None, 'granted_rights': [],
             'media': {'voting': voting_data}})
     assert response.status_code == 200
     thread = response.json()
@@ -71,7 +73,17 @@ def test_voting_create_and_edit_on_thread(room_group, user):
             'media': {'voting': voting_data2}})
     assert response.status_code == 200
     data = response.json()
-    assert data['media']['voting'] == voting_data2
+    voting = data['media']['voting']
+    assert voting['name'] == voting_data2['name']
+    assert voting['body'] == voting_data2['body']
+    # important, items not updated
+    assert len(voting['choices']['items']) == 3
+    assert voting['choices']['items'][0]['name'] == \
+        voting_data['choices']['items'][0]['name']
+    assert voting['choices']['items'][1]['name'] == \
+        voting_data['choices']['items'][1]['name']
+    assert voting['choices']['items'][2]['name'] == \
+        voting_data['choices']['items'][2]['name']
     # real thread update
     response = user.post(
         thread['url'], {
@@ -103,7 +115,10 @@ def test_add_voting_on_thread(thread, admin):
             'media': {'voting': voting_data}})
     assert response.status_code == 200
     data = response.json()
-    assert data['media']['voting'] == voting_data
+    assert data['media']['voting']['name'] == voting_data['name']
+    assert data['media']['voting']['body'] == voting_data['body']
+    assert len(data['media']['voting']['choices']['items']) \
+        == len(voting_data['choices']['items'])
     # do real add
     response = admin.post(
         thread['url'], {
@@ -125,7 +140,7 @@ def test_add_voting_on_thread(thread, admin):
         voting_data['choices']['items'][2]['name']
 
 
-def test_voting_create_and_edit_on_comment(thread, user):
+def test_voting_create_and_edit_on_comment(thread, user, client):
     # preview create comment with voting
     response = user.post(
         thread['url'] + 'comments_page/', {
@@ -136,7 +151,10 @@ def test_voting_create_and_edit_on_comment(thread, user):
     assert response.status_code == 200
     data = response.json()
     assert data['id'] is None
-    assert data['media']['voting'] == voting_data
+    assert data['media']['voting']['name'] == voting_data['name']
+    assert data['media']['voting']['body'] == voting_data['body']
+    assert len(data['media']['voting']['choices']['items']) \
+        == len(voting_data['choices']['items'])
     # create comment with voting
     response = user.post(
         thread['url'] + 'comments_page/', {
@@ -159,6 +177,11 @@ def test_voting_create_and_edit_on_comment(thread, user):
         voting_data['choices']['items'][1]['name']
     assert voting['choices']['items'][2]['name'] == \
         voting_data['choices']['items'][2]['name']
+    # check it is not broken for anonymous client
+    response = client.get(comment['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['media']['voting'] == voting
     # update comment voting preview
     response = user.post(
         comment['url'], {
@@ -167,7 +190,10 @@ def test_voting_create_and_edit_on_comment(thread, user):
             'media': {'voting': voting_data2}})
     assert response.status_code == 200
     data = response.json()
-    assert data['media']['voting'] == voting_data2
+    assert data['media']['voting']['name'] == voting_data2['name']
+    assert data['media']['voting']['body'] == voting_data2['body']
+    assert len(data['media']['voting']['choices']['items']) \
+        == len(voting_data['choices']['items'])
     # real comment update
     response = user.post(
         comment['url'], {
@@ -209,7 +235,10 @@ def test_add_voting_on_comment(thread, user):
             'media': {'voting': voting_data}})
     assert response.status_code == 200
     data = response.json()
-    assert data['media']['voting'] == voting_data
+    assert data['media']['voting']['name'] == voting_data['name']
+    assert data['media']['voting']['body'] == voting_data['body']
+    assert len(data['media']['voting']['choices']['items']) \
+        == len(voting_data['choices']['items'])
     # do real add
     response = user.post(
         comment['url'], {
@@ -229,64 +258,6 @@ def test_add_voting_on_comment(thread, user):
         voting_data['choices']['items'][1]['name']
     assert voting['choices']['items'][2]['name'] == \
         voting_data['choices']['items'][2]['name']
-
-
-def test_thread_with_broken_data(room_group, admin):
-    # create thread with voting
-    response = admin.put(
-        room_group['url'], {
-            'title': 'thread', 'body': 'thread description',
-            'room': False, 'access_type': 0, 'granted_rights': [],
-            'media': {'voting': voting_data}})
-    assert response.status_code == 200
-    thread = response.json()
-    # break data
-    obj = models.Thread.objects.get(pk=thread['id'])
-    obj.media['voting'] += 100
-    obj.save()
-    # check it not breaks thread
-    response = admin.get(thread['url'])
-    assert response.status_code == 200
-    data = response.json()
-    assert data['media'] == {'voting': None}
-    # check update not broken too
-    response = admin.post(
-        thread['url'], {
-            'title': 'thread', 'body': 'thread description',
-            'media': {'voting': voting_data2}})
-    assert response.status_code == 200
-    data = response.json()
-    assert data['media'] == {'voting': None}
-
-
-def test_comment_with_broken_data(thread, user):
-    # create comment with voting
-    response = user.post(
-        thread['url'] + 'comments_page/', {
-            'reply_id': thread['first_comment_id'],
-            'title': 'thread', 'body': 'thread description',
-            'media': {'voting': voting_data}})
-    assert response.status_code == 200
-    data = response.json()
-    assert len(data['comments']) == 2
-    comment = data['comments'][1]
-    # break data
-    obj = models.Comment.objects.get(pk=comment['id'])
-    obj.media['voting'] += 100
-    obj.save()
-    # check it not breaks thread
-    response = user.get(comment['url'])
-    assert response.status_code == 200
-    data = response.json()
-    assert data['media'] == {'voting': None}
-    # check update not broken too
-    response = user.post(
-        comment['url'], {
-            'title': 'thread', 'body': 'thread description',
-            'media': {'voting': voting_data2}})
-    assert response.status_code == 200
-    data = response.json()
-    assert data['media'] == {'voting': None}
 
 
 @pytest.mark.parametrize('preview_results', [True, False])
@@ -323,7 +294,9 @@ def test_voting_process(
     response = user.get(comment['url'] + 'voting/')
     assert response.status_code == 200
     data = response.json()
-    assert data == voting
+    assert data['name'] == voting['name']
+    assert data['body'] == voting['body']
+    assert len(data['choices']['items']) == len(voting['choices']['items'])
     # vote by other user
     response = admin.post(
         comment['url'] + 'voting/',
@@ -383,25 +356,11 @@ def test_vote_with_wrong_id(thread, user):
     assert response.status_code == 200
     data = response.json()
     assert len(data['comments']) == 2
-    comment1 = data['comments'][1]
-    # create second comment with voting
-    response = user.post(
-        thread['url'] + 'comments_page/', {
-            'reply_id': thread['first_comment_id'],
-            'title': 'thread', 'body': 'thread description',
-            'media': {'voting': voting_data}})
-    assert response.status_code == 200
-    data = response.json()
-    assert len(data['comments']) == 3
-    comment2 = data['comments'][2]
-    # try to vote
-    response = user.post(
-        comment1['url'] + 'voting/',
-        {'choice': comment2['media']['voting']['choices']['items'][0]['id']})
-    assert response.status_code == 404
-    voting2 = comment2['media']['voting']
+    comment = data['comments'][1]
+    voting = comment['media']['voting']
     # try to vote with wrong id
-    response = user.post(
-        comment1['url'] + 'voting/',
-        {'choice': voting2['choices']['items'][0]['id'] + 1})
-    assert response.status_code == 404
+    with pytest.raises(exceptions.ValidationError):
+        response = user.post(
+            comment['url'] + 'voting/',
+            {'choice': voting['choices']['items'][0]['id'] + 100})
+        assert response.status_code == 404

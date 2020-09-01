@@ -1,12 +1,12 @@
 from django.conf import urls
 
 from tulius.gameforum import views
-from tulius.gameforum.threads import api as threads
-from tulius.gameforum import other
+from tulius.gameforum.threads import views as threads
 from tulius.gameforum import online_status
-from tulius.gameforum.comments import api as comments
-from tulius.gameforum.rights import api as rights_api
+from tulius.gameforum.comments import views as comments
+from tulius.gameforum.rights import views as rights_api
 from tulius.gameforum.other import trust_marks
+from tulius.gameforum.other import views as other
 
 
 app_name = 'tulius.gameforum'
@@ -19,14 +19,23 @@ urlpatterns = [
         r'^thread_redirrect/(?P<pk>\d+)/$',
         views.RedirrectAPI.as_view(), name='thread_redirect'),
     urls.url(
+        r'^game/(?P<pk>\d+)/$',
+        views.GameAPI.as_view(), name='game'),
+    urls.url(
         r'^variation/(?P<variation_id>\d+)/$',
         views.VariationAPI.as_view(), name='variation'),
+    urls.url(
+        r'^variation/(?P<variation_id>\d+)/likes/$',
+        other.Likes.as_view(), name='likes'),
     urls.url(
         r'^variation/(?P<variation_id>\d+)/trust_mark/(?P<role_id>\d+)/$',
         trust_marks.TrustMarkAPI.as_view(), name='trust_mark'),
     urls.url(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/$',
         threads.ThreadAPI.as_view(), name='thread'),
+    urls.url(
+        r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/fix/$',
+        threads.CountersFix.as_view(), name='fix_thread_counters'),
     urls.url(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/comments_page/$',
         comments.CommentsPageAPI.as_view(), name='comments_page'),
@@ -49,6 +58,9 @@ urlpatterns = [
     urls.url(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/move/$',
         threads.MoveThreadView.as_view(), name='thread_move'),
+    urls.url(
+        r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/restore/$',
+        threads.RestoreThreadView.as_view(), name='restore_thread'),
     urls.url(
         r'^variation/(?P<variation_id>\d+)/comment/(?P<pk>\d+)/$',
         comments.CommentAPI.as_view(), name='comment'),

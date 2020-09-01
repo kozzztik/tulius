@@ -1,12 +1,11 @@
-from tulius.forum import models
-from tulius.forum.rights import default
+from tulius.forum.threads import models
 
 
 def test_limited_read(room_group, thread, superuser, admin, user):
     # set no read to room
     response = superuser.put(
         room_group['url'] + 'granted_rights/', {
-            'access_type': models.THREAD_ACCESS_TYPE_NO_READ
+            'default_rights': models.NO_ACCESS
         }
     )
     assert response.status_code == 200
@@ -14,14 +13,14 @@ def test_limited_read(room_group, thread, superuser, admin, user):
     response = superuser.post(
         room_group['url'] + 'granted_rights/', {
             'user': {'id': admin.user.pk},
-            'access_level': models.THREAD_ACCESS_MODERATOR
+            'access_level': models.ACCESS_MODERATOR
         }
     )
     assert response.status_code == 200
     # set no read to thread
     response = admin.put(
         thread['url'] + 'granted_rights/', {
-            'access_type': models.THREAD_ACCESS_TYPE_NO_READ
+            'default_rights': models.NO_ACCESS
         }
     )
     assert response.status_code == 200
@@ -34,23 +33,24 @@ def test_limited_read(room_group, thread, superuser, admin, user):
     assert limited_read[0]['id'] == admin.user.pk
 
 
-def test_rights_for_deleted_thread(thread, superuser, admin, user):
-    # delete thread
-    response = admin.delete(thread['url'] + '?comment=wow')
+def test_forum_rights_inheritance(room_group, superuser, user):
+    # set no read to room
+    response = superuser.put(
+        room_group['url'] + 'granted_rights/', {
+            'default_rights': models.NO_ACCESS
+        }
+    )
     assert response.status_code == 200
-    obj = models.Thread.objects.get(pk=thread['id'])
-    # check rights for superuser
-    rights = default.DefaultRightsChecker(obj, superuser.user).get_rights()
-    assert rights.read
-    assert not rights.write
-    assert rights.moderate
-    # check rights for owner
-    rights = default.DefaultRightsChecker(obj, admin.user).get_rights()
-    assert rights.read
-    assert not rights.write
-    assert not rights.moderate
-    # check rights for simple user
-    rights = default.DefaultRightsChecker(obj, user.user).get_rights()
-    assert not rights.read
-    assert not rights.write
-    assert not rights.moderate
+    # create opened room
+    response = superuser.put(
+        room_group['url'], {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': models.ACCESS_OPEN,
+            'granted_rights': []})
+    assert response.status_code == 200
+    room = response.json()
+    # check user access
+    response = user.get(room_group['url'])
+    assert response.status_code == 403
+    response = user.get(room['url'])
+    assert response.status_code == 200

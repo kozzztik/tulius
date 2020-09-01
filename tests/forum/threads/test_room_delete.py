@@ -1,4 +1,4 @@
-from tulius.forum import models
+from tulius.forum.threads import models
 
 
 def test_room_delete(client, superuser, admin, user):
@@ -6,21 +6,21 @@ def test_room_delete(client, superuser, admin, user):
     response = superuser.put(
         '/api/forum/', {
             'title': 'group', 'body': 'group description',
-            'room': True, 'access_type': 0, 'granted_rights': []})
+            'room': True, 'default_rights': None, 'granted_rights': []})
     assert response.status_code == 200
     group = response.json()
     # Create rooms in root room
     response = admin.put(
         group['url'], {
             'title': 'room1', 'body': 'room1 description',
-            'room': True, 'access_type': models.THREAD_ACCESS_TYPE_OPEN,
+            'room': True, 'default_rights': models.ACCESS_OPEN,
             'granted_rights': []})
     assert response.status_code == 200
     room1 = response.json()
     response = admin.put(
         group['url'], {
             'title': 'room2', 'body': 'room2 description',
-            'room': True, 'access_type': models.THREAD_ACCESS_TYPE_OPEN,
+            'room': True, 'default_rights': models.ACCESS_OPEN,
             'granted_rights': []})
     assert response.status_code == 200
     room2 = response.json()
@@ -28,14 +28,14 @@ def test_room_delete(client, superuser, admin, user):
     response = admin.put(
         room1['url'], {
             'title': 'room3', 'body': 'room3 description',
-            'room': True, 'access_type': models.THREAD_ACCESS_TYPE_OPEN,
+            'room': True, 'default_rights': models.ACCESS_OPEN,
             'granted_rights': []})
     assert response.status_code == 200
     room3 = response.json()
     response = admin.put(
         room3['url'], {
             'title': 'room4', 'body': 'room4 description',
-            'room': True, 'access_type': models.THREAD_ACCESS_TYPE_OPEN,
+            'room': True, 'default_rights': models.ACCESS_OPEN,
             'granted_rights': []})
     assert response.status_code == 200
     room4 = response.json()
@@ -44,7 +44,7 @@ def test_room_delete(client, superuser, admin, user):
         response = admin.put(
             room['url'], {
                 'title': 'thread1', 'body': 'thread1 description',
-                'room': False, 'access_type': models.THREAD_ACCESS_TYPE_OPEN,
+                'room': False, 'default_rights': models.ACCESS_OPEN,
                 'granted_rights': [], 'media': {}})
         assert response.status_code == 200
     # Check initial state, that before delete it looks like expected
@@ -85,3 +85,58 @@ def test_room_delete(client, superuser, admin, user):
     assert response.status_code == 404
     response = admin.get(room4['url'])
     assert response.status_code == 404
+
+
+def test_room_restore(superuser, admin, room_group):
+    # create room
+    response = admin.put(
+        room_group['url'], {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': None,
+            'granted_rights': []})
+    assert response.status_code == 200
+    room = response.json()
+    # create thread in room
+    response = admin.put(
+        room['url'], {
+            'title': 'thread', 'body': 'thread description',
+            'room': False, 'default_rights': None, 'media': {},
+            'granted_rights': []})
+    assert response.status_code == 200
+    thread = response.json()
+    # check how it looks
+    response = admin.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['threads_count'] == 1
+    assert data['rooms'][0]['comments_count'] == 1
+    assert data['rooms'][0]['last_comment']['thread']['id'] == thread['id']
+    # delete room
+    response = admin.delete(room['url'] + '?comment=foo')
+    assert response.status_code == 200
+    # check it is deleted
+    response = admin.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'] == []
+    # look deleted list
+    response = admin.get(room_group['url'] + '?deleted=1')
+    assert response.status_code == 403
+    response = superuser.get(room_group['url'] + '?deleted=1')
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['id'] == room['id']
+    # restore room
+    response = admin.put(room['url'] + 'restore/')
+    assert response.status_code == 403
+    response = superuser.put(room['url'] + 'restore/')
+    assert response.status_code == 200
+    data = response.json()
+    assert data['id'] == room['id']
+    # check counters
+    response = admin.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['threads_count'] == 1
+    assert data['rooms'][0]['comments_count'] == 1
+    assert data['rooms'][0]['last_comment']['thread']['id'] == thread['id']

@@ -1,10 +1,10 @@
 import json
 
-from tulius.forum import plugins
-from tulius.forum import models
+from tulius.forum import core
+from tulius.forum.threads import models
 
 
-class CollapseAPIList(plugins.BaseAPIView):
+class CollapseAPIList(core.BaseAPIView):
     require_user = True
 
     def get_context_data(self, **kwargs):
@@ -15,7 +15,7 @@ class CollapseAPIList(plugins.BaseAPIView):
         }
 
 
-class CollapseAPISave(plugins.BaseAPIView):
+class CollapseAPISave(core.BaseAPIView):
     require_user = True
 
     def post(self, request, **kwargs):

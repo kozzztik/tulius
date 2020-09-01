@@ -58,11 +58,11 @@
                     <b>Доступ:</b>
                 </label>
                 <div class="col">
-                    <b-form-select :options="access_types"
-                                v-model="form.access_type" id="thread_access_level">
+                    <b-form-select :options="thread_default_rights"
+                                v-model="form.default_rights" id="thread_access_level">
                     </b-form-select>
                 </div>
-                <div class="col-3" v-if="form.access_type > 1">
+                <div class="col-3">
                     <a class="btn btn-light w-100" href="javascript:void(0)"
                        @click="$refs.thread_access.show_dialog()">
                         Исключения...
