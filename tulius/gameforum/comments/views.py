@@ -171,6 +171,7 @@ class CommentAPI(comments.CommentAPI, CommentsBase):
     def get_context_data(self, **kwargs):
         data = super(CommentAPI, self).get_context_data(**kwargs)
         data['thread']['rights'] = self.obj.rights_to_json(self.user)
+        self._rights_strict_roles(data['thread'])
         return data
 
     @classmethod
