@@ -47,4 +47,10 @@ class Migration(migrations.Migration):
                 related_name='game_forum_comments',
                 to=settings.AUTH_USER_MODEL, verbose_name='author'),
         ),
+        migrations.AlterField(
+            model_name='comment',
+            name='create_time',
+            field=models.DateTimeField(
+                auto_now_add=True, verbose_name='created at'),
+        ),
     ]

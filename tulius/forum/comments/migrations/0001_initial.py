@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                     max_length=255, verbose_name='title')),
                 ('body', models.TextField(verbose_name='body')),
                 ('create_time', models.DateTimeField(
-                    auto_now_add=True, verbose_name='created at')),
+                    verbose_name='created at')),
                 ('edit_time', models.DateTimeField(
                     blank=True, null=True, verbose_name='edited at')),
                 ('deleted', models.BooleanField(
@@ -61,7 +61,7 @@ class Migration(migrations.Migration):
                 ('deleted', models.BooleanField(
                     default=True, verbose_name='deleted')),
                 ('delete_time', models.DateTimeField(
-                    auto_now_add=True, verbose_name='deleted at')),
+                    verbose_name='deleted at')),
                 ('comment', models.ForeignKey(
                     on_delete=django.db.models.deletion.PROTECT,
                     related_name='delete_marks', to='forum_comments.Comment',
