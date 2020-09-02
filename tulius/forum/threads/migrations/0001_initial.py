@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                         (0, 'private(no access)')
                     ], default=None, null=True, verbose_name='access type')),
                 ('create_time', models.DateTimeField(
-                    auto_now_add=True, verbose_name='created at')),
+                    verbose_name='created at')),
                 ('closed', models.BooleanField(
                     default=False, verbose_name='closed')),
                 ('important', models.BooleanField(

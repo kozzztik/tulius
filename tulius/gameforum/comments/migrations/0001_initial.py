@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                     max_length=255, verbose_name='title')),
                 ('body', models.TextField(verbose_name='body')),
                 ('create_time', models.DateTimeField(
-                    auto_now_add=True, verbose_name='created at')),
+                    verbose_name='created at')),
                 ('edit_time', models.DateTimeField(
                     blank=True, null=True, verbose_name='edited at')),
                 ('deleted', models.BooleanField(
