@@ -440,3 +440,27 @@ def test_fix_counters_public_thread_and_empty_room(
     assert response.status_code == 200
     data = response.json()
     assert data['result']['threads'] == 3
+
+
+def test_comments_superuser_counters(superuser, room_group, user):
+    # create room with no comments
+    response = user.put(
+        room_group['url'], {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': None, 'granted_rights': []})
+    assert response.status_code == 200
+    room = response.json()
+    # create hidden thread
+    response = user.put(
+        room['url'], {
+            'title': 'thread', 'body': 'thread description',
+            'room': False, 'default_rights': models.NO_ACCESS,
+            'important': False, 'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    thread = response.json()
+    # check counters by super user
+    response = superuser.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['comments_count'] == 1
+    assert data['rooms'][0]['last_comment']['id'] == thread['first_comment_id']

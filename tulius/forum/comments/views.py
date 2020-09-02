@@ -24,8 +24,12 @@ def order_to_page(order):
 
 @dispatch.receiver(thread_signals.room_to_json, sender=thread_models.Thread)
 def room_to_json(instance, response, view, **_kwargs):
-    last_comment_id = models.get_param('last_comment', instance, view.user.pk)
-    comments_count = models.get_param('comments_count', instance, view.user.pk)
+    last_comment_id = models.get_param(
+        'last_comment', instance, view.user.pk,
+        superuser=view.user.is_superuser)
+    comments_count = models.get_param(
+        'comments_count', instance, view.user.pk,
+        superuser=view.user.is_superuser)
     response['comments_count'] = comments_count
     if (not instance.room) and (comments_count is not None):
         response['pages_count'] = order_to_page(comments_count - 1)

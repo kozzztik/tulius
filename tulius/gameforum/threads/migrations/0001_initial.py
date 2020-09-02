@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                         (0, 'private(no access)')
                     ], default=None, null=True, verbose_name='access type')),
                 ('create_time', models.DateTimeField(
-                    auto_now_add=True, verbose_name='created at')),
+                    verbose_name='created at')),
                 ('closed', models.BooleanField(
                     default=False, verbose_name='closed')),
                 ('important', models.BooleanField(
@@ -86,7 +86,7 @@ class Migration(migrations.Migration):
                 ('deleted', models.BooleanField(
                     default=True, verbose_name='deleted')),
                 ('delete_time', models.DateTimeField(
-                    auto_now_add=True, verbose_name='deleted at')),
+                    verbose_name='deleted at')),
                 ('thread', models.ForeignKey(
                     on_delete=django.db.models.deletion.PROTECT,
                     related_name='delete_marks', to='game_forum_threads.Thread',

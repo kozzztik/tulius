@@ -102,10 +102,12 @@ class Comment(AbstractComment):
     pass
 
 
-def get_param(param, thread, user_id):
+def get_param(param, thread, user_id, superuser=False):
     data = thread.data.get(param)
     if not data:
         return None
+    if superuser:
+        return data['su']
     if user_id and str(user_id) in data['users']:
         return data['users'][str(user_id)]
     return data['all']
