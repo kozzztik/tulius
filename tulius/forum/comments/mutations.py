@@ -16,24 +16,28 @@ class ThreadCommentAdd(mutations.Mutation):
     @staticmethod
     def get_last_comment(instance):
         return instance.data.setdefault(
-            'last_comment', {'all': None, 'users': {}})
+            'last_comment', {'all': None, 'su': None, 'users': {}})
 
     @staticmethod
     def get_comments_count(instance):
         return instance.data.setdefault(
-            'comments_count', {'all': 0, 'users': {}})
+            'comments_count', {'all': 0, 'su': 0, 'users': {}})
 
     def process_thread(self, instance):
         if 'first_comment_id' not in instance.data:
             instance.data['first_comment_id'] = self.comment.pk
         last_comment = self.get_last_comment(instance)
         last_comment['all'] = self.comment.pk
+        last_comment['su'] = self.comment.pk
         comments_count = self.get_comments_count(instance)
         comments_count['all'] += 1
+        comments_count['su'] += 1
 
     def process_parent(self, instance, updated_child):
         last_comment = self.get_last_comment(instance)
         comments_count = self.get_comments_count(instance)
+        comments_count['su'] += 1
+        last_comment['su'] = self.comment.pk
         if updated_child.rights(None) & models.ACCESS_READ:
             last_comment['all'] = self.comment.pk
             last_comment['users'] = {
@@ -63,10 +67,16 @@ class FixCounters(mutations.Mutation):
     @staticmethod
     def fix_room(instance, children):
         comments_count = instance.data['comments_count'] = {
-            'all': 0, 'users': {}}
+            'all': 0, 'su': 0, 'users': {}}
         last_comment = instance.data['last_comment'] = {
-            'all': None, 'users': {}}
+            'all': None, 'su': None, 'users': {}}
         for c in children:
+            comments_count['su'] += c.data['comments_count']['su']
+            pk = c.data['last_comment']['su']
+            if pk and (
+                    (not last_comment['su']) or
+                    (pk > last_comment['su'])):
+                last_comment['su'] = pk
             if c.rights(None) & models.ACCESS_READ:
                 pk = c.data['last_comment']['all']
                 if pk and (
@@ -117,9 +127,9 @@ class FixCounters(mutations.Mutation):
                 instance.data['first_comment_id'] = comment.pk
             last_comment_id = comment.pk
         instance.data['comments_count'] = {
-            'all': comments_count, 'users': {}}
+            'all': comments_count, 'su': comments_count, 'users': {}}
         instance.data['last_comment'] = {
-            'all': last_comment_id, 'users': {}}
+            'all': last_comment_id, 'su': last_comment_id, 'users': {}}
         if self.result:
             self.result['comments'] = \
                 self.result.get('comments', 0) + comments_count
