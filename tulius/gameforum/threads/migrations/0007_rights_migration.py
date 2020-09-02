@@ -18,8 +18,8 @@ def migrate_thread(thread, rights_mask):
             thread.default_rights & rights_mask
         thread.save()
     threads = models.Thread.objects.filter(parent=thread, deleted=False)
-    for thread in threads:
-        migrate_thread(thread, rights_mask)
+    for t in threads:
+        migrate_thread(t, rights_mask)
 
 
 def migrate_data(apps, schema_editor):
