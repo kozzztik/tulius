@@ -64,7 +64,7 @@ class Migration(migrations.Migration):
                 ('deleted', models.BooleanField(
                     default=True, verbose_name='deleted')),
                 ('delete_time', models.DateTimeField(
-                    auto_now_add=True, verbose_name='deleted at')),
+                    verbose_name='deleted at')),
                 ('comment', models.ForeignKey(
                     on_delete=django.db.models.deletion.PROTECT,
                     related_name='delete_marks',
