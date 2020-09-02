@@ -169,3 +169,59 @@ def test_thread_author_notified(room_group, thread, admin, user):
     assert response.status_code == 200
     room = response.json()
     assert room['threads'][0]['unreaded'] is None
+
+
+def test_deleted_threads_not_marked(room_group, admin, superuser):
+    # make a room
+    response = admin.put(
+        room_group['url'], {
+            'title': 'room', 'body': 'room description',
+            'room': True, 'default_rights': None,
+            'granted_rights': []})
+    assert response.status_code == 200
+    room = response.json()
+    # make a first thread
+    response = admin.put(
+        room['url'], {
+            'title': 'thread1', 'body': 'thread1 description',
+            'room': False, 'default_rights': None,
+            'granted_rights': [], 'important': False, 'media': {}})
+    assert response.status_code == 200
+    thread1 = response.json()
+    # make a second thread
+    response = admin.put(
+        room['url'], {
+            'title': 'thread2', 'body': 'thread2 description',
+            'room': False, 'default_rights': None,
+            'granted_rights': [], 'important': False, 'media': {}})
+    assert response.status_code == 200
+    thread2 = response.json()
+    # check not read is correct
+    response = superuser.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['unreaded']['thread']['id'] == thread1['id']
+    # delete first thread
+    response = admin.delete(thread1['url'] + '?comment=bar')
+    assert response.status_code == 200
+    # check not read now
+    response = superuser.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['unreaded']['thread']['id'] == thread2['id']
+    # mark all as read
+    response = superuser.post(room['url'] + 'read_mark/', {'comment_id': None})
+    assert response.status_code == 200
+    # check not read
+    response = superuser.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['unreaded'] is None
+    # restore thread
+    response = superuser.put(thread1['url'] + 'restore/')
+    assert response.status_code == 200
+    # check not read is correct
+    response = superuser.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['unreaded']['thread']['id'] == thread1['id']
