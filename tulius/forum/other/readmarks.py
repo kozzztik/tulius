@@ -34,7 +34,7 @@ class ReadmarkAPI(views.BaseThreadView):
             threads = room.get_children()
         else:
             threads = self.thread_model.objects.filter(parent=None)
-        for thread in threads:
+        for thread in threads.exclude(deleted=True):
             if not thread.read_right(self.user):
                 continue
             if thread.room:
