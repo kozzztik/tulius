@@ -32,7 +32,7 @@ def test_game_favorites(game, variation_forum, user, admin, detective):
     assert response.status_code == 200
     data = response.json()
     item = data['groups'][0]
-    assert item['name'] == game.variation.name
+    assert item['name'] == str(game)
     assert item['items'][0]['comment']['id'] == thread['first_comment_id']
     assert item['items'][0]['comment']['user']['id'] is None
     assert item['items'][0]['comment']['user']['title'] == '---'
