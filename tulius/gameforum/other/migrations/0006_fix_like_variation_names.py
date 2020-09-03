@@ -1,6 +1,5 @@
 import gc
 
-from django import http
 from django.conf import settings
 from django.db import migrations
 from tulius.gameforum.other import models as other_models
