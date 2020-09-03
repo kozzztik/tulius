@@ -70,9 +70,11 @@ class Likes(likes.Likes, comments_api.CommentsBase):
 
     def create_like(self):
         like = super(Likes, self).create_like()
+        game = self.variation.game
         # pylint: disable=E1137
         like.data['variation'] = {
-            'id': self.variation.pk, 'name': self.variation.name}
+            'id': self.variation.pk,
+            'name': str(game) if game else self.variation.name}
         return like
 
 
