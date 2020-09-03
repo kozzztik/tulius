@@ -13,7 +13,7 @@
                 %tr
                     %td
                         - if role.variation.game.url
-                            %a{href: '{{ role.variation.game.url }}'}
+                            %a{href: '/play/game/{{ role.variation.game.pk }}/'}
                                 = role.variation.game
                         - else
                             = role.variation.game 
@@ -29,8 +29,8 @@
             - for game in played_games
                 %tr
                     %td
-                        - if game.url
-                            %a{href:'{{ game.url }}'}
+                        - if game.pk
+                            %a{href:'/play/game/{{ game.pk }}/'}
                                 = game
                         - else
                             = game        
