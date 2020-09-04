@@ -36,7 +36,8 @@ class VKConnector():
         args['client_secret'] = self.secret
         args['code'] = code
         args['redirect_uri'] = old_reddirect
-        url = 'https://oauth.vk.com/access_token?' + urllib.parse.urlencode(args)
+        url = 'https://oauth.vk.com/access_token?' + urllib.parse.urlencode(
+            args)
         response = requests.get(url)
         if response.status_code not in [200, 201]:
             raise Exception(response.text)

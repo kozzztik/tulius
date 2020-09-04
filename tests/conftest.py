@@ -8,13 +8,14 @@ from django.test import client as django_client
 class JSONClient(django_client.Client):
     # pylint: disable=too-many-arguments
     def post(
-            self, path, data=None, content_type=django_client.MULTIPART_CONTENT,
+            self, path, data=None,
+            content_type=django_client.MULTIPART_CONTENT,
             follow=False, secure=False, **extra):
         if isinstance(data, dict):
             content_type = 'application/json'
         return super(JSONClient, self).post(
-            path, data, content_type=content_type, follow=follow, secure=secure,
-            **extra)
+            path, data, content_type=content_type, follow=follow,
+            secure=secure, **extra)
 
     # pylint: disable=too-many-arguments
     def put(self, path, data='', content_type='application/octet-stream',
@@ -101,4 +102,5 @@ def pytest_sessionfinish(session, exitstatus):
     db_cfg = getattr(session, 'django_db_cfg')
     if db_cfg:
         from django.test import utils
-        utils.teardown_databases(db_cfg, verbosity=session.config.option.verbose)
+        utils.teardown_databases(
+            db_cfg, verbosity=session.config.option.verbose)

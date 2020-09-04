@@ -88,7 +88,8 @@ class MutationController:
         parents = None
         if self.parent_mutations:
             if self.instance.pk:
-                parents = list(self.instance.get_ancestors().select_for_update())
+                parents = list(
+                    self.instance.get_ancestors().select_for_update())
             elif self.instance.parent:
                 parents = list(
                     self.instance.parent.get_ancestors(

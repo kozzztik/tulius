@@ -299,7 +299,8 @@ class Game(models.Model):
         return urls.reverse('games:game', kwargs={'pk': self.pk})
 
     def get_edit_url(self):
-        return urls.reverse('games:edit_game_main', kwargs={'game_id': self.pk})
+        return urls.reverse(
+            'games:edit_game_main', kwargs={'game_id': self.pk})
 
     def get_request_url(self):
         return urls.reverse('games:game_request', kwargs={'game_id': self.pk})

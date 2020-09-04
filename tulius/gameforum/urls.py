@@ -43,7 +43,8 @@ urlpatterns = [
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/read_mark/$',
         other.ReadmarkAPI.as_view(), name='thread_readmark'),
     urls.url(
-        r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/granted_rights/$',
+        r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)'
+        r'/granted_rights/$',
         rights_api.GrantedRightsAPI.as_view(), name='thread_rights'),
     urls.url(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/granted_rights/'
