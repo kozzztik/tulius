@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('stories', '0001_initial'),
+        ('stories', '0001_squashed_0002_auto_20180418_1722'),
         ('games', '0001_initial'),
     ]
 
