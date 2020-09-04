@@ -4,7 +4,8 @@ from .core import get_formset
 
 class DetailFormsetsMixin:
     formsets = {}
-#    formsets = {'guestsformset': {'model': GameGuest, 'extra': 1, 'form': Form},
+#    formsets = {'guestsformset':
+#        {'model': GameGuest, 'extra': 1, 'form': Form},
 #                'adminformset': {'model': GameAdmin, 'extra': 1},
 #                }
     formset_objs = {}
