@@ -101,7 +101,8 @@ class ActionableFormsMixin(ActionableMixin):
             action = self.actions[action_name].copy()
             form = action.pop('form', None)
             if form:
-                context_name = action.pop('context_name', action_name + '_form')
+                context_name = action.pop(
+                    'context_name', action_name + '_form')
                 forms_dict[context_name] = self.create_form(action_name, form)
         return forms_dict
 

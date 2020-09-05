@@ -33,7 +33,8 @@ class UserAgentParser:
 
         Args:
           pattern: a regular expression string
-          family_replacement: a string to override the matched family (optional)
+          family_replacement: a string to override the matched family
+            (optional)
           v1_replacement: a string to override the matched v1 (optional)
         """
         self.pattern = pattern
@@ -55,7 +56,8 @@ class UserAgentParser:
         if match:
             if self.family_replacement:
                 if re.search(r'\$1', self.family_replacement):
-                    family = re.sub(r'\$1', match.group(1), self.family_replacement)
+                    family = re.sub(
+                        r'\$1', match.group(1), self.family_replacement)
                 else:
                     family = self.family_replacement
             else:
@@ -120,7 +122,8 @@ class DeviceParser:
 
         Args:
           pattern: a regular expression string
-          device_replacement: a string to override the matched device (optional)
+          device_replacement: a string to override the matched device
+            (optional)
         """
         self.pattern = pattern
         self.user_agent_re = re.compile(self.pattern)
@@ -140,7 +143,8 @@ class DeviceParser:
         if match:
             if self.device_replacement:
                 if re.search(r'\$1', self.device_replacement):
-                    device = re.sub(r'\$1', match.group(1), self.device_replacement)
+                    device = re.sub(
+                        r'\$1', match.group(1), self.device_replacement)
                 else:
                     device = self.device_replacement
             else:
@@ -174,7 +178,8 @@ def ParseUserAgent(user_agent_string, **jsParseBits):
     Returns:
       A dictionary containing parsed bits.
     """
-    if 'js_user_agent_family' in jsParseBits and jsParseBits['js_user_agent_family'] != '':
+    if 'js_user_agent_family' in jsParseBits and jsParseBits[
+            'js_user_agent_family'] != '':
         family = jsParseBits['js_user_agent_family']
         if 'js_user_agent_v1' in jsParseBits:
             v1 = jsParseBits['js_user_agent_v1'] or None
@@ -338,10 +343,11 @@ def GetFilters(user_agent_string, js_user_agent_string=None,
                js_user_agent_v3=None):
     """Return the optional arguments that should be saved and used to query.
 
-    js_user_agent_string is always returned if it is present. We really only need
-    it for Chrome Frame. However, I added it in the generally case to find other
-    cases when it is different. When the recording of js_user_agent_string was
-    added, we created new records for all new user agents.
+    js_user_agent_string is always returned if it is present. We really only
+    need it for Chrome Frame. However, I added it in the generally case to
+    find other cases when it is different. When the recording of
+    js_user_agent_string was added, we created new records for all new
+    user agents.
 
     Since we only added js_document_mode for the IE 9 preview case, it did not
     cause new user agent records the way js_user_agent_string did.

@@ -464,3 +464,36 @@ def test_comments_superuser_counters(superuser, room_group, user):
     data = response.json()
     assert data['rooms'][0]['comments_count'] == 1
     assert data['rooms'][0]['last_comment']['id'] == thread['first_comment_id']
+
+
+def test_closed_thread(superuser, room_group):
+    # create thread
+    response = superuser.put(
+        room_group['url'], {
+            'title': 'thread', 'body': 'thread description',
+            'room': False, 'default_rights': None, 'granted_rights': [],
+            'important': True, 'closed': True, 'media': {}})
+    assert response.status_code == 200
+    thread = response.json()
+    assert thread['rights']['write']
+    # check add comment
+    response = superuser.post(
+        thread['url'] + 'comments_page/', {
+            'reply_id': thread['first_comment_id'],
+            'title': 'ho ho ho', 'body': 'happy new year',
+            'media': {},
+        })
+    assert response.status_code == 200
+    # close thread
+    thread['closed'] = True
+    response = superuser.post(thread['url'], thread)
+    assert response.status_code == 200
+    thread = response.json()
+    assert not thread['rights']['write']
+    response = superuser.post(
+        thread['url'] + 'comments_page/', {
+            'reply_id': thread['first_comment_id'],
+            'title': 'ho ho ho', 'body': 'happy new year',
+            'media': {},
+        })
+    assert response.status_code == 403

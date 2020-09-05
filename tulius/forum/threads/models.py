@@ -118,7 +118,8 @@ class AbstractThread(mptt_models.MPTTModel):
 
     def write_right(self, user):
         return bool(
-            user.is_superuser or (self.rights(user.pk) & ACCESS_WRITE))
+            (not self.closed) and
+            (user.is_superuser or (self.rights(user.pk) & ACCESS_WRITE)))
 
     def moderate_right(self, user):
         return bool(
