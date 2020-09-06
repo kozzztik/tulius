@@ -40,7 +40,7 @@ services:
       tuliusnet:
         ipv4_address: 10.5.0.22
     restart: unless-stopped
-    command: ["celery", "-A tulius worker -l warning"]
+    command: ["celery", "-A", "tulius", "worker", "-l", "warning"]
     environment:
       TULIUS_BRANCH: dev
     volumes:

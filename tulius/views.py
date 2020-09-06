@@ -215,12 +215,12 @@ class CeleryStatusAPI(generic.View):
     def get(request, **_kwargs):
         if not request.user.is_superuser:
             raise exceptions.PermissionDenied()
-        active = celery.app.control.inspect().active()
+        active = celery.app.control.inspect().active() or {}
         for worker_data in active.values():
             for task in worker_data:
                 task['time_start'] = str(
                     datetime.datetime.fromtimestamp(task['time_start']))
         return http.JsonResponse({
-            'stats': celery.app.control.inspect().stats(),
+            'stats': celery.app.control.inspect().stats() or {},
             'active': active,
         })
