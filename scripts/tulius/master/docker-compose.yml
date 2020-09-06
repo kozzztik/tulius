@@ -34,6 +34,23 @@ services:
         max-size: "100m"
         max-file: "2"
 
+  celery:
+    image: kozzztik/tulius:master
+    networks:
+      tuliusnet:
+        ipv4_address: 10.5.0.12
+    restart: unless-stopped
+    command: ["celery", "-A tulius worker -l warning"]
+    environment:
+      TULIUS_BRANCH: dev
+    volumes:
+      - ../../../settings_production.py:/opt/tulius/settings_production.py
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "2"
+
 networks:
   tuliusnet:
     driver: bridge

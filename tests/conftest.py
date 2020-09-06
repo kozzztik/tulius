@@ -49,7 +49,8 @@ def create_user_fixture():
         from tulius import models as tulius_models
 
         username = username or f'user_{user_number}'
-        user = tulius_models.User(username=username, **kwargs)
+        user = tulius_models.User(
+            username=username, email=f'{username}@tulius.com', **kwargs)
         user.set_password(username)
         user.save()
         client = JSONClient()
@@ -77,9 +78,8 @@ def user_fixture(user_factory):
 def init_settings():
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", 'settings')
     from django.conf import settings
-
-    if not settings.configured:
-        django.setup()
+    settings.CELERY_TASK_ALWAYS_EAGER = True
+    django.setup()
     from django.test import utils
     utils.setup_test_environment()
 

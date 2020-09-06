@@ -130,6 +130,9 @@
             %a{href: '{% url "counters:index"%}'}
                 {% trans "Counters" %}
         %li
+            %a{href: '/celery_status/'}
+                Очереди
+        %li
             %a{href: '{% url "admin:index" %}'}
                 {% trans "Django admin site" %}
         %li

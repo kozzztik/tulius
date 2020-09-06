@@ -12,6 +12,8 @@ class Notification(models.Model):
         verbose_name_plural = _('notifications')
         ordering = ['order']
 
+    objects = models.Manager()  # linters don't worry, be happy
+
     code_name = models.CharField(
         max_length=40,
         default='',
@@ -62,6 +64,8 @@ class UserNotification(models.Model):
         verbose_name = _('user notification')
         verbose_name_plural = _('user notifications')
 
+    objects = models.Manager()  # linters don't worry, be happy
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, models.PROTECT,
         null=False,
@@ -84,7 +88,8 @@ class UserNotification(models.Model):
     )
 
     def __str__(self):
-        return "%s - %s" % (self.user, self.name or self.code_name)
+        return "%s - %s" % (
+            self.user, self.notification.name or self.notification.code_name)
 
 
 class IncomeMail(models.Model):

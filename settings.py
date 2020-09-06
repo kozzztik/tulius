@@ -69,8 +69,9 @@ INSTALLED_APPS = (
     'djfw.photos',
     'djfw.sortable',
     'djfw.custom_views',
+    'django_celery_results',
     'tulius.pm',
-    'tulius',
+    'tulius.TuliusConfig',
     'tulius.core.ckeditor',
     'tulius.login',
     'tulius.players',
@@ -319,3 +320,8 @@ RAVEN_CONFIG = {
     'integrations': [DjangoIntegration()],
     'send_default_pii': True,
 }
+
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_BROKER_URL = 'redis://{host}:{port}/{db}'.format(**REDIS_CONNECTION)
+CELERY_WORKER_CONCURRENCY = 3
+CELERY_EVENT_QUEUE_PREFIX = f'{env}_'

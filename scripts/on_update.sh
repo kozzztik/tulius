@@ -6,6 +6,8 @@ ROOTDIR=$PWD
 
 echo "Stop existing compose"
 cd scripts/tulius/$1
+docker-compose stop uwsgi
+docker-compose exec celery python manage.py wait_celery
 docker-compose down
 docker system prune --force
 docker rm -v $(docker ps --filter status=exited -q 2>/dev/null) 2>/dev/null
