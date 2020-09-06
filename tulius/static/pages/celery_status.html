@@ -1,0 +1,68 @@
+<div>
+    <div v-for="(worker, name) in workers" class="content">
+        <div class="caption" align="center">
+            <div class="captionleft"></div>
+            <div class="captioncontent">
+                {{ name }}
+            </div>
+            <div class="captionright"></div>
+        </div>
+        <h4>Параметры</h4>
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td>Uptime</td>
+                        <td>{{ worker.uptime }}</td>
+                    </tr>
+                    <tr>
+                        <td>Concurrency</td>
+                        <td>{{ worker.pool['max-concurrency'] }}</td>
+                    </tr>
+                    <tr>
+                        <td>Prefetch_count</td>
+                        <td>{{ worker.prefetch_count }}</td>
+                    </tr>
+                    <tr>
+                        <td>rusage</td>
+                        <td>{{ worker.rusage }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        <h4>Статистика задач</h4>
+        <table class="table">
+            <tbody>
+                <tr v-for="(count, task_name) in worker.total">
+                    <td>{{ task_name }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <h4>Активность</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Задача</th>
+                    <th>Параметры</th>
+                    <th>Начало</th>
+                    <th>Ack</th>
+                    <th>Очередь</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="task in worker.active">
+                    <td>{{task.name}}</td>
+                    <td>args: {{task.args}}, kwargs: {{task.kwargs}}</td>
+                    <td>{{task.time_start}}</td>
+                    <td>{{task.acknowledged}}</td>
+                    <td>{{task.delivery_info.routing_key}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div v-if="workers.length == 0" class="content">
+        <br>
+        Нет исполнителей задач
+        <br>
+        <br>
+    </div>
+</div>

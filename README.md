@@ -121,3 +121,11 @@ Instances, that needed to run:
 1. `manage.py runserver` - Django instance for normal HTTP requests
 2. `async_app.py` - for web sockets support
 3. `celery -A tulius worker -l info` - for deferred tasks
+
+On Windows, as Celery not supports it yet, install gevent:
+
+```pip install gevent```
+
+and start celery with:
+
+```celery -A tulius worker -l info -P gevent```

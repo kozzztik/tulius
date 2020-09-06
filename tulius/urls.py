@@ -41,6 +41,10 @@ urlpatterns = [
     url(r'^installer/', include('djfw.installer.urls', namespace='installer')),
 
     url(r'^$', views.HomeView.as_view(), name='home'),
+    url(r'^celery_status/$', views.IndexVue.as_view(),
+        name='celery_status'),
+    url(r'^api/celery_status/$', views.CeleryStatusAPI.as_view(),
+        name='celery_status_api'),
     url(r'^api/flatpages/$', views.ArticlesAPI.as_view(),
         name='flatpages_api'),
     url(r'^api/app_settings/$', views.AppSettingsAPI.as_view(),

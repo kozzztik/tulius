@@ -15,6 +15,7 @@ from tulius import forms
 from tulius.profile import views as profile_views
 from tulius.games import models as games
 from tulius.websockets import context_processors as websock_context
+from tulius import celery
 
 
 class HomeView(generic.TemplateView):
@@ -206,3 +207,17 @@ class StatisticsView(generic.TemplateView):
         kwargs['graph_type'] = graph_type
         kwargs['graph'] = graph
         return kwargs
+
+
+class CeleryStatusAPI(generic.View):
+    @staticmethod
+    def get(_, **_kwargs):
+        active = celery.app.control.inspect().active()
+        for worker_data in active.values():
+            for task in worker_data:
+                task['time_start'] = str(
+                    datetime.datetime.fromtimestamp(task['time_start']))
+        return http.JsonResponse({
+            'stats': celery.app.control.inspect().stats(),
+            'active': active,
+        })
