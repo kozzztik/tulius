@@ -104,3 +104,20 @@ Update repo if needed (use separate branch and PR)
     . scripts/on_update.sh dev
     ``` 
 15. Check that everything works. Profit.
+
+## Running on local environment
+
+To use Tulius on local dev environment you need to run 3 instances. For both of them
+it is needed to set environment variable:
+
+```bash
+TULIUS_BRANCH=local
+``` 
+So Tulius will understand a context and set needed configuration by default. 
+If you need some special configuration options, you can create `settings_production.py`
+file from template and set needed options there.
+
+Instances, that needed to run:
+1. `manage.py runserver` - Django instance for normal HTTP requests
+2. `async_app.py` - for web sockets support
+3. `celery -A tulius worker -l info` - for deferred tasks

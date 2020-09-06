@@ -55,7 +55,3 @@ class UploadedFile(models.Model):
         Provides unicode string post representation
         """
         return self.name
-
-
-def default_media():
-    return {}
