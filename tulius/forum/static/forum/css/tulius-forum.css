@@ -424,6 +424,7 @@ body .quote, blockquote {
 
 .pagination .progress .bar{ background-color: #53381a; }
 
+<<<<<<< Upstream, based on branch 'dev' of https://github.com/kozzztik/tulius.git
 .voting {
     background-image: url("../img/quote.gif");
     border-color: #8E7F60;
@@ -512,3 +513,85 @@ body .quote, blockquote {
     min-height: 10em;
 }
 
+=======
+th{
+	text-align: left;
+	color: #941a09;
+	}
+
+.bord1-center {
+	background-image: url("/media/forum/bord1-center.png");
+	background-repeat: repeat-x;
+	height: 14px;
+}
+
+.bord1-left {
+	background-image: url("/media/forum/bord1-left.png"); 
+	background-repeat: no-repeat;
+	height: 14px;
+	width: 44px;
+	background-position: left;
+	position: absolute
+}
+
+.bord1-right {
+	background-image: url("/media/forum/bord1-right.png");  
+	background-repeat: no-repeat;
+	width: 44px;
+	height: 14px;
+	background-position: right;
+	float: right;
+	visibility: inherit;
+	position: relative;
+}
+
+.bord2-center {
+	background-image: url("/media/forum/bord2-center.png");   
+	background-repeat: repeat-x;
+	height: 5px;
+	width: 100%;
+	margin-left: 11px;
+}
+
+.bord2-left {
+	background-image: url("/media/forum/bord2-left.png"); 
+	background-repeat: no-repeat;
+	height: 5px;
+	margin-left: 11px;
+	background-position: left;
+	padding-left: 11px;
+}
+
+.bord2-right {
+	background-image: url("/media/forum/bord2-right.png"); 
+	background-repeat: no-repeat;
+	background-position: right;
+	margin-right: 11px;
+	height: 5px;
+	float: right;
+	width: 100%;
+	padding-right: 11px;
+}
+
+.td-text-left {
+	width: auto;
+	margin-right: 7px;
+	margin-left: 33px;
+	height: auto;
+	margin-bottom: 3px;
+}
+
+.td-text-center {
+	width: auto;
+	margin-right: 7px;
+	margin-left: 7px;
+	margin-bottom: 3px;
+}
+
+.td-text-right {
+	width: auto;
+	margin-right: 33px;
+	margin-left: 7px;
+	margin-bottom: 3px;
+}
+>>>>>>> 95ad483 Update tulius-forum.css
