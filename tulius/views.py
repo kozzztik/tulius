@@ -2,6 +2,7 @@ import datetime
 
 from django import http
 from django.conf import settings
+from django.core import exceptions
 from django.utils.translation import ugettext_lazy as _
 from django.template import response
 from django.views import generic
@@ -211,7 +212,9 @@ class StatisticsView(generic.TemplateView):
 
 class CeleryStatusAPI(generic.View):
     @staticmethod
-    def get(_, **_kwargs):
+    def get(request, **_kwargs):
+        if not request.user.is_superuser:
+            raise exceptions.PermissionDenied()
         active = celery.app.control.inspect().active()
         for worker_data in active.values():
             for task in worker_data:
