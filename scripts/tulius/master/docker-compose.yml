@@ -42,7 +42,7 @@ services:
     restart: unless-stopped
     command: ["celery", "-A", "tulius", "worker", "-l", "warning"]
     environment:
-      TULIUS_BRANCH: dev
+      TULIUS_BRANCH: master
     volumes:
       - ../../../settings_production.py:/opt/tulius/settings_production.py
     logging:
