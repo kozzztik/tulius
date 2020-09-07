@@ -444,6 +444,8 @@ class RoleRequest(models.Model):
         verbose_name = _('role request')
         verbose_name_plural = _('role requests')
 
+    objects = models.Manager()  # linters don't worry, be happy
+
     game = models.ForeignKey(
         Game, models.PROTECT,
         null=False,

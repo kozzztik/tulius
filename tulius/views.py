@@ -2,6 +2,7 @@ import datetime
 
 from django import http
 from django.conf import settings
+from django.core import exceptions
 from django.utils.translation import ugettext_lazy as _
 from django.template import response
 from django.views import generic
@@ -15,6 +16,7 @@ from tulius import forms
 from tulius.profile import views as profile_views
 from tulius.games import models as games
 from tulius.websockets import context_processors as websock_context
+from tulius import celery
 
 
 class HomeView(generic.TemplateView):
@@ -206,3 +208,19 @@ class StatisticsView(generic.TemplateView):
         kwargs['graph_type'] = graph_type
         kwargs['graph'] = graph
         return kwargs
+
+
+class CeleryStatusAPI(generic.View):
+    @staticmethod
+    def get(request, **_kwargs):
+        if not request.user.is_superuser:
+            raise exceptions.PermissionDenied()
+        active = celery.app.control.inspect().active() or {}
+        for worker_data in active.values():
+            for task in worker_data:
+                task['time_start'] = str(
+                    datetime.datetime.fromtimestamp(task['time_start']))
+        return http.JsonResponse({
+            'stats': celery.app.control.inspect().stats() or {},
+            'active': active,
+        })

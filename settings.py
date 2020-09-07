@@ -13,7 +13,7 @@ env = {
 }[branch]
 
 ENV = env
-BASE_DIR = os.path.dirname(__file__) + '/'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__)) + '/'
 PROJECT_NAME = 'tulius'
 
 ROOT_URLCONF = 'tulius.urls'
@@ -69,8 +69,10 @@ INSTALLED_APPS = (
     'djfw.photos',
     'djfw.sortable',
     'djfw.custom_views',
+    'django_celery_results',
+    'tulius.core.debug_mail',
     'tulius.pm',
-    'tulius',
+    'tulius.TuliusConfig',
     'tulius.core.ckeditor',
     'tulius.login',
     'tulius.players',
@@ -248,8 +250,8 @@ EMAIL_USE_TLS = False
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 
 if env != 'prod':
-    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-    EMAIL_FILE_PATH = BASE_DIR +  'mail_dump/'
+    EMAIL_BACKEND = 'tulius.core.debug_mail.backend.EmailBackend'
+    EMAIL_FILE_PATH = BASE_DIR + 'data/mail/'
 
 MAIL_RECEIVERS = ['pm.mail.get_mail']
 
@@ -319,3 +321,8 @@ RAVEN_CONFIG = {
     'integrations': [DjangoIntegration()],
     'send_default_pii': True,
 }
+
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_BROKER_URL = 'redis://{host}:{port}/{db}'.format(**REDIS_CONNECTION)
+CELERY_WORKER_CONCURRENCY = 3
+CELERY_EVENT_QUEUE_PREFIX = f'{env}_'
