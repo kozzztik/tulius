@@ -2,8 +2,9 @@ import os
 
 from celery import Celery
 
-settings_file = 'settings_production' \
-    if os.path.exists('../settings_production.py') else 'settings'
+BASE_DIR = os.path.dirname(os.path.dirname(__file__)) + '/'
+path = os.path.join(BASE_DIR, 'settings_production.py')
+settings_file = 'settings_production' if os.path.exists(path) else 'settings'
 
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', settings_file)

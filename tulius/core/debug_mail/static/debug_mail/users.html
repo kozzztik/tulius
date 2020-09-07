@@ -1,0 +1,33 @@
+<div class="content">
+    <div class="caption" align="center">
+        <div class="captionleft"></div>
+        <div class="captioncontent">
+            Получатели почты
+        </div>
+        <div class="captionright"></div>
+    </div>
+    <div class="row m-1">
+        <label class="col-2 col-form-label">
+            Поиск
+        </label>
+        <b-form-input type="text" name="text" class="form-control col-10" v-model="search_text" @change="do_search()"></b-form-input>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Получатель</th>
+                <th>Писем</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="user in users">
+                <td>
+                    <router-link :to="{name: 'debug_mail_box', params: {email: user.name}}">
+                        {{ user.name }}
+                    </router-link>
+                </td>
+                <td>{{ user.count }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
