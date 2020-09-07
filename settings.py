@@ -70,6 +70,7 @@ INSTALLED_APPS = (
     'djfw.sortable',
     'djfw.custom_views',
     'django_celery_results',
+    'tulius.core.debug_mail',
     'tulius.pm',
     'tulius.TuliusConfig',
     'tulius.core.ckeditor',
@@ -249,8 +250,8 @@ EMAIL_USE_TLS = False
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 
 if env != 'prod':
-    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-    EMAIL_FILE_PATH = BASE_DIR +  'mail_dump/'
+    EMAIL_BACKEND = 'tulius.core.debug_mail.backend.EmailBackend'
+    EMAIL_FILE_PATH = BASE_DIR + 'data/mail/'
 
 MAIL_RECEIVERS = ['pm.mail.get_mail']
 

@@ -49,6 +49,10 @@ urlpatterns = [
         name='flatpages_api'),
     url(r'^api/app_settings/$', views.AppSettingsAPI.as_view(),
         name='app_settings'),
+    url(
+        r'^api/debug_mail/',
+        include('tulius.core.debug_mail.urls', namespace='debug_mail_api')),
+    url(r'^debug_mail/', views.IndexVue.as_view(), name='debug_mail'),
 
     url(r'^statistics/$', views.StatisticsView.as_view(), name='stats'),
 

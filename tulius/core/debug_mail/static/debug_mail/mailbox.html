@@ -1,0 +1,30 @@
+<div class="content">
+    <div class="caption" align="center">
+        <div class="captionleft"></div>
+        <div class="captioncontent">
+            {{ email }}
+        </div>
+        <div class="captionright"></div>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Размер</th>
+                <th>Дата</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="mail in mailbox">
+                <td>
+                    <router-link :to="{name: 'debug_mail_text', params: {email: email, pk: mail.name}}">
+                        {{ mail.name }}
+                    </router-link>
+                </td>
+                <td>{{ mail.size }}</td>
+                <td>{{ mail.date }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
