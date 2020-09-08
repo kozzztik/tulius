@@ -53,9 +53,7 @@ class ReadmarkAPI(views.BaseThreadView):
             ).exclude(user=self.user).order_by('id').first()
         else:
             not_read = None
-            read_id = comment_models.get_param(
-                'last_comment', thread, self.user,
-                superuser=self.user.is_superuser)
+            read_id = thread.last_comment[self.user]
         read_mark.readed_comment_id = read_id
         read_mark.not_readed_comment_id = not_read.pk if not_read else None
         read_mark.save()
@@ -165,9 +163,7 @@ class ReadmarkAPI(views.BaseThreadView):
     @classmethod
     def on_thread_prepare_thread(cls, threads, view, **_kwargs):
         for thread in threads:
-            thread.last_comment_id = comment_models.get_param(
-                'last_comment', thread, view.user.pk,
-                superuser=view.user.is_superuser) or 0
+            thread.last_comment_id = thread.last_comment[view.user] or 0
         threads.sort(key=lambda t: t.last_comment_id, reverse=True)
         if not view.user.is_anonymous:
             read_marks = cls.read_mark_model.objects.filter(

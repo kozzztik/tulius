@@ -24,6 +24,3 @@ class Comment(comment_models.AbstractComment):
                 'pk': self.pk,
                 'variation_id': self.parent.variation_id,
             })
-
-
-get_param = comment_models.get_param

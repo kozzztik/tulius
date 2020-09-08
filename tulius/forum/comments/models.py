@@ -102,12 +102,7 @@ class Comment(AbstractComment):
     pass
 
 
-def get_param(param, thread, user_id, superuser=False):
-    data = thread.data.get(param)
-    if not data:
-        return None
-    if superuser:
-        return data['su']
-    if user_id and str(user_id) in data['users']:
-        return data['users'][str(user_id)]
-    return data['all']
+thread_models.AbstractThread.last_comment = thread_models.CounterField(
+    'last_comment')
+thread_models.AbstractThread.comments_count = thread_models.CounterField(
+    'comments_count', default=0)

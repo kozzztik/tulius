@@ -11,7 +11,7 @@ User = get_user_model()
 class RolesRights:
     data = None
 
-    def __init__(self, instance, name):
+    def __init__(self, instance, name, default):
         self.data = instance.data
 
     def __getitem__(self, item):

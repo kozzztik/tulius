@@ -39,15 +39,20 @@ def default_json():
     return {}
 
 
+DEFAULT = object()
+
+
 class Counter:
     data = None
     name = None
     instance = None
+    default = None
 
-    def __init__(self, instance, name):
+    def __init__(self, instance, name, default=None):
         self.name = name
         self.instance = instance
         self.data = instance.data.get(name)
+        self.default = default
         if not self.data:
             self.cleanup()
 
@@ -64,15 +69,17 @@ class Counter:
         return self.data['all']
 
     def __setitem__(self, key, value):
-        if hasattr(key, 'pk'):
-            key = key.pk
+        # if hasattr(key, 'pk'):
+        #     key = key.pk
         for user in self.data['users']:
             if user['id'] == key:
                 user['value'] = value
                 return
         self.data['users'].append({'id': key, 'value': value})
 
-    def cleanup(self, default=None):
+    def cleanup(self, default=DEFAULT):
+        if default is DEFAULT:
+            default = self.default
         self.data = {'all': default, 'su': default, 'users': []}
         self.instance.data[self.name] = self.data
 
@@ -110,14 +117,15 @@ class RightsCounter(Counter):
 class CounterField:
     name = None
     counter_class = None
+    default = None
 
-    def __init__(self, name, counter_class=Counter):
+    def __init__(self, name, counter_class=Counter, default=None):
         self.name = name
         self.counter_class = counter_class
+        self.default = default
 
     def __get__(self, instance, owner):
-        return self.counter_class(instance, self.name)
-
+        return self.counter_class(instance, self.name, default=self.default)
 
 
 class AbstractThread(mptt_models.MPTTModel):
