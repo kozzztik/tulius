@@ -91,18 +91,15 @@ class BaseThreadView(core.BaseAPIView):
     def create_thread(self, data):
         room = bool(data['room'])
         important = ((not room) and data.get('important', False))
-        return self.thread_model(
+        obj = self.thread_model(
             parent=self.obj, room=room,
             title=data['title'], body=data['body'],
             user=self.user,
-            data={
-                'rights': {
-                    'all': 0,
-                    'users': {},
-                }
-            },
+            data={},
             important=important and self.obj.moderate_right(self.user),
         )
+        obj.rights.cleanup(default=0)
+        return obj
 
     def update_thread(self, data):
         self.obj.title = data['title']

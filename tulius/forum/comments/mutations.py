@@ -38,7 +38,7 @@ class ThreadCommentAdd(mutations.Mutation):
         comments_count = self.get_comments_count(instance)
         comments_count['su'] += 1
         last_comment['su'] = self.comment.pk
-        if updated_child.rights(None) & models.ACCESS_READ:
+        if updated_child.rights.all & models.ACCESS_READ:
             last_comment['all'] = self.comment.pk
             last_comment['users'] = {
                 u: self.comment.pk for u in last_comment['users'].keys()}
@@ -46,7 +46,7 @@ class ThreadCommentAdd(mutations.Mutation):
             for u, count in comments_count['users'].items():
                 comments_count['users'][u] = count + 1
         else:
-            for user, right in self.thread.data['rights']['users'].items():
+            for user, right in self.thread.rights:
                 if right & models.ACCESS_READ:
                     last_comment['users'][str(user)] = self.comment.pk
                     comments_count['users'][str(user)] = \
@@ -77,7 +77,7 @@ class FixCounters(mutations.Mutation):
                     (not last_comment['su']) or
                     (pk > last_comment['su'])):
                 last_comment['su'] = pk
-            if c.rights(None) & models.ACCESS_READ:
+            if c.rights.all & models.ACCESS_READ:
                 pk = c.data['last_comment']['all']
                 if pk and (
                         (not last_comment['all']) or
@@ -92,7 +92,7 @@ class FixCounters(mutations.Mutation):
                 for u, count in comments_count['users'].items():
                     comments_count['users'][u] = count + child_count
             else:
-                for user, right in c.data['rights']['users'].items():
+                for user, right in c.rights:
                     if right & models.ACCESS_READ:
                         pk = comment_models.get_param(
                             'last_comment', instance, user)

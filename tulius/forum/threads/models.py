@@ -39,6 +39,87 @@ def default_json():
     return {}
 
 
+class Counter:
+    data = None
+    name = None
+    instance = None
+
+    def __init__(self, instance, name):
+        self.name = name
+        self.instance = instance
+        self.data = instance.data.get(name)
+        if not self.data:
+            self.cleanup()
+
+    def __getitem__(self, item):
+        if hasattr(item, 'is_anonymous'):
+            if item.is_anonymous:
+                return self.data['all']
+            if item.is_superuser:
+                return self.data['su']
+            item = item.pk
+        for user in self.data['users']:
+            if user['id'] == item:
+                return user['value']
+        return self.data['all']
+
+    def __setitem__(self, key, value):
+        if hasattr(key, 'pk'):
+            key = key.pk
+        for user in self.data['users']:
+            if user['id'] == key:
+                user['value'] = value
+                return
+        self.data['users'].append({'id': key, 'value': value})
+
+    def cleanup(self, default=None):
+        self.data = {'all': default, 'su': default, 'users': []}
+        self.instance.data[self.name] = self.data
+
+    def __iter__(self):
+        for i in self.data['users']:
+            yield i['id'], i['value']
+
+    @property
+    def all(self):
+        return self.data['all']
+
+    @all.setter
+    def all(self, value):
+        self.data['all'] = value
+
+    @property
+    def su(self):
+        return self.data['su']
+
+    @su.setter
+    def su(self, value):
+        self.data['su'] = value
+
+
+class RightsCounter(Counter):
+    @property
+    def all_inherit(self):
+        return self.data.get('all_inherit')
+
+    @all_inherit.setter
+    def all_inherit(self, value):
+        self.data['all_inherit'] = value
+
+
+class CounterField:
+    name = None
+    counter_class = None
+
+    def __init__(self, name, counter_class=Counter):
+        self.name = name
+        self.counter_class = counter_class
+
+    def __get__(self, instance, owner):
+        return self.counter_class(instance, self.name)
+
+
+
 class AbstractThread(mptt_models.MPTTModel):
     """
     Forum thread
@@ -105,45 +186,36 @@ class AbstractThread(mptt_models.MPTTModel):
     def get_absolute_url(self):
         return urls.reverse('forum_api:thread', kwargs={'pk': self.pk})
 
-    def rights(self, user_id):
-        rights = self.data['rights']
-        result = rights['all']
-        if user_id:
-            result |= rights['users'].get(str(user_id), 0)
-        return result
+    rights = CounterField('rights', counter_class=RightsCounter)
 
     def read_right(self, user):
         return bool(
-            user.is_superuser or (self.rights(user.pk) & ACCESS_READ))
+            user.is_superuser or (self.rights[user] & ACCESS_READ))
 
     def write_right(self, user):
         return bool(
             (not self.closed) and
-            (user.is_superuser or (self.rights(user.pk) & ACCESS_WRITE)))
+            (user.is_superuser or (self.rights[user] & ACCESS_WRITE)))
 
     def moderate_right(self, user):
         return bool(
-            user.is_superuser or (self.rights(user.pk) & ACCESS_MODERATE))
+            user.is_superuser or (self.rights[user] & ACCESS_MODERATE))
 
     def edit_right(self, user):
         return bool(
-            user.is_superuser or (self.rights(user.pk) & ACCESS_EDIT))
+            user.is_superuser or (self.rights[user] & ACCESS_EDIT))
 
     @property
     def moderators(self):
         return User.objects.filter(pk__in=[
-            pk for pk, right in
-            self.data.get('rights', {}).get('users', {}).items()
-            if right & ACCESS_MODERATE])
+            pk for pk, right in self.rights if right & ACCESS_MODERATE])
 
     @property
     def accessed_users(self):
         if self.default_rights != NO_ACCESS:
             return None
         return User.objects.filter(pk__in=[
-            pk for pk, right in
-            self.data.get('rights', {}).get('users', {}).items()
-            if right & ACCESS_READ])
+            pk for pk, right in self.rights if right & ACCESS_READ])
 
     def rights_to_json(self, user):
         return {
