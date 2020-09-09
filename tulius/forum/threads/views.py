@@ -48,7 +48,6 @@ class BaseThreadView(core.BaseAPIView):
         for room in rooms:
             threads = self.room_descendants(room)[1]
             threads = self._thread_list_apply_rights(threads)
-            room.threads_count = len(threads)
             signals.prepare_room.send(
                 self.thread_model, room=room, threads=threads, view=self)
         return rooms
@@ -81,7 +80,8 @@ class BaseThreadView(core.BaseAPIView):
             'accessed_users': None if thread.accessed_users is None else [
                 user.to_json() for user in thread.accessed_users
             ],
-            'threads_count': thread.threads_count if thread.room else None,
+            'threads_count': thread.threads_count[self.user],
+            'rooms_count': thread.rooms_count[self.user],
             'url': thread.get_absolute_url(),
         }
         signals.room_to_json.send(
@@ -141,6 +141,8 @@ class BaseThreadView(core.BaseAPIView):
 
 
 class ThreadView(BaseThreadView):
+    create_mutation = mutations.ThreadCreateMutation
+
     def get_context_data(self, **kwargs):
         super(ThreadView, self).get_context_data(**kwargs)
         if self.obj is None:
@@ -182,7 +184,7 @@ class ThreadView(BaseThreadView):
             self.thread_model, instance=self.obj, data=data, view=self,
             preview=preview)
         if not preview:
-            self.obj.save()
+            self.create_mutation(self.obj).apply()
         signals.after_create.send(
             self.thread_model, instance=self.obj, data=data, preview=preview,
             view=self)
@@ -216,6 +218,7 @@ class ThreadView(BaseThreadView):
 
 class IndexView(BaseThreadView):
     rights_model = rights_models.ThreadAccessRight
+    create_mutation = mutations.ThreadCreateMutation
 
     def get_index(self, level):
         threads = self.thread_model.objects.filter(level=level, deleted=False)
@@ -272,7 +275,7 @@ class IndexView(BaseThreadView):
         signals.before_create.send(
             self.thread_model, instance=thread, data=data, view=self,
             preview=False)
-        thread.save()
+        self.create_mutation(thread).apply()
         signals.after_create.send(
             self.thread_model, instance=thread, data=data, preview=False,
             view=self)

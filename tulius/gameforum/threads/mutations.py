@@ -4,6 +4,10 @@ from tulius.forum.comments import mutations as comments_mutatuions
 from tulius.gameforum.comments import models as comment_models
 
 
+class ThreadCreateMutation(mutations.ThreadCreateMutation):
+    pass
+
+
 class ThreadFixCounters(mutations.ThreadFixCounters):
     def fix_variation(self, instance):
         if instance.parent_id or not instance.pk:

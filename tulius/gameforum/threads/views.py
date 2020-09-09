@@ -92,7 +92,8 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
             'accessed_users': None if thread.accessed_users is None else [
                 self.role_to_json(user) for user in thread.accessed_users
             ],
-            'threads_count': thread.threads_count if thread.room else None,
+            'threads_count': thread.threads_count[self.user],
+            'rooms_count': thread.rooms_count[self.user],
             'url': thread.get_absolute_url(),
         }
         signals.room_to_json.send(
@@ -142,7 +143,7 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
 
 
 class ThreadAPI(views.ThreadView, BaseThreadAPI):
-    pass
+    create_mutation = mutations.ThreadCreateMutation
 
 
 class MoveThreadView(views.MoveThreadView, BaseThreadAPI):

@@ -195,6 +195,8 @@ class AbstractThread(mptt_models.MPTTModel):
         return urls.reverse('forum_api:thread', kwargs={'pk': self.pk})
 
     rights = CounterField('rights', counter_class=RightsCounter)
+    threads_count = CounterField('threads', default=0)
+    rooms_count = CounterField('rooms', default=0)
 
     def read_right(self, user):
         return bool(
