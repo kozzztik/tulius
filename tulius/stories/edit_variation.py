@@ -5,7 +5,7 @@ from django import shortcuts
 from django import urls
 from django.views import generic
 from django.contrib.auth import decorators
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from djfw import subviews
 from djfw import views as djfw_views
