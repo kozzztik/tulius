@@ -3,7 +3,6 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import jsonfield.fields
 import mptt.fields
 import tulius.forum.threads.models
 
@@ -54,9 +53,9 @@ class Migration(migrations.Migration):
                     default=False, verbose_name='important')),
                 ('deleted', models.BooleanField(
                     default=False, verbose_name='deleted')),
-                ('data', jsonfield.fields.JSONField(
+                ('data', models.JSONField(
                     default=tulius.forum.threads.models.default_json)),
-                ('media', jsonfield.fields.JSONField(
+                ('media', models.JSONField(
                     default=tulius.forum.threads.models.default_json)),
                 ('lft', models.PositiveIntegerField(
                     db_index=True, editable=False)),

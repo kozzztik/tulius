@@ -1,8 +1,8 @@
 """
 Forum comment models for Tulius project
 """
-import jsonfield
 from django import urls
+import django.core.serializers.json
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
@@ -85,8 +85,12 @@ class AbstractComment(models.Model):
         blank=False,
         verbose_name=_(u'order'),
     )
-    data = jsonfield.JSONField(default=default_json)
-    media = jsonfield.JSONField(default=default_json)
+    data = models.JSONField(
+        default=default_json,
+        encoder=django.core.serializers.json.DjangoJSONEncoder)
+    media = models.JSONField(
+        default=default_json,
+        encoder=django.core.serializers.json.DjangoJSONEncoder)
 
     def __str__(self):
         return self.title[:40] if self.title else self.body[:40]

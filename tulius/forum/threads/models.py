@@ -1,8 +1,8 @@
 """
 Forum engine base Thread entity
 """
-import jsonfield
 from django import urls
+import django.core.serializers.json
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
@@ -182,8 +182,12 @@ class AbstractThread(mptt_models.MPTTModel):
         default=False,
         verbose_name=_(u'deleted')
     )
-    data = jsonfield.JSONField(default=default_json)
-    media = jsonfield.JSONField(default=default_json)
+    data = models.JSONField(
+        default=default_json,
+        encoder=django.core.serializers.json.DjangoJSONEncoder)
+    media = models.JSONField(
+        default=default_json,
+        encoder=django.core.serializers.json.DjangoJSONEncoder)
 
     def __str__(self):
         return (self.title or self.body)[:40]

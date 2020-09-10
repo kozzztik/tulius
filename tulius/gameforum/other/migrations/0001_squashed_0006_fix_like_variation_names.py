@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import jsonfield.fields
+
 import tulius.forum.other.models
 
 
@@ -66,7 +66,7 @@ class Migration(migrations.Migration):
                     on_delete=django.db.models.deletion.PROTECT,
                     related_name='game_liked_comments',
                     to=settings.AUTH_USER_MODEL, verbose_name='user')),
-                ('data', jsonfield.fields.JSONField(
+                ('data', models.JSONField(
                     default=tulius.forum.other.models.default_json)),
 
             ],

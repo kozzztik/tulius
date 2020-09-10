@@ -1,9 +1,9 @@
 import typing
 
+import django.core.serializers.json
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
-import jsonfield
 
 from tulius.forum.threads import models as thread_models
 from tulius.forum.comments import models as comment_models
@@ -67,7 +67,9 @@ class AbstractCommentLike(models.Model):
         related_name='liked',
         verbose_name=_('comment'),
     )
-    data: typing.Dict = jsonfield.JSONField(default=default_json)
+    data: typing.Dict = models.JSONField(
+        default=default_json,
+        encoder=django.core.serializers.json.DjangoJSONEncoder)
 
 
 class CommentLike(AbstractCommentLike):

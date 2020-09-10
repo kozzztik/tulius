@@ -23,4 +23,4 @@ RUN pip install uwsgi django==3.1.1 pytz==2020.1 pillow==6.2.0 \
     celery==4.4.7 django-celery-results==1.2.1 \
     requests==2.24.0 sentry-sdk==0.17.4 aiohttp==3.6.2 \
     pylint==2.5.0 pytest==5.4.1 pytest-cov==2.8.1 \
-    coverage==4.5.4 python-coveralls==2.9.3 jsonfield2==4.0.0
+    coverage==4.5.4 python-coveralls==2.9.3
