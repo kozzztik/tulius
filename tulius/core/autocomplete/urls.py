@@ -1,10 +1,11 @@
-from django.conf.urls import url
+from django.conf import urls
 
 from tulius.core.autocomplete import views
 
 app_name = 'tulius.core.autocomplete'
 
 urlpatterns = [
-    url('user', views.autocomplete_user, name='user'),
-    url(r'^(?P<token>[\w-]+)/$', views.get_autocomplete, name='autocomplete'),
+    urls.re_path('user', views.autocomplete_user, name='user'),
+    urls.re_path(
+        r'^(?P<token>[\w-]+)/$', views.get_autocomplete, name='autocomplete'),
 ]

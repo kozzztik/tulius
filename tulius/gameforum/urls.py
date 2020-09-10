@@ -12,60 +12,60 @@ from tulius.gameforum.other import views as other
 app_name = 'tulius.gameforum'
 
 urlpatterns = [
-    urls.url(
+    urls.re_path(
         r'^favorites/$',
         other.Favorites.as_view(), name='favorites'),
-    urls.url(
+    urls.re_path(
         r'^thread_redirrect/(?P<pk>\d+)/$',
         views.RedirrectAPI.as_view(), name='thread_redirect'),
-    urls.url(
+    urls.re_path(
         r'^game/(?P<pk>\d+)/$',
         views.GameAPI.as_view(), name='game'),
-    urls.url(
+    urls.re_path(
         r'^variation/(?P<variation_id>\d+)/$',
         views.VariationAPI.as_view(), name='variation'),
-    urls.url(
+    urls.re_path(
         r'^variation/(?P<variation_id>\d+)/likes/$',
         other.Likes.as_view(), name='likes'),
-    urls.url(
+    urls.re_path(
         r'^variation/(?P<variation_id>\d+)/trust_mark/(?P<role_id>\d+)/$',
         trust_marks.TrustMarkAPI.as_view(), name='trust_mark'),
-    urls.url(
+    urls.re_path(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/$',
         threads.ThreadAPI.as_view(), name='thread'),
-    urls.url(
+    urls.re_path(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/fix/$',
         threads.CountersFix.as_view(), name='fix_thread_counters'),
-    urls.url(
+    urls.re_path(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/comments_page/$',
         comments.CommentsPageAPI.as_view(), name='comments_page'),
-    urls.url(
+    urls.re_path(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/read_mark/$',
         other.ReadmarkAPI.as_view(), name='thread_readmark'),
-    urls.url(
+    urls.re_path(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)'
         r'/granted_rights/$',
         rights_api.GrantedRightsAPI.as_view(), name='thread_rights'),
-    urls.url(
+    urls.re_path(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/granted_rights/'
         r'(?P<right_id>\d+)/$',
         rights_api.GrantedRightAPI.as_view(), name='thread_right'),
-    urls.url(
+    urls.re_path(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/online_status/$',
         online_status.OnlineStatusAPI.as_view(), name='online_status'),
-    urls.url(
+    urls.re_path(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/search/$',
         other.Search.as_view(), name='thread_search'),
-    urls.url(
+    urls.re_path(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/move/$',
         threads.MoveThreadView.as_view(), name='thread_move'),
-    urls.url(
+    urls.re_path(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/restore/$',
         threads.RestoreThreadView.as_view(), name='restore_thread'),
-    urls.url(
+    urls.re_path(
         r'^variation/(?P<variation_id>\d+)/comment/(?P<pk>\d+)/$',
         comments.CommentAPI.as_view(), name='comment'),
-    urls.url(
+    urls.re_path(
         r'^variation/(?P<variation_id>\d+)/comment/(?P<pk>\d+)/voting/$',
         other.VotingAPI.as_view(), name='voting'),
 ]

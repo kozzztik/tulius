@@ -1,15 +1,17 @@
-from django.conf.urls import url
+from django.conf import urls
 
 from djfw.tinymce import views
 
 app_name = 'djfw.tinymce'
 
 urlpatterns = [
-    url(r'^$', views.Smiles.as_view(), name='index'),
-    url(r'^emotions/emotions.htm$', views.Smiles.as_view(), name='smiles'),
-    url(
+    urls.re_path(r'^$', views.Smiles.as_view(), name='index'),
+    urls.re_path(
+        r'^emotions/emotions.htm$', views.Smiles.as_view(), name='smiles'),
+    urls.re_path(
         r'^uploaded_files/$',
         views.Uploaded_files.as_view(),
         name='uploaded_files'),
-    url(r'^upload_file/$', views.Upload_file.as_view(), name='upload_file'),
+    urls.re_path(
+        r'^upload_file/$', views.Upload_file.as_view(), name='upload_file'),
 ]

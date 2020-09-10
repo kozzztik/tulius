@@ -1,11 +1,11 @@
-from django.conf.urls import url
+from django.conf import urls
 
 from djfw.installer import views
 
 app_name = 'djfw.installer'
 
 urlpatterns = [
-    url(
+    urls.re_path(
         r'^download/(?P<object_id>\d+)/$',
         views.download_backup,
         name='backup'),
