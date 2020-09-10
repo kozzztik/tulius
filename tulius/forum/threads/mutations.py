@@ -87,15 +87,7 @@ class MutationController:
     def apply(self):
         parents = None
         if self.parent_mutations:
-            if self.instance.pk:
-                parents = list(
-                    self.instance.get_ancestors().select_for_update())
-            elif self.instance.parent:
-                parents = list(
-                    self.instance.parent.get_ancestors(
-                        include_self=True).select_for_update())
-            else:
-                parents = []
+            parents = list(self.instance.get_parents().select_for_update())
         for mutation in self.mutations:
             mutation.process_thread(self.instance)
         descendants_mutations = [
@@ -112,12 +104,12 @@ class MutationController:
             self._apply_parents(self.instance, parents, self.parent_mutations)
 
 
-def on_mutation(mutation, **kwargs):
+def on_mutation(parent_mutation, **kwargs):
     def decorator(mutation_class):
-        def chain_mutations(instance, **_kwargs):
-            return mutation_class(instance, **kwargs)
+        def chain_mutations(instance, mutation, **_kwargs):
+            return mutation_class(instance, parent=mutation, **kwargs)
         signals.apply_mutation.connect(
-            chain_mutations, sender=mutation, weak=False)
+            chain_mutations, sender=parent_mutation, weak=False)
         return mutation_class
     return decorator
 
@@ -128,6 +120,11 @@ class ThreadCreateMutation(Mutation):
     with_post_process = True
     all_read = True
     read_list = None
+    data = None
+
+    def __init__(self, thread, data, **kwargs):
+        self.data = data
+        super(ThreadCreateMutation, self).__init__(thread, **kwargs)
 
     def process_thread(self, instance):
         instance.threads_count.cleanup()
@@ -163,8 +160,12 @@ class ThreadCreateMutation(Mutation):
                 counter[u] += 1
 
 
-class ThreadCountersBase(Mutation):
-    def _calc_counters(self, instance, children):
+class ThreadCounters(Mutation):
+    with_post_process = True
+    with_parent = True
+
+    @staticmethod
+    def _calc_counters(instance, children):
         instance.rooms_count.cleanup()
         instance.threads_count.cleanup()
         for c in children:
@@ -192,8 +193,11 @@ class ThreadCountersBase(Mutation):
                         instance.threads_count[u] += c.threads_count[u]
                         counter[u] += 1
 
+    def post_process(self, instance, children):
+        self._calc_counters(instance, children)
 
-class ThreadDeleteMutation(ThreadCountersBase):
+
+class ThreadDeleteMutation(ThreadCounters):
     with_descendants = True
     with_parent = True
     with_post_process = True
@@ -225,7 +229,7 @@ class ThreadDeleteMutation(ThreadCountersBase):
         self._calc_counters(instance, children)
 
 
-class ThreadFixCounters(ThreadCountersBase):
+class ThreadFixCounters(ThreadCounters):
     result = None
     user = None
     with_descendants = True
@@ -251,9 +255,6 @@ class ThreadFixCounters(ThreadCountersBase):
             instance.data['parents'] = []
         instance.__class__.objects.partial_rebuild(instance.tree_id)
         self.update_result(instance)
-
-    def post_process(self, instance, children):
-        self._calc_counters(instance, children)
 
     def process_descendant(self, instance, parent):
         self.update_result(instance)

@@ -14,7 +14,7 @@ class VariationMutationMixin(base_mutations.Mutation):
     admins = None
     guests = None
 
-    def __init__(self, thread, variation):
+    def __init__(self, thread, variation, **_kwargs):
         super(VariationMutationMixin, self).__init__(thread)
         self.variation = variation
         self.all_roles = {
@@ -122,13 +122,22 @@ def on_fix_counters(instance, **_kwargs):
     return UpdateRights(instance, variation)
 
 
+base_mutations.on_mutation(UpdateRights)(base_mutations.ThreadCounters)
+
 signals.apply_mutation.connect(
     on_fix_counters, sender=thread_mutations.ThreadFixCounters)
 
 
+@base_mutations.on_mutation(thread_mutations.ThreadCreateMutation)
 class UpdateRightsOnThreadCreate(
         UpdateRights, mutations.UpdateRightsOnThreadCreate,
         VariationMutationMixin):
+    def __init__(
+            self, thread, parent=None, data=None, variation=None, **kwargs):
+        super(UpdateRightsOnThreadCreate, self).__init__(
+            thread, parent=parent, data=data,
+            variation=variation or parent.variation, **kwargs)
+
     def _query_granted_exceptions(self, instance):
         return [
             rights_models.GameThreadRight(

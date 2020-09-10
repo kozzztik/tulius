@@ -12,18 +12,11 @@ from tulius.games import models as game_models
 from tulius.stories import models as stories_models
 
 
-@dispatch.receiver(thread_signals.before_create, sender=thread_models.Thread)
-def before_create_thread(instance, data, preview, view, **_kwargs):
-    if not preview:
-        mutations.UpdateRightsOnThreadCreate(
-            instance, data, variation=view.variation).apply()
-
-
 @dispatch.receiver(thread_signals.after_create, sender=thread_models.Thread)
 def after_create_thread(instance, data, preview, view, **_kwargs):
     if not preview:
         mutations.UpdateRightsOnThreadCreate(
-            instance, data, variation=view.variation).save_exceptions()
+            instance, data=data, variation=view.variation).save_exceptions()
 
 
 @dispatch.receiver(game_signals.game_status_changed)

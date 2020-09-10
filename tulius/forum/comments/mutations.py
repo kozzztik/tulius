@@ -44,7 +44,7 @@ class FixCounters(mutations.Mutation):
     with_descendants = True
     result = None
 
-    def __init__(self, thread, result=None):
+    def __init__(self, thread, result=None, **_kwargs):
         super(FixCounters, self).__init__(thread)
         self.result = result
 

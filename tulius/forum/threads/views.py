@@ -35,7 +35,7 @@ class BaseThreadView(core.BaseAPIView):
             thread for thread in thread_list if thread.read_right(self.user)]
 
     def room_descendants(self, room):
-        if not room.descendant_count():
+        if not room.threads_count[self.user] + room.rooms_count[self.user]:
             return [], []
         threads = room.get_descendants().filter(deleted=False)
         readable = [t for t in threads if t.read_right(self.user)]
@@ -121,7 +121,7 @@ class BaseThreadView(core.BaseAPIView):
                 'id': parent.id,
                 'title': parent.title,
                 'url': parent.get_absolute_url(),
-            } for parent in self.obj.get_ancestors()] if self.obj.pk else None,
+            } for parent in self.obj.get_parents()],
             'rights': self.obj.rights_to_json(self.user),
             'default_rights': self.obj.default_rights,
         }
@@ -184,7 +184,7 @@ class ThreadView(BaseThreadView):
             self.thread_model, instance=self.obj, data=data, view=self,
             preview=preview)
         if not preview:
-            self.create_mutation(self.obj).apply()
+            self.create_mutation(self.obj, data=data, view=self).apply()
         signals.after_create.send(
             self.thread_model, instance=self.obj, data=data, preview=preview,
             view=self)
@@ -275,7 +275,7 @@ class IndexView(BaseThreadView):
         signals.before_create.send(
             self.thread_model, instance=thread, data=data, view=self,
             preview=False)
-        self.create_mutation(thread).apply()
+        self.create_mutation(thread, data=data, view=self).apply()
         signals.after_create.send(
             self.thread_model, instance=thread, data=data, preview=False,
             view=self)
@@ -298,7 +298,8 @@ class MoveThreadView(BaseThreadView):
         self.get_parent_thread(for_update=True, **kwargs)
         if not self.obj.edit_right(self.user):
             raise exceptions.PermissionDenied('No source edit right')
-        if new_parent.is_descendant_of(self.obj, include_self=True):
+        if self.obj.pk in new_parent.data['parents'] or (
+                new_parent.pk == self.obj.pk):
             raise exceptions.PermissionDenied('Cant move inside yourself')
         old_parent = self.obj.parent
         self.obj.parent = new_parent

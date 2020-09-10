@@ -31,10 +31,11 @@ class ReadmarkAPI(views.BaseThreadView):
 
     def mark_room_as_read(self, room):
         if room:
-            threads = room.get_children()
+            threads = room.get_children(self.user, deleted=False)
         else:
-            threads = self.thread_model.objects.filter(parent=None)
-        for thread in threads.exclude(deleted=True):
+            threads = self.thread_model.objects.filter(
+                parent=None, deleted=False)
+        for thread in threads:
             if not thread.read_right(self.user):
                 continue
             if thread.room:

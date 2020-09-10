@@ -58,17 +58,21 @@ class UpdateRights(mutations.Mutation):
         self._process_author(instance)
 
 
+mutations.on_mutation(UpdateRights)(mutations.ThreadCounters)
+
+
+@mutations.on_mutation(mutations.ThreadCreateMutation)
 class UpdateRightsOnThreadCreate(UpdateRights):
     with_descendants = False
     data = None
 
-    def __init__(self, thread, data, **kwargs):
+    def __init__(self, thread, parent=None, data=None, **kwargs):
         super(UpdateRightsOnThreadCreate, self).__init__(thread, **kwargs)
-        self.data = data
-        if data['default_rights'] is None:
+        self.data = data or parent.data
+        if self.data['default_rights'] is None:
             thread.default_rights = None
         else:
-            thread.default_rights = int(data['default_rights'])
+            thread.default_rights = int(self.data['default_rights'])
 
     def _query_granted_exceptions(self, instance):
         return [

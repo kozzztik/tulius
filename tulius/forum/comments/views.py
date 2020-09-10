@@ -198,7 +198,7 @@ class CommentAPI(CommentBase):
             'id': parent.id,
             'title': parent.title,
             'url': parent.get_absolute_url(),
-        } for parent in self.obj.get_ancestors()]
+        } for parent in self.obj.get_parents()]
         return data
 
     @transaction.atomic

@@ -188,8 +188,23 @@ class AbstractThread(mptt_models.MPTTModel):
     def __str__(self):
         return (self.title or self.body)[:40]
 
-    def descendant_count(self):
-        return (self.rght - self.lft - 1) / 2
+    def get_parents(self):
+        if 'parents' not in self.data:
+            if self.parent:
+                self.data['parents'] = \
+                    self.parent.data['parents'] + [self.parent.pk]
+            else:
+                self.data['parents'] = []
+        return self.__class__.objects.filter(
+            pk__in=self.data['parents']).order_by('level')
+
+    # TODO remove lint exception after MPTT remove
+    # pylint: disable=W0221
+    def get_children(self, user, **kwargs):
+        if not self.threads_count[user] + self.rooms_count[user]:
+            return []
+        children = self.__class__.objects.filter(parent=self, **kwargs)
+        return [c for c in children if c.read_right(user)]
 
     def get_absolute_url(self):
         return urls.reverse('forum_api:thread', kwargs={'pk': self.pk})

@@ -5,7 +5,11 @@ from tulius.gameforum.comments import models as comment_models
 
 
 class ThreadCreateMutation(mutations.ThreadCreateMutation):
-    pass
+    variation = None
+
+    def __init__(self, thread, data, view, **kwargs):
+        self.variation = view.variation
+        super(ThreadCreateMutation, self).__init__(thread, data, **kwargs)
 
 
 class ThreadFixCounters(mutations.ThreadFixCounters):
