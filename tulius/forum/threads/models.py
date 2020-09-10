@@ -31,14 +31,6 @@ DEFAULT_RIGHTS_CHOICES = (
 )
 
 
-class ThreadManager(mptt_models.TreeManager):
-    pass
-
-
-def default_json():
-    return {}
-
-
 DEFAULT = object()
 
 
@@ -138,7 +130,7 @@ class AbstractThread(mptt_models.MPTTModel):
         ordering = ['id']
         abstract = True
 
-    objects = ThreadManager()
+    objects = mptt_models.TreeManager()
 
     title = models.CharField(
         max_length=255,
@@ -183,24 +175,26 @@ class AbstractThread(mptt_models.MPTTModel):
         verbose_name=_(u'deleted')
     )
     data = models.JSONField(
-        default=default_json,
+        default=dict, editable=False,
         encoder=django.core.serializers.json.DjangoJSONEncoder)
     media = models.JSONField(
-        default=default_json,
+        default=dict,
         encoder=django.core.serializers.json.DjangoJSONEncoder)
+    parents_ids = models.JSONField(
+        default=None, db_index=True, blank=True, null=True, editable=False)
 
     def __str__(self):
         return (self.title or self.body)[:40]
 
     def get_parents(self):
-        if 'parents' not in self.data:
+        if self.parents_ids is None:
             if self.parent:
-                self.data['parents'] = \
-                    self.parent.data['parents'] + [self.parent.pk]
+                self.parents_ids = \
+                    self.parent.parents_ids + [self.parent.pk]
             else:
-                self.data['parents'] = []
+                self.parents_ids = []
         return self.__class__.objects.filter(
-            pk__in=self.data['parents']).order_by('level')
+            pk__in=self.parents_ids).order_by('level')
 
     # TODO remove lint exception after MPTT remove
     # pylint: disable=W0221

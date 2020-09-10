@@ -130,10 +130,10 @@ class ThreadCreateMutation(Mutation):
         instance.threads_count.cleanup()
         instance.rooms_count.cleanup()
         if instance.parent:
-            instance.data['parents'] = \
-                instance.parent.data['parents'] + [instance.parent.pk]
+            instance.parents_ids = \
+                instance.parent.parents_ids + [instance.parent.pk]
         else:
-            instance.data['parents'] = []
+            instance.parents_ids = []
 
     def post_process(self, instance, children):
         self.all_read &= instance.rights.all & models.ACCESS_READ
@@ -223,7 +223,7 @@ class ThreadDeleteMutation(ThreadCounters):
         instance.deleted = True
 
     def post_process(self, instance, children):
-        if self.thread.pk in instance.data['parents'] or \
+        if self.thread.pk in instance.parents_ids or \
                 self.thread.pk == instance.pk:
             return
         self._calc_counters(instance, children)
@@ -249,10 +249,10 @@ class ThreadFixCounters(ThreadCounters):
         instance.threads_count.cleanup()
         instance.rooms_count.cleanup()
         if instance.parent:
-            instance.data['parents'] = \
-                instance.parent.data['parents'] + [instance.parent.pk]
+            instance.parents_ids = \
+                instance.parent.parents_ids + [instance.parent.pk]
         else:
-            instance.data['parents'] = []
+            instance.parents_ids = []
         instance.__class__.objects.partial_rebuild(instance.tree_id)
         self.update_result(instance)
 

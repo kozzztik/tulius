@@ -3,8 +3,6 @@
 import django.core.serializers.json
 from django.db import migrations, models
 
-import tulius.forum.threads.models
-
 
 class Migration(migrations.Migration):
 
@@ -17,14 +15,21 @@ class Migration(migrations.Migration):
             model_name='thread',
             name='data',
             field=models.JSONField(
-                default=tulius.forum.threads.models.default_json,
+                default=dict, editable=False,
                 encoder=django.core.serializers.json.DjangoJSONEncoder),
         ),
         migrations.AlterField(
             model_name='thread',
             name='media',
             field=models.JSONField(
-                default=tulius.forum.threads.models.default_json,
+                default=dict,
                 encoder=django.core.serializers.json.DjangoJSONEncoder),
+        ),
+        migrations.AddField(
+            model_name='thread',
+            name='parents_ids',
+            field=models.JSONField(
+                blank=True, db_index=True, default=None, editable=False,
+                null=True),
         ),
     ]

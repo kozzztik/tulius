@@ -111,7 +111,6 @@ class BaseThreadView(core.BaseAPIView):
     def obj_to_json(self, deleted=False):
         data = {
             'id': self.obj.pk,
-            'tree_id': self.obj.tree_id,
             'title': self.obj.title,
             'body': bbcodes.bbcode(self.obj.body),
             'room': self.obj.room,
@@ -298,7 +297,7 @@ class MoveThreadView(BaseThreadView):
         self.get_parent_thread(for_update=True, **kwargs)
         if not self.obj.edit_right(self.user):
             raise exceptions.PermissionDenied('No source edit right')
-        if self.obj.pk in new_parent.data['parents'] or (
+        if self.obj.pk in new_parent.parents_ids or (
                 new_parent.pk == self.obj.pk):
             raise exceptions.PermissionDenied('Cant move inside yourself')
         old_parent = self.obj.parent
