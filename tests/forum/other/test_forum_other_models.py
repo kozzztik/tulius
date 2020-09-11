@@ -15,11 +15,6 @@ def test_upload_file_model(user):
     assert not obj.is_image()
 
 
-def test_online_user(user):
-    obj = other_models.OnlineUser(user=user.user)
-    assert str(obj) == user.user.username
-
-
 def test_voting(user):
     obj = other_models.VotingVote(
         user=user.user, choice=1, comment=comment.Comment(title='bar'))

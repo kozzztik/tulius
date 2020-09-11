@@ -1,3 +1,18 @@
+from django import dispatch
+from django.conf import settings
+
+from redis import client
+
+from tulius.forum.threads import signals
+from tulius.forum import online_status
+
+
+@dispatch.receiver(signals.after_create)
+def cleanup_caches(instance, **_kwargs):
+    redis = client.Redis(**settings.REDIS_CONNECTION)
+    redis.delete(online_status.thread_key(instance.__class__, instance.pk))
+
+
 def test_online_status(thread, admin, user):
     # check online on thread
     response = admin.get(f'/api/forum/online_status/{thread["id"]}/')

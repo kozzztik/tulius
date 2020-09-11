@@ -3,8 +3,6 @@
 import django.core.serializers.json
 from django.db import migrations, models
 
-import tulius.forum.other.models
-
 
 class Migration(migrations.Migration):
 
@@ -17,7 +15,10 @@ class Migration(migrations.Migration):
             model_name='commentlike',
             name='data',
             field=models.JSONField(
-                default=tulius.forum.other.models.default_json,
+                default=dict,
                 encoder=django.core.serializers.json.DjangoJSONEncoder),
+        ),
+        migrations.DeleteModel(
+            name='OnlineUser',
         ),
     ]

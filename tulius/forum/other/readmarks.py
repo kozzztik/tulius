@@ -71,7 +71,7 @@ class ReadmarkAPI(views.BaseThreadView):
             ).exclude(user=user).count() + 1
         }
 
-    def post(self, *args, **kwargs):
+    def post(self, *_args, **kwargs):
         if 'pk' in kwargs:
             self.get_parent_thread(**kwargs)
         read_id = json.loads(self.request.body)['comment_id']
@@ -87,7 +87,7 @@ class ReadmarkAPI(views.BaseThreadView):
             ) if read_mark and read_mark.not_readed_comment_id else None
         }
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *_args, **kwargs):
         self.get_parent_thread(**kwargs)
         self.read_mark_model.objects.filter(
             thread=self.obj, user=self.user).delete()
@@ -129,9 +129,7 @@ class ReadmarkAPI(views.BaseThreadView):
         read_marks = []
         if not view.user.is_anonymous:
             read_marks = cls.read_mark_model.objects.filter(
-                thread__tree_id=room.tree_id,
-                thread__lft__gt=room.lft,
-                thread__rght__lt=room.rght,
+                thread__pk__in=[thread.pk for thread in threads],
                 thread__room=False, user=view.user)
         room.unreaded_id = None
         room.unreaded = None

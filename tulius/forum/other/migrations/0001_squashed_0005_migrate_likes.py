@@ -4,8 +4,6 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 
-import tulius.forum.other.models
-
 
 class Migration(migrations.Migration):
 
@@ -64,7 +62,7 @@ class Migration(migrations.Migration):
                     related_name='liked_comments',
                     to=settings.AUTH_USER_MODEL, verbose_name='user')),
                 ('data', models.JSONField(
-                    default=tulius.forum.other.models.default_json)),
+                    default=dict)),
             ],
             options={
                 'verbose_name': 'comment like',
