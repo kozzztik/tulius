@@ -6,15 +6,10 @@ import django.core.serializers.json
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
-from mptt import models as mptt_models
 
 from tulius.forum.threads import models as thread_models
 
 User = get_user_model()
-
-
-def default_json():
-    return {}
 
 
 class AbstractComment(models.Model):
@@ -29,7 +24,7 @@ class AbstractComment(models.Model):
 
     objects = models.Manager()  # linters don't worry, be happy
 
-    parent = mptt_models.TreeForeignKey(
+    parent = models.ForeignKey(
         thread_models.Thread, models.PROTECT,
         null=False,
         blank=False,
@@ -86,10 +81,10 @@ class AbstractComment(models.Model):
         verbose_name=_(u'order'),
     )
     data = models.JSONField(
-        default=default_json,
+        default=dict,
         encoder=django.core.serializers.json.DjangoJSONEncoder)
     media = models.JSONField(
-        default=default_json,
+        default=dict,
         encoder=django.core.serializers.json.DjangoJSONEncoder)
 
     def __str__(self):

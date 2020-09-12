@@ -6,7 +6,6 @@ import django.core.serializers.json
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
-from mptt import models as mptt_models
 
 
 User = get_user_model()
@@ -120,7 +119,7 @@ class CounterField:
         return self.counter_class(instance, self.name, default=self.default)
 
 
-class AbstractThread(mptt_models.MPTTModel):
+class AbstractThread(models.Model):
     """
     Forum thread
     """
@@ -130,7 +129,7 @@ class AbstractThread(mptt_models.MPTTModel):
         ordering = ['id']
         abstract = True
 
-    objects = mptt_models.TreeManager()
+    objects = models.Manager()
 
     title = models.CharField(
         max_length=255,
@@ -138,7 +137,7 @@ class AbstractThread(mptt_models.MPTTModel):
         verbose_name=_('title')
     )
     body = models.TextField(verbose_name=_('body'))
-    parent = mptt_models.TreeForeignKey(
+    parent = models.ForeignKey(
         'self', models.PROTECT,
         null=True, blank=True,
         related_name='children',
@@ -186,18 +185,20 @@ class AbstractThread(mptt_models.MPTTModel):
     def __str__(self):
         return (self.title or self.body)[:40]
 
-    def get_parents(self):
+    def get_parents(self, for_update=False):
         if self.parents_ids is None:
             if self.parent:
                 self.parents_ids = \
                     self.parent.parents_ids + [self.parent.pk]
             else:
                 self.parents_ids = []
-        return self.__class__.objects.filter(
-            pk__in=self.parents_ids).order_by('level')
+        items = self.__class__.objects.filter(pk__in=self.parents_ids)
+        if for_update:
+            items = items.select_for_update()
+        # preserve order
+        items = {item.pk: item for item in items}
+        return [items[pk] for pk in self.parents_ids]
 
-    # TODO remove lint exception after MPTT remove
-    # pylint: disable=W0221
     def get_children(self, user, **kwargs):
         if not self.threads_count[user] + self.rooms_count[user]:
             return []

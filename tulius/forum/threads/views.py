@@ -37,7 +37,8 @@ class BaseThreadView(core.BaseAPIView):
     def room_descendants(self, room):
         if not room.threads_count[self.user] + room.rooms_count[self.user]:
             return [], []
-        threads = room.get_descendants().filter(deleted=False)
+        threads = self.thread_model.objects.filter(
+            deleted=False, parents_ids__contains=room.pk)
         readable = [t for t in threads if t.read_right(self.user)]
         room_list = [thread for thread in readable if thread.room]
         threads = [thread for thread in readable if not thread.room]
@@ -220,7 +221,12 @@ class IndexView(BaseThreadView):
     create_mutation = mutations.ThreadCreateMutation
 
     def get_index(self, level):
-        threads = self.thread_model.objects.filter(level=level, deleted=False)
+        if level:
+            threads = self.thread_model.objects.filter(
+                parent__parent=None, deleted=False)
+        else:
+            threads = self.thread_model.objects.filter(
+                parent=None, deleted=False)
         return self._thread_list_apply_rights(threads)
 
     def room_group_unreaded(self, rooms):
@@ -302,15 +308,10 @@ class MoveThreadView(BaseThreadView):
             raise exceptions.PermissionDenied('Cant move inside yourself')
         old_parent = self.obj.parent
         self.obj.parent = new_parent
-        self.obj.save()
-        if old_parent and ((not new_parent) or (
-                old_parent.tree_id != new_parent.tree_id)):
-            obj = self.thread_model.objects.get(
-                tree_id=old_parent.tree_id, parent=None)
-            self.fix_mutation(obj).apply()
-        if new_parent:
-            obj = self.thread_model.objects.get(
-                tree_id=new_parent.tree_id, parent=None)
+        self.fix_mutation(self.obj).apply()
+        if old_parent:
+            obj = self.thread_model.objects.select_for_update().get(
+                pk=old_parent.pk)
             self.fix_mutation(obj).apply()
         response = self.obj_to_json()
         signals.to_json.send(

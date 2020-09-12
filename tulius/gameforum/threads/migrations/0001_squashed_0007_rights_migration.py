@@ -3,7 +3,6 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import mptt.fields
 
 
 class Migration(migrations.Migration):
@@ -65,7 +64,7 @@ class Migration(migrations.Migration):
                     db_index=True, editable=False)),
                 ('level', models.PositiveIntegerField(
                     db_index=True, editable=False)),
-                ('parent', mptt.fields.TreeForeignKey(
+                ('parent', models.ForeignKey(
                     blank=True, null=True,
                     on_delete=django.db.models.deletion.PROTECT,
                     related_name='children', to='game_forum_threads.Thread',

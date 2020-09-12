@@ -23,11 +23,11 @@ class ThreadFixCounters(mutations.ThreadFixCounters):
             role = stories_models.Role.objects.select_for_update(
                 ).get(pk=role.pk)
             role.comments_count = comment_models.Comment.objects.filter(
-                parent__tree_id=instance.tree_id, deleted=False,
+                parent__parents_ids__contains=instance.pk, deleted=False,
                 role_id=role.id).count()
             role.save()
         variation.comments_count = comment_models.Comment.objects.filter(
-            parent__tree_id=instance.tree_id, deleted=False).count()
+            parent__parents_ids__contains=instance.pk, deleted=False).count()
         variation.save()
         return None
 

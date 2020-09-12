@@ -57,7 +57,7 @@ class MutationController:
         threads = self._get_descendants(instance)
         processed_threads = []
         for sub_thread in threads:
-            sub_thread = self.thread_model.objects.select_for_update().get(
+            sub_thread = instance.children.select_for_update().get(
                 pk=sub_thread.pk)
             for mutation in mutations:
                 mutation.process_descendant(sub_thread, instance)
@@ -87,7 +87,7 @@ class MutationController:
     def apply(self):
         parents = None
         if self.parent_mutations:
-            parents = list(self.instance.get_parents().select_for_update())
+            parents = list(self.instance.get_parents(for_update=True))
         for mutation in self.mutations:
             mutation.process_thread(self.instance)
         descendants_mutations = [
@@ -253,11 +253,10 @@ class ThreadFixCounters(ThreadCounters):
                 instance.parent.parents_ids + [instance.parent.pk]
         else:
             instance.parents_ids = []
-        instance.__class__.objects.partial_rebuild(instance.tree_id)
         self.update_result(instance)
 
     def process_descendant(self, instance, parent):
-        self.update_result(instance)
+        self.process_thread(instance)
 
 
 class DeletedController(MutationController):

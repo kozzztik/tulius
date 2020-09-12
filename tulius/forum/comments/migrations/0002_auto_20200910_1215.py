@@ -3,8 +3,6 @@
 import django.core.serializers.json
 from django.db import migrations, models
 
-import tulius.forum.comments.models
-
 
 class Migration(migrations.Migration):
 
@@ -17,14 +15,22 @@ class Migration(migrations.Migration):
             model_name='comment',
             name='data',
             field=models.JSONField(
-                default=tulius.forum.comments.models.default_json,
+                default=dict,
                 encoder=django.core.serializers.json.DjangoJSONEncoder),
         ),
         migrations.AlterField(
             model_name='comment',
             name='media',
             field=models.JSONField(
-                default=tulius.forum.comments.models.default_json,
+                default=dict,
                 encoder=django.core.serializers.json.DjangoJSONEncoder),
+        ),
+        migrations.AlterField(
+            model_name='comment',
+            name='parent',
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name='comments', to='forum_threads.thread',
+                verbose_name='thread'),
         ),
     ]

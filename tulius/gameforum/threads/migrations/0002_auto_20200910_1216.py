@@ -32,4 +32,31 @@ class Migration(migrations.Migration):
                 blank=True, db_index=True, default=None, editable=False,
                 null=True),
         ),
+        migrations.RemoveField(
+            model_name='thread',
+            name='level',
+        ),
+        migrations.RemoveField(
+            model_name='thread',
+            name='lft',
+        ),
+        migrations.RemoveField(
+            model_name='thread',
+            name='rght',
+        ),
+        migrations.RemoveField(
+            model_name='thread',
+            name='tree_id',
+        ),
+        migrations.AlterField(
+            model_name='thread',
+            name='parent',
+            field=models.ForeignKey(
+                blank=True, null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name='children',
+                to='game_forum_threads.thread',
+                verbose_name='parent thread'),
+        ),
+
     ]
