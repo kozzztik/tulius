@@ -7,7 +7,7 @@ from tulius.gameforum.threads import models as thread_models
 
 
 class Comment(comment_models.AbstractComment):
-    role_id = models.IntegerField(blank=True, null=True)
+    role_id = models.IntegerField(blank=True, null=True, db_index=True)
     edit_role_id = models.IntegerField(blank=True, null=True)
     parent: thread_models.Thread = models.ForeignKey(
         thread_models.Thread, models.PROTECT,

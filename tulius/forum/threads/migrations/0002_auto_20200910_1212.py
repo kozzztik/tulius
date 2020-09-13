@@ -29,8 +29,7 @@ class Migration(migrations.Migration):
             model_name='thread',
             name='parents_ids',
             field=models.JSONField(
-                blank=True, db_index=True, default=None, editable=False,
-                null=True),
+                blank=True, default=None, editable=False, null=True),
         ),
         migrations.RemoveField(
             model_name='thread',

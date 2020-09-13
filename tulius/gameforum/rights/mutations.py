@@ -70,8 +70,8 @@ class UpdateRights(mutations.UpdateRights, VariationMutationMixin):
             instance.rights.role.all = parent_all
         if instance.rights.role.all & forum_models.ACCESS_NO_INHERIT:
             instance.rights.role.all_inherit = parent_all
-        self._process_variation(instance.rights)
         super(UpdateRights, self)._process_parent_rights(instance, parent)
+        self._process_variation(instance.rights)
         # process parent role exceptions
         for role_id, right in parent.rights.role:
             if (not right & forum_models.ACCESS_MODERATE) and \

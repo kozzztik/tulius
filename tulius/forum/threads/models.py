@@ -180,7 +180,7 @@ class AbstractThread(models.Model):
         default=dict,
         encoder=django.core.serializers.json.DjangoJSONEncoder)
     parents_ids = models.JSONField(
-        default=None, db_index=True, blank=True, null=True, editable=False)
+        default=None, blank=True, null=True, editable=False)
 
     def __str__(self):
         return (self.title or self.body)[:40]
