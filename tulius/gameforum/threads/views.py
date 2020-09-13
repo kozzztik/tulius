@@ -32,14 +32,13 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
                 variation=self.variation)}
 
     def write_roles(self):
-        rights = self.obj.data['rights']['roles']
+        rights = self.obj.rights.role
         result = []
         admin = self.variation.edit_right(self.user)
         if admin:
             result.append(None)
         for role in self.all_roles.values():
-            r = self.obj.data['rights']['role_all'] | rights.get(
-                str(role.pk), 0) | rights.get(role.pk, 0)
+            r = self.obj.rights.role.all | rights[role.pk]
             r &= forum_models.ACCESS_WRITE
             if admin or ((role.user_id == self.user.pk) and r):
                 result.append(role.pk)
@@ -93,7 +92,8 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
             'accessed_users': None if thread.accessed_users is None else [
                 self.role_to_json(user) for user in thread.accessed_users
             ],
-            'threads_count': thread.threads_count if thread.room else None,
+            'threads_count': thread.threads_count[self.user],
+            'rooms_count': thread.rooms_count[self.user],
             'url': thread.get_absolute_url(),
         }
         signals.room_to_json.send(
@@ -128,10 +128,10 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
     def _rights_strict_roles(self, data):
         data['rights']['user_write_roles'] = self.write_roles()
         data['rights']['strict_read'] = None
-        rights = self.obj.data['rights']
-        if not rights['role_all'] & forum_models.ACCESS_READ:
+        rights = self.obj.rights
+        if not rights.role.all & forum_models.ACCESS_READ:
             data['rights']['strict_read'] = [
-                int(key) for key, right in rights['roles'].items()
+                key for key, right in rights.role
                 if right & forum_models.ACCESS_READ]
 
     def obj_to_json(self, deleted=False):
@@ -143,7 +143,7 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
 
 
 class ThreadAPI(views.ThreadView, BaseThreadAPI):
-    pass
+    create_mutation = mutations.ThreadCreateMutation
 
 
 class MoveThreadView(views.MoveThreadView, BaseThreadAPI):

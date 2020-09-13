@@ -4,8 +4,17 @@ from tulius.forum.comments import mutations as comments_mutatuions
 from tulius.gameforum.comments import models as comment_models
 
 
+class ThreadCreateMutation(mutations.ThreadCreateMutation):
+    variation = None
+
+    def __init__(self, thread, data, view, **kwargs):
+        self.variation = view.variation
+        super(ThreadCreateMutation, self).__init__(thread, data, **kwargs)
+
+
 class ThreadFixCounters(mutations.ThreadFixCounters):
-    def fix_variation(self, instance):
+    @staticmethod
+    def fix_variation(instance):
         if instance.parent_id or not instance.pk:
             return None
         variation = stories_models.Variation.objects.select_for_update(
@@ -15,11 +24,10 @@ class ThreadFixCounters(mutations.ThreadFixCounters):
             role = stories_models.Role.objects.select_for_update(
                 ).get(pk=role.pk)
             role.comments_count = comment_models.Comment.objects.filter(
-                parent__tree_id=instance.tree_id, deleted=False,
-                role_id=role.id).count()
+                deleted=False, role_id=role.id).count()
             role.save()
         variation.comments_count = comment_models.Comment.objects.filter(
-            parent__tree_id=instance.tree_id, deleted=False).count()
+            parent__variation_id=variation.pk, deleted=False).count()
         variation.save()
         return None
 

@@ -14,7 +14,7 @@ class VariationMutationMixin(base_mutations.Mutation):
     admins = None
     guests = None
 
-    def __init__(self, thread, variation):
+    def __init__(self, thread, variation, **_kwargs):
         super(VariationMutationMixin, self).__init__(thread)
         self.variation = variation
         self.all_roles = {
@@ -37,91 +37,84 @@ class VariationMutationMixin(base_mutations.Mutation):
 class UpdateRights(mutations.UpdateRights, VariationMutationMixin):
     def _process_variation(self, rights):
         for user_id in self.admins:
-            rights['users'][user_id] = \
+            rights[user_id] = \
                 forum_models.ACCESS_OWN + forum_models.ACCESS_MODERATE
         for user_id in self.guests:
-            rights['users'][user_id] = \
-                rights['users'].get(user_id, 0) | forum_models.ACCESS_READ
+            rights[user_id] |= forum_models.ACCESS_READ
         for role in self.all_roles.values():
             if role.user_id:
-                rights['users'][role.user_id] = \
-                    rights['users'].get(role.user_id, 0) | rights['role_all']
+                rights[role.user_id] = \
+                    (rights[role.user_id] or 0) | rights.role.all
 
     @staticmethod
     def _query_granted_exceptions(instance):
         return instance.access_roles.all()
 
-    def _rights_for_root(self, instance, rights):
-        rights['role_all'] = rights['all']
-        if not rights['role_all']:
-            rights['role_all'] = forum_models.ACCESS_OPEN
-        if rights['role_all'] & forum_models.ACCESS_NO_INHERIT:
-            rights['role_all_inherit'] = forum_models.ACCESS_OPEN
-        rights['all'] = 0
-        rights['roles'] = {}
-        self._process_variation(rights)
-        super(UpdateRights, self)._rights_for_root(instance, rights)
+    def _rights_for_root(self, instance: forum_models.AbstractThread):
+        instance.rights.role.all = instance.rights.all
+        if not instance.rights.role.all:
+            instance.rights.role.all = forum_models.ACCESS_OPEN
+        if instance.rights.role.all & forum_models.ACCESS_NO_INHERIT:
+            instance.rights.role.all_inherit = forum_models.ACCESS_OPEN
+        instance.rights.all = 0
+        self._process_variation(instance.rights)
+        super(UpdateRights, self)._rights_for_root(instance)
 
-    def _process_parent_rights(self, instance, rights, parent_rights):
-        rights['role_all'] = instance.default_rights
-        parent_all = parent_rights['role_all']
+    def _process_parent_rights(
+            self, instance: forum_models.AbstractThread, parent):
+        instance.rights.role.all = instance.default_rights
+        parent_all = parent.rights.role.all
         if parent_all & forum_models.ACCESS_NO_INHERIT:
-            parent_all = parent_rights['role_all_inherit']
-        if rights['role_all'] is None:
-            rights['role_all'] = parent_all
-        if rights['role_all'] & forum_models.ACCESS_NO_INHERIT:
-            rights['role_all_inherit'] = parent_all
-        rights['roles'] = {}
-        self._process_variation(rights)
-        super(UpdateRights, self)._process_parent_rights(
-            instance, rights, parent_rights)
+            parent_all = parent.rights.role.all_inherit
+        if instance.rights.role.all is None:
+            instance.rights.role.all = parent_all
+        if instance.rights.role.all & forum_models.ACCESS_NO_INHERIT:
+            instance.rights.role.all_inherit = parent_all
+        super(UpdateRights, self)._process_parent_rights(instance, parent)
+        self._process_variation(instance.rights)
         # process parent role exceptions
-        for role_id, right in parent_rights['roles'].items():
+        for role_id, right in parent.rights.role:
             if (not right & forum_models.ACCESS_MODERATE) and \
                     instance.default_rights is not None:
                 right &= instance.default_rights
-            rights['roles'][role_id] = right
+            instance.rights.role[role_id] = right
 
-    def _process_granted_exceptions(self, instance, rights):
+    def _process_granted_exceptions\
+                    (self, instance: forum_models.AbstractThread):
         for right in self._query_granted_exceptions(instance):
-            access_level = rights['role_all'] | right.access_level
-            access_level |= rights['roles'].get(right.role_id, 0)
+            access_level = instance.rights.role.all | right.access_level
+            access_level |= instance.rights.role[right.role_id]
             if access_level & forum_models.ACCESS_MODERATE:
                 access_level |= forum_models.ACCESS_OWN
-            rights['roles'][right.role_id] = access_level
+            instance.rights.role[right.role_id] = access_level
             role = self.all_roles.get(right.role_id)
             user_id = role.user_id if role else None
             if user_id:
-                rights['users'][user_id] = \
-                    rights['users'].get(user_id, 0) | access_level
+                instance.rights[user_id] |= access_level
 
-    def _process_author(self, instance, rights):
+    def _process_author(self, instance):
         if instance.role_id:
-            rights['roles'][instance.role_id] = \
-                rights['roles'].get(
-                    instance.role_id, 0) | forum_models.ACCESS_OWN
+            instance.rights.role[instance.role_id] |= forum_models.ACCESS_OWN
             user_id = self.all_roles[instance.role_id].user_id
             if user_id:
-                rights['users'][user_id] = \
-                    rights['users'].get(user_id, 0) | forum_models.ACCESS_OWN
+                instance.rights[user_id] |= forum_models.ACCESS_OWN
         # process game specific rules that overrides all exceptions
         if self.variation.game:
             if self.variation.game.status == \
                     game_models.GAME_STATUS_COMPLETED_OPEN:
-                rights['all'] |= forum_models.ACCESS_READ
+                instance.rights.all |= forum_models.ACCESS_READ
             if self.variation.game.status > game_models.GAME_STATUS_FINISHING:
                 block = forum_models.ACCESS_WRITE | forum_models.ACCESS_EDIT
-                rights['role_all'] &= ~block
-                rights['all'] &= ~block
-                rights['users'] = {
-                    pk: right & ~block
-                    for pk, right in rights['users'].items()}
+                instance.rights.role.all &= ~block
+                instance.rights.all &= ~block
+                for pk, right in instance.rights:
+                    instance.rights[pk] = right & ~block
             if self.variation.game.status >= game_models.GAME_STATUS_FINISHING:
-                rights['role_all'] |= forum_models.ACCESS_READ
+                instance.rights.role.all |= forum_models.ACCESS_READ
                 for role in self.all_roles.values():
                     if role.user_id:
-                        rights['users'][role.user_id] = rights['users'].get(
-                            role.user_id, 0) | forum_models.ACCESS_READ
+                        instance.rights[role.user_id] |= \
+                            forum_models.ACCESS_READ
 
 
 def on_fix_counters(instance, **_kwargs):
@@ -129,13 +122,22 @@ def on_fix_counters(instance, **_kwargs):
     return UpdateRights(instance, variation)
 
 
+base_mutations.on_mutation(UpdateRights)(base_mutations.ThreadCounters)
+
 signals.apply_mutation.connect(
     on_fix_counters, sender=thread_mutations.ThreadFixCounters)
 
 
+@base_mutations.on_mutation(thread_mutations.ThreadCreateMutation)
 class UpdateRightsOnThreadCreate(
         UpdateRights, mutations.UpdateRightsOnThreadCreate,
         VariationMutationMixin):
+    def __init__(
+            self, thread, parent=None, data=None, variation=None, **kwargs):
+        super(UpdateRightsOnThreadCreate, self).__init__(
+            thread, parent=parent, data=data,
+            variation=variation or parent.variation, **kwargs)
+
     def _query_granted_exceptions(self, instance):
         return [
             rights_models.GameThreadRight(

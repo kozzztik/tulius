@@ -41,6 +41,19 @@ def test_guest_access_to_game(game, variation_forum, admin, game_guest):
     assert response.status_code == 200
     data = response.json()
     assert data['body'] == 'thread description'
+    # create thread with no specified rights. There was a problem with
+    # fail on it
+    response = admin.put(
+        variation_forum.get_absolute_url(), {
+            'title': 'thread', 'body': 'thread description',
+            'room': False, 'default_rights': None,
+            'granted_rights': [],
+            'important': True, 'closed': True, 'media': {}})
+    assert response.status_code == 200
+    thread = response.json()
+    # check guest can read it
+    response = game_guest.get(thread['url'])
+    assert response.status_code == 200
 
 
 def test_finishing_game_rights(

@@ -3,9 +3,6 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import jsonfield.fields
-import mptt.fields
-import tulius.forum.comments.models
 
 
 class Migration(migrations.Migration):
@@ -43,16 +40,14 @@ class Migration(migrations.Migration):
                 ('deleted', models.BooleanField(
                     default=False, verbose_name='deleted')),
                 ('order', models.IntegerField(verbose_name='order')),
-                ('data', jsonfield.fields.JSONField(
-                    default=tulius.forum.comments.models.default_json)),
-                ('media', jsonfield.fields.JSONField(
-                    default=tulius.forum.comments.models.default_json)),
+                ('data', models.JSONField(default=dict)),
+                ('media', models.JSONField(default=dict)),
                 ('editor', models.ForeignKey(
                     blank=True, null=True,
                     on_delete=django.db.models.deletion.PROTECT,
                     related_name='forum_comments_edited',
                     to=settings.AUTH_USER_MODEL, verbose_name='edited by')),
-                ('parent', mptt.fields.TreeForeignKey(
+                ('parent', models.ForeignKey(
                     on_delete=django.db.models.deletion.PROTECT,
                     related_name='comments', to='forum_threads.Thread',
                     verbose_name='thread')),

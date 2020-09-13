@@ -1,10 +1,13 @@
-from django.conf.urls import url
-from .views import vk_success_auth, vk_auth_reddirect
+from django.conf import urls
+
+from tulius.vk import views
 
 
 app_name = 'tulius.vk'
 
 urlpatterns = [
-    url(r'^login_vk_oauth/$', vk_auth_reddirect, name='auth_oauth'),
-    url(r'^login_vk_success/$', vk_success_auth, name='auth_success'),
+    urls.re_path(
+        r'^login_vk_oauth/$', views.vk_auth_reddirect, name='auth_oauth'),
+    urls.re_path(
+        r'^login_vk_success/$', views.vk_success_auth, name='auth_success'),
 ]

@@ -4,7 +4,7 @@ from django import urls
 from django.contrib import messages
 from django.views import generic
 from django.contrib.auth import decorators
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from djfw import custom_views
 from djfw import subviews

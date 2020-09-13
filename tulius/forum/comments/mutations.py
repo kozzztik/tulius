@@ -1,7 +1,6 @@
 from tulius.forum.threads import mutations
 from tulius.forum.threads import models
 from tulius.forum.comments import signals
-from tulius.forum.comments import models as comment_models
 from tulius.forum.rights import mutations as right_mutations
 
 
@@ -13,44 +12,29 @@ class ThreadCommentAdd(mutations.Mutation):
         super(ThreadCommentAdd, self).__init__(thread, **kwargs)
         self.comment = comment
 
-    @staticmethod
-    def get_last_comment(instance):
-        return instance.data.setdefault(
-            'last_comment', {'all': None, 'su': None, 'users': {}})
-
-    @staticmethod
-    def get_comments_count(instance):
-        return instance.data.setdefault(
-            'comments_count', {'all': 0, 'su': 0, 'users': {}})
-
     def process_thread(self, instance):
         if 'first_comment_id' not in instance.data:
             instance.data['first_comment_id'] = self.comment.pk
-        last_comment = self.get_last_comment(instance)
-        last_comment['all'] = self.comment.pk
-        last_comment['su'] = self.comment.pk
-        comments_count = self.get_comments_count(instance)
-        comments_count['all'] += 1
-        comments_count['su'] += 1
+        instance.last_comment.all = self.comment.pk
+        instance.last_comment.su = self.comment.pk
+        instance.comments_count.all += 1
+        instance.comments_count.su += 1
 
     def process_parent(self, instance, updated_child):
-        last_comment = self.get_last_comment(instance)
-        comments_count = self.get_comments_count(instance)
-        comments_count['su'] += 1
-        last_comment['su'] = self.comment.pk
-        if updated_child.rights(None) & models.ACCESS_READ:
-            last_comment['all'] = self.comment.pk
-            last_comment['users'] = {
-                u: self.comment.pk for u in last_comment['users'].keys()}
-            comments_count['all'] += 1
-            for u, count in comments_count['users'].items():
-                comments_count['users'][u] = count + 1
+        instance.comments_count.su += 1
+        instance.last_comment.su = self.comment.pk
+        if updated_child.rights.all & models.ACCESS_READ:
+            instance.last_comment.all = self.comment.pk
+            for u, _ in instance.last_comment:
+                instance.last_comment[u] = self.comment.pk
+            instance.comments_count.all += 1
+            for u, count in instance.comments_count:
+                instance.comments_count[u] = count + 1
         else:
-            for user, right in self.thread.data['rights']['users'].items():
+            for user, right in self.thread.rights:
                 if right & models.ACCESS_READ:
-                    last_comment['users'][str(user)] = self.comment.pk
-                    comments_count['users'][str(user)] = \
-                        comments_count['users'].get(str(user), 0) + 1
+                    instance.last_comment[user] = self.comment.pk
+                    instance.comments_count[user] += 1
 
 
 class FixCounters(mutations.Mutation):
@@ -60,50 +44,45 @@ class FixCounters(mutations.Mutation):
     with_descendants = True
     result = None
 
-    def __init__(self, thread, result=None):
+    def __init__(self, thread, result=None, **_kwargs):
         super(FixCounters, self).__init__(thread)
         self.result = result
 
     @staticmethod
     def fix_room(instance, children):
-        comments_count = instance.data['comments_count'] = {
-            'all': 0, 'su': 0, 'users': {}}
-        last_comment = instance.data['last_comment'] = {
-            'all': None, 'su': None, 'users': {}}
+        instance.comments_count.cleanup()
+        comments_count = instance.comments_count
+        instance.last_comment.cleanup()
+        last_comment = instance.last_comment
         for c in children:
-            comments_count['su'] += c.data['comments_count']['su']
-            pk = c.data['last_comment']['su']
+            instance.comments_count.su += c.comments_count.su
+            pk = c.last_comment.su
             if pk and (
-                    (not last_comment['su']) or
-                    (pk > last_comment['su'])):
-                last_comment['su'] = pk
-            if c.rights(None) & models.ACCESS_READ:
-                pk = c.data['last_comment']['all']
+                    (not last_comment.su) or
+                    (pk > last_comment.su)):
+                last_comment.su = pk
+            if c.rights.all & models.ACCESS_READ:
+                pk = c.last_comment.all
                 if pk and (
-                        (not last_comment['all']) or
-                        (pk > last_comment['all'])):
-                    last_comment['all'] = pk
+                        (not last_comment.all) or
+                        (pk > last_comment.all)):
+                    last_comment.all = pk
                 if pk:
-                    for u, l_pk in last_comment['users'].items():
+                    for u, l_pk in last_comment:
                         if l_pk < pk:
-                            last_comment['users'][u] = pk
-                child_count = c.data['comments_count']['all']
-                comments_count['all'] += child_count
-                for u, count in comments_count['users'].items():
-                    comments_count['users'][u] = count + child_count
+                            last_comment[u] = pk
+                child_count = c.comments_count.all
+                comments_count.all += child_count
+                for u, count in comments_count:
+                    comments_count[u] = count + child_count
             else:
-                for user, right in c.data['rights']['users'].items():
+                for user, right in c.rights:
                     if right & models.ACCESS_READ:
-                        pk = comment_models.get_param(
-                            'last_comment', instance, user)
-                        new_pk = comment_models.get_param(
-                            'last_comment', c, user)
+                        pk = last_comment[user]
+                        new_pk = c.last_comment[user]
                         if new_pk and ((not pk) or (new_pk > pk)):
-                            last_comment['users'][user] = new_pk
-                        comments_count['users'][str(user)] = \
-                            comment_models.get_param(
-                                'comments_count', instance, user) + \
-                            comment_models.get_param('comments_count', c, user)
+                            last_comment[user] = new_pk
+                        comments_count[user] += c.comments_count[user]
 
     def post_process(self, instance, children):
         if instance.deleted:
@@ -126,10 +105,8 @@ class FixCounters(mutations.Mutation):
             if not instance.data['first_comment_id']:
                 instance.data['first_comment_id'] = comment.pk
             last_comment_id = comment.pk
-        instance.data['comments_count'] = {
-            'all': comments_count, 'su': comments_count, 'users': {}}
-        instance.data['last_comment'] = {
-            'all': last_comment_id, 'su': last_comment_id, 'users': {}}
+        instance.comments_count.cleanup(default=comments_count)
+        instance.last_comment.cleanup(default=last_comment_id)
         if self.result:
             self.result['comments'] = \
                 self.result.get('comments', 0) + comments_count

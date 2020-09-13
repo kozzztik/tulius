@@ -31,10 +31,11 @@ class ReadmarkAPI(views.BaseThreadView):
 
     def mark_room_as_read(self, room):
         if room:
-            threads = room.get_children()
+            threads = room.get_children(self.user, deleted=False)
         else:
-            threads = self.thread_model.objects.filter(parent=None)
-        for thread in threads.exclude(deleted=True):
+            threads = self.thread_model.objects.filter(
+                parent=None, deleted=False)
+        for thread in threads:
             if not thread.read_right(self.user):
                 continue
             if thread.room:
@@ -53,9 +54,7 @@ class ReadmarkAPI(views.BaseThreadView):
             ).exclude(user=self.user).order_by('id').first()
         else:
             not_read = None
-            read_id = comment_models.get_param(
-                'last_comment', thread, self.user,
-                superuser=self.user.is_superuser)
+            read_id = thread.last_comment[self.user]
         read_mark.readed_comment_id = read_id
         read_mark.not_readed_comment_id = not_read.pk if not_read else None
         read_mark.save()
@@ -72,7 +71,7 @@ class ReadmarkAPI(views.BaseThreadView):
             ).exclude(user=user).count() + 1
         }
 
-    def post(self, *args, **kwargs):
+    def post(self, *_args, **kwargs):
         if 'pk' in kwargs:
             self.get_parent_thread(**kwargs)
         read_id = json.loads(self.request.body)['comment_id']
@@ -88,7 +87,7 @@ class ReadmarkAPI(views.BaseThreadView):
             ) if read_mark and read_mark.not_readed_comment_id else None
         }
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *_args, **kwargs):
         self.get_parent_thread(**kwargs)
         self.read_mark_model.objects.filter(
             thread=self.obj, user=self.user).delete()
@@ -130,9 +129,7 @@ class ReadmarkAPI(views.BaseThreadView):
         read_marks = []
         if not view.user.is_anonymous:
             read_marks = cls.read_mark_model.objects.filter(
-                thread__tree_id=room.tree_id,
-                thread__lft__gt=room.lft,
-                thread__rght__lt=room.rght,
+                thread__pk__in=[thread.pk for thread in threads],
                 thread__room=False, user=view.user)
         room.unreaded_id = None
         room.unreaded = None
@@ -165,9 +162,7 @@ class ReadmarkAPI(views.BaseThreadView):
     @classmethod
     def on_thread_prepare_thread(cls, threads, view, **_kwargs):
         for thread in threads:
-            thread.last_comment_id = comment_models.get_param(
-                'last_comment', thread, view.user.pk,
-                superuser=view.user.is_superuser) or 0
+            thread.last_comment_id = thread.last_comment[view.user] or 0
         threads.sort(key=lambda t: t.last_comment_id, reverse=True)
         if not view.user.is_anonymous:
             read_marks = cls.read_mark_model.objects.filter(
