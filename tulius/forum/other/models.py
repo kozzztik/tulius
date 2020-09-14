@@ -25,22 +25,22 @@ class AbstractThreadReadMark(models.Model):
     user = models.ForeignKey(
         User, models.PROTECT,
         null=False, blank=False,
-        related_name='%(app_label)s_readed_threads',
+        related_name='%(app_label)s_read_marks',
         verbose_name=_('user'),
     )
-    readed_comment_id = models.IntegerField(null=False, blank=False)
-    not_readed_comment_id = models.IntegerField(
+    not_read_comment_id = models.IntegerField(
         null=True, blank=True,
         db_index=True)
-
-
-class ThreadReadMark(AbstractThreadReadMark):
     thread = models.ForeignKey(
         thread_models.Thread, models.PROTECT,
         null=False, blank=False,
         related_name='read_marks',
         verbose_name=_('thread'),
     )
+
+
+class ThreadReadMark(AbstractThreadReadMark):
+    pass
 
 
 class AbstractCommentLike(models.Model):
