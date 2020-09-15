@@ -65,6 +65,22 @@ def test_voting_create_and_edit_on_thread(room_group, user):
         voting_data['choices']['items'][1]['name']
     assert voting['choices']['items'][2]['name'] == \
         voting_data['choices']['items'][2]['name']
+    # check how it looks like in comments
+    response = user.get(thread['url'] + 'comments_page/')
+    assert response.status_code == 200
+    data = response.json()
+    voting = data['comments'][0]['media']['voting']
+    assert voting['name'] == voting_data['name']
+    assert voting['body'] == voting_data['body']
+    assert voting['show_results'] == voting_data['show_results']
+    assert voting['preview_results'] == voting_data['preview_results']
+    assert len(voting['choices']['items']) == 3
+    assert voting['choices']['items'][0]['name'] == \
+        voting_data['choices']['items'][0]['name']
+    assert voting['choices']['items'][1]['name'] == \
+        voting_data['choices']['items'][1]['name']
+    assert voting['choices']['items'][2]['name'] == \
+        voting_data['choices']['items'][2]['name']
     # update thread voting preview
     response = user.post(
         thread['url'], {
@@ -92,6 +108,23 @@ def test_voting_create_and_edit_on_thread(room_group, user):
     assert response.status_code == 200
     data = response.json()
     voting = data['media']['voting']
+    assert voting['name'] == voting_data2['name']
+    assert voting['body'] == voting_data2['body']
+    assert voting['show_results'] == voting_data2['show_results']
+    assert voting['preview_results'] == voting_data2['preview_results']
+    # important, items not updated
+    assert len(voting['choices']['items']) == 3
+    assert voting['choices']['items'][0]['name'] == \
+        voting_data['choices']['items'][0]['name']
+    assert voting['choices']['items'][1]['name'] == \
+        voting_data['choices']['items'][1]['name']
+    assert voting['choices']['items'][2]['name'] == \
+        voting_data['choices']['items'][2]['name']
+    # check how it looks like in comments
+    response = user.get(thread['url'] + 'comments_page/')
+    assert response.status_code == 200
+    data = response.json()
+    voting = data['comments'][0]['media']['voting']
     assert voting['name'] == voting_data2['name']
     assert voting['body'] == voting_data2['body']
     assert voting['show_results'] == voting_data2['show_results']
@@ -364,3 +397,21 @@ def test_vote_with_wrong_id(thread, user):
             comment['url'] + 'voting/',
             {'choice': voting['choices']['items'][0]['id'] + 100})
         assert response.status_code == 404
+
+
+def test_closing_voting_on_thread(room_group, user):
+    # create voting
+    response = user.put(
+        room_group['url'], {
+            'title': 'thread', 'body': 'thread description',
+            'room': False, 'default_rights': None, 'granted_rights': [],
+            'media': {'voting': voting_data}})
+    assert response.status_code == 200
+    thread = response.json()
+    # close it
+    thread['closed'] = True
+    response = user.post(thread['url'], thread)
+    assert response.status_code == 200
+    data = response.json()
+    assert data['media']['voting']['closed']
+
