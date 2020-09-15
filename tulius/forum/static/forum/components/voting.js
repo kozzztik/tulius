@@ -40,7 +40,7 @@ export default LazyComponent('forum_voting', {
             this.$refs.modal.show();
         },
         do_vote() {
-            if ((!this.choice)||this.editor||(!this.comment.url))
+            if ((this.choice === null)||this.editor||(!this.comment.url))
                 return;
             this.loading = true;
             axios.post(
