@@ -397,21 +397,3 @@ def test_vote_with_wrong_id(thread, user):
             comment['url'] + 'voting/',
             {'choice': voting['choices']['items'][0]['id'] + 100})
         assert response.status_code == 404
-
-
-def test_closing_voting_on_thread(room_group, user):
-    # create voting
-    response = user.put(
-        room_group['url'], {
-            'title': 'thread', 'body': 'thread description',
-            'room': False, 'default_rights': None, 'granted_rights': [],
-            'media': {'voting': voting_data}})
-    assert response.status_code == 200
-    thread = response.json()
-    # close it
-    thread['closed'] = True
-    response = user.post(thread['url'], thread)
-    assert response.status_code == 200
-    data = response.json()
-    assert data['media']['voting']['closed']
-
