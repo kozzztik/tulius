@@ -34,14 +34,14 @@ def test_read_marks(room_group, admin, user):
     data = response.json()
     rooms = {g['id']: g for g in data['groups']}
     room_data = rooms[room_group['id']]
-    assert room_data['unreaded']['id'] == thread['first_comment_id']
+    assert room_data['not_read']['id'] == thread['first_comment_id']
     # check how it looks for admin
     response = admin.get('/api/forum/')
     assert response.status_code == 200
     data = response.json()
     rooms = {g['id']: g for g in data['groups']}
     room_data = rooms[room_group['id']]
-    assert room_data['unreaded'] is None
+    assert room_data['not_read'] is None
     # mark first comment as read
     response = user.post(
         thread['url'] + 'read_mark/',
@@ -49,61 +49,61 @@ def test_read_marks(room_group, admin, user):
     assert response.status_code == 200
     data = response.json()
     assert data['last_read_id'] == thread['first_comment_id']
-    assert data['not_read_comment']['id'] == comment['id']
-    assert data['not_read_comment']['count'] == 1
+    assert data['not_read']['id'] == comment['id']
+    assert data['not_read']['count'] == 1
     # check how it looks like on index
     response = user.get('/api/forum/')
     assert response.status_code == 200
     data = response.json()
     rooms = {g['id']: g for g in data['groups']}
     room_data = rooms[room_group['id']]
-    assert room_data['unreaded']['id'] == comment['id']
+    assert room_data['not_read']['id'] == comment['id']
     # check how it looks on room
     response = user.get(room['url'])
     assert response.status_code == 200
     data = response.json()
-    assert data['threads'][0]['unreaded']['id'] == comment['id']
+    assert data['threads'][0]['not_read']['id'] == comment['id']
     # check how it looks on thread
     response = user.get(thread['url'])
     assert response.status_code == 200
     data = response.json()
-    assert data['not_read_comment']['id'] == comment['id']
-    assert data['not_read_comment']['count'] == 1
+    assert data['not_read']['id'] == comment['id']
+    assert data['not_read']['count'] == 1
     # now mark all forum as read
     response = user.post('/api/forum/read_mark/', {'comment_id': None})
     assert response.status_code == 200
     data = response.json()
     assert data['last_read_id'] is None
-    assert data['not_read_comment'] is None
+    assert data['not_read'] is None
     # check index
     response = user.get('/api/forum/')
     assert response.status_code == 200
     data = response.json()
     rooms = {g['id']: g for g in data['groups']}
     room_data = rooms[room_group['id']]
-    assert room_data['unreaded'] is None
+    assert room_data['not_read'] is None
     # check room
     response = user.get(room['url'])
     assert response.status_code == 200
     data = response.json()
-    assert data['threads'][0]['unreaded'] is None
+    assert data['threads'][0]['not_read'] is None
     # check thread
     response = user.get(thread['url'])
     assert response.status_code == 200
     data = response.json()
-    assert data['not_read_comment'] is None
+    assert data['not_read'] is None
     # Delete readmark
     response = user.delete(thread['url'] + 'read_mark/')
     assert response.status_code == 200
     data = response.json()
     assert data['last_read_id'] is None
-    assert data['not_read_comment']['id'] == thread['first_comment_id']
-    assert data['not_read_comment']['count'] == 2
+    assert data['not_read']['id'] == thread['first_comment_id']
+    assert data['not_read']['count'] == 2
     # check room
     response = user.get(room['url'])
     assert response.status_code == 200
     data = response.json()
-    assert data['threads'][0]['unreaded']['id'] == thread['first_comment_id']
+    assert data['threads'][0]['not_read']['id'] == thread['first_comment_id']
 
 
 def test_readmark_rights(room_group, admin, user):
@@ -132,7 +132,7 @@ def test_readmark_rights(room_group, admin, user):
     assert response.status_code == 200
     data = response.json()
     assert data['last_read_id'] is None
-    assert data['not_read_comment'] is None
+    assert data['not_read'] is None
     # open thread
     response = admin.put(
         thread['url'] + 'granted_rights/', {'default_rights': None})
@@ -143,7 +143,7 @@ def test_readmark_rights(room_group, admin, user):
     data = response.json()
     rooms = {g['id']: g for g in data['groups']}
     room_data = rooms[room_group['id']]
-    assert room_data['unreaded']['id'] == thread['first_comment_id']
+    assert room_data['not_read']['id'] == thread['first_comment_id']
 
 
 def test_thread_author_notified(room_group, thread, admin, user):
@@ -160,7 +160,7 @@ def test_thread_author_notified(room_group, thread, admin, user):
     response = admin.get(room_group['url'])
     assert response.status_code == 200
     room = response.json()
-    assert room['threads'][0]['unreaded']['id'] == comment['id']
+    assert room['threads'][0]['not_read']['id'] == comment['id']
     # delete user comment
     response = user.delete(comment['url'] + '?comment=foo')
     assert response.status_code == 200
@@ -168,7 +168,7 @@ def test_thread_author_notified(room_group, thread, admin, user):
     response = admin.get(room_group['url'])
     assert response.status_code == 200
     room = response.json()
-    assert room['threads'][0]['unreaded'] is None
+    assert room['threads'][0]['not_read'] is None
 
 
 def test_deleted_threads_not_marked(room_group, admin, superuser):
@@ -200,7 +200,7 @@ def test_deleted_threads_not_marked(room_group, admin, superuser):
     response = superuser.get(room_group['url'])
     assert response.status_code == 200
     data = response.json()
-    assert data['rooms'][0]['unreaded']['thread']['id'] == thread1['id']
+    assert data['rooms'][0]['not_read']['thread']['id'] == thread1['id']
     # delete first thread
     response = admin.delete(thread1['url'] + '?comment=bar')
     assert response.status_code == 200
@@ -208,7 +208,7 @@ def test_deleted_threads_not_marked(room_group, admin, superuser):
     response = superuser.get(room_group['url'])
     assert response.status_code == 200
     data = response.json()
-    assert data['rooms'][0]['unreaded']['thread']['id'] == thread2['id']
+    assert data['rooms'][0]['not_read']['thread']['id'] == thread2['id']
     # mark all as read
     response = superuser.post(room['url'] + 'read_mark/', {'comment_id': None})
     assert response.status_code == 200
@@ -216,7 +216,7 @@ def test_deleted_threads_not_marked(room_group, admin, superuser):
     response = superuser.get(room_group['url'])
     assert response.status_code == 200
     data = response.json()
-    assert data['rooms'][0]['unreaded'] is None
+    assert data['rooms'][0]['not_read'] is None
     # restore thread
     response = superuser.put(thread1['url'] + 'restore/')
     assert response.status_code == 200
@@ -224,4 +224,4 @@ def test_deleted_threads_not_marked(room_group, admin, superuser):
     response = superuser.get(room_group['url'])
     assert response.status_code == 200
     data = response.json()
-    assert data['rooms'][0]['unreaded']['thread']['id'] == thread1['id']
+    assert data['rooms'][0]['not_read']['thread']['id'] == thread1['id']

@@ -15,8 +15,7 @@ def migrate_data(apps, schema_editor):
         if read_mark.thread.deleted:
             read_mark.delete()
             continue
-        else:
-            read_mark.save()
+        read_mark.save()
         for parent_id in read_mark.thread.parents_ids:
             item = ThreadReadMark.objects.get_or_create(
                 thread_id=parent_id, user_id=read_mark.user_id,
@@ -28,7 +27,8 @@ def migrate_data(apps, schema_editor):
             )[0]
             if (not item.not_read_comment_id) or (
                     read_mark.not_read_comment_id and (
-                    item.not_read_comment_id > read_mark.not_read_comment_id)):
+                        item.not_read_comment_id >
+                        read_mark.not_read_comment_id)):
                 item.not_read_comment_id = read_mark.not_read_comment_id
             item.save()
         count += 1

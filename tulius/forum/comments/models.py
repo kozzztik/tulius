@@ -101,6 +101,8 @@ class Comment(AbstractComment):
     pass
 
 
+thread_models.AbstractThread.first_comment = thread_models.CounterField(
+    'first_comment')
 thread_models.AbstractThread.last_comment = thread_models.CounterField(
     'last_comment')
 thread_models.AbstractThread.comments_count = thread_models.CounterField(

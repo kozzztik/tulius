@@ -48,9 +48,8 @@ def room_to_json(instance, response, view, **_kwargs):
 
 
 @dispatch.receiver(thread_signals.to_json)
-def thread_to_json(instance, response, **_kwargs):
-    if not instance.room:
-        response['first_comment_id'] = instance.data.get('first_comment_id')
+def thread_to_json(instance, response, view, **_kwargs):
+    response['first_comment_id'] = instance.first_comment[view.user]
 
 
 class CommentsBase(views.BaseThreadView):
@@ -118,7 +117,7 @@ class CommentsPageAPI(CommentsBase):
     @classmethod
     def create_comment(cls, data, view):
         reply_id = data.get('reply_id')
-        if reply_id and (reply_id != view.obj.data.get('first_comment_id')):
+        if reply_id and (reply_id != view.obj.first_comment[view.user]):
             obj = shortcuts.get_object_or_404(cls.comment_model, pk=reply_id)
             if obj.parent_id != view.obj.id:
                 raise exceptions.PermissionDenied()
@@ -236,7 +235,7 @@ class CommentAPI(CommentBase):
     def on_thread_update(cls, instance, data, preview, view, **_kwargs):
         if not instance.room:
             comment = cls.comment_model.objects.select_for_update().get(
-                id=instance.data['first_comment_id'])
+                id=instance.first_comment[view.user])
             cls.update_comment(comment, data, preview, view)
             if not preview:
                 comment.save()
