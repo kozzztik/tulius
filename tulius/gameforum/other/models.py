@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
 
 from tulius.forum.other import models as other_models
+from tulius.forum.read_marks import models as read_marks_models
 from tulius.gameforum.threads import models as thread_models
 from tulius.gameforum.comments import models as comment_models
 
@@ -10,7 +11,7 @@ from tulius.gameforum.comments import models as comment_models
 User = get_user_model()
 
 
-class ThreadReadMark(other_models.AbstractThreadReadMark):
+class ThreadReadMark(read_marks_models.AbstractThreadReadMark):
     thread = models.ForeignKey(
         thread_models.Thread, models.PROTECT,
         null=False, blank=False,

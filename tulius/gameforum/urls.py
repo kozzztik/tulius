@@ -6,6 +6,7 @@ from tulius.gameforum import online_status
 from tulius.gameforum.comments import views as comments
 from tulius.gameforum.rights import views as rights_api
 from tulius.gameforum.other import trust_marks
+from tulius.gameforum.other import read_marks
 from tulius.gameforum.other import views as other
 
 
@@ -41,7 +42,7 @@ urlpatterns = [
         comments.CommentsPageAPI.as_view(), name='comments_page'),
     urls.re_path(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/read_mark/$',
-        other.ReadmarkAPI.as_view(), name='thread_readmark'),
+        read_marks.ReadmarkAPI.as_view(), name='thread_readmark'),
     urls.re_path(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)'
         r'/granted_rights/$',
