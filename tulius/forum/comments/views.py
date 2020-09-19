@@ -128,7 +128,7 @@ class CommentsPageAPI(CommentsBase):
         comment.body = data['body']
         comment.reply_id = reply_id
         comment.media = {}
-        comment.order = view.obj.comments_count.all
+        comment.order = view.obj.comments_count.su
         return comment
 
     @classmethod

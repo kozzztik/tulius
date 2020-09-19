@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                     blank=True, db_index=True, null=True)),
                 ('thread', models.ForeignKey(
                     on_delete=django.db.models.deletion.PROTECT,
-                    related_name='read_marks_old', to='forum_threads.thread')),
+                    related_name='read_marks', to='forum_threads.thread')),
                 ('user', models.ForeignKey(
                     on_delete=django.db.models.deletion.PROTECT,
                     related_name='forum_read_marks_read_marks',

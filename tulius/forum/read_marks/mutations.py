@@ -1,6 +1,7 @@
 from tulius.forum.threads import mutations
-
+from tulius.forum.rights import mutations as rights_mutations
 from tulius.forum.read_marks import models
+from tulius.forum.read_marks import tasks
 
 
 @mutations.on_mutation(mutations.ThreadCreateMutation)
@@ -24,6 +25,21 @@ class OnAddThread(mutations.Mutation):
             defaults={
                 'not_read_comment_id':
                     instance.first_comment[self.thread.user]})
+
+
+@mutations.on_mutation(mutations.RestoreThread)
+@mutations.on_mutation(rights_mutations.UpdateRights)
+class OnUpdateRights(mutations.Mutation):
+    with_parent = True
+
+    def process_parent(self, instance, updated_child):
+        # start task on parents processing - original thread is updated in DB.
+        # task is started only for direct parent of original thread
+        if updated_child.pk == self.thread.pk:
+            tasks.update_read_marks_on_rights.apply_async(
+                args=[
+                    self.thread._meta.app_label, self.thread._meta.object_name,
+                    instance.pk])
 
 
 def init():

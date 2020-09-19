@@ -79,6 +79,13 @@ class Counter:
             yield i['id'], i['value']
 
     @property
+    def users(self):
+        result = set()
+        for i in self.data['users']:
+            result.add(i['id'])
+        return result
+
+    @property
     def all(self):
         return self.data['all']
 

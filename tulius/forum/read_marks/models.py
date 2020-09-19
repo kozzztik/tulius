@@ -27,7 +27,7 @@ class AbstractThreadReadMark(models.Model):
     thread = models.ForeignKey(
         thread_models.Thread, models.PROTECT,
         null=False, blank=False,
-        related_name='read_marks_old',
+        related_name='read_marks',
     )
 
 

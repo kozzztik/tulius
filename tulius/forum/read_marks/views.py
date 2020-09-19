@@ -10,8 +10,9 @@ from tulius.forum.threads import views
 from tulius.forum.comments import models as comment_models
 from tulius.forum.comments import views as comment_views
 
+# TODO game forum migration
 # TODO update UI with last read
-# TODO update edge cases with changing threads and comments
+# TODO update edge cases with changing threads and comments (move, delete)
 
 
 class ReadmarkAPI(views.BaseThreadView):

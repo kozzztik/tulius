@@ -6,6 +6,7 @@ from tulius.forum.read_marks import mutations as marks_mutations
 from tulius.gameforum.threads import mutations
 from tulius.gameforum.threads import models as thread_models
 from tulius.gameforum.threads import views as thread_views
+from tulius.gameforum.rights import mutations as rights_mutations
 from tulius.gameforum.comments import models as comment_models
 from tulius.gameforum.other import models as other_models
 
@@ -20,6 +21,8 @@ class ReadmarkOnAddThread(marks_mutations.OnAddThread):
     read_mark_model = other_models.ThreadReadMark
 
 
+mutations.on_mutation(rights_mutations.UpdateRights)(
+    marks_mutations.OnUpdateRights)
 comment_signals.on_delete.connect(
     ReadmarkAPI.on_delete_comment, sender=comment_models.Comment)
 comment_signals.after_add.connect(
