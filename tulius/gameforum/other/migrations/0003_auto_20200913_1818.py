@@ -25,6 +25,10 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.PROTECT,
                 related_name='game_forum_other_read_marks',
-                to=settings.AUTH_USER_MODEL, verbose_name='user'),
+                to=settings.AUTH_USER_MODEL),
+        ),
+        migrations.AlterModelOptions(
+            name='threadreadmark',
+            options={},
         ),
     ]

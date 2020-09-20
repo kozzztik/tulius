@@ -18,7 +18,7 @@ def migrate_data(apps, schema_editor):
             thread_id=old.thread_id,
             user_id=old.user_id,
             not_read_comment_id=old.not_readed_comment_id,
-        )
+        )[0]
         for parent_id in read_mark.thread.parents_ids:
             item = ThreadReadMark.objects.get_or_create(
                 thread_id=parent_id, user_id=read_mark.user_id,
