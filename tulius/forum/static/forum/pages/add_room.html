@@ -32,17 +32,17 @@
 
             </div>
             <div class="col-3">
-                <a class="btn btn-light w-100" href="javascript:void(0)"
+                <a class="btn btn-grey " href="javascript:void(0)"
                    @click="$refs.thread_access.show_dialog()">
-                    Исключения...
+                    Для кого...
                 </a>
             </div>
         </div>
         <div class="row" style="margin-top: 0.5em;" >
             <div class="col">
                 <div class="float-right">
-                    <router-link class="btn btn-light" :to="urls.room(parent_thread.id)" v-if="parent_thread.id">Отмена</router-link>
-                    <router-link class="btn btn-light" :to="urls.root_api" v-else>Отмена</router-link>
+                    <router-link class="btn btn-grey" :to="urls.room(parent_thread.id)" v-if="parent_thread.id">Отмена</router-link>
+                    <router-link class="btn btn-grey" :to="urls.root_api" v-else>Отмена</router-link>
                     <button type="submit" class="btn btn-primary">Добавить</button>
                 </div>
             </div>
