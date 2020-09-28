@@ -13,19 +13,15 @@ from tulius.forum.comments import mutations as comments_mutations
 
 
 class FixComments(comments_mutations.FixCounters):
-    def post_process(self, instance, children):
-        if instance.deleted:
-            return
-        if instance.room:
-            self.fix_room(instance, children)
-            return
+    def fix_comments(self, instance):
         comments = instance.comments.filter(deleted=False)
         comments_count = comments.count()
-        last_comment_id = None
+        first_comment = None
+        last_comment = None
         if comments_count:
-            last_comment_id = comments.order_by('-id')[0].pk
-        instance.comments_count.cleanup(default=comments_count)
-        instance.last_comment.cleanup(default=last_comment_id)
+            first_comment = comments.order_by('id')[0].pk
+            last_comment = comments.order_by('-id')[0].pk
+        return first_comment, last_comment, comments_count
 
 
 class FixMutation(mutations.ThreadFixCounters):

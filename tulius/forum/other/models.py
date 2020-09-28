@@ -5,42 +5,9 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
 
-from tulius.forum.threads import models as thread_models
 from tulius.forum.comments import models as comment_models
 
 User = get_user_model()
-
-
-class AbstractThreadReadMark(models.Model):
-    """
-    Mark on thread, what last post was read
-    """
-    class Meta:
-        verbose_name = _('thread read mark')
-        verbose_name_plural = _('thread read marks')
-        abstract = True
-
-    objects = models.Manager()  # linter, be happy
-
-    user = models.ForeignKey(
-        User, models.PROTECT,
-        null=False, blank=False,
-        related_name='%(app_label)s_readed_threads',
-        verbose_name=_('user'),
-    )
-    readed_comment_id = models.IntegerField(null=False, blank=False)
-    not_readed_comment_id = models.IntegerField(
-        null=True, blank=True,
-        db_index=True)
-
-
-class ThreadReadMark(AbstractThreadReadMark):
-    thread = models.ForeignKey(
-        thread_models.Thread, models.PROTECT,
-        null=False, blank=False,
-        related_name='read_marks',
-        verbose_name=_('thread'),
-    )
 
 
 class AbstractCommentLike(models.Model):

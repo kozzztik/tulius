@@ -82,6 +82,7 @@ INSTALLED_APPS = (
     'tulius.forum.threads.ForumThreadsConfig',
     'tulius.forum.rights.ForumRightsConfig',
     'tulius.forum.comments.ForumCommentsConfig',
+    'tulius.forum.read_marks.ForumReadMarksConfig',
     'tulius.forum.other.ForumOtherConfig',
     'tulius.stories',
     'tulius.gameforum',

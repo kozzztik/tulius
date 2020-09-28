@@ -8,7 +8,7 @@ from tulius.forum.comments import views as comments_api
 from tulius.forum.rights import views as rights_api
 from tulius.forum.other import likes
 from tulius.forum.other import voting
-from tulius.forum.other import readmarks
+from tulius.forum.read_marks import views as read_marks
 from tulius.forum.other import search
 from tulius.forum.other import images
 from tulius.forum.other import html
@@ -29,7 +29,7 @@ urlpatterns = [
         rights_api.GrantedRightsAPI.as_view(), name='index_rights'),
     urls.re_path(
         r'^read_mark/$',
-        readmarks.ReadmarkAPI.as_view(), name='index_readmark'),
+        read_marks.ReadmarkAPI.as_view(), name='index_readmark'),
     urls.re_path(
         r'^collapse/$',
         collapse_views.CollapseAPIList.as_view(), name='collapse_list'),
@@ -53,7 +53,7 @@ urlpatterns = [
         comments_api.CommentsPageAPI.as_view(), name='comments_page'),
     urls.re_path(
         r'^thread/(?P<pk>\d+)/read_mark/$',
-        readmarks.ReadmarkAPI.as_view(), name='thread_readmark'),
+        read_marks.ReadmarkAPI.as_view(), name='thread_readmark'),
     urls.re_path(
         r'^thread/(?P<pk>\d+)/granted_rights/$',
         rights_api.GrantedRightsAPI.as_view(), name='thread_rights'),

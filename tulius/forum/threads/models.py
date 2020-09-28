@@ -79,6 +79,13 @@ class Counter:
             yield i['id'], i['value']
 
     @property
+    def users(self):
+        result = set()
+        for i in self.data['users']:
+            result.add(i['id'])
+        return result
+
+    @property
     def all(self):
         return self.data['all']
 
@@ -199,10 +206,11 @@ class AbstractThread(models.Model):
         items = {item.pk: item for item in items}
         return [items[pk] for pk in self.parents_ids]
 
-    def get_children(self, user, **kwargs):
-        if not self.threads_count[user] + self.rooms_count[user]:
+    def get_children(self, user, deleted=False, **kwargs):
+        if (not deleted) and (
+                not self.threads_count[user] + self.rooms_count[user]):
             return []
-        children = self.__class__.objects.filter(parent=self, **kwargs)
+        children = self.children.filter(deleted=deleted, **kwargs)
         return [c for c in children if c.read_right(user)]
 
     def get_absolute_url(self):
