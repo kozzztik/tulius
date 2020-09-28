@@ -15,3 +15,4 @@ prepare_room = dispatch.Signal(
 room_to_json = dispatch.Signal(providing_args=['instance', 'response', 'view'])
 index_to_json = dispatch.Signal(providing_args=['groups', 'view', 'response'])
 apply_mutation = dispatch.Signal(providing_args=['mutation', 'instance'])
+after_move = dispatch.Signal(providing_args=['instance', 'view', 'old_parent'])

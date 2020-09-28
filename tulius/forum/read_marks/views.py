@@ -12,8 +12,6 @@ from tulius.forum.comments import views as comment_views
 from tulius.forum.read_marks import tasks
 
 # TODO game forum thread counters
-# TODO update edge cases with changing threads (move)
-# TODO test delete read mark
 
 
 class ReadmarkAPI(views.BaseThreadView):
@@ -127,11 +125,13 @@ class ReadmarkAPI(views.BaseThreadView):
         }
 
     def delete(self, *_args, **kwargs):
-        # TODO
         self.get_parent_thread(**kwargs)
         self.read_mark_model.objects.filter(
             thread=self.obj, user=self.user).delete()
         comment_id = self.obj.first_comment[self.user]
+        if self.obj.parent:
+            tasks.update_read_marks_on_rights_async(
+                self.obj.parent, only_users=[self.user.pk])
         return {
             'not_read':
                 self.not_read_comment_json(

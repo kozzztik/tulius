@@ -260,6 +260,9 @@ class MoveThreadView(BaseThreadView):
             obj = self.thread_model.objects.select_for_update().get(
                 pk=old_parent.pk)
             self.fix_mutation(obj).apply()
+        signals.after_move.send(
+            self.thread_model, instance=self.obj, view=self,
+            old_parent=old_parent)
         response = self.obj_to_json()
         signals.to_json.send(
             self.thread_model, instance=self.obj, response=response, view=self)

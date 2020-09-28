@@ -1,4 +1,7 @@
+from django import dispatch
+
 from tulius.forum.threads import mutations
+from tulius.forum.threads import signals
 from tulius.forum.rights import mutations as rights_mutations
 from tulius.forum.read_marks import models
 from tulius.forum.read_marks import tasks
@@ -38,6 +41,12 @@ class OnThreadChange(mutations.Mutation):
         # task is started only for direct parent of original thread
         if updated_child.pk == self.thread.pk:
             tasks.update_read_marks_on_rights_async(instance)
+
+
+@dispatch.receiver(signals.after_move)
+def on_thread_move(instance, old_parent, **_kwargs):
+    tasks.update_read_marks_on_rights_async(old_parent)
+    tasks.after_thread_move_async(instance)
 
 
 def init():
