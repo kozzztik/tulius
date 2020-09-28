@@ -22,7 +22,7 @@ class ReadmarkOnAddThread(marks_mutations.OnAddThread):
 
 
 mutations.on_mutation(rights_mutations.UpdateRights)(
-    marks_mutations.OnUpdateRights)
+    marks_mutations.OnThreadChange)
 comment_signals.on_delete.connect(
     ReadmarkAPI.on_delete_comment, sender=comment_models.Comment)
 comment_signals.after_add.connect(

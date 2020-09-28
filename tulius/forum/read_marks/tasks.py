@@ -2,6 +2,11 @@ from django.apps import apps
 from celery import shared_task
 
 
+def update_read_marks_on_rights_async(thread):
+    update_read_marks_on_rights.apply_async(
+        args=[thread._meta.app_label, thread._meta.object_name, thread.pk])
+
+
 @shared_task(track_started=True)
 def update_read_marks_on_rights(
         app_name, model_name, thread_id, only_users=None):

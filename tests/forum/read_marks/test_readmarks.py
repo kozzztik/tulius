@@ -48,7 +48,6 @@ def test_read_marks(room_group, admin, user):
         {'comment_id': thread['first_comment_id']})
     assert response.status_code == 200
     data = response.json()
-    assert data['last_read_id'] == thread['first_comment_id']
     assert data['not_read']['id'] == comment['id']
     assert data['not_read']['count'] == 1
     # check how it looks like on index
@@ -73,7 +72,6 @@ def test_read_marks(room_group, admin, user):
     response = user.post('/api/forum/read_mark/', {'comment_id': None})
     assert response.status_code == 200
     data = response.json()
-    assert data['last_read_id'] is None
     assert data['not_read'] is None
     # check index
     response = user.get('/api/forum/')
@@ -96,7 +94,6 @@ def test_read_marks(room_group, admin, user):
     response = user.delete(thread['url'] + 'read_mark/')
     assert response.status_code == 200
     data = response.json()
-    assert data['last_read_id'] is None
     assert data['not_read']['id'] == thread['first_comment_id']
     assert data['not_read']['count'] == 2
     # check room
@@ -131,7 +128,6 @@ def test_readmark_rights(room_group, admin, user):
     response = user.post('/api/forum/read_mark/', {'comment_id': None})
     assert response.status_code == 200
     data = response.json()
-    assert data['last_read_id'] is None
     assert data['not_read'] is None
     # open thread
     response = admin.put(

@@ -29,17 +29,15 @@ class OnAddThread(mutations.Mutation):
 
 @mutations.on_mutation(mutations.RestoreThread)
 @mutations.on_mutation(rights_mutations.UpdateRights)
-class OnUpdateRights(mutations.Mutation):
+@mutations.on_mutation(mutations.ThreadDeleteMutation)
+class OnThreadChange(mutations.Mutation):
     with_parent = True
 
     def process_parent(self, instance, updated_child):
         # start task on parents processing - original thread is updated in DB.
         # task is started only for direct parent of original thread
         if updated_child.pk == self.thread.pk:
-            tasks.update_read_marks_on_rights.apply_async(
-                args=[
-                    self.thread._meta.app_label, self.thread._meta.object_name,
-                    instance.pk])
+            tasks.update_read_marks_on_rights_async(instance)
 
 
 def init():

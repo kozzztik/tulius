@@ -9,9 +9,11 @@ from tulius.forum.threads import signals as thread_signals
 from tulius.forum.threads import views
 from tulius.forum.comments import models as comment_models
 from tulius.forum.comments import views as comment_views
+from tulius.forum.read_marks import tasks
 
 # TODO game forum thread counters
-# TODO update edge cases with changing threads and comments (move, delete)
+# TODO update edge cases with changing threads (move)
+# TODO test delete read mark
 
 
 class ReadmarkAPI(views.BaseThreadView):
@@ -138,16 +140,17 @@ class ReadmarkAPI(views.BaseThreadView):
 
     @classmethod
     def on_delete_comment(cls, sender, comment, view, **_kwargs):
-        # TODO
         thread = view.obj
-        last_comment_id = thread.data['last_comment']['all']
+        last_comment_id = thread.last_comment.su
         if (not comment.is_thread()) and (last_comment_id <= comment.pk):
             comments = sender.objects.filter(
                 parent=thread, deleted=False, id__gt=comment.id).order_by('id')
             new_not_read = comments[0].id if comments else None
-            cls.read_mark_model.objects.filter(
+            count = cls.read_mark_model.objects.filter(
                 thread=thread, not_read_comment_id=comment.pk
             ).update(not_read_comment_id=new_not_read)
+            if count and thread.parent:
+                tasks.update_read_marks_on_rights_async(thread.parent)
 
     @classmethod
     def after_add_comment(cls, comment, preview, view, **_kwargs):
