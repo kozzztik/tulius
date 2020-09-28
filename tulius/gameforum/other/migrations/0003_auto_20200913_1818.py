@@ -31,4 +31,8 @@ class Migration(migrations.Migration):
             name='threadreadmark',
             options={},
         ),
+        migrations.RemoveField(
+            model_name='threadreadmark',
+            name='readed_comment_id',
+        ),
     ]

@@ -25,9 +25,8 @@ def migrate_data(apps, schema_editor):
         with transaction.atomic():
             mutations.ThreadFixCounters(thread).apply()
         count += 1
-        if count % 10 == 0:
-            gc.collect()
-            print(f'migrated {count} threads')
+        gc.collect()
+        print(f'migrated {count} threads')
     print(f'Threads migrated {count} of {total_count}')
 
 

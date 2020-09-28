@@ -11,8 +11,6 @@ from tulius.forum.comments import models as comment_models
 from tulius.forum.comments import views as comment_views
 from tulius.forum.read_marks import tasks
 
-# TODO game forum thread counters
-
 
 class ReadmarkAPI(views.BaseThreadView):
     require_user = True

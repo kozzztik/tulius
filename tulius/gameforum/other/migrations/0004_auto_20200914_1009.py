@@ -22,7 +22,6 @@ def migrate_data(apps, schema_editor):
                 defaults={
                     'not_read_comment_id': read_mark.not_read_comment_id,
                     'not_readed_comment_id': read_mark.not_read_comment_id,
-                    'readed_comment_id': read_mark.readed_comment_id,
                 }
             )[0]
             if (not item.not_read_comment_id) or (
