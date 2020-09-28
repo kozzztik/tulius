@@ -10,8 +10,7 @@ from tulius.forum.threads import views
 from tulius.forum.comments import models as comment_models
 from tulius.forum.comments import views as comment_views
 
-# TODO game forum migration
-# TODO update UI with last read
+# TODO game forum thread counters
 # TODO update edge cases with changing threads and comments (move, delete)
 
 
@@ -120,7 +119,6 @@ class ReadmarkAPI(views.BaseThreadView):
             read_mark = self.mark_thread_as_read(
                 self.obj, read_id, with_parent=True)
         return {
-            'last_read_id': read_id,  # TODO remove
             'not_read': self.not_read_comment_json(
                 read_mark.not_read_comment_id, self.user
             ) if read_mark and read_mark.not_read_comment_id else None
@@ -133,7 +131,6 @@ class ReadmarkAPI(views.BaseThreadView):
             thread=self.obj, user=self.user).delete()
         comment_id = self.obj.first_comment[self.user]
         return {
-            'last_read_id': None,
             'not_read':
                 self.not_read_comment_json(
                     comment_id, self.user) if comment_id else None

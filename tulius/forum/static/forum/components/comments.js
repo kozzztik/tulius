@@ -124,7 +124,9 @@ export default LazyComponent('forum_thread_comments', {
         mark_as_read(comment) {
             if (this.user.is_anonymous)
                 return;
-            if (comment.id <= this.thread.last_read_id)
+            if (!this.thread.not_read)
+                return;
+            if (comment.id < this.thread.not_read.id)
                 return;
             if (this.mark_read_id)
                 return;
@@ -142,7 +144,6 @@ export default LazyComponent('forum_thread_comments', {
         do_mark_mark_as_read(comment_id) {
             // console.log('пошел запрос');
             axios.post(this.thread.url + 'read_mark/', {'comment_id': comment_id}).then(response => {
-                this.thread.last_read_id = response.data.last_read_id;
                 this.thread.not_read = response.data.not_read;
             }).catch(error => this.$root.add_message(error, "error")).then(() => {
                 this.mark_read_id = null;
