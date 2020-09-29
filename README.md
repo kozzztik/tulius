@@ -27,6 +27,8 @@ Repo for http://tulius.com project.
     mkdir /home/travis/master/data/mysql
     mkdir /home/travis/master/data/static
     mkdir /home/travis/master/data/media
+    mkdir /home/travis/master/data/elastic
+    chown 1000:1000 /home/travis/master/data/elastic
     mkdir /home/travis/dev/data
     mkdir /home/travis/dev/data/static
     mkdir /home/travis/dev/data/media
