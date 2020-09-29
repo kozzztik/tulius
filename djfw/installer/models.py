@@ -5,6 +5,7 @@ from django.db import models
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext_lazy as _
+from django.template.defaultfilters import filesizeformat
 
 
 class BackupCategory(models.Model):
@@ -101,7 +102,6 @@ class Backup(models.Model):
         return "%s.tar.gz" % self.pk
 
     def file_size(self):
-        from django.template.defaultfilters import filesizeformat
         return filesizeformat(self.size)
 
     file_size.short_description = _(u'size')

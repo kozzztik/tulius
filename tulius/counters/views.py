@@ -1,5 +1,7 @@
 from django.views.generic import TemplateView
 
+from tulius import models
+
 
 class CountersIndex(TemplateView):
     template_name = 'counters/index.haml'
@@ -18,6 +20,5 @@ class CountersBase(TemplateView):
 
 class PMCounters(CountersBase):
     def do_action(self):
-        from tulius.models import User
-        for player in User.objects.all():
+        for player in models.User.objects.all():
             player.update_not_readed()

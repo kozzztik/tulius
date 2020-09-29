@@ -2,6 +2,8 @@ import datetime
 
 from django.core.management.base import BaseCommand
 
+from djfw.profiler.collapse import do_collapse
+
 
 class Command(BaseCommand):
     help = "Calculates collapsed statistics for fast reports"
@@ -9,7 +11,6 @@ class Command(BaseCommand):
         "'last'(previous day), 'all'(recalc all) or date like '2014-01-01'."
 
     def handle(self, *args, **options):
-        from djfw.profiler.collapse import do_collapse
         day = options['day']
         if day == 'last':
             day = datetime.date.today() - datetime.timedelta(days=1)

@@ -1,6 +1,7 @@
 from django import template
 from django.template import TemplateSyntaxError
 from django.template.loader_tags import BlockNode, do_block
+from django.template.loader_tags import do_extends
 
 
 register = template.Library()
@@ -69,7 +70,6 @@ def do_enablemacros(parser, token):
 
 
 def do_extends_with_macros(parser, token):
-    from django.template.loader_tags import do_extends
     # parse it as an ExtendsNode, but also create a fake MacroRoot node
     # and add it to the parser, like we do in do_enablemacros().
     parser._macro_root = MacroRoot()

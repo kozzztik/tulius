@@ -8,5 +8,6 @@ class GameForumThreadsConfig(AppConfig):
 
     def ready(self):
         # rights receivers may not be connected in tests
+        # pylint: disable=C0415
         from tulius.gameforum.rights import views
         views.init()

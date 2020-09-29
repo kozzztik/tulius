@@ -90,7 +90,7 @@ INSTALLED_APPS = (
     'tulius.gameforum.comments.GameForumCommentsConfig',
     'tulius.gameforum.other.GameForumOtherConfig',
     'djfw.installer',
-    'tulius.events',
+    'tulius.events.EventsConfig',
     'tulius.vk',
     'tulius.counters',
     'tulius.websockets',

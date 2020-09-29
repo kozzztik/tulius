@@ -6,5 +6,6 @@ class ForumReadMarksConfig(AppConfig):
     label = 'forum_read_marks'
 
     def ready(self):
+        # pylint: disable=C0415
         from tulius.forum.read_marks import mutations
         mutations.init()

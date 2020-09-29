@@ -174,6 +174,8 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
     def email_user(self, subject, message, from_email=None):
         send_mail(subject, message, from_email, [self.email])
 
+    # TODO: refactor this. Make counter updated by signals
+    # pylint: disable=C0415
     def full_stars(self):
         from tulius.stories.models import Variation, Role
         from tulius.games import models as game_models

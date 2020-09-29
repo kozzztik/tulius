@@ -7,6 +7,8 @@ class DBLogHandler(logging.Handler):
         if record.name == 'django.db.backends':
             return
         try:
+            # TODO: remove handler and model
+            # pylint: disable=C0415
             from djfw.logger.models import LogMessage
             log_message = LogMessage()
             log_message.level = record.levelno
