@@ -22,7 +22,7 @@ PLAYERS_SORT_TYPE = (
     (PLAYERS_SORT_GAMES_PLAYED_DEC, _("games played count decreasing")),
     (PLAYERS_SORT_REG_DATE, _("registration date")),
     (PLAYERS_SORT_ALPH, _("alphabetical")),
-    )
+)
 
 
 class PlayersFilterForm(forms.Form):

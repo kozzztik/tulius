@@ -1,8 +1,8 @@
 from aiohttp import web
 from django.conf import settings
 
-#from aiohttpdemo_polls.db import close_pg, init_pg
-#from aiohttpdemo_polls.middlewares import setup_middlewares
+# from aiohttpdemo_polls.db import close_pg, init_pg
+# from aiohttpdemo_polls.middlewares import setup_middlewares
 
 from tulius.websockets.routes import setup_routes
 

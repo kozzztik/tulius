@@ -8,7 +8,6 @@ from tulius.gameforum import online_status
 from tulius.forum import online_status as forum_online
 
 
-
 def test_game_online_status(
         game, variation_forum, user, admin, detective, client):
     # cleanup caches

@@ -157,8 +157,8 @@ class ReadmarkAPI(views.BaseThreadView):
         if not comment.is_thread():
             pks = view.obj.parents_ids + [view.obj.pk]
             cls.read_mark_model.objects.filter(
-                dj_models.Q(not_read_comment_id=None)
-                | dj_models.Q(not_read_comment_id__gt=comment.pk),
+                dj_models.Q(not_read_comment_id=None) | dj_models.Q(
+                    not_read_comment_id__gt=comment.pk),
                 thread_id__in=pks,
             ).exclude(user=view.user).update(not_read_comment_id=comment.pk)
 

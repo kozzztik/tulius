@@ -27,7 +27,7 @@ class RoleForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         story = kwargs.pop('story')
-        super(RoleForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['avatar'].queryset = self.fields[
             'avatar'].queryset.filter(story=story)
         self.fields['character'].queryset = self.fields[
@@ -54,6 +54,6 @@ class RoleDeleteForm(forms.Form):
     )
 
     def __init__(self, variation, *args, **kwargs):
-        super(RoleDeleteForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['role'].queryset = self.fields[
             'role'].queryset.filter(variation=variation)

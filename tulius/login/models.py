@@ -18,15 +18,15 @@ class RegistrationProfile(models.Model):
         verbose_name = _('registration profile')
         verbose_name_plural = _('registration profiles')
 
-    def __unicode__(self):
-        return u"Registration information for %s" % self.user
+    def __str__(self):
+        return "Registration information for %s" % self.user
 
     def activation_key_expired(self):
         expiration_date = datetime.timedelta(
             days=settings.ACCOUNT_ACTIVATION_DAYS)
-        return (
-            self.activation_key == self.ACTIVATED or
-            self.user.date_joined + expiration_date <= datetime_now())
+        if self.activation_key == self.ACTIVATED:
+            return True
+        return self.user.date_joined + expiration_date <= datetime_now()
 
     def send_activation_email(self, site):
         ctx_dict = {'activation_key': self.activation_key,

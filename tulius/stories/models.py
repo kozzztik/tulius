@@ -30,7 +30,7 @@ class Genre(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def get_absolute_url(self):
         return urls.reverse('stories:genre', kwargs={'genre_id': self.pk})
@@ -117,7 +117,7 @@ class Story(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def get_absolute_url(self):
         return urls.reverse('stories:story', kwargs={'pk': self.pk})
@@ -193,8 +193,7 @@ class Avatar(models.Model):
         self.delete_data()
         Character.objects.filter(avatar=self).update(avatar=None)
         Role.objects.filter(avatar=self).update(avatar=None)
-        return super(Avatar, self).delete(
-            using=using, keep_parents=keep_parents)
+        return super().delete(using=using, keep_parents=keep_parents)
 
     def __str__(self):
         return '%s' % (self.name,)
@@ -310,7 +309,7 @@ class Character(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def get_absolute_url(self):
         return urls.reverse('stories:character', args=(self.pk,))
@@ -375,7 +374,7 @@ class Variation(SortableModelMixin):
     )
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def get_absolute_url(self):
         return urls.reverse('stories:variation', args=(self.pk,))
@@ -695,7 +694,7 @@ class AdditionalMaterial(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def get_absolute_url(self):
         if self.variation and self.variation.game:
@@ -779,7 +778,7 @@ class Illustration(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def get_absolute_url(self):
         if self.variation and self.variation.game:
@@ -803,8 +802,7 @@ class Illustration(models.Model):
 
     def delete(self, using=None, keep_parents=False):
         self.delete_data()
-        return super(Illustration, self).delete(
-            using=using, keep_parents=keep_parents)
+        return super().delete(using=using, keep_parents=keep_parents)
 
     def edit_right(self, user):
         if self.story:

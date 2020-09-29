@@ -39,7 +39,7 @@ class FormFields(template.Node):
 def do_form_field(parser, token):
     try:
         _, formname, formset, head = token.split_contents()
-    except ValueError:
+    except ValueError as exc:
         msg = 'inline_form_fields tag requires a three arguments'
-        raise template.TemplateSyntaxError(msg)
+        raise template.TemplateSyntaxError(msg) from exc
     return FormFields(formname, formset, head)

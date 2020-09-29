@@ -1,6 +1,5 @@
 from django.db import transaction
 
-from tulius.forum.threads import models
 from tulius.games import models as game_models
 
 

@@ -196,10 +196,10 @@ def ParseUserAgent(user_agent_string, **jsParseBits):
     # Override for Chrome Frame IFF Chrome is enabled.
     if 'js_user_agent_string' in jsParseBits:
         js_user_agent_string = jsParseBits['js_user_agent_string']
-        if (
-                js_user_agent_string and
-                js_user_agent_string.find('Chrome/') > -1 and
-                user_agent_string.find('chromeframe') > -1):
+        chrome = bool(js_user_agent_string)
+        chrome = chrome and js_user_agent_string.find('Chrome/') > -1
+        chrome = chrome and user_agent_string.find('chromeframe') > -1
+        if chrome:
             jsOverride = ParseUserAgent(js_user_agent_string)
             family = 'Chrome Frame (%s %s)' % (family, v1)
             v1 = jsOverride['major']
@@ -311,8 +311,8 @@ def ParseWithJSOverrides(user_agent_string,
                 break
 
     # Override for Chrome Frame IFF Chrome is enabled.
-    if (js_user_agent_string and js_user_agent_string.find('Chrome/') > -1 and
-            user_agent_string.find('chromeframe') > -1):
+    chrome = js_user_agent_string and js_user_agent_string.find('Chrome/') > -1
+    if chrome and user_agent_string.find('chromeframe') > -1:
         family = 'Chrome Frame (%s %s)' % (family, v1)
         ua_dict = ParseUserAgent(js_user_agent_string)
         v1 = ua_dict['major']

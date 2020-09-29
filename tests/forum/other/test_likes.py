@@ -10,13 +10,13 @@ def test_setting_likes(thread, user, superuser):
     assert str(comment_id) in data
     assert not data[str(comment_id)]
     # check that favorites is empty
-    response = user.get(f'/api/forum/favorites/')
+    response = user.get('/api/forum/favorites/')
     assert response.status_code == 200
     data = response.json()
     assert data['groups'][0]['items'] == []
     # set like mark
     response = user.post(
-        f'/api/forum/likes/', {'id': comment_id, 'value': True})
+        '/api/forum/likes/', {'id': comment_id, 'value': True})
     assert response.status_code == 200
     data = response.json()
     assert data == {'value': True}
@@ -27,7 +27,7 @@ def test_setting_likes(thread, user, superuser):
     assert str(comment_id) in data
     assert data[str(comment_id)]
     # check favorites
-    response = user.get(f'/api/forum/favorites/')
+    response = user.get('/api/forum/favorites/')
     assert response.status_code == 200
     data = response.json()
     assert len(data['groups'][0]['items']) == 1
@@ -35,12 +35,12 @@ def test_setting_likes(thread, user, superuser):
     assert data['groups'][0]['items'][0]['thread']['id'] == thread['id']
     # remove like mark
     response = user.post(
-        f'/api/forum/likes/', {'id': comment_id, 'value': False})
+        '/api/forum/likes/', {'id': comment_id, 'value': False})
     assert response.status_code == 200
     data = response.json()
     assert data == {'value': False}
     # check that favorites is empty
-    response = user.get(f'/api/forum/favorites/')
+    response = user.get('/api/forum/favorites/')
     assert response.status_code == 200
     data = response.json()
     assert data['groups'][0]['items'] == []
@@ -56,7 +56,7 @@ def test_rights_check_in_favorites(thread, user, superuser):
     comment_id = thread['first_comment_id']
     # set like mark
     response = user.post(
-        f'/api/forum/likes/', {'id': comment_id, 'value': True})
+        '/api/forum/likes/', {'id': comment_id, 'value': True})
     assert response.status_code == 200
     data = response.json()
     assert data == {'value': True}
@@ -67,7 +67,7 @@ def test_rights_check_in_favorites(thread, user, superuser):
     assert str(comment_id) in data
     assert data[str(comment_id)]
     # check favorites
-    response = user.get(f'/api/forum/favorites/')
+    response = user.get('/api/forum/favorites/')
     assert response.status_code == 200
     data = response.json()
     assert len(data['groups'][0]['items']) == 1
@@ -80,18 +80,18 @@ def test_rights_check_in_favorites(thread, user, superuser):
     assert response.status_code == 200
     # check we can double like
     response = user.post(
-        f'/api/forum/likes/', {'id': comment_id, 'value': True})
+        '/api/forum/likes/', {'id': comment_id, 'value': True})
     assert response.status_code == 200
     # check we still can remove like
     response = user.post(
-        f'/api/forum/likes/', {'id': comment_id, 'value': False})
+        '/api/forum/likes/', {'id': comment_id, 'value': False})
     assert response.status_code == 200
     # but not set it back
     response = user.post(
-        f'/api/forum/likes/', {'id': comment_id, 'value': True})
+        '/api/forum/likes/', {'id': comment_id, 'value': True})
     assert response.status_code == 403
     # check favorites
-    response = user.get(f'/api/forum/favorites/')
+    response = user.get('/api/forum/favorites/')
     assert response.status_code == 200
     data = response.json()
     assert data['groups'][0]['items'] == []
@@ -101,7 +101,7 @@ def test_liking_not_existing_comment(thread, user):
     comment_id = thread['first_comment_id']
     # set like mark for not created comment
     response = user.post(
-        f'/api/forum/likes/', {'id': comment_id + 1, 'value': True})
+        '/api/forum/likes/', {'id': comment_id + 1, 'value': True})
     assert response.status_code == 404
 
 
@@ -109,13 +109,13 @@ def test_double_liking(thread, user):
     comment_id = thread['first_comment_id']
     # set like mark
     response = user.post(
-        f'/api/forum/likes/', {'id': comment_id, 'value': True})
+        '/api/forum/likes/', {'id': comment_id, 'value': True})
     assert response.status_code == 200
     data = response.json()
     assert data == {'value': True}
     # set like mark again
     response = user.post(
-        f'/api/forum/likes/', {'id': comment_id, 'value': True})
+        '/api/forum/likes/', {'id': comment_id, 'value': True})
     assert response.status_code == 200
     data = response.json()
     assert data == {'value': True}
@@ -127,7 +127,7 @@ def test_double_liking(thread, user):
     assert data[str(comment_id)]
     # Remove
     response = user.post(
-        f'/api/forum/likes/', {'id': comment_id, 'value': False})
+        '/api/forum/likes/', {'id': comment_id, 'value': False})
     assert response.status_code == 200
     data = response.json()
     assert data == {'value': False}
@@ -139,7 +139,7 @@ def test_double_liking(thread, user):
     assert not data[str(comment_id)]
     # remove again
     response = user.post(
-        f'/api/forum/likes/', {'id': comment_id, 'value': False})
+        '/api/forum/likes/', {'id': comment_id, 'value': False})
     assert response.status_code == 200
     data = response.json()
     assert data == {'value': False}

@@ -12,8 +12,7 @@ class OnlineStatusAPI(online_status.OnlineStatusAPI, base.VariationMixin):
     thread_model = thread_models.Thread
 
     def update_online_status(self, redis, timestamp, timeout):
-        super(OnlineStatusAPI, self).update_online_status(
-            redis, timestamp, timeout)
+        super().update_online_status(redis, timestamp, timeout)
         if self.variation.game_id and (not self.user.is_anonymous):
             models.Role.objects.filter(
                 variation=self.variation, user=self.user

@@ -15,7 +15,7 @@ class VariationMutationMixin(base_mutations.Mutation):
     guests = None
 
     def __init__(self, thread, variation, **_kwargs):
-        super(VariationMutationMixin, self).__init__(thread)
+        super().__init__(thread)
         self.variation = variation
         self.all_roles = {
             role.id: role for role in stories_models.Role.objects.filter(
@@ -58,7 +58,7 @@ class UpdateRights(mutations.UpdateRights, VariationMutationMixin):
             instance.rights.role.all_inherit = forum_models.ACCESS_OPEN
         instance.rights.all = 0
         self._process_variation(instance.rights)
-        super(UpdateRights, self)._rights_for_root(instance)
+        super()._rights_for_root(instance)
 
     def _process_parent_rights(
             self, instance: forum_models.AbstractThread, parent):
@@ -70,7 +70,7 @@ class UpdateRights(mutations.UpdateRights, VariationMutationMixin):
             instance.rights.role.all = parent_all
         if instance.rights.role.all & forum_models.ACCESS_NO_INHERIT:
             instance.rights.role.all_inherit = parent_all
-        super(UpdateRights, self)._process_parent_rights(instance, parent)
+        super()._process_parent_rights(instance, parent)
         self._process_variation(instance.rights)
         # process parent role exceptions
         for role_id, right in parent.rights.role:
@@ -79,8 +79,8 @@ class UpdateRights(mutations.UpdateRights, VariationMutationMixin):
                 right &= instance.default_rights
             instance.rights.role[role_id] = right
 
-    def _process_granted_exceptions\
-                    (self, instance: forum_models.AbstractThread):
+    def _process_granted_exceptions(
+            self, instance: forum_models.AbstractThread):
         for right in self._query_granted_exceptions(instance):
             access_level = instance.rights.role.all | right.access_level
             access_level |= instance.rights.role[right.role_id]
@@ -134,7 +134,7 @@ class UpdateRightsOnThreadCreate(
         VariationMutationMixin):
     def __init__(
             self, thread, parent=None, data=None, variation=None, **kwargs):
-        super(UpdateRightsOnThreadCreate, self).__init__(
+        super().__init__(
             thread, parent=parent, data=data,
             variation=variation or parent.variation, **kwargs)
 

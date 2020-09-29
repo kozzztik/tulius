@@ -25,7 +25,7 @@ class Search(search.Search, base.VariationMixin):
     comments_class = comments_api.CommentAPI
 
     def get_view(self, comment):
-        view = super(Search, self).get_view(comment)
+        view = super().get_view(comment)
         view.variation = self.variation
         return view
 
@@ -50,9 +50,8 @@ class Likes(likes.Likes, comments_api.CommentsBase):
     like_model = other_models.CommentLike
 
     def create_like(self):
-        like = super(Likes, self).create_like()
+        like = super().create_like()
         game = self.variation.game
-        # pylint: disable=E1137
         like.data['variation'] = {
             'id': self.variation.pk,
             'name': str(game) if game else self.variation.name}

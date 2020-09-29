@@ -2,6 +2,8 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from django.template.defaultfilters import filesizeformat
+
 
 class Smile(models.Model):
     class Meta:
@@ -31,7 +33,7 @@ class Smile(models.Model):
         return '<img src="' + str(self.image.url) + '"/>'
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     preview_image.allow_tags = True
     preview_image.short_description = _('image')
@@ -86,7 +88,6 @@ class UploadedFile(models.Model):
         return self.body.url if self.body else None
 
     def file_size_formated(self):
-        from django.template.defaultfilters import filesizeformat
         return filesizeformat(self.file_size)
 
     def filename_link(self):
@@ -164,7 +165,6 @@ class UploadedImage(models.Model):
         return self.body.url if self.body else None
 
     def file_size_formated(self):
-        from django.template.defaultfilters import filesizeformat
         return filesizeformat(self.file_size)
 
     get_absolute_url.short_description = _('URL')

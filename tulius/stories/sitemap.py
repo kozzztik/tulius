@@ -1,6 +1,7 @@
 from django.contrib.sitemaps import Sitemap
 from .models import Story
 
+
 class StoriesSitemap(Sitemap):
     changefreq = "daily"
     priority = 1.0

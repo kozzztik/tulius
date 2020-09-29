@@ -1,5 +1,5 @@
 def test_youtube_media_on_threads(room_group, user):
-    response=user.put(
+    response = user.put(
         room_group['url'], {
             'title': 'thread', 'body': 'thread description',
             'room': False, 'default_rights': None, 'granted_rights': [],

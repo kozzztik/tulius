@@ -11,10 +11,10 @@ class PrivateMessageForm(forms.ModelForm):
     def __init__(self, sender, receiver, *args, **kwargs):
         self.sender = sender
         self.receiver = receiver
-        super(PrivateMessageForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def save(self, commit=True):
-        pm = super(PrivateMessageForm, self).save(commit=False)
+        pm = super().save(commit=False)
         pm.receiver = self.receiver
         pm.sender = self.sender
         pm.save()

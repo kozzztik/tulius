@@ -26,11 +26,10 @@ def migrate_data(apps, schema_editor):
                     'not_read_comment_id': read_mark.not_read_comment_id,
                 }
             )[0]
+            pk = read_mark.not_read_comment_id
             if (not item.not_read_comment_id) or (
-                    read_mark.not_read_comment_id and (
-                        item.not_read_comment_id >
-                        read_mark.not_read_comment_id)):
-                item.not_read_comment_id = read_mark.not_read_comment_id
+                    pk and (item.not_read_comment_id > pk)):
+                item.not_read_comment_id = pk
             item.save()
         count += 1
         if count % 1000 == 0:

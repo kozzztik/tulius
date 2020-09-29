@@ -1,32 +1,5 @@
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
-from django.db.models.signals import post_save
-
-
-class DirtyFieldsMixin:
-    def __init__(self, *args, **kwargs):
-        super(DirtyFieldsMixin, self).__init__(*args, **kwargs)
-        post_save.connect(
-            self._reset_state,
-            sender=self.__class__,
-            dispatch_uid='%s-DirtyFieldsMixin-sweeper' % (
-                self.__class__.__name__)
-        )
-        self._reset_state()
-
-    def _reset_state(self, *args, **kwargs):
-        self._original_state = self._as_dict()
-
-    def _as_dict(self):
-        return {
-            f.attname: getattr(self, f.attname)
-            for f in self._meta.local_fields}
-
-    def get_dirty_fields(self):
-        new_state = self._as_dict()
-        return {
-            key: value for key, value in
-            self._original_state.items() if value != new_state[key]}
 
 
 class UpdatedAndCreatedDatesMixin(models.Model):
@@ -75,7 +48,7 @@ class AbstractStatusModel(AbstractBaseModel):
     )
 
     def __unicode__(self):
-        return '#%s. %s' % (self.id, self.name,)
+        return '#%s. %s' % (self.pk, self.name,)
 
 
 class AbstractDescribedStatusModel(AbstractStatusModel):
@@ -111,7 +84,7 @@ class AbstractMessage(AbstractBaseModel):
     )
 
     def __unicode__(self):
-        return '#%s. %s' % (self.id, self.title,)
+        return '#%s. %s' % (self.pk, self.title,)
 
 
 class AbstractQuestion(AbstractBaseModel):

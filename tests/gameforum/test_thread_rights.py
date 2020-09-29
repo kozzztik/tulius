@@ -89,4 +89,5 @@ def test_user_thread_api_rights(
     assert data['threads'][0]['user']['id'] == detective.pk
     assert data['threads'][0]['user']['title'] == detective.name
     assert data['threads'][0]['last_comment']['user']['id'] == detective.pk
-    assert data['threads'][0]['last_comment']['user']['title'] == detective.name
+    assert data['threads'][0]['last_comment']['user']['title'] == \
+           detective.name

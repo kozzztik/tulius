@@ -92,9 +92,8 @@ class VotingAPI(views.CommentBase):
         data['id'] = comment_id  # backward compatibility with frontend
         data['choice'] = cls.user_choice(data['choices'], user, comment_id)
         with_results = bool(
-            data['closed'] or
-            data['preview_results'] or
-            (data['choice'] and data['show_results']))
+            data['closed'] or data['preview_results'] or (
+                data['choice'] and data['show_results']))
         if not with_results:
             for item in data['choices']['items']:
                 item['count'] = None

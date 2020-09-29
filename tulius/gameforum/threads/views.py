@@ -23,7 +23,7 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
 
     def get_parent_thread(
             self, pk=None, for_update=False, deleted=False, **_kwargs):
-        super(BaseThreadAPI, self).get_parent_thread(
+        super().get_parent_thread(
             pk=pk, for_update=for_update, deleted=deleted, **_kwargs)
         if self.obj.variation_id != self.variation.pk:
             raise exceptions.PermissionDenied('Wrong variation')
@@ -70,8 +70,8 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
                     role.avatar and role.avatar.image) else '',
                 'online_status': on,
                 'owned': (
-                    self.user.is_authenticated and
-                    (role.user_id == self.user.id)),
+                    self.user.is_authenticated and (
+                        role.user_id == self.user.id)),
                 'trust': role.trust_value if role.show_trust_marks else None,
                 'show_trust_marks': role.show_trust_marks,
             })
@@ -112,13 +112,13 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
         return role_id
 
     def create_thread(self, data):
-        obj = super(BaseThreadAPI, self).create_thread(data)
+        obj = super().create_thread(data)
         obj.role_id = self.process_role(None, data)
         obj.variation_id = self.variation.pk
         return obj
 
     def update_thread(self, data):
-        super(BaseThreadAPI, self).update_thread(data)
+        super().update_thread(data)
         self.obj.role_id = self.process_role(self.obj.role_id, data)
         editor_role = data['edit_role_id']
         if editor_role not in self.write_roles():
@@ -135,7 +135,7 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
                 if right & forum_models.ACCESS_READ]
 
     def obj_to_json(self, deleted=False):
-        data = super(BaseThreadAPI, self).obj_to_json(deleted=deleted)
+        data = super().obj_to_json(deleted=deleted)
         data['user'] = self.role_to_json(self.obj.role_id, detailed=True)
         data['edit_role_id'] = self.obj.edit_role_id
         self._rights_strict_roles(data)

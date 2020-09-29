@@ -9,7 +9,7 @@ GRAPH_TYPE_CHOICES = (
     (GRAPH_TYPE_LINEAR, 'Linear'),
     (GRAPH_TYPE_LINEAR_C, 'Combined'),
     (GRAPH_TYPE_SUNLIGHT, 'Sunlight'),
-    )
+)
 
 LINEAR_CALLS = 0
 LINEAR_ERRORS = 1
@@ -29,7 +29,7 @@ LINEAR_GRAPH_CHOICES = (
     (LINEAR_DB_CALLS, 'Database queries'),
     (LINEAR_DB_EXEC, 'Database work time, s'),
     (LINEAR_TEMPLATE, 'Template rendering, s'),
-    )
+)
 
 LINEAR_C_ANONS = 0
 LINEAR_C_MOBILES = 1
@@ -41,7 +41,7 @@ LINEAR_C_GRAPH_CHOICES = (
     (LINEAR_C_MOBILES, 'Mobile devices'),
     (LINEAR_C_EXEC, 'Loading view, s'),
     (LINEAR_C_ERRORS, 'Exceptions'),
-    )
+)
 
 SUNLIGHT_BROWSERS = 0
 SUNLIGHT_OSES = 1
@@ -67,7 +67,7 @@ SUNLIGHT_CHOICES = (
     (SUNLIGHT_MOD_DB_COUNT, 'Modules - DB queries'),
     (SUNLIGHT_MOD_DB_TIME, 'Modules - DB work time'),
     (SUNLIGHT_MOD_TEMPLATE, 'Modules - Rendering'),
-    )
+)
 
 PERIOD_DAY = 1
 PERIOD_LASTDAY = 2
@@ -85,7 +85,7 @@ PERIOD_CHOICES = (
     (PERIOD_2WEEKS, 'Last 2 weeks'),
     (PERIOD_3WEEKS, 'Last 3 weeks'),
     (PERIOD_MONTH, 'Last month'),
-    )
+)
 
 
 class StatsFilterForm(forms.Form):

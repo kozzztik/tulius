@@ -4,7 +4,7 @@ import time
 
 class LocalCounter(threading.local):
     def __init__(self):
-        super(LocalCounter, self).__init__()
+        super().__init__()
         self.clear()
 
     def clear(self):
@@ -81,7 +81,6 @@ class CursorWrapper:
             end_time = int(time.clock() * 1000)
             local_counter.exec_count += 1
             local_counter.exec_time += end_time - starttime
-
 
     def __getattr__(self, attr):
         cursor_attr = getattr(self.cursor, attr)

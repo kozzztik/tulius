@@ -31,9 +31,9 @@ class CatalogCaption(CatalogIndex):
 def do_catalog_index(parser, token):
     try:
         _, catalog_page = token.split_contents()
-    except ValueError:
+    except ValueError as exc:
         msg = 'catalog_index tag requires a single argument'
-        raise template.TemplateSyntaxError(msg)
+        raise template.TemplateSyntaxError(msg) from exc
     return CatalogIndex(catalog_page)
 
 
@@ -41,7 +41,7 @@ def do_catalog_index(parser, token):
 def do_catalog_caption(parser, token):
     try:
         _, catalog_page = token.split_contents()
-    except ValueError:
+    except ValueError as exc:
         msg = 'catalog_caption tag requires a single argument'
-        raise template.TemplateSyntaxError(msg)
+        raise template.TemplateSyntaxError(msg) from exc
     return CatalogCaption(catalog_page)

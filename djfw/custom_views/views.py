@@ -46,7 +46,7 @@ class SortableDetailViewMixin(SortableViewMixin):
 
     def get_sortable_queryset(self):
         self.object = self.get_object()
-        queryset = super(SortableDetailViewMixin, self).get_sortable_queryset()
+        queryset = super().get_sortable_queryset()
         if self.sortable_model and self.model:
             fk = forms.models._get_foreign_key(
                 self.model, self.sortable_model, fk_name=self.sortable_fk)
@@ -64,7 +64,7 @@ class SortableDetailViewMixin(SortableViewMixin):
 class DecoratorChainingMixin:
     def dispatch(self, *args, **kwargs):
         decorators = getattr(self, 'decorators', [])
-        base = super(DecoratorChainingMixin, self).dispatch
+        base = super().dispatch
 
         for decorator in decorators:
             base = decorator(base)
@@ -144,7 +144,7 @@ class ActionableViewMixin(ActionableBase):
     widgets_param = 'widget'
 
     def __init__(self, *args, **kwargs):
-        super(ActionableViewMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         widgets_list = {}
         for widget_name in self.widgets.keys():
             widget_data = self.widgets[widget_name].copy()
@@ -154,7 +154,7 @@ class ActionableViewMixin(ActionableBase):
         self.widgets_list = widgets_list
 
     def get_context_data(self, **kwargs):
-        context = super(ActionableViewMixin, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['view'] = self
         return context
 
@@ -177,7 +177,7 @@ class ActionableViewMixin(ActionableBase):
     def get(self, request, *args, **kwargs):
         if not self.get_read_right():
             raise PermissionDenied()
-        return super(ActionableViewMixin, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         if self.widgets_param in request.POST:
@@ -187,8 +187,7 @@ class ActionableViewMixin(ActionableBase):
         if widget_name:
             widget = self.widgets_list[widget_name]
             return widget.post(request, *args, **kwargs)
-        return super(ActionableViewMixin, self).post(
-            request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
     def __getitem__(self, key):
         return self.widgets_list[key]
@@ -253,12 +252,12 @@ class FormWidget(TemplatedWidget):
     button_name = 'Send'
 
     def __init__(self, *args, **kwargs):
-        super(FormWidget, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # pylint: disable=not-callable
         self.form = self.form_class(self.request.POST or None)
 
     def get_context_data(self):
-        context = super(FormWidget, self).get_context_data()
+        context = super().get_context_data()
         context_name = self.context_name or 'form'
         context[context_name] = self.form
         return context
@@ -347,7 +346,7 @@ class FormsetWidget(TemplatedWidget):
         return self.queryset
 
     def get_context_data(self):
-        context = super(FormsetWidget, self).get_context_data()
+        context = super().get_context_data()
         self.formset = self.prepare_formset()
         self.editable = self.get_editable()
         if not hasattr(self, 'form'):

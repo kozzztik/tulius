@@ -2,6 +2,7 @@ import logging
 
 from django.utils.translation import ugettext_lazy as _
 
+from djfw.datablocks.models import DataBlock
 
 bb_codes_list = {}
 bb_simple_codes_list = {'br': '<br/>'}
@@ -176,7 +177,6 @@ def bb_size(tagname, param, text):
 
 def bb_datablock(tagname, param):
     try:
-        from djfw.datablocks.models import DataBlock
         block = DataBlock.objects.languaged().filter(name=param)[0]
         return block.full_text
     except Exception as e:

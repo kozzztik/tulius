@@ -67,7 +67,7 @@ class UpdateRightsOnThreadCreate(UpdateRights):
     data = None
 
     def __init__(self, thread, parent=None, data=None, **kwargs):
-        super(UpdateRightsOnThreadCreate, self).__init__(thread, **kwargs)
+        super().__init__(thread, **kwargs)
         self.data = data or parent.data
         if self.data['default_rights'] is None:
             thread.default_rights = None

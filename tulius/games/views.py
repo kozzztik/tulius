@@ -26,7 +26,7 @@ class MessageMixin:
     success_message = ''
 
     def form_valid(self, form):
-        response = super(MessageMixin, self).form_valid(form)
+        response = super().form_valid(form)
         if self.success_message:
             messages.success(self.request, self.success_message)
         return response
@@ -34,7 +34,7 @@ class MessageMixin:
     def form_invalid(self, form):
         if self.error_message:
             messages.error(self.request, self.error_message)
-        return super(MessageMixin, self).form_invalid(form)
+        return super().form_invalid(form)
 
 
 # pylint: disable=too-many-branches
@@ -198,7 +198,7 @@ class CreateGame(MessageMixin, subviews.SubCreateView):
         return http.HttpResponseRedirect(game.get_edit_url())
 
     def get_context_data(self, **kwargs):
-        context = super(CreateGame, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['catalog_page'] = cataloging.CatalogPage(
             name=_('create game'), parent=catalog.games_catalog_page())
         context['form_submit_title'] = _("add")
@@ -222,11 +222,9 @@ def role_text_read_right(role, user, game):
     if role.user == user and (
             game.status >= models.GAME_STATUS_REGISTRATION_COMPLETED):
         return True
-    return (
-        game.status in [
-            models.GAME_STATUS_FINISHING, models.GAME_STATUS_COMPLETED]
-        and game.read_right(user)
-    )
+    status = game.status in [
+        models.GAME_STATUS_FINISHING, models.GAME_STATUS_COMPLETED]
+    return status and game.read_right(user)
 
 
 class GameView(djfw_views.RightsDetailMixin, generic.DetailView):
@@ -258,10 +256,10 @@ class GameView(djfw_views.RightsDetailMixin, generic.DetailView):
             story=game.variation.story)
         kwargs['materials'] = stories.AdditionalMaterial.objects.filter(
             (
-                query_utils.Q(variation=game.variation) |
-                query_utils.Q(story=game.variation.story)
+                query_utils.Q(variation=game.variation) | query_utils.Q(
+                    story=game.variation.story)
             ) & query_utils.Q(admins_only=False))
-        return super(GameView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class GameRoleView(djfw_views.RightsDetailMixin, generic.DetailView):
@@ -282,7 +280,7 @@ class GameRoleView(djfw_views.RightsDetailMixin, generic.DetailView):
         kwargs['game_page'] = game_page
         kwargs['catalog_page'] = cataloging.CatalogPage(
             name=self.object.name, parent=game_page)
-        return super(GameRoleView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 @decorators.login_required

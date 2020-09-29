@@ -108,7 +108,7 @@ class ThreadView(BaseThreadView):
     create_mutation = mutations.ThreadCreateMutation
 
     def get_context_data(self, **kwargs):
-        super(ThreadView, self).get_context_data(**kwargs)
+        super().get_context_data(**kwargs)
         if self.obj is None:
             self.get_parent_thread(**kwargs)
         # cache rights for async app

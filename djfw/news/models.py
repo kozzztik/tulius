@@ -47,7 +47,7 @@ class NewsItem(AbstractBaseModel):
     )
 
     def __str__(self):
-        return self.caption
+        return str(self.caption)
 
     def get_absolute_url(self):
         return urls.reverse('news:detail', kwargs={'pk': self.pk})
@@ -57,6 +57,6 @@ class NewsItem(AbstractBaseModel):
             update_fields=None):
         if not self.language:
             self.language = translation.get_language()
-        super(NewsItem, self).save(
+        super().save(
             force_insert=force_insert, force_update=force_update,
             using=using, update_fields=update_fields)

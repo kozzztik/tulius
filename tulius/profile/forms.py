@@ -80,5 +80,4 @@ class ChangeEmailForm(forms.Form):
         self.user = user
         self.change_email = False
         self.change_pass = False
-        super(ChangeEmailForm, self).__init__(
-            data=data or None, initial={'email': user.email})
+        super().__init__(data=data or None, initial={'email': user.email})

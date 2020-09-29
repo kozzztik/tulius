@@ -1,5 +1,7 @@
 from django.apps import AppConfig
 
+from tulius.forum.other import youtube
+
 
 class ForumOtherConfig(AppConfig):
     name = 'tulius.forum.other'
@@ -7,5 +9,4 @@ class ForumOtherConfig(AppConfig):
 
     def ready(self):
         # import to connect to signals
-        from tulius.forum.other import youtube
         youtube.init()
