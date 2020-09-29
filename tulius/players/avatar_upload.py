@@ -25,7 +25,7 @@ def save_upload(request, upload, filename, user):
     image_file = ContentFile(image_content.getvalue())
     if user.avatar:
         user.avatar.delete()
-    user.avatar.save(str(user.pk)+'.' + imageformat, image_file)
+    user.avatar.save(str(user.pk) + '.' + imageformat, image_file)
     path = user.avatar.path
     path = os.path.split(path)[0]
     for size in AVATAR_SIZES:

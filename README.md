@@ -129,3 +129,10 @@ On Windows, as Celery not supports it yet, install gevent:
 and start celery with:
 
 ```celery -A tulius worker -l info -P gevent```
+
+## Running tests
+
+``` 
+python -m pylint tests tulius djfw
+python -m pytest tests tulius djfw
+```

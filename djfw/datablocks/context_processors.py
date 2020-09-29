@@ -10,7 +10,7 @@ def datablocks(request):
         if datablock.urls:
             urls = datablock.urls.split()
             urls = [url.strip() for url in urls]
-            if not request.path in urls:
+            if request.path not in urls:
                 continue
         elif datablock.exclude_urls:
             urls = datablock.exclude_urls.split()

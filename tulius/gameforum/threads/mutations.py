@@ -18,11 +18,11 @@ class ThreadFixCounters(mutations.ThreadFixCounters):
         if instance.parent_id or not instance.pk:
             return None
         variation = stories_models.Variation.objects.select_for_update(
-            ).get(thread=instance)
+        ).get(thread=instance)
         roles = stories_models.Role.objects.filter(variation=variation)
         for role in roles:
             role = stories_models.Role.objects.select_for_update(
-                ).get(pk=role.pk)
+            ).get(pk=role.pk)
             role.comments_count = comment_models.Comment.objects.filter(
                 deleted=False, role_id=role.id).count()
             role.save()

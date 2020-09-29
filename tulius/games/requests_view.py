@@ -62,10 +62,9 @@ class RequestSelectionForm(forms.models.ModelForm):
 
     def after_constuct(self, formset, params, i):
         game = params['game']
-        self.fields['role'].queryset = \
-            self.fields['role'].queryset.filter(
-                variation=game.variation, requestable=True
-            ).exclude(deleted=True)
+        self.fields['role'].queryset = self.fields['role'].queryset.filter(
+            variation=game.variation, requestable=True
+        ).exclude(deleted=True)
 
 
 @login_required

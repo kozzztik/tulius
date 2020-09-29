@@ -33,8 +33,8 @@ def update_read_marks_on_rights(
             else:
                 not_read = child.first_comment[mark.user]
             if not_read and (
-                    (not mark.not_read_comment_id) or
-                    (mark.not_read_comment_id > not_read)):
+                    (not mark.not_read_comment_id) or (
+                        mark.not_read_comment_id > not_read)):
                 mark.not_read_comment_id = not_read
         if old_not_read != mark.not_read_comment_id:
             mark.save()

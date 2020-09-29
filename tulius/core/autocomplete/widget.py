@@ -95,7 +95,7 @@ class AutocompleteWidget(TextInput):
             'function(event, ui)'
             ' { $(this).autocomplete_select(event, ui); }')
         self.options['change'] = (
-            'function(event, ui) ' +
+            'function(event, ui) '
             '{ $(this).autocomplete_change(event, ui); }')
         self.options['appendTo'] = '#' + name + '_autocomplete'
         html_code = HiddenInput().render(
@@ -137,9 +137,9 @@ class AutocompleteWidget(TextInput):
 <script type="text/javascript">
     $(document).ready(function() {
         %s$("input[id$='%s_autocomplete']").autocomplete({%s
-        }); 
+        });
     });
-</script> 
+</script>
 """ % (extra, final_attrs['id'], options)
 
         return mark_safe(html_code)

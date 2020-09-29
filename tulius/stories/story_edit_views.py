@@ -122,9 +122,9 @@ class UsersFormsets:
         self.instance = instance
 
     def is_valid(self):
-        return (
-            (not self.static) and self.authorformset.is_valid() and
-            self.adminformset.is_valid())
+        if self.static:
+            return False
+        return self.authorformset.is_valid() and self.adminformset.is_valid()
 
     def save(self):
         self.authorformset.save()

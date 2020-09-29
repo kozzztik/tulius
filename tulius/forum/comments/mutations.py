@@ -83,14 +83,13 @@ class FixCounters(mutations.Mutation):
             if not c.rights.all & models.ACCESS_READ:
                 users |= c.rights.users
             if c.first_comment.su and (
-                    not first_comment.su or
-                    first_comment.su > c.first_comment.su):
+                    not first_comment.su or (
+                        first_comment.su > c.first_comment.su)):
                 first_comment.su = c.first_comment.su
             instance.comments_count.su += c.comments_count.su
             pk = c.last_comment.su
             if pk and (
-                    (not last_comment.su) or
-                    (pk > last_comment.su)):
+                    (not last_comment.su) or (pk > last_comment.su)):
                 last_comment.su = pk
             if c.rights.all & models.ACCESS_READ:
                 pk = c.last_comment.all

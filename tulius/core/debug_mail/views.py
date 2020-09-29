@@ -40,7 +40,7 @@ class MailboxAPI(generic.View):
                     'size': entry.stat().st_size,
                     'timestamp': timestamp,
                     'date': str(datetime.datetime.fromtimestamp(
-                        timestamp/1000000000))
+                        timestamp / 1000000000))
                 })
         result.sort(key=lambda x: x['timestamp'], reverse=True)
         return http.JsonResponse({'result': result[:100]})

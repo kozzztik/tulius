@@ -222,11 +222,9 @@ def role_text_read_right(role, user, game):
     if role.user == user and (
             game.status >= models.GAME_STATUS_REGISTRATION_COMPLETED):
         return True
-    return (
-        game.status in [
-            models.GAME_STATUS_FINISHING, models.GAME_STATUS_COMPLETED]
-        and game.read_right(user)
-    )
+    status = game.status in [
+        models.GAME_STATUS_FINISHING, models.GAME_STATUS_COMPLETED]
+    return status and game.read_right(user)
 
 
 class GameView(djfw_views.RightsDetailMixin, generic.DetailView):
@@ -258,8 +256,8 @@ class GameView(djfw_views.RightsDetailMixin, generic.DetailView):
             story=game.variation.story)
         kwargs['materials'] = stories.AdditionalMaterial.objects.filter(
             (
-                query_utils.Q(variation=game.variation) |
-                query_utils.Q(story=game.variation.story)
+                query_utils.Q(variation=game.variation) | query_utils.Q(
+                    story=game.variation.story)
             ) & query_utils.Q(admins_only=False))
         return super().get_context_data(**kwargs)
 

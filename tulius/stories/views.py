@@ -45,8 +45,8 @@ class IndexView(generic.TemplateView):
             story for story in stories
             if ((not story.hidden) or story.edit_right(self.request.user))]
         filtered_stories_count = len(stories)
-        filtered = self.request.GET and (filtered_stories_count
-                                         != total_stories_count)
+        filtered = self.request.GET and (
+            filtered_stories_count != total_stories_count)
         for story in stories:
             story.editable = story.edit_right(self.request.user)
             story.authors.all()

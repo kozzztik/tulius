@@ -82,7 +82,6 @@ class CursorWrapper:
             local_counter.exec_count += 1
             local_counter.exec_time += end_time - starttime
 
-
     def __getattr__(self, attr):
         cursor_attr = getattr(self.cursor, attr)
         if attr in CursorWrapper.WRAP_ERROR_ATTRS:

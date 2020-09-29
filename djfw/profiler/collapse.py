@@ -35,8 +35,8 @@ def do_collapse(day):
     devices = {}
     modules = {}
     for x in range(COLLAPSE_INTERVALS):
-        min_time = day_start + datetime.timedelta(minutes=x*30)
-        max_time = day_start + datetime.timedelta(minutes=(x + 1)*30)
+        min_time = day_start + datetime.timedelta(minutes=x * 30)
+        max_time = day_start + datetime.timedelta(minutes=(x + 1) * 30)
         messages = ProfilerMessage.objects.filter(
             create_time__gte=min_time, create_time__lt=max_time)
         time_stats = TimeCollapse(day=day_start, create_time=min_time)

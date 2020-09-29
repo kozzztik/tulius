@@ -30,7 +30,7 @@ def do_autopaginate(parser, token):
             context_var = split[as_index + 1]
         except IndexError as exc:
             raise template.TemplateSyntaxError(
-                "Context variable assignment " +
+                "Context variable assignment "
                 "must take the form of {%% %r object.example_set.all ... as "
                 "context_var_name %%}" % split[0]) from exc
         del split[as_index:as_index + 2]
@@ -159,10 +159,10 @@ def paginate(context, window=DEFAULT_WINDOW, hashtag=''):
         last = set(page_range[-window:])
         # Now we look around our current page, making sure that we don't wrap
         # around.
-        current_start = page_obj.number-1-window
+        current_start = page_obj.number - 1 - window
         if current_start < 0:
             current_start = 0
-        current_end = page_obj.number-1+window
+        current_end = page_obj.number - 1 + window
         if current_end < 0:
             current_end = 0
         current = set(page_range[current_start:current_end])

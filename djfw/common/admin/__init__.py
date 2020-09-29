@@ -4,10 +4,10 @@ from django.contrib import admin
 class CustomModelAdmin(admin.ModelAdmin):
 
     # class Media:
-        # js = [
-        #     '/media/tinymce/jscripts/tiny_mce/tiny_mce.js',
-        #     '/media/tinymce_setup/tinymce_setup.js',
-        # ]
+    #     js = [
+    #         '/media/tinymce/jscripts/tiny_mce/tiny_mce.js',
+    #         '/media/tinymce_setup/tinymce_setup.js',
+    #     ]
     save_on_top = True
 
     list_display = (

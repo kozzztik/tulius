@@ -53,7 +53,7 @@ class OnlineStatusAPI(core.BaseAPIView):
         for key in keys:
             pipe.zadd(key, {self.user.pk: timestamp})
             pipe.zremrangebyscore(
-                key, min=float('-inf'), max=timestamp-timeout)
+                key, min=float('-inf'), max=timestamp - timeout)
             pipe.expire(key, timeout)
         pipe.execute()
         set_user_status(self.user.id, self.thread.id if self.thread else None)

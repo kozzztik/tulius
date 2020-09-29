@@ -79,8 +79,8 @@ class UpdateRights(mutations.UpdateRights, VariationMutationMixin):
                 right &= instance.default_rights
             instance.rights.role[role_id] = right
 
-    def _process_granted_exceptions\
-                    (self, instance: forum_models.AbstractThread):
+    def _process_granted_exceptions(
+            self, instance: forum_models.AbstractThread):
         for right in self._query_granted_exceptions(instance):
             access_level = instance.rights.role.all | right.access_level
             access_level |= instance.rights.role[right.role_id]

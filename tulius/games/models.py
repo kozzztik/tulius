@@ -52,8 +52,8 @@ class GameManager(models.Manager):
 
     def any_completed(self):
         return self.filter(
-            Q(status=GAME_STATUS_COMPLETED) |
-            Q(status=GAME_STATUS_COMPLETED_OPEN)
+            Q(status=GAME_STATUS_COMPLETED) | Q(
+                status=GAME_STATUS_COMPLETED_OPEN)
         )
 
     def current(self):
@@ -105,8 +105,9 @@ class GameManager(models.Manager):
 
     def current_games(self, user, check_read=False, announce=False):
         games = self.filter(
-            Q(status=GAME_STATUS_IN_PROGRESS) |
-            Q(status=GAME_STATUS_FINISHING)).filter(deleted=False)
+            Q(status=GAME_STATUS_IN_PROGRESS) | Q(
+                status=GAME_STATUS_FINISHING)
+        ).filter(deleted=False)
         if announce:
             games = games.filter(show_announcement=True)
         return [

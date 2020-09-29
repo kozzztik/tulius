@@ -91,7 +91,7 @@ class VariationAPI(base.VariationMixin):
         if (not self.variation.thread) and self.user.is_authenticated:
             with transaction.atomic():
                 variation = stories_models.Variation.objects.select_for_update(
-                    ).get(pk=self.variation.pk)
+                ).get(pk=self.variation.pk)
                 self.obj.thread = variation.thread = core.create_game_forum(
                     self.user, variation)
                 variation.save()

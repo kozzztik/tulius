@@ -163,8 +163,8 @@ def test_comments_illustrations(
             'title': 'thread', 'body': 'thread description',
             'role_id': detective.pk, 'edit_role_id': detective.pk,
             'media': {'illustrations': [{
-                    'id': variation_illustration.pk,
-                    'foo': 'bar'
+                'id': variation_illustration.pk,
+                'foo': 'bar'
             }]}})
     assert response.status_code == 200
     thread = response.json()

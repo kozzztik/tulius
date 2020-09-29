@@ -25,7 +25,7 @@ USER_SEX_CHOICES = (
     (USER_SEX_UNDEFINED, _('Not defined')),
     (USER_SEX_MALE, _('Male')),
     (USER_SEX_FEMALE, _('Female')),
-    )
+)
 
 USER_GAME_INLINE_TIME = 0
 USER_GAME_INLINE_POSTS = 1

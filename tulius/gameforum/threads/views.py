@@ -70,8 +70,8 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
                     role.avatar and role.avatar.image) else '',
                 'online_status': on,
                 'owned': (
-                    self.user.is_authenticated and
-                    (role.user_id == self.user.id)),
+                    self.user.is_authenticated and (
+                        role.user_id == self.user.id)),
                 'trust': role.trust_value if role.show_trust_marks else None,
                 'show_trust_marks': role.show_trust_marks,
             })
