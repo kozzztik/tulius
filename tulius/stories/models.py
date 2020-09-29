@@ -30,7 +30,7 @@ class Genre(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def get_absolute_url(self):
         return urls.reverse('stories:genre', kwargs={'genre_id': self.pk})
@@ -117,7 +117,7 @@ class Story(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def get_absolute_url(self):
         return urls.reverse('stories:story', kwargs={'pk': self.pk})
@@ -309,7 +309,7 @@ class Character(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def get_absolute_url(self):
         return urls.reverse('stories:character', args=(self.pk,))
@@ -374,7 +374,7 @@ class Variation(SortableModelMixin):
     )
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def get_absolute_url(self):
         return urls.reverse('stories:variation', args=(self.pk,))
@@ -694,7 +694,7 @@ class AdditionalMaterial(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def get_absolute_url(self):
         if self.variation and self.variation.game:
@@ -778,7 +778,7 @@ class Illustration(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def get_absolute_url(self):
         if self.variation and self.variation.game:

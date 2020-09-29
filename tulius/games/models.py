@@ -524,7 +524,7 @@ class RequestQuestion(models.Model):
     )
 
     def __str__(self):
-        return self.question
+        return str(self.question)
 
 
 class RequestQuestionAnswer(models.Model):

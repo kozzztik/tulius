@@ -47,7 +47,7 @@ class NewsItem(AbstractBaseModel):
     )
 
     def __str__(self):
-        return self.caption
+        return str(self.caption)
 
     def get_absolute_url(self):
         return urls.reverse('news:detail', kwargs={'pk': self.pk})

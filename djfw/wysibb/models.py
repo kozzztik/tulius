@@ -33,7 +33,7 @@ class Smile(models.Model):
         return '<img src="' + str(self.image.url) + '"/>'
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     preview_image.allow_tags = True
     preview_image.short_description = _('image')
