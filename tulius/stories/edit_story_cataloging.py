@@ -40,7 +40,7 @@ class EditStoryPage(CatalogPage):
         return str(self.instance)
 
     def __init__(self, story):
-        super(EditStoryPage, self).__init__(
+        super().__init__(
             is_index=True,
             parent=stories_catalog_page(),
             name="%s %s" % (str(_('edit')), story),
@@ -51,7 +51,7 @@ class EditStoryPage(CatalogPage):
 
 class EditStorySubpage(CatalogPage):
     def __init__(self, story, name='', url='', parent=None):
-        super(EditStorySubpage, self).__init__(
+        super().__init__(
             parent=parent or EditStoryPage(story),
             name=name,
             url=urls.reverse('stories:' + url, args=(story.pk,)),

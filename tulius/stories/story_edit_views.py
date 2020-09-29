@@ -35,7 +35,7 @@ class StoryAdminMixin(djfw_views.RightsDetailMixin):
         if self.page_url:
             kwargs['catalog_page'] = story_catalog.EditStorySubpage(
                 self.object, url=self.page_url)
-        return super(StoryAdminMixin, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
     def get_success_url(self):
         return urls.reverse('stories:' + self.page_url, args=(self.object.pk,))
@@ -87,7 +87,7 @@ class StoryGraphics(StoryAdminMixin, generic.DetailView):
                 self.object, 'bottom_banner', _('bottom banner'),
                 self.object.bottom_banner),
         )
-        return super(StoryGraphics, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
     def post(self, request, *args, **kwargs):
         story = self.get_object()
@@ -177,7 +177,7 @@ class BaseStoryAddView(
             name=self.page_name,
             parent=story_catalog.EditStorySubpage(
                 self.parent_object, url=self.parent_page_url))
-        return super(BaseStoryAddView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class AddVariationView(BaseStoryAddView):
@@ -221,7 +221,7 @@ class CharacterFormMixin:
     parent_page_url = story_catalog.EDIT_STORY_PAGES_CHARACTERS
 
     def get_form_kwargs(self):
-        kwargs = super(CharacterFormMixin, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs['story'] = self.parent_object
         return kwargs
 
@@ -256,7 +256,7 @@ class CharacterView(
             name=self.object,
             parent=story_catalog.EditStorySubpage(
                 self.parent_object, url=self.parent_page_url))
-        return super(CharacterView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class StoryAvatarsView(StoryAdminMixin, generic.DetailView):
@@ -271,7 +271,7 @@ class StoryIllustrationsView(StoryAdminMixin, generic.DetailView):
     def get_context_data(self, **kwargs):
         kwargs['illustrations'] = models.Illustration.objects.filter(
             story=self.object)
-        return super(StoryIllustrationsView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class StoryMaterialsView(StoryAdminMixin, generic.DetailView):
@@ -281,7 +281,7 @@ class StoryMaterialsView(StoryAdminMixin, generic.DetailView):
     def get_context_data(self, **kwargs):
         kwargs['materials'] = models.AdditionalMaterial.objects.filter(
             story=self.object)
-        return super(StoryMaterialsView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class StoryDeleteAvatarView(
@@ -320,7 +320,7 @@ class EditAvatarView(
             name=self.object,
             parent=story_catalog.EditStorySubpage(
                 self.story, url=self.parent_page_url))
-        return super(EditAvatarView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
     def get_success_url(self):
         return urls.reverse('stories:' + self.parent_page_url, args=(
@@ -359,7 +359,7 @@ class EditIllustrationView(
         kwargs['story'] = self.story
         kwargs['variation'] = self.variation
         kwargs['catalog_page'] = self.catalog_page
-        return super(EditIllustrationView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
     def get_success_url(self):
         return self.catalog_page.parent.url
@@ -377,8 +377,8 @@ class EditMaterialView(EditIllustrationView):
 def get_story(story_id, user):
     try:
         story_id = int(story_id)
-    except:
-        raise http.Http404()
+    except ValueError as exc:
+        raise http.Http404() from exc
     story = shortcuts.get_object_or_404(models.Story, id=story_id)
     if not story.edit_right(user):
         raise http.Http404()

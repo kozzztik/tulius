@@ -122,7 +122,7 @@ class Backup(models.Model):
     def delete(self, using=None, keep_parents=False):
         if os.path.exists(self.path()):
             os.remove(self.path())
-        super(Backup, self).delete(using=using, keep_parents=keep_parents)
+        super().delete(using=using, keep_parents=keep_parents)
 
 
 def get_lock_file_name():
@@ -264,14 +264,13 @@ class MaintenanceLog(models.Model):
         was_none = not self.pk
         if (not was_none) and self.end_time and (os.path.exists(file_name)):
             f = open(file_name, 'r')
-            old_id = None
             try:
                 old_id = int(f.read())
             finally:
                 f.close()
             if old_id == self.id:
                 os.remove(file_name)
-        super(MaintenanceLog, self).save(
+        super().save(
             force_insert=force_insert, force_update=force_update,
             using=using, update_fields=update_fields)
         if was_none and not self.end_time:

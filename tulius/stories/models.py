@@ -193,8 +193,7 @@ class Avatar(models.Model):
         self.delete_data()
         Character.objects.filter(avatar=self).update(avatar=None)
         Role.objects.filter(avatar=self).update(avatar=None)
-        return super(Avatar, self).delete(
-            using=using, keep_parents=keep_parents)
+        return super().delete(using=using, keep_parents=keep_parents)
 
     def __str__(self):
         return '%s' % (self.name,)
@@ -803,8 +802,7 @@ class Illustration(models.Model):
 
     def delete(self, using=None, keep_parents=False):
         self.delete_data()
-        return super(Illustration, self).delete(
-            using=using, keep_parents=keep_parents)
+        return super().delete(using=using, keep_parents=keep_parents)
 
     def edit_right(self, user):
         if self.story:

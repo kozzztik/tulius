@@ -34,7 +34,7 @@ class GameInviteForm(forms.Form):
     )
 
     def __init__(self, variation, *args, **kwargs):
-        super(GameInviteForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['role'].queryset = self.fields['role'].queryset.filter(
             variation=variation).exclude(deleted=True)
 

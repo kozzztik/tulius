@@ -32,7 +32,7 @@ class NewsItemAdmin(CustomModelAdmin):
     )
 
     def queryset(self, request):
-        return super(NewsItemAdmin, self).queryset(request).filter(
+        return super().queryset(request).filter(
             language=translation.get_language())
 
     def make_published(self, request, queryset):

@@ -9,7 +9,7 @@ class ThreadCreateMutation(mutations.ThreadCreateMutation):
 
     def __init__(self, thread, data, view, **kwargs):
         self.variation = view.variation
-        super(ThreadCreateMutation, self).__init__(thread, data, **kwargs)
+        super().__init__(thread, data, **kwargs)
 
 
 class ThreadFixCounters(mutations.ThreadFixCounters):
@@ -33,7 +33,7 @@ class ThreadFixCounters(mutations.ThreadFixCounters):
 
     def process_thread(self, instance):
         self.fix_variation(instance)
-        super(ThreadFixCounters, self).process_thread(instance)
+        super().process_thread(instance)
 
 
 mutations.signals.apply_mutation.connect(

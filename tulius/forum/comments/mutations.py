@@ -9,7 +9,7 @@ class ThreadCommentAdd(mutations.Mutation):
     comment = None
 
     def __init__(self, thread, comment, **kwargs):
-        super(ThreadCommentAdd, self).__init__(thread, **kwargs)
+        super().__init__(thread, **kwargs)
         self.comment = comment
 
     def process_thread(self, instance):
@@ -67,7 +67,7 @@ class FixCounters(mutations.Mutation):
     result = None
 
     def __init__(self, thread, result=None, **_kwargs):
-        super(FixCounters, self).__init__(thread)
+        super().__init__(thread)
         self.result = result
 
     @staticmethod

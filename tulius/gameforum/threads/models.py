@@ -52,7 +52,7 @@ class RightsCounter(thread_models.RightsCounter):
     role = thread_models.CounterField('roles', counter_class=RolesRights)
 
     def cleanup(self, default=None):
-        super(RightsCounter, self).cleanup(default=default)
+        super().cleanup(default=default)
         self.data['roles'] = []
         self.data['all_roles'] = default
 

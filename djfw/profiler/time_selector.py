@@ -137,7 +137,7 @@ class TimePeriodView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         self.update_request(request)
-        return super(TimePeriodView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
 
 class SetTimePeriod(TimePeriodView):

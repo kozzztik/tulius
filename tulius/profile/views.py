@@ -60,7 +60,7 @@ class PlayerSettingsView(generic.TemplateView):
 class LoginTemplateView(generic.TemplateView):
     @decorators.method_decorator(auth_decorators.login_required)
     def get(self, request, *args, **kwargs):
-        return super(LoginTemplateView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
 
 class PlayerSubscriptionsView(LoginTemplateView):

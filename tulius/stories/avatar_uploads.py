@@ -80,8 +80,8 @@ def edit_story_avatar_reload(request, avatar_id):
     """
     try:
         avatar_id = int(avatar_id)
-    except:
-        raise Http404()
+    except ValueError as exc:
+        raise Http404() from exc
     avatar = get_object_or_404(Avatar, id=avatar_id)
     story = get_story(avatar.story.id, request.user)
     res = check_mime(request)

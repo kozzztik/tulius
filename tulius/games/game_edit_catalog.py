@@ -56,7 +56,7 @@ class EditGamePage(CatalogPage):
         return str(self.instance)
 
     def __init__(self, game):
-        super(EditGamePage, self).__init__(
+        super().__init__(
             parent=games_catalog_page(),
             name="%s %s" % (str(_('edit')), game),
             url=game.get_edit_url(),
@@ -76,7 +76,7 @@ class GameSubpage:
     paging_class = EditGamePage
 
     def get_context_data(self, **kwargs):
-        context = super(GameSubpage, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         gamepage = self.paging_class(self.object)
         context['catalog_page'] = gamepage.get_subpage(
             urls.reverse(URL_PREFIX + self.page_url, args=(self.object.pk,)))

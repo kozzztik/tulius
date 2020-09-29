@@ -46,7 +46,7 @@ class AutocompleteWidget(TextInput):
             * ``related_fields`` - Fields that relates to current (value
             of this field will sended to autocomplete view via POST)
         """
-        super(AutocompleteWidget, self).__init__(attrs=attrs)
+        super().__init__(attrs=attrs)
         self.options = options or {}
         self.token = token
         self.model = model
@@ -131,8 +131,7 @@ class AutocompleteWidget(TextInput):
         if value:
             obj = self.model.objects.get(pk=value)
             value = str(obj)
-        html_code += super(AutocompleteWidget, self).render(
-            name + '_autocomplete', value, attrs)
+        html_code += super().render(name + '_autocomplete', value, attrs)
 
         html_code += u"""
 <script type="text/javascript">

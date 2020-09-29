@@ -21,8 +21,8 @@ from .game_edit_catalog import EDIT_GAME_PAGES_REQUESTS, \
 def get_game(user, game_id, requested):
     try:
         game_id = int(game_id)
-    except:
-        raise Http404()
+    except ValueError as exc:
+        raise Http404() from exc
     game = get_object_or_404(Game, id=game_id)
     if user.is_anonymous:
         raise Http404()
@@ -160,8 +160,8 @@ def role_assign_user(request, role_id, user_id, backtoroles=False):
     try:
         role_id = int(role_id)
         user_id = int(user_id)
-    except:
-        raise Http404()
+    except ValueError as exc:
+        raise Http404() from exc
     role = get_object_or_404(Role, id=role_id, deleted=False)
     user = get_object_or_404(User, id=user_id)
     if not role.variation.game:
@@ -187,8 +187,8 @@ def role_clear_user(request, role_id):
     """
     try:
         role_id = int(role_id)
-    except:
-        raise Http404()
+    except ValueError as exc:
+        raise Http404() from exc
     role = get_object_or_404(Role, id=role_id)
     if not role.variation.game:
         raise Http404()

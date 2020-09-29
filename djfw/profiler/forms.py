@@ -17,6 +17,6 @@ class TimeSelectorForm(forms.Form):
     )
 
     def __init__(self, period_choices, weight_choices, *args, **kwargs):
-        super(TimeSelectorForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['period'].choices = period_choices
         self.fields['weight'].choices = weight_choices

@@ -13,7 +13,7 @@ class JSONClient(django_client.Client):
             follow=False, secure=False, **extra):
         if isinstance(data, dict):
             content_type = 'application/json'
-        return super(JSONClient, self).post(
+        return super().post(
             path, data, content_type=content_type, follow=follow,
             secure=secure, **extra)
 
@@ -22,7 +22,7 @@ class JSONClient(django_client.Client):
             follow=False, secure=False, **extra):
         if isinstance(data, dict):
             content_type = 'application/json'
-        return super(JSONClient, self).put(
+        return super().put(
             path, data=data, content_type=content_type, follow=follow,
             secure=secure, **extra)
 
@@ -31,7 +31,7 @@ class JSONClient(django_client.Client):
                 follow=False, secure=False, **extra):
         if isinstance(data, dict):
             content_type = 'application/json'
-        return super(JSONClient, self).options(
+        return super().options(
             path, data=data, content_type=content_type, follow=follow,
             secure=secure, **extra)
 

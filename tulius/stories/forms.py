@@ -28,7 +28,7 @@ class StoryFilterForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        super(StoryFilterForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['filter_by_author'].queryset = self.fields[
             'filter_by_author'].queryset.filter(
                 pk__in=[

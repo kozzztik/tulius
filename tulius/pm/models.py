@@ -51,7 +51,7 @@ class PrivateMessage(AbstractBaseModel):
         if self.sender_id == self.receiver_id:
             self.is_read = True
         created = not self.id
-        super(PrivateMessage, self).save(
+        super().save(
             force_insert=force_insert, force_update=force_update,
             using=using, update_fields=update_fields)
         if created:

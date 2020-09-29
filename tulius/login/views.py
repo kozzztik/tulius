@@ -104,7 +104,7 @@ class RegisterView(FormView):
         registration_profile = RegistrationProfile.objects.create(
             user=new_user, activation_key=activation_key)
         registration_profile.send_activation_email(site)
-        return super(RegisterView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class ActivateView(TemplateView):

@@ -313,7 +313,7 @@ class Game(models.Model):
         return '%s - %d' % (self.name, int(self.serial_number))
 
     def clean(self):
-        super(Game, self).clean()
+        super().clean()
         if not self.serial_number:
             raise ValidationError(_('Specify game serial number'))
         if not self.variation_id:
@@ -351,7 +351,7 @@ class Game(models.Model):
         if not was_none:
             old_self = Game.objects.select_for_update().get(id=self.id)
 
-        super(Game, self).save(
+        super().save(
             force_insert=force_insert, force_update=force_update, using=using,
             update_fields=update_fields)
         if old_self:

@@ -124,7 +124,7 @@ class ThreadCreateMutation(Mutation):
 
     def __init__(self, thread, data, **kwargs):
         self.data = data
-        super(ThreadCreateMutation, self).__init__(thread, **kwargs)
+        super().__init__(thread, **kwargs)
 
     def process_thread(self, instance):
         instance.threads_count.cleanup()
@@ -205,7 +205,7 @@ class ThreadDeleteMutation(ThreadCounters):
     comment = ''
 
     def __init__(self, thread, user, comment):
-        super(ThreadDeleteMutation, self).__init__(thread)
+        super().__init__(thread)
         self.user = user
         self.comment = comment
 
@@ -236,7 +236,7 @@ class ThreadFixCounters(ThreadCounters):
     with_post_process = True
 
     def __init__(self, thread, user=None, result=None):
-        super(ThreadFixCounters, self).__init__(thread)
+        super().__init__(thread)
         self.user = user
         self.result = result or {}
 

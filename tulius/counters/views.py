@@ -13,7 +13,7 @@ class CountersBase(TemplateView):
 
     def get_context_data(self, **kwargs):
         self.do_action()
-        return super(CountersBase, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class PMCounters(CountersBase):

@@ -91,7 +91,7 @@ class DataBlock(models.Model):
             self.language = lang
             self.pk = None
             drop_cache = True
-        super(DataBlock, self).save(
+        super().save(
             force_insert=force_insert, force_update=force_update,
             using=using, update_fields=update_fields)
         if drop_cache:

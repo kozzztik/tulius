@@ -4,7 +4,7 @@ import time
 
 class LocalCounter(threading.local):
     def __init__(self):
-        super(LocalCounter, self).__init__()
+        super().__init__()
         self.clear()
 
     def clear(self):
