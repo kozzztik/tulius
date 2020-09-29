@@ -95,6 +95,7 @@ class ProfilerMiddleware:
         request.profiler = rec
 
     def save_rec(self, request, error=False):
+        logger = logging.getLogger('profiler')
         rec = getattr(request, 'profiler', None)
         if (not rec) or rec.pk:
             return
@@ -108,11 +109,27 @@ class ProfilerMiddleware:
             rec.db_time = rec.exec_time
         rec.db_count = wrappers.local_counter.exec_count
         rec.error = error
-        rec.save()
+        # rec.save()
+        logger.info(request.path, extra={
+            'module_name': rec.module_name,
+            'func_name': rec.func_name,
+            'user_id': rec.user_id,
+            'exec_time': rec.exec_time,
+            'thread_id': rec.thread_id,
+            'exec_param': rec.exec_param,
+            'ip': rec.ip,
+            'browser': rec.browser,
+            'browser_version': rec.browser_version,
+            'os': rec.os,
+            'os_version': rec.os_version,
+            'device': rec.device,
+            'mobile': rec.mobile,
+            'error': rec.error,
+        })
 
     def __call__(self, request):
-        self.save_rec(request)
         response = self.get_response(request)
+        self.save_rec(request)
         return response
 
     def process_exception(self, request, exception):

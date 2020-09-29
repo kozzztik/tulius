@@ -212,6 +212,13 @@ LOGGING = {
             'class': 'logging.handlers.WatchedFileHandler',
             'filename': BASE_DIR + 'sql-logfile.txt',
         },
+        'log_stash': {
+            'level': 'DEBUG',
+            'class': 'logstash.TCPLogstashHandler',
+            'host': '127.0.0.1' if env == 'dev' else '10.5.0.31',
+            'port': 11011,
+            'version': 1,
+        }
     },
     'loggers': {
         'django.db.backends': {
@@ -233,6 +240,11 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'DEBUG' if env == 'dev' else 'ERROR',
             'propagate': True,
+        },
+        'profiler': {
+            'handlers': ['log_stash'],
+            'level': 'DEBUG',
+            'propagate': False,
         }
     }
 }
