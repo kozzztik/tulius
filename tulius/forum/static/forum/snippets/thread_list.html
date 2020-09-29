@@ -12,17 +12,17 @@
         <tr v-for="thread in threads" :class="thread.deleted ? 'deleted-thread' : ''">
             <td class="forum-post-icon">
                 <div v-if="thread.important">
-                    <router-link :to="urls.comment(thread.unreaded)" v-if="thread.unreaded">
+                    <router-link :to="urls.comment(thread.not_read)" v-if="thread.not_read">
                         <img src="/static/forum/img/important_not_readed.gif">
                     </router-link>
-                    <img src="/static/forum/img/important_readed.gif" v-if="!thread.unreaded">
+                    <img src="/static/forum/img/important_readed.gif" v-if="!thread.not_read">
                 </div>
                 <div v-else>
                     <img src="/static/forum/img/closed.gif" v-if="thread.closed">
-                    <router-link :to="urls.comment(thread.unreaded)" v-if="!thread.closed && thread.unreaded">
+                    <router-link :to="urls.comment(thread.not_read)" v-if="!thread.closed && thread.not_read">
                         <img src="/static/forum/img/unreadedmark.gif">
                     </router-link>
-                    <img src="/static/forum/img/readedmark.gif" v-if="!thread.closed && !thread.unreaded">
+                    <img src="/static/forum/img/readedmark.gif" v-if="!thread.closed && !thread.not_read">
                 </div>
             </td>
             <td>

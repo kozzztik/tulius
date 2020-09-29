@@ -115,7 +115,7 @@ class VotingAPI(views.CommentBase):
         v = instance.media.get('voting')
         if v:
             response['media']['voting'] = cls.user_voting_data(
-                v, view.user, instance.data.get('first_comment_id'))
+                v, view.user, instance.first_comment[view.user])
 
     @classmethod
     def on_before_add_comment(cls, comment, data, view, **_kwargs):

@@ -13,16 +13,11 @@ from tulius.forum.threads import signals as thread_signals
 from tulius.forum.rights import mutations
 
 
-@dispatch.receiver(thread_signals.before_create, sender=thread_models.Thread)
-def before_create_thread(instance, data, preview, **_kwargs):
-    if not preview:
-        mutations.UpdateRightsOnThreadCreate(instance, data).apply()
-
-
 @dispatch.receiver(thread_signals.after_create, sender=thread_models.Thread)
 def after_create_thread(instance, data, preview, **_kwargs):
     if not preview:
-        mutations.UpdateRightsOnThreadCreate(instance, data).save_exceptions()
+        mutations.UpdateRightsOnThreadCreate(
+            instance, data=data).save_exceptions()
 
 
 class BaseGrantedRightsAPI(views.BaseThreadView):

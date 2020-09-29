@@ -1,20 +1,15 @@
 """
 Forum comment models for Tulius project
 """
-import jsonfield
 from django import urls
+import django.core.serializers.json
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
-from mptt import models as mptt_models
 
 from tulius.forum.threads import models as thread_models
 
 User = get_user_model()
-
-
-def default_json():
-    return {}
 
 
 class AbstractComment(models.Model):
@@ -29,7 +24,7 @@ class AbstractComment(models.Model):
 
     objects = models.Manager()  # linters don't worry, be happy
 
-    parent = mptt_models.TreeForeignKey(
+    parent = models.ForeignKey(
         thread_models.Thread, models.PROTECT,
         null=False,
         blank=False,
@@ -85,8 +80,12 @@ class AbstractComment(models.Model):
         blank=False,
         verbose_name=_(u'order'),
     )
-    data = jsonfield.JSONField(default=default_json)
-    media = jsonfield.JSONField(default=default_json)
+    data = models.JSONField(
+        default=dict,
+        encoder=django.core.serializers.json.DjangoJSONEncoder)
+    media = models.JSONField(
+        default=dict,
+        encoder=django.core.serializers.json.DjangoJSONEncoder)
 
     def __str__(self):
         return self.title[:40] if self.title else self.body[:40]
@@ -102,12 +101,9 @@ class Comment(AbstractComment):
     pass
 
 
-def get_param(param, thread, user_id, superuser=False):
-    data = thread.data.get(param)
-    if not data:
-        return None
-    if superuser:
-        return data['su']
-    if user_id and str(user_id) in data['users']:
-        return data['users'][str(user_id)]
-    return data['all']
+thread_models.AbstractThread.first_comment = thread_models.CounterField(
+    'first_comment')
+thread_models.AbstractThread.last_comment = thread_models.CounterField(
+    'last_comment')
+thread_models.AbstractThread.comments_count = thread_models.CounterField(
+    'comments_count', default=0)

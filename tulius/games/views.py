@@ -7,7 +7,7 @@ from django.db.models import query_utils
 from django.contrib.auth import decorators
 from django.template import loader
 from django.views import generic
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from djfw import subviews
 from djfw import views as djfw_views

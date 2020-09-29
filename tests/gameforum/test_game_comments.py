@@ -147,7 +147,7 @@ def test_comments_illustrations(
             'default_rights': None,
             'granted_rights': [], 'role_id': detective.pk, 'media': {
                 'illustrations': [{
-                    'id' : story_illustration.pk,
+                    'id': story_illustration.pk,
                     'foo': 'bar'
                 }]
             }})
@@ -248,7 +248,7 @@ def test_broken_last_comment(game, variation_forum, user, detective):
     thread = response.json()
     # break last comment
     obj = thread_models.Thread.objects.get(pk=thread['id'])
-    obj.data['last_comment']['all'] += 1
+    obj.last_comment[user.user.pk] += 1
     obj.save()
     # check room view still works
     response = user.get(base_url + f'thread/{variation_forum.id}/')

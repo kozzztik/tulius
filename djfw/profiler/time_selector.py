@@ -3,7 +3,7 @@ import datetime
 from django import urls
 from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils.timezone import now
 
 from .forms import TimeSelectorForm

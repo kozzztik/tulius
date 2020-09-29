@@ -1,16 +1,15 @@
 from django import urls
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from mptt import models as mptt_models
 
 from tulius.forum.comments import models as comment_models
 from tulius.gameforum.threads import models as thread_models
 
 
 class Comment(comment_models.AbstractComment):
-    role_id = models.IntegerField(blank=True, null=True)
+    role_id = models.IntegerField(blank=True, null=True, db_index=True)
     edit_role_id = models.IntegerField(blank=True, null=True)
-    parent: thread_models.Thread = mptt_models.TreeForeignKey(
+    parent: thread_models.Thread = models.ForeignKey(
         thread_models.Thread, models.PROTECT,
         null=False,
         blank=False,
@@ -24,6 +23,3 @@ class Comment(comment_models.AbstractComment):
                 'pk': self.pk,
                 'variation_id': self.parent.variation_id,
             })
-
-
-get_param = comment_models.get_param

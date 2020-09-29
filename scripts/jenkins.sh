@@ -4,7 +4,8 @@ GIT_BRANCH=$1
 export BRANCH_NAME=$(echo "$GIT_BRANCH" | sed 's/origin\///')
 docker build -t kozzztik/tulius:${BRANCH_NAME} .
 
-docker run -e TULIUS_BRANCH=test -e COV_BRANCH="$BRANCH_NAME" -e DJANGO_SETTINGS_MODULE="settings_production" --net="tuliusnet" \
+docker run -e TULIUS_BRANCH=test -e GIT_BRANCH="$BRANCH_NAME" -e BUILD_NUMBER="$BUILD_NUMBER" \
+-e DJANGO_SETTINGS_MODULE="settings_production" --net="tuliusnet" \
 -v /mnt/big/jenkins/settings_production.py:/opt/tulius/settings_production.py \
 -v /mnt/big/jenkins/.coveralls.yml:/opt/tulius/.coveralls.yml \
 kozzztik/tulius:${BRANCH_NAME} /opt/tulius/travis_test.sh

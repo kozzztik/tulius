@@ -1,5 +1,5 @@
 from django import urls
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from djfw.cataloging.core import CatalogPage
 from .edit_story_cataloging import EditStoryPage

@@ -1,5 +1,5 @@
 from django import urls
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from tulius.stories.catalog import stories_catalog_page
 from djfw.cataloging.core import CatalogPage

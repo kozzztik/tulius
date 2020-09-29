@@ -24,12 +24,8 @@ def order_to_page(order):
 
 @dispatch.receiver(thread_signals.room_to_json, sender=thread_models.Thread)
 def room_to_json(instance, response, view, **_kwargs):
-    last_comment_id = models.get_param(
-        'last_comment', instance, view.user.pk,
-        superuser=view.user.is_superuser)
-    comments_count = models.get_param(
-        'comments_count', instance, view.user.pk,
-        superuser=view.user.is_superuser)
+    last_comment_id = instance.last_comment[view.user]
+    comments_count = instance.comments_count[view.user]
     response['comments_count'] = comments_count
     if (not instance.room) and (comments_count is not None):
         response['pages_count'] = order_to_page(comments_count - 1)
@@ -52,9 +48,8 @@ def room_to_json(instance, response, view, **_kwargs):
 
 
 @dispatch.receiver(thread_signals.to_json)
-def thread_to_json(instance, response, **_kwargs):
-    if not instance.room:
-        response['first_comment_id'] = instance.data.get('first_comment_id')
+def thread_to_json(instance, response, view, **_kwargs):
+    response['first_comment_id'] = instance.first_comment[view.user]
 
 
 class CommentsBase(views.BaseThreadView):
@@ -63,8 +58,7 @@ class CommentsBase(views.BaseThreadView):
 
     @classmethod
     def pages_count(cls, thread):
-        comments_count = models.get_param('comments_count', thread, None)
-        return order_to_page(comments_count - 1)
+        return order_to_page(thread.comments_count.all - 1)
 
     def comment_edit_right(self, comment):
         return (comment.user == self.user) or \
@@ -123,7 +117,7 @@ class CommentsPageAPI(CommentsBase):
     @classmethod
     def create_comment(cls, data, view):
         reply_id = data.get('reply_id')
-        if reply_id and (reply_id != view.obj.data.get('first_comment_id')):
+        if reply_id and (reply_id != view.obj.first_comment[view.user]):
             obj = shortcuts.get_object_or_404(cls.comment_model, pk=reply_id)
             if obj.parent_id != view.obj.id:
                 raise exceptions.PermissionDenied()
@@ -134,7 +128,7 @@ class CommentsPageAPI(CommentsBase):
         comment.body = data['body']
         comment.reply_id = reply_id
         comment.media = {}
-        comment.order = view.obj.data.get('comments_count', {'all': 0})['all']
+        comment.order = view.obj.comments_count.su
         return comment
 
     @classmethod
@@ -203,7 +197,7 @@ class CommentAPI(CommentBase):
             'id': parent.id,
             'title': parent.title,
             'url': parent.get_absolute_url(),
-        } for parent in self.obj.get_ancestors()]
+        } for parent in self.obj.get_parents()]
         return data
 
     @transaction.atomic
@@ -241,7 +235,7 @@ class CommentAPI(CommentBase):
     def on_thread_update(cls, instance, data, preview, view, **_kwargs):
         if not instance.room:
             comment = cls.comment_model.objects.select_for_update().get(
-                id=instance.data['first_comment_id'])
+                id=instance.first_comment[view.user])
             cls.update_comment(comment, data, preview, view)
             if not preview:
                 comment.save()

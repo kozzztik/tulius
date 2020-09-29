@@ -14,6 +14,7 @@ class FooMutation(mutations.Mutation):
 
 def test_mutation_parent_on_not_saved_thread(user):
     parent = models.Thread(title='foo', user=user.user)
+    parent.get_parents()  # small hack to fill 'parents' counter
     parent.save()
     thread = models.Thread(title='bar', parent=parent, user=user.user)
     mutation = FooMutation(thread)
