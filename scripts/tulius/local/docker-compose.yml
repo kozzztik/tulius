@@ -1,0 +1,53 @@
+version: '3.5'
+services:
+  elastic_search:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
+    restart: "no"
+    networks:
+      tuliusnet:
+        ipv4_address: 10.5.0.30
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - ../../../data/elastic:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    container_name: tulius_elastic
+
+  log_stash:
+    image: docker.elastic.co/logstash/logstash:7.9.2
+    restart: "no"
+    networks:
+      tuliusnet:
+        ipv4_address: 10.5.0.31
+    volumes:
+      - ../logstash:/usr/share/logstash/pipeline/
+    environment:
+      - MONITORING_ENABLED=false
+    ports:
+      - 11011:11011
+    container_name: tulius_log_stash
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.9.2
+    networks:
+      tuliusnet:
+        ipv4_address: 10.5.0.23
+    restart: unless-stopped
+    ports:
+      - 5601:5601
+    environment:
+      SERVER_NAME: 127.0.0.1
+      ELASTICSEARCH_HOSTS: http://10.5.0.30:9200
+
+networks:
+  tuliusnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+    name: tuliusnet
