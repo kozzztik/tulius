@@ -63,7 +63,7 @@ services:
     volumes:
       - ../../data/elastic:/usr/share/elasticsearch/data
     ports:
-      - 9200:9200
+      - 127.0.0.1:9200:9200
     container_name: tulius_elastic
 
   log_stash:
@@ -76,8 +76,6 @@ services:
         ipv4_address: 10.5.0.31
     volumes:
       - ./logstash:/usr/share/logstash/pipeline/
-    ports:
-      - 11011:11011
     container_name: tulius_log_stash
 
 #  sentry_web:

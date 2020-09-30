@@ -1,7 +1,6 @@
 """Django settings for tulius project."""
 import os
 
-from django.utils.translation import ugettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
 
 branch = os.environ.get("TULIUS_BRANCH", '')
@@ -36,11 +35,6 @@ VK_APP_SECRET = 'm6GcbXexyppJ4cv1p94y'
 MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
 
-# TODO remove in 3.6
-LANGUAGES = (
-    ('ru', _('Russian')),
-)
-
 AUTH_USER_MODEL = 'tulius.User'
 
 INSTALLED_APPS = (
@@ -56,7 +50,7 @@ INSTALLED_APPS = (
     'hamlpy',
     'djfw',
     'djfw.datablocks',
-    'djfw.logger',
+    'djfw.logger',  # TODO remove after release with its files
     'djfw.pagination',
     'djfw.flatpages',
     'djfw.tinymce',
@@ -65,7 +59,7 @@ INSTALLED_APPS = (
     'djfw.cataloging',
     'djfw.news',
     'djfw.uploader',
-    'djfw.profiler',
+    'djfw.profiler',  # TODO remove after release with its files
     'djfw.photos',
     'djfw.sortable',
     'djfw.custom_views',
@@ -106,7 +100,7 @@ MIDDLEWARE = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'djfw.pagination.middleware.PaginationMiddleware',
     'djfw.flatpages.middleware.FlatpageFallbackMiddleware',
-    'djfw.profiler.middleware.ProfilerMiddleware',
+    'tulius.core.profiler.ProfilerMiddleware',
 )
 
 STATICFILES_FINDERS = (
@@ -142,15 +136,6 @@ TEMPLATES = [
         }
     },
 ]
-
-# TODO that must not work now
-# if not DEBUG:
-#     TEMPLATES += [
-#         {
-#             'BACKEND': 'django.template.loaders.cached.Loader'
-#         }
-#     ]
-
 
 AUTHENTICATION_BACKENDS = (
     'tulius.vk.backend.VKBackend',
@@ -242,7 +227,7 @@ LOGGING = {
             'propagate': True,
         },
         'profiler': {
-            'handlers': ['log_stash'],
+            'handlers': ['null' if env == 'test' else 'log_stash'],
             'level': 'DEBUG',
             'propagate': False,
         }
@@ -322,7 +307,7 @@ if env == 'prod':
     ALLOWED_HOSTS += [
         'tulius.com',
         'tulius.co-de.org',
-]
+    ]
 elif env == 'qa':
     DEFAULT_FROM_EMAIL = 'tulius-test@tulius.com'
     ALLOWED_HOSTS += [
