@@ -76,8 +76,6 @@ services:
         ipv4_address: 10.5.0.31
     volumes:
       - ./logstash:/usr/share/logstash/pipeline/
-    ports:
-      - 11011:11011
     container_name: tulius_log_stash
 
 #  sentry_web:
