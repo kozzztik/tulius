@@ -100,7 +100,7 @@ MIDDLEWARE = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'djfw.pagination.middleware.PaginationMiddleware',
     'djfw.flatpages.middleware.FlatpageFallbackMiddleware',
-    'djfw.profiler.middleware.ProfilerMiddleware',
+    'tulius.core.profiler.ProfilerMiddleware',
 )
 
 STATICFILES_FINDERS = (

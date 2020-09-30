@@ -3,7 +3,7 @@ import time
 import logging
 
 from django import http
-from djfw.profiler.ua_parser import user_agent_parser
+from ua_parser import user_agent_parser
 
 
 class ProfilerMiddleware:
@@ -26,8 +26,7 @@ class ProfilerMiddleware:
                 'os': os['family'],
                 'os_version': os['major'],
                 'device': device_family,
-                'mobile': bool(
-                    device_family and (device_family != 'Spider')),
+                'mobile': device_family not in [None, 'Spider', 'Other'],
 
             }
             if user_agent['minor']:
@@ -39,7 +38,7 @@ class ProfilerMiddleware:
                     result['os_version'] = os_list[1]
             if os['minor']:
                 result['os_version'] += '.' + os['minor']
-        except:
+        except Exception:
             logger = logging.getLogger('django.request')
             logger.error(
                 'Cant parse user agent %s', request.META['HTTP_USER_AGENT'])
