@@ -27,7 +27,7 @@ class ProfilerMiddleware:
                 'os_version': os['major'],
                 'device': device_family,
                 'mobile': bool(
-                    device_family and not (device_family == 'Spider')),
+                    device_family and (device_family != 'Spider')),
 
             }
             if user_agent['minor']:
@@ -80,4 +80,3 @@ class ProfilerMiddleware:
         exec_time = time.perf_counter_ns() - start_time
         self.log_record(request, exec_time, response)
         return response
-

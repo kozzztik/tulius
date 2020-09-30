@@ -41,9 +41,6 @@ urlpatterns = [
         r'^autocomplete/', urls.include(
             'tulius.core.autocomplete.urls', namespace='autocomplete')),
     urls.re_path(
-        r'^profiler/', urls.include(
-            'djfw.profiler.urls', namespace='profiler')),
-    urls.re_path(
         r'^installer/', urls.include(
             'djfw.installer.urls', namespace='installer')),
 
@@ -63,9 +60,6 @@ urlpatterns = [
         r'^api/debug_mail/', urls.include(
             'tulius.core.debug_mail.urls', namespace='debug_mail_api')),
     urls.re_path(r'^debug_mail/', views.IndexVue.as_view(), name='debug_mail'),
-
-    urls.re_path(
-        r'^statistics/$', views.StatisticsView.as_view(), name='stats'),
 
     urls.re_path(
         r'^accounts/', urls.include('tulius.login.urls', namespace='auth')),
