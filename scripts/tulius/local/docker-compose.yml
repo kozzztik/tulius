@@ -16,7 +16,7 @@ services:
     volumes:
       - ../../../data/elastic:/usr/share/elasticsearch/data
     ports:
-      - 9200:9200
+      - 127.0.0.1:9200:9200
     container_name: tulius_elastic
 
   log_stash:

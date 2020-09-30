@@ -242,7 +242,7 @@ LOGGING = {
             'propagate': True,
         },
         'profiler': {
-            'handlers': ['log_stash'],
+            'handlers': ['null' if env == 'test' else 'log_stash'],
             'level': 'DEBUG',
             'propagate': False,
         }

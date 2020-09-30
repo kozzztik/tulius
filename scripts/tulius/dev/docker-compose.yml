@@ -63,6 +63,16 @@ services:
       SERVER_NAME: kibana.test.tulius.co-de.org
       ELASTICSEARCH_HOSTS: http://10.5.0.30:9200
 
+#  kibana:
+#    image: docker.elastic.co/kibana/kibana:7.9.2
+#    networks:
+#      tuliusnet:
+#        ipv4_address: 10.5.0.13
+#    restart: unless-stopped
+#    environment:
+#      SERVER_NAME: kibana.tulius.co-de.org
+#      ELASTICSEARCH_HOSTS: http://tulius.com:9200
+
 networks:
   tuliusnet:
     driver: bridge

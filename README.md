@@ -138,3 +138,10 @@ and start celery with:
 python -m pylint tests tulius djfw
 python -m pytest tests tulius djfw
 ```
+
+## Configure kibana access
+```
+sudo apt install apache2-utils
+sudo touch /etc/nginx/htpasswd
+sudo htpasswd /etc/nginx/htpasswd bob
+```
