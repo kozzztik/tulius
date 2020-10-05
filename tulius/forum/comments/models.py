@@ -96,6 +96,14 @@ class AbstractComment(models.Model):
     def get_absolute_url(self):
         return urls.reverse('forum_api:comment', kwargs={'pk': self.pk})
 
+    def to_elastic_search(self, data):
+        data['parent_id'] = self.parent_id
+        data['parents_ids'] = self.parent.parents_ids + [self.parent_id]
+        data['user'] = {
+            'id': self.user.pk,
+            'title': str(self.user)
+        }
+
 
 class Comment(AbstractComment):
     pass
