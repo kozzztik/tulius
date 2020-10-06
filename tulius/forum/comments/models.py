@@ -98,7 +98,8 @@ class AbstractComment(models.Model):
 
     def to_elastic_search(self, data):
         data['parent_id'] = self.parent_id
-        data['parents_ids'] = self.parent.parents_ids + [self.parent_id]
+        data['parents_ids'] = self.parent.parents_ids or []
+        data['parents_ids'].append(self.parent_id)
         data['user'] = {
             'id': self.user.pk,
             'title': str(self.user)

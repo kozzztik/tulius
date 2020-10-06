@@ -166,6 +166,7 @@ INSTALLER_BACKUPS_DIR = BASE_DIR + 'backups/'
 
 WYSIBB_THUMB_SIZE = (350, 350)
 
+ELASTIC_HOSTS = ['localhost:9200'] if env == 'dev' else ['10.5.0.30:9200']
 ELASTIC_PREFIX = env
 ELASTIC_MODELS = (
     ('tulius', 'User'),
@@ -256,7 +257,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
-
+        'elasticsearch': {
+            'handlers': ['console'],
+            'level': 'DEBUG' if env == 'dev' else 'ERROR',
+            'propagate': True,
+        },
     }
 }
 

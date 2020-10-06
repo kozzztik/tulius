@@ -264,6 +264,11 @@ class AbstractThread(models.Model):
             'title': str(self.user)
         }
 
+    @classmethod
+    def to_elastic_mapping(cls, fields):
+        fields['parents_ids'] = {'type': 'integer'}
+
+
 class Thread(AbstractThread):
     pass
 

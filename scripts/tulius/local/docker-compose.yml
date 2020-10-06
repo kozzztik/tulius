@@ -39,7 +39,7 @@ services:
     image: docker.elastic.co/kibana/kibana:7.9.2
     networks:
       tuliusnet:
-        ipv4_address: 10.5.0.23
+        ipv4_address: 10.5.0.32
     restart: unless-stopped
     ports:
       - 5601:5601
