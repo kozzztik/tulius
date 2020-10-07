@@ -2,7 +2,6 @@ import os
 
 import pytest
 import django
-from django.conf import settings
 from django.test import client as django_client
 from django.test import utils
 
