@@ -10,6 +10,7 @@ from django.db import models
 from django.db.models import signals
 from django.db.models.fields import related
 from django.db.models.fields import reverse_related
+from django.core.serializers.json import DjangoJSONEncoder
 import elasticsearch7
 
 logger = logging.getLogger('elastic_search_indexing')
@@ -45,7 +46,7 @@ def instance_to_document(instance):
 
 def do_index(instance, **_kwargs):
     data = instance_to_document(instance)
-    record = bytes(json.dumps(data), 'utf-8')
+    record = bytes(json.dumps(data, cls=DjangoJSONEncoder), 'utf-8') + b'\n'
     for h in logger.handlers:
         if isinstance(h, (handlers.SocketHandler, handlers.DatagramHandler)):
             h.send(record)
