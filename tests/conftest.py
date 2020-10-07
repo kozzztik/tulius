@@ -79,10 +79,8 @@ def user_fixture(user_factory):
 
 
 def init_settings():
-    os.environ["TULIUS_BRANCH"] = "local"
+    os.environ["TULIUS_TEST"] = "1"
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", 'settings')
-    settings.CELERY_TASK_ALWAYS_EAGER = True
-    settings.ELASTIC_PREFIX = 'test'
     django.setup()
     utils.setup_test_environment()
 
