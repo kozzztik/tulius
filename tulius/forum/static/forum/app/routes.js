@@ -10,6 +10,8 @@ import extended_search from '../pages/extended_search.js'
 import comment_redirect from './comment_redirect.js'
 import fix_counters from '../pages/fix_counters.js'
 import room_deleted from '../pages/deleted_threads.js'
+import reindex_all from '../elastic_search/reindex_all.js'
+import reindex_thread from '../elastic_search/reindex_thread.js'
 
 
 export default [
@@ -28,6 +30,9 @@ export default [
             {path: 'search/:id(\\d+)/', component: search_results, name: 'forum_search_results'},
             {path: 'extended_search/:id(\\d+)/', component: extended_search, name: 'forum_extended_search'},
             {path: 'room/:id(\\d+)/deleted/', component: room_deleted, name: 'forum_deleted_threads'},
+            {path: 'reindex_elastic/all/', component: reindex_all, name: 'forum_reindex_all'},
+            {path: 'reindex_elastic/forum/', component: reindex_thread, name: 'forum_reindex_forum'},
+            {path: 'reindex_elastic/:id(\\d+)/', component: reindex_thread, name: 'forum_reindex_thread'},
         ],
     }
 ]

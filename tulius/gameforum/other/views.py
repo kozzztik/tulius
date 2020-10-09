@@ -9,6 +9,7 @@ from tulius.gameforum.comments import views as comments_api
 from tulius.gameforum.comments import models as comment_models
 from tulius.gameforum.other import models as other_models
 from tulius.stories import models as story_models
+from tulius.forum.elastic_search import views as elastic_search
 
 
 class VotingAPI(voting.VotingAPI, comments_api.CommentsBase):
@@ -77,3 +78,7 @@ class Favorites(likes.Favorites):
                 'items': data['items'],
             } for variation_id, data in variations.items()]
         }
+
+
+class ReindexForum(elastic_search.ReindexForum):
+    thread_model = thread_models.Thread

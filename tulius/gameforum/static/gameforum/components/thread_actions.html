@@ -38,6 +38,9 @@
             <b-dropdown-item href="javascript:void(0);" :to="urls.thread_fix(thread.id)" v-if="user.superuser">
                 Обновить счетчики
             </b-dropdown-item>
+            <b-dropdown-item href="javascript:void(0);" :to="{name: 'game_forum_reindex_thread', id: thread.id}" v-if="thread.room && user.superuser">
+               Переиндексировать комнату
+            </b-dropdown-item>
             <b-dropdown-item href="javascript:void(0);" :to="urls.deleted_threads(thread.id)" v-if="thread.room && user.superuser">
                 Удаленные комнаты и темы
             </b-dropdown-item>

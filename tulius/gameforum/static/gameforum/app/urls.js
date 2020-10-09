@@ -68,5 +68,7 @@ export default function(variation_id) {
             name: 'game_extended_search',
             params: { id: pk, variation_id: variation_id },
         }),
+        elastic_reindex_forum_api: '/api/game_forum/elastic/reindex/forum_all/',
+	    elastic_reindex_thread_api: pk => `/api/game_forum/elastic/reindex/thread/${pk}/`,
 	}
 }
