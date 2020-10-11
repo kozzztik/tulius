@@ -106,6 +106,12 @@ class AbstractComment(models.Model):
             'date_joined': self.user.date_joined,
             'sex': self.user.sex,
         }
+        data['public'] = bool(
+            (self.parent.rights.all or 0) & thread_models.ACCESS_READ)
+        data['read_access'] = []
+        for u, r in self.parent.rights:
+            if r & thread_models.ACCESS_READ:
+                data['read_access'].append(u)
 
     @classmethod
     def to_elastic_mapping(cls, fields):
@@ -117,6 +123,8 @@ class AbstractComment(models.Model):
             'date_joined': {'type': 'date'},
             'sex': {'type': 'integer'},
         }}
+        fields['public'] = {'type': 'boolean'}
+        fields['read_access'] = {'type': 'integer'}
 
 
 class Comment(AbstractComment):

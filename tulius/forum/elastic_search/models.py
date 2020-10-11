@@ -52,6 +52,14 @@ def do_index(instance, **_kwargs):
             h.send(record)
 
 
+def do_direct_index(instance, **_kwargs):
+    """ For testing, to be sure that data visible to search immediately """
+    # pylint: disable=unexpected-keyword-arg
+    client.index(
+        id=instance.pk, index=index_name(instance.__class__),
+        body=instance_to_document(instance), refresh=True)
+
+
 client = elasticsearch7.Elasticsearch(hosts=settings.ELASTIC_HOSTS)
 
 

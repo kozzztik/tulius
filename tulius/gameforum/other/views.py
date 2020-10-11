@@ -2,7 +2,6 @@ from tulius.forum.comments import signals as comment_signals
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.other import voting
 from tulius.forum.other import likes
-from tulius.forum.other import search
 from tulius.gameforum import base
 from tulius.gameforum.threads import models as thread_models
 from tulius.gameforum.comments import views as comments_api
@@ -22,7 +21,7 @@ thread_signals.to_json.connect(
     VotingAPI.on_thread_to_json, sender=thread_models.Thread)
 
 
-class Search(search.Search, base.VariationMixin):
+class Search(elastic_search.Search, base.VariationMixin):
     comments_class = comments_api.CommentAPI
 
     def get_view(self, comment):
@@ -30,21 +29,24 @@ class Search(search.Search, base.VariationMixin):
         view.variation = self.variation
         return view
 
-    def apply_users_filters(self, comments, conditions, data):
+    def apply_users_filters(self, search_request, conditions, data):
         filter_users = data.get('users', [])
         filter_not_users = data.get('not_users', [])
         if filter_users:
             users = story_models.Role.objects.filter(
                 pk__in=filter_users, variation=self.variation)
             conditions.append('От: ' + ', '.join([u.name for u in users]))
-            comments = comments.filter(role_id__in=[u.pk for u in users])
+            search_request['must'].append(
+                {'terms': {'role_id': [u.pk for u in users]}},
+            )
         if filter_not_users:
             users = story_models.Role.objects.filter(
                 pk__in=filter_not_users, variation=self.variation)
             conditions.append(
                 'Не от: ' + ', '.join([u.name for u in users]))
-            comments = comments.exclude(role_id__in=[u.pk for u in users])
-        return comments
+            search_request['must_not'].append(
+                {'terms': {'role_id': [u.pk for u in users]}},
+            )
 
 
 class Likes(likes.Likes, comments_api.CommentsBase):

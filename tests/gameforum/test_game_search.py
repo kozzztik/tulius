@@ -1,6 +1,9 @@
 from django.db import transaction
+from django.db.models import signals
 
 from tulius.games import models as game_models
+from tulius.gameforum.comments import models
+from tulius.forum.elastic_search import models as es_models
 
 
 def test_game_search(game, variation_forum, user, admin, detective, murderer):
@@ -62,3 +65,15 @@ def test_game_search(game, variation_forum, user, admin, detective, murderer):
     assert len(data['results']) == 2
     assert data['results'][0]['comment']['id'] == thread['first_comment_id']
     assert data['results'][1]['comment']['id'] == comment1['id']
+
+
+def setup_module(module):
+    signals.post_save.connect(es_models.do_direct_index, sender=models.Comment)
+
+
+def teardown_module(module):
+    """ teardown any state that was previously setup with a setup_module
+    method.
+    """
+    assert signals.post_save.disconnect(
+        es_models.do_direct_index, sender=models.Comment)

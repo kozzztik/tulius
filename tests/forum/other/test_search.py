@@ -1,9 +1,9 @@
-from unittest import mock
-
 from django.utils import timezone
+from django.db.models import signals
 
 from tulius.forum.threads import models as thread_models
 from tulius.forum.comments import models
+from tulius.forum.elastic_search import models as es_models
 
 
 def test_options(user, room_group):
@@ -94,31 +94,6 @@ def test_search_conditions(admin, user, thread):
     assert data['results'][0]['comment']['id'] == comment1.pk
 
 
-def test_too_much_results(thread, user):
-    response = user.post(
-        thread['url'] + 'comments_page/', {
-            'reply_id': thread['first_comment_id'],
-            'title': 'title', 'body': 'Some text',
-            'media': {},
-        })
-    assert response.status_code == 200
-    comment = models.Comment.objects.filter(parent_id=thread['id'])[1]
-    # do search for user faking search results
-    query = mock.MagicMock()
-    query.filter.return_value = [comment] * 55
-    with mock.patch.object(
-            models.Comment.objects, 'select_related',
-            return_value=query) as mock_method:
-        response = user.post(
-            f'/api/forum/thread/{thread["id"]}/search/',
-            {})
-        assert mock_method.called
-        assert query.filter.called
-    assert response.status_code == 200
-    data = response.json()
-    assert len(data['results']) == 50
-
-
 def test_search_access_rights(room_group, thread, admin, user):
     # create thread with limited access
     response = admin.put(
@@ -147,3 +122,15 @@ def test_search_access_rights(room_group, thread, admin, user):
     assert response.status_code == 200
     data = response.json()
     assert len(data['results']) == 1
+
+
+def setup_module(module):
+    signals.post_save.connect(es_models.do_direct_index, sender=models.Comment)
+
+
+def teardown_module(module):
+    """ teardown any state that was previously setup with a setup_module
+    method.
+    """
+    assert signals.post_save.disconnect(
+        es_models.do_direct_index, sender=models.Comment)

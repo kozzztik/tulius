@@ -98,3 +98,16 @@ def reindex_forum(app_label, model_name, parent_id, user_id):
             'threads': counters['threads'],
             'comments': counters['comments'],
         })
+
+
+@shared_task(track_started=True)
+def after_update_rights(app_label, model_name, thread_id):
+    thread_model = apps.apps.get_model(app_label, model_name)
+    instance = thread_model.objects.get(pk=thread_id)
+    if instance.room:
+        threads = thread_model.objects.filter(
+            parents_ids__contains=thread_id, room=False)
+    else:
+        threads = [instance]
+    for thread in threads:
+        models.ReindexQuery()(thread.comments)

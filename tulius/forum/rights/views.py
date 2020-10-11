@@ -11,6 +11,7 @@ from tulius.forum.threads import models as thread_models
 from tulius.forum.threads import views
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.rights import mutations
+from tulius.forum.rights import signals
 
 
 @dispatch.receiver(thread_signals.after_create, sender=thread_models.Thread)
@@ -63,6 +64,8 @@ class GrantedRightsAPI(BaseGrantedRightsAPI):
         obj = self.create_right(data)
         obj.save()
         self.get_mutation(self.obj).apply()
+        signals.after_update.send(
+            self.thread_model, instance=self.obj, view=self)
         return obj.to_json()
 
     @transaction.atomic
@@ -73,6 +76,8 @@ class GrantedRightsAPI(BaseGrantedRightsAPI):
             raise exceptions.PermissionDenied()
         self.obj.default_rights = data['default_rights']
         self.get_mutation(self.obj).apply()
+        signals.after_update.send(
+            self.thread_model, instance=self.obj, view=self)
         return {'default_rights': self.obj.default_rights}
 
 
@@ -92,6 +97,8 @@ class GrantedRightAPI(BaseGrantedRightsAPI):
         count = self.rights_model.objects.filter(pk=right_id).delete()
         if count:
             self.get_mutation(self.obj).apply()
+            signals.after_update.send(
+                self.thread_model, instance=self.obj, view=self)
         return {'count': count}
 
     @transaction.atomic
@@ -105,4 +112,6 @@ class GrantedRightAPI(BaseGrantedRightsAPI):
         obj.access_level = data['access_level']
         obj.save()
         self.get_mutation(self.obj).apply()
+        signals.after_update.send(
+            self.thread_model, instance=self.obj, view=self)
         return obj.to_json()
