@@ -111,7 +111,7 @@ class Search(core.BaseAPIView):
         search_request = {
             'must': [],
             'filter': {},
-            'must_not': []
+            'must_not': [{'term': {'deleted': True}}]
         }
         if not self.user.is_superuser:
             search_request['filter'] = {

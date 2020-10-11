@@ -33,9 +33,9 @@ class Migration(migrations.Migration):
     initial = True
     atomic = False
     dependencies = [
-        ('forum_threads', '0003_auto_20200912_1840'),
+        ('forum_threads', '0004_auto_20201011_1318'),
         ('forum_comments', '0002_auto_20200910_1215'),
-        ('game_forum_threads', '0003_auto_20200912_1854'),
+        ('game_forum_threads', '0004_auto_20201011_1323'),
         ('game_forum_comments', '0003_auto_20200913_1526'),
         ('tulius', '0001_squashed_0003_user_stories_author'),
         ('stories', '0001_squashed_0002_auto_20200724_2142'),

@@ -264,6 +264,11 @@ LOGGING = {
             'level': 'DEBUG' if env == 'dev' else 'ERROR',
             'propagate': True,
         },
+        'celery.task': {
+            'handlers': ['console'],
+            'level': 'DEBUG' if env == 'dev' else 'ERROR',
+            'propagate': True,
+        },
     }
 }
 
