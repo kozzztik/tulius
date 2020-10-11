@@ -136,11 +136,14 @@ class Search(core.BaseAPIView):
 
         if filter_text:
             conditions.append(f'С текстом: {filter_text}')
-            search_request['must'].append({'match': {
-                'body': {
-                    'query': filter_text,
-                    'fuzziness': 'AUTO',
-            }}})
+            search_request['must'].append({
+                'match': {
+                    'body': {
+                        'query': filter_text,
+                        'fuzziness': 'AUTO',
+                    }
+                }
+            })
         for name in ['must', 'filter', 'must_not']:
             if not search_request[name]:
                 del search_request[name]
@@ -152,11 +155,11 @@ class Search(core.BaseAPIView):
         }
         if filter_text:
             body['highlight'] = {
-                "pre_tags": ["[search]"],
-                "post_tags": ["[/search]"],
+                'pre_tags': ['[search]'],
+                'post_tags': ['[/search]'],
                 'number_of_fragments': 0,
-                "fields": {
-                  "body": {}
+                'fields': {
+                    'body': {}
                 }
             }
         response = models.client.search(

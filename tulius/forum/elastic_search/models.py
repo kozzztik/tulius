@@ -93,7 +93,7 @@ class ReindexQuery:
         self.progress(counter, all_count)
         for instance in query.iterator(chunk_size=self.chunk_size):
             bulk.append(instance_to_document(instance))
-            if len(bulk) >= 50:
+            if len(bulk) >= self.bulk_size:
                 self.bulk_index(bulk)
                 bulk = []
             counter += 1
