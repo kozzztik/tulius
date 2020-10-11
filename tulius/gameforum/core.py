@@ -17,8 +17,13 @@ def copy_game_post(thread, new_parent, variation, role_links):
     sub_threads = models.Thread.objects.filter(parent=thread, deleted=False)
     rights = game_forum_models.GameThreadRight.objects.filter(thread=thread)
     old_thread = thread
+    if new_parent:
+        parents_ids = new_parent.parents_ids + [new_parent.pk]
+    else:
+        parents_ids = []
     thread = models.Thread(
         title=old_thread.title, parent=new_parent,
+        parents_ids=parents_ids,
         body=old_thread.body, room=old_thread.room, user=old_thread.user,
         default_rights=old_thread.default_rights,
         create_time=old_thread.create_time, closed=old_thread.closed,

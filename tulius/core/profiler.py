@@ -71,11 +71,13 @@ class ProfilerMiddleware:
             'exec_time': exec_time / 1000000,
             'thread_id': threading.current_thread().ident,
             'ip': request.META['REMOTE_ADDR'],
-            **self.get_user_data(request)
+            **self.get_user_data(request),
+            **request.profiling_data,
         })
 
     def __call__(self, request):
         start_time = time.perf_counter_ns()
+        request.profiling_data = {}
         response = self.get_response(request)
         exec_time = time.perf_counter_ns() - start_time
         self.log_record(request, exec_time, response)

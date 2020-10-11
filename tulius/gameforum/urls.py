@@ -69,4 +69,11 @@ urlpatterns = [
     urls.re_path(
         r'^variation/(?P<variation_id>\d+)/comment/(?P<pk>\d+)/voting/$',
         other.VotingAPI.as_view(), name='voting'),
+    urls.re_path(
+        r'^elastic/reindex/forum_all/$',
+        other.ReindexForum.as_view(), name='elastic_reindex_forum'),
+    urls.re_path(
+        r'^elastic/reindex/thread/(?P<pk>\d+)/$',
+        other.ReindexForum.as_view(), name='elastic_reindex_thread'),
+
 ]

@@ -248,6 +248,14 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
             User, instance=self, response=data, detailed=detailed)
         return data
 
+    @staticmethod
+    def to_elastic_search(data):
+        del data['password']
+
+    @staticmethod
+    def to_elastic_mapping(fields):
+        del fields['password']
+
 
 User.autocomplete_widget = add_autocomplete_widget(
     User, User.objects.all(), User.USERNAME_FIELD)

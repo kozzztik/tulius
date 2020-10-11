@@ -145,3 +145,17 @@ sudo apt install apache2-utils
 sudo touch /etc/nginx/htpasswd
 sudo htpasswd /etc/nginx/htpasswd bob
 ```
+## Remove elastic disk limit on dev environment
+```
+curl -XPUT "http://localhost:9200/_cluster/settings" \
+ -H 'Content-Type: application/json' -d'
+{
+  "persistent": {
+    "cluster": {
+      "routing": {
+        "allocation.disk.threshold_enabled": false
+      }
+    }
+  }
+}'
+```

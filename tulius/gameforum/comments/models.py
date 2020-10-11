@@ -23,3 +23,12 @@ class Comment(comment_models.AbstractComment):
                 'pk': self.pk,
                 'variation_id': self.parent.variation_id,
             })
+
+    def to_elastic_search(self, data):
+        super().to_elastic_search(data)
+        data['variation_id'] = self.parent.variation_id
+
+    @classmethod
+    def to_elastic_mapping(cls, fields):
+        super().to_elastic_mapping(fields)
+        fields['variation_id'] = {'type': 'integer'}

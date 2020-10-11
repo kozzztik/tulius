@@ -10,6 +10,9 @@
             <b-dropdown-item href="javascript:void(0);" :to="{name: 'fix_counters_index'}" v-if="user.superuser">
                 Обновить счетчики
             </b-dropdown-item>
+            <b-dropdown-item href="javascript:void(0);" :to="{name: 'forum_reindex_forum'}" v-if="user.superuser">
+                Переиндексировать форум
+            </b-dropdown-item>
         </b-dropdown>
     </div>
     <div class="content" v-for="group in index.groups" v-if="!loading">

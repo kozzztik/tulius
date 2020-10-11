@@ -96,6 +96,36 @@ class AbstractComment(models.Model):
     def get_absolute_url(self):
         return urls.reverse('forum_api:comment', kwargs={'pk': self.pk})
 
+    def to_elastic_search(self, data):
+        data['parent_id'] = self.parent_id
+        data['parents_ids'] = (
+            (self.parent.parents_ids or []) + [self.parent_id])
+        data['user'] = {
+            'id': self.user.pk,
+            'title': str(self.user),
+            'date_joined': self.user.date_joined,
+            'sex': self.user.sex,
+        }
+        data['public'] = bool(
+            (self.parent.rights.all or 0) & thread_models.ACCESS_READ)
+        data['read_access'] = []
+        for u, r in self.parent.rights:
+            if r & thread_models.ACCESS_READ:
+                data['read_access'].append(u)
+
+    @classmethod
+    def to_elastic_mapping(cls, fields):
+        fields['parent_id'] = {'type': 'integer'}
+        fields['parents_ids'] = {'type': 'integer'}
+        fields['user'] = {'properties': {
+            'id': {'type': 'integer'},
+            'title': {'type': 'keyword'},
+            'date_joined': {'type': 'date'},
+            'sex': {'type': 'integer'},
+        }}
+        fields['public'] = {'type': 'boolean'}
+        fields['read_access'] = {'type': 'integer'}
+
 
 class Comment(AbstractComment):
     pass

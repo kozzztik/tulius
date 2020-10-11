@@ -48,4 +48,7 @@ export default {
         name: 'forum_extended_search',
         params: { id: pk },
 	}),
+	elastic_reindex_all_api: '/api/forum/elastic/reindex/all/',
+	elastic_reindex_forum_api: '/api/forum/elastic/reindex/forum_all/',
+	elastic_reindex_thread_api: pk => `/api/forum/elastic/reindex/thread/${pk}/`,
 }

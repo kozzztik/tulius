@@ -10,6 +10,7 @@ env = {
     'local': 'dev',  # local development env
     'test': 'test'  # ci tests env
 }[branch]
+TEST_RUN = bool(os.environ.get("TULIUS_TEST", ''))
 
 ENV = env
 BASE_DIR = os.path.dirname(os.path.abspath(__file__)) + '/'
@@ -78,6 +79,7 @@ INSTALLED_APPS = (
     'tulius.forum.comments.ForumCommentsConfig',
     'tulius.forum.read_marks.ForumReadMarksConfig',
     'tulius.forum.other.ForumOtherConfig',
+    'tulius.forum.elastic_search.ForumElasticSearchConfig',
     'tulius.stories',
     'tulius.gameforum',
     'tulius.gameforum.threads.GameForumThreadsConfig',
@@ -165,6 +167,20 @@ INSTALLER_BACKUPS_DIR = BASE_DIR + 'backups/'
 
 WYSIBB_THUMB_SIZE = (350, 350)
 
+ELASTIC_HOSTS = ['localhost:9200'] if env == 'dev' else ['10.5.0.30:9200']
+ELASTIC_PREFIX = 'test' if TEST_RUN else env
+
+ELASTIC_MODELS = (
+    ('tulius', 'User'),
+    ('stories', 'Story'),
+    ('stories', 'Role'),
+    ('stories', 'Character'),
+    ('forum_threads', 'Thread'),
+    ('forum_comments', 'Comment'),
+    ('game_forum_threads', 'Thread'),
+    ('game_forum_comments', 'Comment'),
+)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
@@ -203,6 +219,13 @@ LOGGING = {
             'host': '127.0.0.1' if env == 'dev' else '10.5.0.31',
             'port': 11011,
             'version': 1,
+        },
+        'elastic_search_indexing': {
+            'level': 'DEBUG',
+            'class': 'logstash.TCPLogstashHandler',
+            'host': '127.0.0.1' if env == 'dev' else '10.5.0.31',
+            'port': 11012,
+            'version': 1,
         }
     },
     'loggers': {
@@ -227,10 +250,25 @@ LOGGING = {
             'propagate': True,
         },
         'profiler': {
-            'handlers': ['null' if env == 'test' else 'log_stash'],
+            'handlers': ['null' if TEST_RUN else 'log_stash'],
             'level': 'DEBUG',
             'propagate': False,
-        }
+        },
+        'elastic_search_indexing': {
+            'handlers': ['elastic_search_indexing'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'elasticsearch': {
+            'handlers': ['console'],
+            'level': 'DEBUG' if env == 'dev' else 'ERROR',
+            'propagate': True,
+        },
+        'celery.task': {
+            'handlers': ['console'],
+            'level': 'DEBUG' if env == 'dev' else 'ERROR',
+            'propagate': True,
+        },
     }
 }
 
@@ -324,3 +362,4 @@ CELERY_RESULT_BACKEND = 'django-db'
 CELERY_BROKER_URL = 'redis://{host}:{port}/{db}'.format(**REDIS_CONNECTION)
 CELERY_WORKER_CONCURRENCY = 3
 CELERY_EVENT_QUEUE_PREFIX = f'{env}_'
+CELERY_TASK_ALWAYS_EAGER = TEST_RUN

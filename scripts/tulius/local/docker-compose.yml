@@ -26,19 +26,21 @@ services:
       tuliusnet:
         ipv4_address: 10.5.0.31
     volumes:
-      - ../logstash:/usr/share/logstash/pipeline/
+      - ../logstash/configs:/usr/share/logstash/pipeline/
+      - ../logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml
     environment:
       - MONITORING_ENABLED=false
     ports:
       - 11011:11011
+      - 11012:11012
     container_name: tulius_log_stash
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.9.2
     networks:
       tuliusnet:
-        ipv4_address: 10.5.0.23
-    restart: unless-stopped
+        ipv4_address: 10.5.0.32
+    restart: "no"
     ports:
       - 5601:5601
     environment:

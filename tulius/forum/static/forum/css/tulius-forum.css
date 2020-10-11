@@ -512,3 +512,6 @@ body .quote, blockquote {
     min-height: 10em;
 }
 
+.search_highlight {
+    background-color: yellow;
+}

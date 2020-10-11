@@ -9,9 +9,10 @@ from tulius.forum.rights import views as rights_api
 from tulius.forum.other import likes
 from tulius.forum.other import voting
 from tulius.forum.read_marks import views as read_marks
-from tulius.forum.other import search
 from tulius.forum.other import images
 from tulius.forum.other import html
+from tulius.forum.elastic_search import views as elastic_search
+
 
 app_name = 'tulius.forum'
 
@@ -62,7 +63,7 @@ urlpatterns = [
         rights_api.GrantedRightAPI.as_view(), name='thread_right'),
     urls.re_path(
         r'^thread/(?P<pk>\d+)/search/$',
-        search.Search.as_view(), name='thread_search'),
+        elastic_search.Search.as_view(), name='thread_search'),
     urls.re_path(
         r'^thread/(?P<pk>\d+)/move/$',
         threads_api.MoveThreadView.as_view(), name='thread_move'),
@@ -78,4 +79,14 @@ urlpatterns = [
     urls.re_path(
         r'^likes/$',
         likes.Likes.as_view(), name='likes'),
+    urls.re_path(
+        r'^elastic/reindex/all/$',
+        elastic_search.ReindexAll.as_view(), name='elastic_reindex_all'),
+    urls.re_path(
+        r'^elastic/reindex/forum_all/$',
+        elastic_search.ReindexForum.as_view(), name='elastic_reindex_forum'),
+    urls.re_path(
+        r'^elastic/reindex/thread/(?P<pk>\d+)/$',
+        elastic_search.ReindexForum.as_view(), name='elastic_reindex_thread'),
+
 ]

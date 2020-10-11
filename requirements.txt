@@ -11,10 +11,11 @@ ua-parser == 0.10.0
 python-logstash == 0.4.6
 
 # sentry
-sentry-sdk == 0.17.4
+sentry-sdk == 0.18.0
 redis == 3.5.3
 django-redis-cache == 2.1.1
 requests == 2.24.0
+elasticsearch7 == 7.9.1
 
 # async
 aiohttp == 3.6.2

@@ -257,6 +257,17 @@ class AbstractThread(models.Model):
             'move': self.edit_right(user),
         }
 
+    def to_elastic_search(self, data):
+        data['parent_id'] = self.parent_id
+        data['user'] = {
+            'id': self.user.pk,
+            'title': str(self.user)
+        }
+
+    @classmethod
+    def to_elastic_mapping(cls, fields):
+        fields['parents_ids'] = {'type': 'integer'}
+
 
 class Thread(AbstractThread):
     pass
