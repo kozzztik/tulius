@@ -1,3 +1,4 @@
+import time
 import datetime
 import json
 
@@ -162,10 +163,14 @@ class Search(core.BaseAPIView):
                     'body': {}
                 }
             }
+        start_time = time.perf_counter_ns()
         response = models.client.search(
             index=models.index_name(self.comments_class.comment_model),
             body=body
         )
+        request.profiling_data['elastic_time'] = response['took']
+        request.profiling_data['elastic_full'] = \
+            (time.perf_counter_ns() - start_time) / 1000000
         pks = [int(hit['_id']) for hit in response['hits']['hits']]
         comments = list(
             self.comments_class.comment_model.objects.filter(pk__in=pks))
@@ -184,6 +189,7 @@ class Search(core.BaseAPIView):
                 continue
             search_results.append(view)
         return {
+            'took': response['took'],
             'thread': thread_view.obj_to_json(),
             'conditions': conditions,
             'results': [{
