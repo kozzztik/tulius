@@ -7,6 +7,10 @@ export default LazyComponent('forum_extended_search_page', {
         user_search: {
 			type: Function,
 	    },
+        show_root: {
+			type: Boolean,
+			default: true,
+	    },
 	},
     mixins: [APILoadMixin,],
     template: '/static/forum/pages/extended_search.html',
@@ -28,21 +32,47 @@ export default LazyComponent('forum_extended_search_page', {
     },
     methods: {
         load_api(route) {
-            return axios.get(this.urls.thread_api(route.params.id)
-            ).then(response => {
-                this.thread = response.data;
-                this.breadcrumbs = this.$parent.thread_breadcrumbs(this.thread);
-                this.breadcrumbs.push({
+            //cleanup form
+            this.form.text = route.query.text || '';
+            this.form.date_from = route.query.date_from || null;
+            this.form.date_to = route.query.date_to || null;
+            this.form.users = [];
+            if (route.query.users) {
+                var pks = route.query.users;
+                if (!Array.isArray(pks))
+                    pks = [pks];
+                if (pks.length > 0)
+                    axios.options(
+                        this.urls.search_api, {'params': {'pks': pks.join()}}
+                    ).then(response => this.form.users = response.data.users)
+            }
+            this.form.not_users = [];
+            if (route.query.not_users) {
+                var pks = route.query.not_users;
+                if (!Array.isArray(pks))
+                    pks = [pks];
+                if (pks.length > 0)
+                    axios.options(
+                        this.urls.search_api, {'params': {'pks': pks.join()}}
+                    ).then(response => this.form.not_users = response.data.users)
+            }
+            this.thread = null;
+            if (route.query.thread_id)
+                return axios.get(this.urls.thread_api(route.query.thread_id)
+                ).then(response => {
+                    this.thread = response.data;
+                    this.breadcrumbs = this.$parent.thread_breadcrumbs(this.thread);
+                    this.breadcrumbs.push({
+                        'title': 'Поиск',
+                        'url': route
+                    })
+                })
+            else {
+                this.breadcrumbs = [{
                     'title': 'Поиск',
                     'url': route
-                })
-                //cleanup form
-                form.text = '';
-                form.date_from = null;
-                form.date_to = null;
-                form.users = [];
-                form.not_users = [];
-            })
+                }]
+            }
         },
         form_submit() {
             var users = [];
@@ -54,8 +84,11 @@ export default LazyComponent('forum_extended_search_page', {
             var form = JSON.parse(JSON.stringify(this.form));
             form.users = users;
             form.not_users = not_users;
+            form.thread_id = null;
+            if (this.thread && this.thread.id)
+                form.thread_id = this.thread.id;
             this.$router.push(
-                this.urls.search_results(this.thread.id, form));
+                this.urls.search_results(form));
         },
         do_search(query) {
             var res = (this.user_search||this.default_user_search)(query);
@@ -69,7 +102,7 @@ export default LazyComponent('forum_extended_search_page', {
             if (query.length < 3)
                 return
             return axios.options(
-                this.thread.url + 'granted_rights/', {params: {query: query}}
+                this.urls.search_api, {params: {query: query}}
             ).then(response => response.data.users)
         },
     },

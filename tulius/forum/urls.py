@@ -62,8 +62,8 @@ urlpatterns = [
         r'^thread/(?P<pk>\d+)/granted_rights/(?P<right_id>\d+)/$',
         rights_api.GrantedRightAPI.as_view(), name='thread_right'),
     urls.re_path(
-        r'^thread/(?P<pk>\d+)/search/$',
-        elastic_search.Search.as_view(), name='thread_search'),
+        r'search/$',
+        elastic_search.Search.as_view(), name='forum_search'),
     urls.re_path(
         r'^thread/(?P<pk>\d+)/move/$',
         threads_api.MoveThreadView.as_view(), name='thread_move'),

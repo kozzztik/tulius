@@ -13,7 +13,16 @@
             <b-dropdown-item href="javascript:void(0);" :to="{name: 'forum_reindex_forum'}" v-if="user.superuser">
                 Переиндексировать форум
             </b-dropdown-item>
+            <b-dropdown-item :to="urls.extended_search({})">
+                Расширенный поиск
+            </b-dropdown-item>
         </b-dropdown>
+        <form class="input-group btn-group-sm" @submit.prevent="search_submit"  v-if="!user.is_anonymous" >
+            <input type="text" name="text" required class="form-control" v-model="search_text">
+            <button class="btn btn-light" id="search" type="submit">
+                Поиск
+            </button>
+        </form>
     </div>
     <div class="content" v-for="group in index.groups" v-if="!loading">
         <div class="caption" align="center">
