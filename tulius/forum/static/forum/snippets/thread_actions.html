@@ -38,7 +38,7 @@
         <b-dropdown-item href="javascript:void(0);" :to="urls.deleted_threads(thread.id)" v-if="thread.room && user.superuser">
             Удаленные комнаты и темы
         </b-dropdown-item>
-        <b-dropdown-item :to="urls.extended_search(thread.id)">
+        <b-dropdown-item :to="urls.extended_search({thread_id: thread.id})">
             Расширенный поиск
         </b-dropdown-item>
     </b-dropdown>

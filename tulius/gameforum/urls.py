@@ -55,7 +55,7 @@ urlpatterns = [
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/online_status/$',
         online_status.OnlineStatusAPI.as_view(), name='online_status'),
     urls.re_path(
-        r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/search/$',
+        r'^variation/(?P<variation_id>\d+)/search/$',
         other.Search.as_view(), name='thread_search'),
     urls.re_path(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/move/$',

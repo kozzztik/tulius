@@ -17,6 +17,8 @@ export default {
                 ).then(
                     () => this.$parent.loading_end(this.breadcrumbs)
                 );
+            } else {
+                this.$parent.loading_end(this.breadcrumbs);
             }
         },
     },

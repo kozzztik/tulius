@@ -27,6 +27,7 @@ class Comment(comment_models.AbstractComment):
     def to_elastic_search(self, data):
         super().to_elastic_search(data)
         data['variation_id'] = self.parent.variation_id
+        data['role_id'] = self.role_id or 0
 
     @classmethod
     def to_elastic_mapping(cls, fields):

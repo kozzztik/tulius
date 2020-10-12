@@ -25,13 +25,20 @@ def teardown_module(module):
         es_models.do_direct_index, sender=models.Comment)
 
 
-def test_options(user, room_group):
-    response = user.options(
-        f'/api/forum/thread/{room_group["id"]}/search/?query=Tul')
+def test_options(user, superuser):
+    response = user.options('/api/forum/search/?query=Tul')
     assert response.status_code == 200
     data = response.json()
     for u in data['users']:
         assert 'Tul' in u['title']
+    pks = f'{user.user.pk},{superuser.user.pk}'
+    response = user.options(f'/api/forum/search/?pks={pks}')
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data['users']) == 2
+    users = {u['id']: u for u in data['users']}
+    assert users[user.user.pk]['title'] == user.user.username
+    assert users[superuser.user.pk]['title'] == superuser.user.username
 
 
 def test_search_conditions(admin, user, thread):
@@ -51,8 +58,8 @@ def test_search_conditions(admin, user, thread):
     assert response.status_code == 200
     # do search for user
     response = user.post(
-        f'/api/forum/thread/{thread["id"]}/search/',
-        {'users': [admin.user.pk]})
+        '/api/forum/search/',
+        {'users': [admin.user.pk], 'thread_id': thread["id"]})
     assert response.status_code == 200
     data = response.json()
     assert len(data['results']) == 2
@@ -60,8 +67,8 @@ def test_search_conditions(admin, user, thread):
         assert result['comment']['user']['id'] == admin.user.id
     # do search for not user
     response = user.post(
-        f'/api/forum/thread/{thread["id"]}/search/',
-        {'not_users': [admin.user.pk]})
+        '/api/forum/search/',
+        {'not_users': [admin.user.pk], 'thread_id': thread["id"]})
     assert response.status_code == 200
     data = response.json()
     assert len(data['results']) == 1
@@ -69,8 +76,8 @@ def test_search_conditions(admin, user, thread):
     assert comment['user']['id'] == user.user.id
     # do search by text
     response = user.post(
-        f'/api/forum/thread/{thread["id"]}/search/',
-        {'text': 'foo'})
+        '/api/forum/search/',
+        {'text': 'foo', 'thread_id': thread["id"]})
     assert response.status_code == 200
     data = response.json()
     assert len(data['results']) == 1
@@ -89,24 +96,30 @@ def test_search_conditions(admin, user, thread):
     comment2.save()
     # do search "before"
     response = user.post(
-        f'/api/forum/thread/{thread["id"]}/search/',
-        {'date_to': '10.10.2019'})
+        '/api/forum/search/',
+        {'date_to': '10.10.2019', 'thread_id': thread["id"]})
     assert response.status_code == 200
     data = response.json()
     assert len(data['results']) == 1
     assert data['results'][0]['comment']['id'] == comment1.pk
     # do combined time search
     response = user.post(
-        f'/api/forum/thread/{thread["id"]}/search/',
-        {'date_from': '10.10.2019', 'date_to': '02.02.2020'})
+        '/api/forum/search/', {
+            'date_from': '10.10.2019',
+            'date_to': '02.02.2020',
+            'thread_id': thread["id"]
+        })
     assert response.status_code == 200
     data = response.json()
     assert len(data['results']) == 1
     assert data['results'][0]['comment']['id'] == comment2.pk
     # do search with incorrect date
     response = user.post(
-        f'/api/forum/thread/{thread["id"]}/search/',
-        {'date_to': '10.10.2019', 'date_from': 'foobar'})
+        '/api/forum/search/', {
+            'date_to': '10.10.2019',
+            'date_from': 'foobar',
+            'thread_id': thread["id"]
+        })
     assert response.status_code == 200
     data = response.json()
     assert len(data['results']) == 1
@@ -124,18 +137,19 @@ def test_search_access_rights(room_group, thread, admin, user, superuser):
             'important': False, 'media': {}})
     assert response.status_code == 200
     # search by admin in room
-    response = admin.post(f'/api/forum/thread/{room_group["id"]}/search/', {})
+    response = admin.post(
+        '/api/forum/search/', {'thread_id': room_group["id"]})
     assert response.status_code == 200
     data = response.json()
     assert len(data['results']) == 2
     # search by user in room
-    response = user.post(f'/api/forum/thread/{room_group["id"]}/search/', {})
+    response = user.post('/api/forum/search/', {'thread_id': room_group["id"]})
     assert response.status_code == 200
     data = response.json()
     assert len(data['results']) == 1
     # search by superuser in room
     response = superuser.post(
-        f'/api/forum/thread/{room_group["id"]}/search/', {})
+        '/api/forum/search/', {'thread_id': room_group["id"]})
     assert response.status_code == 200
     data = response.json()
     assert len(data['results']) == 2
@@ -143,7 +157,8 @@ def test_search_access_rights(room_group, thread, admin, user, superuser):
     response = admin.delete(thread['url'] + '?comment=wow')
     assert response.status_code == 200
     # check deleted comments filtered
-    response = admin.post(f'/api/forum/thread/{room_group["id"]}/search/', {})
+    response = admin.post(
+        '/api/forum/search/', {'thread_id': room_group["id"]})
     assert response.status_code == 200
     data = response.json()
     assert len(data['results']) == 1
@@ -152,7 +167,7 @@ def test_search_access_rights(room_group, thread, admin, user, superuser):
 def test_search_access_rights_double_check(
         room_group, thread, admin, user, superuser):
     # check initial state
-    response = user.post(f'/api/forum/thread/{room_group["id"]}/search/', {})
+    response = user.post('/api/forum/search/', {'thread_id': room_group["id"]})
     assert response.status_code == 200
     data = response.json()
     assert len(data['results']) == 1
@@ -163,7 +178,7 @@ def test_search_access_rights_double_check(
         data=thread.data)
     assert count == 1
     # search by superuser in room again
-    response = user.post(f'/api/forum/thread/{room_group["id"]}/search/', {})
+    response = user.post('/api/forum/search/', {'thread_id': room_group["id"]})
     assert response.status_code == 200
     data = response.json()
     assert len(data['results']) == 0

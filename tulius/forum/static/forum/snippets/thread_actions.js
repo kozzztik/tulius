@@ -48,7 +48,10 @@ export default LazyComponent('forum_thread_actions', {
             var parents = this.thread.parents;
             var pk = parents.length > 0 ? parents[0].id : this.thread.id;
             this.$router.push(
-                this.urls.search_results(pk, {text: this.search_text})
+                this.urls.search_results({
+                    thread_id: pk,
+                    text: this.search_text}
+                )
             );
         }
     }

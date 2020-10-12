@@ -6,7 +6,9 @@ export default LazyComponent('pagination', {
             if ((pk < 1)||(pk == this.page_num)||(pk > this.pagination.pages_count)) {
                 return true;
             }
-            this.$router.push({path: this.$router.path, query: {page: pk}})
+            var query = JSON.parse(JSON.stringify(this.$route.query));
+            query['page'] = pk;
+            this.$router.push({path: this.$router.path, query: query})
             return true;
         },
         page_class(page) {

@@ -1,3 +1,4 @@
+import math
 import time
 import datetime
 import json
@@ -14,6 +15,7 @@ from tulius.forum.threads import models as thread_models
 from tulius.forum.elastic_search import tasks
 from tulius.forum.rights import signals
 from tulius.forum.comments import views
+from tulius.forum.comments import pagination
 from tulius.forum.elastic_search import models
 
 
@@ -105,15 +107,7 @@ class Search(core.BaseAPIView):
                     'lte': date.isoformat()
                 }}})
 
-    def post(self, request, pk, **_kwargs):
-        data = json.loads(request.body)
-        thread_view = self.get_view(None)
-        thread_view.get_parent_thread(pk)
-        search_request = {
-            'must': [],
-            'filter': {},
-            'must_not': [{'term': {'deleted': True}}]
-        }
+    def filter_rights(self, search_request):
         if not self.user.is_superuser:
             search_request['filter'] = {
                 'bool': {
@@ -127,11 +121,41 @@ class Search(core.BaseAPIView):
                 search_request['filter']['bool']['should'].append(
                     {'term': {'read_access': self.user.pk}},
                 )
+
+    def do_search(self, request, body):
+        start_time = time.perf_counter_ns()
+        response = models.client.search(
+            index=models.index_name(self.comments_class.comment_model),
+            body=body
+        )
+        hits = response['hits']['total']['value']
+        request.profiling_data['elastic_time'] = response['took']
+        request.profiling_data['elastic_full'] = \
+            (time.perf_counter_ns() - start_time) / 1000000
+        request.profiling_data['elastic_hits'] = hits
+        return response
+
+    def post(self, request, **_kwargs):
+        data = json.loads(request.body)
+        page = int(data.get('page', 1))
+        pk = data.get('thread_id', None)
+        thread_view = None
+        conditions = []
+        if pk:
+            pk = int(pk)
+            thread_view = self.get_view(None)
+            thread_view.get_parent_thread(pk)
+            conditions.append(f'В: {thread_view.obj.title}')
+        search_request = {
+            'must': [],
+            'filter': {},
+            'must_not': [{'term': {'deleted': True}}]
+        }
+        self.filter_rights(search_request)
         if pk:
             search_request['must'].append(
                 {'term': {'parents_ids': pk}})
         filter_text = data.get('text', [])
-        conditions = []
         self.apply_users_filters(search_request, conditions, data)
         self.apply_dates_filters(search_request, conditions, data)
 
@@ -151,6 +175,7 @@ class Search(core.BaseAPIView):
         body = {
             'query': {'bool': search_request},
             '_source': False,
+            'from': (page - 1) * self.comments_class.COMMENTS_ON_PAGE,
             'size': self.comments_class.COMMENTS_ON_PAGE,
             'explain': settings.DEBUG,
         }
@@ -163,14 +188,13 @@ class Search(core.BaseAPIView):
                     'body': {}
                 }
             }
-        start_time = time.perf_counter_ns()
-        response = models.client.search(
-            index=models.index_name(self.comments_class.comment_model),
-            body=body
-        )
-        request.profiling_data['elastic_time'] = response['took']
-        request.profiling_data['elastic_full'] = \
-            (time.perf_counter_ns() - start_time) / 1000000
+
+        response = self.do_search(request, body)
+
+        hits = response['hits']['total']['value']
+        page_count = math.ceil(hits / self.comments_class.COMMENTS_ON_PAGE)
+        request.profiling_data['elastic_page'] = page
+        request.profiling_data['elastic_page_count'] = page_count
         pks = [int(hit['_id']) for hit in response['hits']['hits']]
         comments = list(
             self.comments_class.comment_model.objects.filter(pk__in=pks))
@@ -190,7 +214,11 @@ class Search(core.BaseAPIView):
             search_results.append(view)
         return {
             'took': response['took'],
-            'thread': thread_view.obj_to_json(),
+            'page': page,
+            'page_count': page_count,
+            'pagination': pagination.get_pagination_context(
+                self.request, page, max(page_count, 1)),
+            'thread': thread_view.obj_to_json() if thread_view else None,
             'conditions': conditions,
             'results': [{
                 'comment': view.comment_to_json(view.comment),
@@ -199,8 +227,14 @@ class Search(core.BaseAPIView):
         }
 
     def options(self, request, *args, **kwargs):
-        users = auth.get_user_model().objects.filter(
-            is_active=True, username__istartswith=request.GET['query'])[:10]
+        if 'pks' in request.GET:
+            pks = request.GET['pks'].split(',')
+            users = auth.get_user_model().objects.filter(
+                is_active=True, pk__in=pks)
+        else:
+            users = auth.get_user_model().objects.filter(
+                is_active=True, username__istartswith=request.GET['query']
+            )[:10]
         return {
             "users": [{"id": u.pk, "title": u.username} for u in users]
         }

@@ -31,22 +31,52 @@ class Search(elastic_search.Search, base.VariationMixin):
 
     def apply_users_filters(self, search_request, conditions, data):
         filter_users = data.get('users', [])
+        filter_users = [int(u) for u in filter_users]
         filter_not_users = data.get('not_users', [])
+        filter_not_users = [int(u) for u in filter_not_users]
         if filter_users:
             users = story_models.Role.objects.filter(
                 pk__in=filter_users, variation=self.variation)
-            conditions.append('От: ' + ', '.join([u.name for u in users]))
+            pks = [u.pk for u in users]
+            names = [u.name for u in users]
+            if 0 in filter_users:
+                pks.append(0)
+                names.append('---')
+            conditions.append('От: ' + ', '.join(names))
             search_request['must'].append(
-                {'terms': {'role_id': [u.pk for u in users]}},
+                {'terms': {'role_id': pks}},
             )
         if filter_not_users:
             users = story_models.Role.objects.filter(
                 pk__in=filter_not_users, variation=self.variation)
+            pks = [u.pk for u in users]
+            names = [u.name for u in users]
+            if 0 in filter_not_users:
+                pks.append(0)
+                names.append('---')
             conditions.append(
-                'Не от: ' + ', '.join([u.name for u in users]))
+                'Не от: ' + ', '.join(names))
             search_request['must_not'].append(
-                {'terms': {'role_id': [u.pk for u in users]}},
+                {'terms': {'role_id': pks}},
             )
+
+    def options(self, request, *args, **kwargs):
+        add_leader = False
+        if 'pks' in request.GET:
+            pks = request.GET['pks'].split(',')
+            users = story_models.Role.objects.filter(
+                deleted=False, pk__in=pks, variation=self.variation)
+            if '0' in pks:
+                add_leader = True
+        else:
+            users = story_models.Role.objects.filter(
+                deleted=False, name__istartswith=request.GET['query'],
+                variation=self.variation
+            )[:10]
+        users = [{"id": u.pk, "title": u.name} for u in users]
+        if add_leader:
+            users.append({'id': 0, 'title': '---'})
+        return {"users": users}
 
 
 class Likes(likes.Likes, comments_api.CommentsBase):

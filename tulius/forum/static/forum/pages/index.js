@@ -9,6 +9,7 @@ export default LazyComponent('forum_index_page', {
         breadcrumbs: [],
         loading: true,
         index: {groups: []},
+        search_text: '',
     }),
     computed: {
         urls() {return this.$parent.urls},
@@ -52,6 +53,13 @@ export default LazyComponent('forum_index_page', {
                 this.$parent.loading_end();
                 this.load_api(null);
             });
+        },
+        search_submit() {
+            this.$router.push(
+                this.urls.search_results({
+                    text: this.search_text}
+                )
+            );
         },
     },
 })
