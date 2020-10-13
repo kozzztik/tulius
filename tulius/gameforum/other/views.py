@@ -60,6 +60,10 @@ class Search(elastic_search.Search, base.VariationMixin):
                 {'terms': {'role_id': pks}},
             )
 
+    def comments_query(self, pks):
+        return self.comments_class.comment_model.objects.filter(
+            pk__in=pks).select_related('role', 'role__avatar', 'parent')
+
     def options(self, request, *args, **kwargs):
         add_leader = False
         if 'pks' in request.GET:

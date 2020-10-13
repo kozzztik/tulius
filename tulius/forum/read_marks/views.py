@@ -8,7 +8,6 @@ from tulius.forum.threads import models as thread_models
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.threads import views
 from tulius.forum.comments import models as comment_models
-from tulius.forum.comments import views as comment_views
 from tulius.forum.read_marks import tasks
 
 
@@ -25,7 +24,7 @@ class ReadmarkAPI(views.BaseThreadView):
             'thread': {
                 'id': comment.parent_id,
             },
-            'page': comment_views.order_to_page(comment.order),
+            'page': comment.page,
         } if pk else None
 
     def mark_room_as_read(self, room):
@@ -100,7 +99,7 @@ class ReadmarkAPI(views.BaseThreadView):
         comment = cls.comment_model.objects.get(pk=comment_id)
         return {
             'id': comment.id,
-            'page_num': comment_views.order_to_page(comment.order),
+            'page_num': comment.page,
             'count': cls.comment_model.objects.filter(
                 parent_id=comment.parent_id, deleted=False, id__gt=comment.id
             ).exclude(user=user).count() + 1

@@ -52,7 +52,7 @@ class VotingAPI(views.CommentBase):
         voting = self.get_voting(for_update=True, **kwargs)
         data = json.loads(self.request.body)
         if data.get('close'):
-            if not self.comment_edit_right(self.comment):
+            if not self.comment.edit_right(self.user):
                 raise exceptions.PermissionDenied()
             voting['closed'] = True
             self.comment.save()
@@ -103,11 +103,10 @@ class VotingAPI(views.CommentBase):
         return data
 
     @classmethod
-    def on_comment_to_json(cls, comment, data, view, **_kwargs):
+    def on_comment_to_json(cls, comment, data, user, **_kwargs):
         v = comment.media.get('voting')
         if v:
-            data['media']['voting'] = cls.user_voting_data(
-                v, view.user, comment.pk)
+            data['media']['voting'] = cls.user_voting_data(v, user, comment.pk)
 
     @classmethod
     def on_thread_to_json(cls, instance, response, view, **_kwargs):

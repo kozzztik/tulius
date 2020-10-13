@@ -12,4 +12,8 @@ export default LazyComponent('game_search_results', {
         loading_end(breadcrumbs) {this.$parent.loading_end(breadcrumbs)},
         thread_breadcrumbs(thread) {return this.$parent.thread_breadcrumbs(thread)},
     },
+    beforeRouteUpdate (to, from, next) {
+        this.$refs.search._load_api(to);
+        next();
+    },
 })

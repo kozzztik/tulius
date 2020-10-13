@@ -3,6 +3,7 @@ from datetime import timedelta
 from django import urls
 from django import dispatch
 from django.db import models
+from django.utils import html
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import now
 from django.contrib.auth import get_user_model
@@ -543,6 +544,40 @@ class Role(SortableModelMixin):
         self.comments_count = 0
         self.save()
         return True
+
+    def to_json(self, user, detailed=False):
+        data = {
+            'id': self.id,
+            'title': html.escape(self.name),
+            'url': None,
+        }
+        if detailed:
+            on = self.is_online() if self.show_in_online_character else None
+            data.update({
+                'sex': self.sex,
+                'avatar': self.avatar.image.url if (
+                    self.avatar and self.avatar.image) else '',
+                'online_status': on,
+                'owned': (
+                    user.is_authenticated and (
+                        self.user_id == user.pk)),
+                'trust': self.trust_value if self.show_trust_marks else None,
+                'show_trust_marks': self.show_trust_marks,
+            })
+        return data
+
+
+def leader_json():
+    return {
+        'id': None,
+        'title': '---',
+        'url': None,
+        'sex': None,
+        'avatar': None,
+        'online_status': None,
+        'trust': None,
+        'show_trust_marks': False,
+    }
 
 
 class RoleDeleteMark(models.Model):

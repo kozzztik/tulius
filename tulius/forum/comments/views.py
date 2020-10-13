@@ -4,8 +4,7 @@ from django import dispatch
 from django import shortcuts
 from django.core import exceptions
 from django.db import transaction
-from django.utils import html, timezone
-from djfw.wysibb.templatetags import bbcodes
+from django.utils import timezone
 
 from tulius.core.ckeditor import html_converter
 from tulius.forum.comments import models
@@ -18,17 +17,14 @@ from tulius.forum.comments import mutations
 from tulius.websockets import publisher
 
 
-def order_to_page(order):
-    return int(order / CommentsBase.COMMENTS_ON_PAGE) + 1
-
-
 @dispatch.receiver(thread_signals.room_to_json, sender=thread_models.Thread)
 def room_to_json(instance, response, view, **_kwargs):
     last_comment_id = instance.last_comment[view.user]
     comments_count = instance.comments_count[view.user]
     response['comments_count'] = comments_count
     if (not instance.room) and (comments_count is not None):
-        response['pages_count'] = order_to_page(comments_count - 1)
+        response['pages_count'] = models.Comment.order_to_page(
+            comments_count - 1)
     if last_comment_id is None:
         return
     try:
@@ -41,7 +37,7 @@ def room_to_json(instance, response, view, **_kwargs):
         'thread': {
             'id': last_comment.parent_id,
         },
-        'page': order_to_page(last_comment.order),
+        'page': last_comment.page,
         'user': last_comment.user.to_json(),
         'create_time': last_comment.create_time,
     }
@@ -53,58 +49,31 @@ def thread_to_json(instance, response, view, **_kwargs):
 
 
 class CommentsBase(views.BaseThreadView):
-    COMMENTS_ON_PAGE = 25
     comment_model = models.Comment
 
     @classmethod
     def pages_count(cls, thread):
-        return order_to_page(thread.comments_count.all - 1)
+        return cls.comment_model.order_to_page(thread.comments_count.su - 1)
 
-    def comment_edit_right(self, comment):
-        return (comment.user == self.user) or \
-            self.obj.moderate_right(self.user)
-
-    def comment_to_json(self, c):
-        data = {
-            'id': c.id,
-            'thread': {
-                'id': c.parent_id,
-                'url': c.parent.get_absolute_url()
-            },
-            'page': order_to_page(c.order),
-            'url': c.get_absolute_url() if c.pk else None,
-            'title': html.escape(c.title),
-            'body': bbcodes.bbcode(c.body),
-            'user': c.user.to_json(detailed=True),
-            'create_time': c.create_time,
-            'edit_right': self.comment_edit_right(c),
-            'is_thread': c.is_thread(),
-            'edit_time': c.edit_time,
-            'editor': c.editor.to_json() if c.editor else None,
-            'media': c.media,
-            'reply_id': c.reply_id,
-        }
-        comment_signals.to_json.send(
-            self.comment_model, comment=c, data=data, view=self)
-        return data
+    def comments_query(self):
+        # use reverse manager, so "parent" is cached correctly
+        return self.obj.comments.select_related('user').exclude(deleted=True)
 
 
 class CommentsPageAPI(CommentsBase):
     def get_context_data(self, **kwargs):
         self.get_parent_thread(**kwargs)
         page_num = kwargs.get('page') or int(self.request.GET.get('page', 1))
-        # use reverse manager, so "parent" is cached correctly
-        comments = self.obj.comments.select_related('user')
-        comments = comments.exclude(deleted=True).filter(
-            order__gte=CommentsBase.COMMENTS_ON_PAGE * (page_num - 1),
-            order__lt=CommentsBase.COMMENTS_ON_PAGE * page_num
+        comments = self.comments_query().filter(
+            order__gte=self.comment_model.COMMENTS_ON_PAGE * (page_num - 1),
+            order__lt=self.comment_model.COMMENTS_ON_PAGE * page_num
         )
         # TODO move pagination to frontend
         pagination_context = pagination.get_pagination_context(
             self.request, page_num, self.pages_count(self.obj))
         return {
             'pagination': pagination_context,
-            'comments': [self.comment_to_json(c) for c in comments]
+            'comments': [c.to_json(self.user) for c in comments]
         }
 
     @classmethod
@@ -158,12 +127,12 @@ class CommentsPageAPI(CommentsBase):
         if data['body']:
             comment = self.create_comment_process(data, preview, self)
             if preview:
-                return self.comment_to_json(comment)
+                return comment.to_json(self.user)
             # commit transaction to be sure that clients wouldn't be notified
             # before comment will be accessible in DB
             self.obj.save()
             transaction.commit()
-            page = order_to_page(comment.order)
+            page = comment.page
             publisher.notify_thread_about_new_comment(
                 self, self.obj, comment, page)
         else:
@@ -191,7 +160,7 @@ class CommentBase(CommentsBase):
 class CommentAPI(CommentBase):
     def get_context_data(self, **kwargs):
         self.get_comment(**kwargs)
-        data = self.comment_to_json(self.comment)
+        data = self.comment.to_json(self.user)
         data['thread']['title'] = self.obj.title
         data['thread']['parents'] = [{
             'id': parent.id,
@@ -205,7 +174,7 @@ class CommentAPI(CommentBase):
         self.get_comment(for_update=True, **kwargs)
         if self.comment.is_thread():
             raise exceptions.PermissionDenied()
-        if not self.comment_edit_right(self.comment):
+        if not self.comment.edit_right(self.user):
             raise exceptions.PermissionDenied()
         self.comment.deleted = True
         self.comment.data['deleted'] = {
@@ -248,7 +217,7 @@ class CommentAPI(CommentBase):
         self.get_comment(for_update=True, **kwargs)
         if self.comment.is_thread():
             raise exceptions.PermissionDenied()
-        if not self.comment_edit_right(self.comment):
+        if not self.comment.edit_right(self.user):
             raise exceptions.PermissionDenied()
 
         self.update_comment(self.comment, data, preview, self)
@@ -258,7 +227,7 @@ class CommentAPI(CommentBase):
         else:
             self.comment.save()
             transaction.commit()
-        return self.comment_to_json(self.comment)
+        return self.comment.to_json(self.user)
 
 
 thread_signals.on_update.connect(

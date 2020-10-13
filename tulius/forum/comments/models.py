@@ -6,8 +6,12 @@ import django.core.serializers.json
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
+from django.utils import html
 
+from djfw.wysibb.templatetags import bbcodes
 from tulius.forum.threads import models as thread_models
+from tulius.forum.comments import signals
+
 
 User = get_user_model()
 
@@ -21,6 +25,8 @@ class AbstractComment(models.Model):
         verbose_name_plural = _('comments')
         ordering = ['id']
         abstract = True
+
+    COMMENTS_ON_PAGE = 25
 
     objects = models.Manager()  # linters don't worry, be happy
 
@@ -87,6 +93,10 @@ class AbstractComment(models.Model):
         default=dict,
         encoder=django.core.serializers.json.DjangoJSONEncoder)
 
+    @property
+    def page(self):
+        return self.order_to_page(self.order)
+
     def __str__(self):
         return self.title[:40] if self.title else self.body[:40]
 
@@ -95,6 +105,11 @@ class AbstractComment(models.Model):
 
     def get_absolute_url(self):
         return urls.reverse('forum_api:comment', kwargs={'pk': self.pk})
+
+    def edit_right(self, user):
+        if not user.is_authenticated:
+            return False
+        return (self.user_id == user.pk) or self.parent.moderate_right(user)
 
     def to_elastic_search(self, data):
         data['parent_id'] = self.parent_id
@@ -125,6 +140,34 @@ class AbstractComment(models.Model):
         }}
         fields['public'] = {'type': 'boolean'}
         fields['read_access'] = {'type': 'integer'}
+
+    @classmethod
+    def order_to_page(cls, order):
+        return int(order / cls.COMMENTS_ON_PAGE) + 1
+
+    def to_json(self, user):
+        data = {
+            'id': self.pk,
+            'thread': {
+                'id': self.parent_id,
+                'url': self.parent.get_absolute_url()
+            },
+            'page': self.page,
+            'url': self.get_absolute_url() if self.pk else None,
+            'title': html.escape(self.title),
+            'body': bbcodes.bbcode(self.body),
+            'user': self.user.to_json(detailed=True),
+            'create_time': self.create_time,
+            'edit_right': self.edit_right(user),
+            'is_thread': self.is_thread(),
+            'edit_time': self.edit_time,
+            'editor': self.editor.to_json() if self.editor else None,
+            'media': self.media,
+            'reply_id': self.reply_id,
+        }
+        signals.to_json.send(
+            self.__class__, comment=self, data=data, user=user)
+        return data
 
 
 class Comment(AbstractComment):

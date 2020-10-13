@@ -14,4 +14,4 @@ on_thread_delete = dispatch.Signal(providing_args=['instance', 'mutation'])
 on_update = dispatch.Signal(
     providing_args=['comment', 'data', 'preview', 'view'])
 
-to_json = dispatch.Signal(providing_args=['comment', 'data', 'view'])
+to_json = dispatch.Signal(providing_args=['comment', 'data', 'user'])

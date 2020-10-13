@@ -1,8 +1,6 @@
 from django import dispatch
 from django.core import exceptions
 from django.db import models as dj_models
-from django.utils import html
-from djfw.wysibb.templatetags import bbcodes
 
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.comments import signals as comment_signals
@@ -82,7 +80,8 @@ def room_to_json(instance, response, view, **_kwargs):
     comments_count = instance.comments_count[view.user]
     response['comments_count'] = comments_count
     if (not instance.room) and (comments_count is not None):
-        response['pages_count'] = comments.order_to_page(comments_count - 1)
+        response['pages_count'] = comment_models.Comment.order_to_page(
+            comments_count - 1)
     if last_comment_id is None:
         return
     try:
@@ -95,7 +94,7 @@ def room_to_json(instance, response, view, **_kwargs):
         'thread': {
             'id': last_comment.parent_id,
         },
-        'page': comments.order_to_page(last_comment.order),
+        'page': last_comment.page,
         'user': view.role_to_json(last_comment.role_id),
         'create_time': last_comment.create_time,
     }
@@ -113,30 +112,11 @@ def on_thread_delete(instance, **_kwargs):
 class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
     comment_model = comment_models.Comment
 
-    def comment_to_json(self, c):
-        data = {
-            'id': c.id,
-            'thread': {
-                'id': c.parent_id,
-                'url': c.parent.get_absolute_url(),
-            },
-            'page': comments.order_to_page(c.order),
-            'url': c.get_absolute_url() if c.id else None,
-            'title': html.escape(c.title),
-            'body': bbcodes.bbcode(c.body),
-            'user': self.role_to_json(c.role_id, detailed=True),
-            'create_time': c.create_time,
-            'edit_right': self.comment_edit_right(c),
-            'is_thread': c.is_thread(),
-            'edit_time': c.edit_time,
-            'editor': self.role_to_json(c.edit_role_id) if c.editor else None,
-            'media': c.media,
-            'reply_id': c.reply_id,
-
-        }
-        comment_signals.to_json.send(
-            self.comment_model, comment=c, data=data, view=self)
-        return data
+    def comments_query(self):
+        # use reverse manager, so "parent" is cached correctly
+        # use related "role" instead of user
+        return self.obj.comments.select_related(
+            'role', 'role__avatar').exclude(deleted=True)
 
 
 def update_role_comments_count(role_id, value):

@@ -135,6 +135,10 @@ class Search(core.BaseAPIView):
         request.profiling_data['elastic_hits'] = hits
         return response
 
+    def comments_query(self, pks):
+        return self.comments_class.comment_model.objects.filter(
+            pk__in=pks).select_related('user', 'parent')
+
     def post(self, request, **_kwargs):
         data = json.loads(request.body)
         page = int(data.get('page', 1))
@@ -172,11 +176,12 @@ class Search(core.BaseAPIView):
         for name in ['must', 'filter', 'must_not']:
             if not search_request[name]:
                 del search_request[name]
+        comments_on_page = self.comments_class.comment_model.COMMENTS_ON_PAGE
         body = {
             'query': {'bool': search_request},
             '_source': False,
-            'from': (page - 1) * self.comments_class.COMMENTS_ON_PAGE,
-            'size': self.comments_class.COMMENTS_ON_PAGE,
+            'from': (page - 1) * comments_on_page,
+            'size': comments_on_page,
             'explain': settings.DEBUG,
         }
         if filter_text:
@@ -192,12 +197,11 @@ class Search(core.BaseAPIView):
         response = self.do_search(request, body)
 
         hits = response['hits']['total']['value']
-        page_count = math.ceil(hits / self.comments_class.COMMENTS_ON_PAGE)
+        page_count = math.ceil(hits / comments_on_page)
         request.profiling_data['elastic_page'] = page
         request.profiling_data['elastic_page_count'] = page_count
         pks = [int(hit['_id']) for hit in response['hits']['hits']]
-        comments = list(
-            self.comments_class.comment_model.objects.filter(pk__in=pks))
+        comments = list(self.comments_query(pks))
         comments.sort(key=lambda x: pks.index(x.pk))
         search_results = []
         hits = {int(hit['_id']): hit for hit in response['hits']['hits']}
@@ -221,7 +225,7 @@ class Search(core.BaseAPIView):
             'thread': thread_view.obj_to_json() if thread_view else None,
             'conditions': conditions,
             'results': [{
-                'comment': view.comment_to_json(view.comment),
+                'comment': view.comment.to_json(self.user),
                 'thread': view.obj_to_json(),
             } for view in search_results]
         }
@@ -236,5 +240,5 @@ class Search(core.BaseAPIView):
                 is_active=True, username__istartswith=request.GET['query']
             )[:10]
         return {
-            "users": [{"id": u.pk, "title": u.username} for u in users]
+            'users': [{'id': u.pk, 'title': u.username} for u in users]
         }
