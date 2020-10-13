@@ -16,14 +16,12 @@ class Comment(comment_models.AbstractComment):
         null=True,
         blank=True,
         related_name='comments',
-        db_column='role_id'
     )
     edit_role = models.ForeignKey(
         story_models.Role, models.PROTECT,
         null=True,
         blank=True,
         related_name='edited_comments',
-        db_column='edit_role_id'
     )
     parent: thread_models.Thread = models.ForeignKey(
         thread_models.Thread, models.PROTECT,

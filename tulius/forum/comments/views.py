@@ -17,10 +17,10 @@ from tulius.forum.comments import mutations
 from tulius.websockets import publisher
 
 
-@dispatch.receiver(thread_signals.room_to_json, sender=thread_models.Thread)
-def room_to_json(instance, response, view, **_kwargs):
-    last_comment_id = instance.last_comment[view.user]
-    comments_count = instance.comments_count[view.user]
+@dispatch.receiver(thread_signals.to_json_as_item, sender=thread_models.Thread)
+def thread_item_to_json(instance, response, user, **_kwargs):
+    last_comment_id = instance.last_comment[user]
+    comments_count = instance.comments_count[user]
     response['comments_count'] = comments_count
     if (not instance.room) and (comments_count is not None):
         response['pages_count'] = models.Comment.order_to_page(

@@ -3,7 +3,6 @@ import json
 from django import shortcuts
 from django.core import exceptions
 from django.core.cache import cache
-from django.utils import html
 from django.db import transaction
 
 from tulius.core.ckeditor import html_converter
@@ -29,28 +28,6 @@ class BaseThreadView(core.BaseAPIView):
         self.obj = shortcuts.get_object_or_404(query, id=thread_id)
         if not self.obj.read_right(self.user):
             raise exceptions.PermissionDenied()
-
-    def room_to_json(self, thread):
-        data = {
-            'id': thread.pk,
-            'title': html.escape(thread.title),
-            'body': bbcodes.bbcode(thread.body),
-            'room': thread.room,
-            'deleted': thread.deleted,
-            'important': thread.important,
-            'closed': thread.closed,
-            'user': thread.user.to_json(),
-            'moderators': [user.to_json() for user in thread.moderators],
-            'accessed_users': None if thread.accessed_users is None else [
-                user.to_json() for user in thread.accessed_users
-            ],
-            'threads_count': thread.threads_count[self.user],
-            'rooms_count': thread.rooms_count[self.user],
-            'url': thread.get_absolute_url(),
-        }
-        signals.room_to_json.send(
-            self.thread_model, instance=thread, response=data, view=self)
-        return data
 
     def create_thread(self, data):
         room = bool(data['room'])
@@ -90,9 +67,10 @@ class BaseThreadView(core.BaseAPIView):
         }
         if self.obj.room:
             children = self.obj.get_children(self.user, deleted=deleted)
-            data['rooms'] = [self.room_to_json(t) for t in children if t.room]
+            data['rooms'] = [
+                t.to_json_as_item(self.user) for t in children if t.room]
             data['threads'] = [
-                self.room_to_json(t) for t in children if not t.room]
+                t.to_json_as_item(self.user) for t in children if not t.room]
             signals.prepare_room.send(
                 self.thread_model, room=self.obj, threads=children,
                 response=data, view=self)
@@ -205,7 +183,7 @@ class IndexView(BaseThreadView):
             'groups': [{
                 'id': group.id,
                 'title': group.title,
-                'rooms': [self.room_to_json(thread) for thread in group.rooms],
+                'rooms': [t.to_json_as_item(self.user) for t in group.rooms],
                 'url': group.get_absolute_url(),
             } for group in groups]
         }

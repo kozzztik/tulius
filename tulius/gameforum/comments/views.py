@@ -74,10 +74,10 @@ def on_comment_update(comment, data, view, **_kwargs):
             view.obj.media['illustrations'] = images_data
 
 
-@dispatch.receiver(thread_signals.room_to_json, sender=thread_models.Thread)
-def room_to_json(instance, response, view, **_kwargs):
-    last_comment_id = instance.last_comment[view.user]
-    comments_count = instance.comments_count[view.user]
+@dispatch.receiver(thread_signals.to_json_as_item, sender=thread_models.Thread)
+def thread_item_to_json(instance, response, user, **_kwargs):
+    last_comment_id = instance.last_comment[user]
+    comments_count = instance.comments_count[user]
     response['comments_count'] = comments_count
     if (not instance.room) and (comments_count is not None):
         response['pages_count'] = comment_models.Comment.order_to_page(
@@ -86,7 +86,7 @@ def room_to_json(instance, response, view, **_kwargs):
         return
     try:
         last_comment = comment_models.Comment.objects.select_related(
-            'user').get(id=last_comment_id)
+            'role').get(id=last_comment_id)
     except comment_models.Comment.DoesNotExist:
         return
     response['last_comment'] = {
@@ -95,7 +95,9 @@ def room_to_json(instance, response, view, **_kwargs):
             'id': last_comment.parent_id,
         },
         'page': last_comment.page,
-        'user': view.role_to_json(last_comment.role_id),
+        'user':
+            last_comment.role.to_json(user)
+            if last_comment.role else stories_models.leader_json(),
         'create_time': last_comment.create_time,
     }
 

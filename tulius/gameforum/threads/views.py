@@ -44,62 +44,6 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
                 result.append(role.pk)
         return result
 
-    def role_to_json(self, role_id, detailed=False):
-        if role_id is None:
-            return {
-                'id': None,
-                'title': '---',
-                'url': None,
-                'sex': None,
-                'avatar': None,
-                'online_status': None,
-                'trust': None,
-                'show_trust_marks': False,
-            }
-        role = self.all_roles[role_id]
-        data = {
-            'id': role.id,
-            'title': html.escape(role.name),
-            'url': None,
-        }
-        if detailed:
-            on = role.is_online() if role.show_in_online_character else None
-            data.update({
-                'sex': role.sex,
-                'avatar': role.avatar.image.url if (
-                    role.avatar and role.avatar.image) else '',
-                'online_status': on,
-                'owned': (
-                    self.user.is_authenticated and (
-                        role.user_id == self.user.id)),
-                'trust': role.trust_value if role.show_trust_marks else None,
-                'show_trust_marks': role.show_trust_marks,
-            })
-        return data
-
-    def room_to_json(self, thread):
-        data = {
-            'id': thread.pk,
-            'title': html.escape(thread.title),
-            'body': bbcodes.bbcode(thread.body),
-            'room': thread.room,
-            'deleted': thread.deleted,
-            'important': thread.important,
-            'closed': thread.closed,
-            'user': self.role_to_json(thread.role_id),
-            'moderators': [
-                self.role_to_json(user) for user in thread.moderators],
-            'accessed_users': None if thread.accessed_users is None else [
-                self.role_to_json(user) for user in thread.accessed_users
-            ],
-            'threads_count': thread.threads_count[self.user],
-            'rooms_count': thread.rooms_count[self.user],
-            'url': thread.get_absolute_url(),
-        }
-        signals.room_to_json.send(
-            self.thread_model, instance=thread, response=data, view=self)
-        return data
-
     def process_role(self, init_role_id, data):
         role_id = data.get('role_id')
         if role_id:
@@ -136,7 +80,9 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
 
     def obj_to_json(self, deleted=False):
         data = super().obj_to_json(deleted=deleted)
-        data['user'] = self.role_to_json(self.obj.role_id, detailed=True)
+        data['user'] = \
+            self.obj.role.to_json(self.user, detailed=True) \
+            if self.obj.role else stories_models.leader_json()
         data['edit_role_id'] = self.obj.edit_role_id
         self._rights_strict_roles(data)
         return data
