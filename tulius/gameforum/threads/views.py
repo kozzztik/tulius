@@ -1,7 +1,5 @@
 from django.core import exceptions
-from django.utils import html
 
-from tulius.forum.threads import signals
 from tulius.forum.threads import views
 from tulius.forum.threads import counters
 from tulius.forum.threads import models as forum_models
@@ -9,7 +7,6 @@ from tulius.gameforum import base
 from tulius.gameforum.threads import models as thread_models
 from tulius.gameforum.threads import mutations
 from tulius.stories import models as stories_models
-from djfw.wysibb.templatetags import bbcodes
 
 
 class CountersFix(counters.CountersFix):
@@ -28,8 +25,7 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
         if self.obj.variation_id != self.variation.pk:
             raise exceptions.PermissionDenied('Wrong variation')
         self.all_roles = {
-            role.id: role for role in stories_models.Role.objects.filter(
-                variation=self.variation)}
+            role.id: role for role in self.variation.roles.all()}
 
     def write_roles(self):
         rights = self.obj.rights.role

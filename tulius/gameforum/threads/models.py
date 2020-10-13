@@ -3,10 +3,9 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import html
 
+from djfw.wysibb.templatetags import bbcodes
 from tulius.forum.threads import models as thread_models
 from tulius.stories import models as story_models
-
-from djfw.wysibb.templatetags import bbcodes
 from tulius.forum.threads import signals
 
 
