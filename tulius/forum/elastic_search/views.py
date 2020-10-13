@@ -49,7 +49,7 @@ def after_update_rights(sender, instance, **_kwargs):
 
 def get_datetime(text):
     try:
-        date = datetime.datetime.strptime(text, "%d.%m.%Y")
+        date = datetime.datetime.strptime(text, "%Y-%m-%d")
     except:
         return None
     return datetime.datetime(

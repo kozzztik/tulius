@@ -97,7 +97,7 @@ def test_search_conditions(admin, user, thread):
     # do search "before"
     response = user.post(
         '/api/forum/search/',
-        {'date_to': '10.10.2019', 'thread_id': thread["id"]})
+        {'date_to': '2019-10-10', 'thread_id': thread["id"]})
     assert response.status_code == 200
     data = response.json()
     assert len(data['results']) == 1
@@ -105,8 +105,8 @@ def test_search_conditions(admin, user, thread):
     # do combined time search
     response = user.post(
         '/api/forum/search/', {
-            'date_from': '10.10.2019',
-            'date_to': '02.02.2020',
+            'date_from': '2019-10-10',
+            'date_to': '2020-02-02',
             'thread_id': thread["id"]
         })
     assert response.status_code == 200
@@ -116,7 +116,7 @@ def test_search_conditions(admin, user, thread):
     # do search with incorrect date
     response = user.post(
         '/api/forum/search/', {
-            'date_to': '10.10.2019',
+            'date_to': '2019-10-10',
             'date_from': 'foobar',
             'thread_id': thread["id"]
         })
