@@ -11,9 +11,10 @@ from django.utils import timezone
 
 from tulius.forum import core
 from tulius.forum.threads import models as thread_models
+from tulius.forum.threads import views
 from tulius.forum.elastic_search import tasks
 from tulius.forum.rights import signals
-from tulius.forum.comments import views
+from tulius.forum.comments import models as comment_models
 from tulius.forum.comments import pagination
 from tulius.forum.elastic_search import models
 
@@ -56,16 +57,9 @@ def get_datetime(text):
         tzinfo=timezone.get_current_timezone())
 
 
-class Search(core.BaseAPIView):
+class Search(views.BaseThreadView):
     require_user = True
-    comments_class = views.CommentAPI
-
-    def get_view(self, comment):
-        view = self.comments_class()
-        view.setup(self.request)
-        view.user = self.user
-        view.comment = comment
-        return view
+    comment_model = comment_models.Comment
 
     @staticmethod
     def apply_users_filters(search_request, conditions, data):
@@ -124,7 +118,7 @@ class Search(core.BaseAPIView):
     def do_search(self, request, body):
         start_time = time.perf_counter_ns()
         response = models.client.search(
-            index=models.index_name(self.comments_class.comment_model),
+            index=models.index_name(self.comment_model),
             body=body
         )
         hits = response['hits']['total']['value']
@@ -135,34 +129,32 @@ class Search(core.BaseAPIView):
         return response
 
     def comments_query(self, pks):
-        return self.comments_class.comment_model.objects.filter(
+        return self.comment_model.objects.filter(
             pk__in=pks, deleted=False, parent__deleted=False
         ).select_related('user', 'parent')
 
     def post(self, request, **_kwargs):
         data = json.loads(request.body)
         page = int(data.get('page', 1))
-        pk = data.get('thread_id', None)
-        thread_view = None
         conditions = []
-        if pk:
-            pk = int(pk)
-            thread_view = self.get_view(None)
-            thread_view.get_parent_thread(pk)
-            conditions.append(f'В: {thread_view.obj.title}')
         search_request = {
             'must': [],
             'filter': {},
             'must_not': [{'term': {'deleted': True}}]
         }
         self.filter_rights(search_request)
+
+        pk = data.get('thread_id', None)
         if pk:
+            self.get_parent_thread(pk)
+            conditions.append(f'В: {self.obj.title}')
             search_request['must'].append(
                 {'term': {'parents_ids': pk}})
-        filter_text = data.get('text', [])
+
         self.apply_users_filters(search_request, conditions, data)
         self.apply_dates_filters(search_request, conditions, data)
 
+        filter_text = data.get('text', [])
         if filter_text:
             conditions.append(f'С текстом: {filter_text}')
             search_request['must'].append({
@@ -176,7 +168,7 @@ class Search(core.BaseAPIView):
         for name in ['must', 'filter', 'must_not']:
             if not search_request[name]:
                 del search_request[name]
-        comments_on_page = self.comments_class.comment_model.COMMENTS_ON_PAGE
+        comments_on_page = self.comment_model.COMMENTS_ON_PAGE
         body = {
             'query': {'bool': search_request},
             '_source': False,
@@ -219,7 +211,7 @@ class Search(core.BaseAPIView):
             'pagination': pagination.get_pagination_context(
                 self.request, page, max(page_count, 1)),
             'thread':
-                thread_view.obj.to_json(self.user) if thread_view else None,
+                self.obj.to_json(self.user) if self.obj else None,
             'conditions': conditions,
             'results': [{
                 'comment': comment.to_json(self.user, detailed=True),
