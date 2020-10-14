@@ -16,15 +16,16 @@ from tulius.stories import models as stories_models
 def after_create_thread(instance, data, preview, **_kwargs):
     if not preview:
         mutations.UpdateRightsOnThreadCreate(
-            instance, data=data, variation=instance.variation
-        ).save_exceptions()
+            instance, data=data).save_exceptions()
 
 
 @dispatch.receiver(game_signals.game_status_changed)
 def game_status_changed(sender, **_kwargs):
     variation = sender.variation
     if variation.thread:
-        mutations.UpdateRights(variation.thread, variation).apply()
+        # to use actual variation info on thread
+        variation.thread.variation = variation
+        mutations.UpdateRights(variation.thread).apply()
 
 
 @dispatch.receiver(dj_models.signals.post_delete, sender=game_models.GameAdmin)
@@ -34,7 +35,7 @@ def game_status_changed(sender, **_kwargs):
 def on_game_models_updates(instance, **_kwargs):
     variation = instance.game.variation
     if variation.thread:
-        mutations.UpdateRights(variation.thread, variation).apply()
+        mutations.UpdateRights(variation.thread).apply()
 
 
 @dispatch.receiver(
@@ -44,15 +45,13 @@ def on_game_models_updates(instance, **_kwargs):
 def on_stories_models_updates(instance, **_kwargs):
     for variation in instance.story.variations.all():
         if variation.thread:
-            mutations.UpdateRights(variation.thread, variation).apply()
+            mutations.UpdateRights(variation.thread).apply()
 
 
 class BaseGrantedRightsAPI(
         views.BaseGrantedRightsAPI, threads_api.BaseThreadAPI):
     rights_model = models.GameThreadRight
-
-    def get_mutation(self, thread):
-        return mutations.UpdateRights(thread, self.variation)
+    update_mutation = mutations.UpdateRights
 
     def create_right(self, data):
         obj = self.rights_model.objects.get_or_create(
