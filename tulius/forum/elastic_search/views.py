@@ -218,7 +218,8 @@ class Search(core.BaseAPIView):
             'page_count': page_count,
             'pagination': pagination.get_pagination_context(
                 self.request, page, max(page_count, 1)),
-            'thread': thread_view.obj_to_json() if thread_view else None,
+            'thread':
+                thread_view.obj.to_json(self.user) if thread_view else None,
             'conditions': conditions,
             'results': [{
                 'comment': comment.to_json(self.user, detailed=True),

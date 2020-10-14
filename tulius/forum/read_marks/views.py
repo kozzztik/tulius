@@ -178,12 +178,12 @@ class ReadmarkAPI(views.BaseThreadView):
                     cls.comment_json(read_mark.not_read_comment_id)
 
     @classmethod
-    def on_prepare_room_list(cls, threads, view, response, **_kwargs):
+    def on_prepare_room_list(cls, threads, user, response, **_kwargs):
         threads = {t.pk: t for t in threads}
         response['threads'].sort(
             key=lambda t: t.get('last_comment', {}).get('id', 0), reverse=True)
         cls.update_response_with_marks(
-            response['rooms'] + response['threads'], view.user, threads)
+            response['rooms'] + response['threads'], user, threads)
         important = [t for t in response['threads'] if t['important']]
         not_read_threads = [
             t for t in response['threads']
@@ -215,18 +215,18 @@ class ReadmarkAPI(views.BaseThreadView):
             group['not_read'] = not_read
 
     @classmethod
-    def on_thread_to_json(cls, instance, view, response, **_kwargs):
+    def on_thread_to_json(cls, instance, user, response, **_kwargs):
         not_read_comment = None
-        if view.user.is_authenticated:
+        if user.is_authenticated:
             readmark = cls.read_mark_model.objects.filter(
-                thread=instance, user=view.user).first()
+                thread=instance, user=user).first()
             if readmark:
                 if readmark.not_read_comment_id:
                     not_read_comment = cls.not_read_comment_json(
-                        readmark.not_read_comment_id, view.user)
-            elif instance.first_comment[view.user]:
+                        readmark.not_read_comment_id, user)
+            elif instance.first_comment[user]:
                 not_read_comment = cls.not_read_comment_json(
-                    instance.first_comment[view.user], view.user)
+                    instance.first_comment[user], user)
         response['not_read'] = not_read_comment
 
 

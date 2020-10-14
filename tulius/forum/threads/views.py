@@ -12,7 +12,6 @@ from tulius.forum.threads import models
 from tulius.forum.threads import signals
 from tulius.forum.threads import mutations
 from tulius.forum.rights import models as rights_models
-from djfw.wysibb.templatetags import bbcodes
 
 
 class BaseThreadView(core.BaseAPIView):
@@ -49,38 +48,6 @@ class BaseThreadView(core.BaseAPIView):
             self.obj.important = bool(data['important'])
             self.obj.closed = bool(data['closed'])
 
-    def obj_to_json(self, deleted=False):
-        data = {
-            'id': self.obj.pk,
-            'title': self.obj.title,
-            'body': bbcodes.bbcode(self.obj.body),
-            'room': self.obj.room,
-            'deleted': self.obj.deleted,
-            'url': self.obj.get_absolute_url() if self.obj.pk else None,
-            'parents': [{
-                'id': parent.id,
-                'title': parent.title,
-                'url': parent.get_absolute_url(),
-            } for parent in self.obj.get_parents()],
-            'rights': self.obj.rights_to_json(self.user),
-            'default_rights': self.obj.default_rights,
-        }
-        if self.obj.room:
-            children = self.obj.get_children(self.user, deleted=deleted)
-            data['rooms'] = [
-                t.to_json_as_item(self.user) for t in children if t.room]
-            data['threads'] = [
-                t.to_json_as_item(self.user) for t in children if not t.room]
-            signals.prepare_room.send(
-                self.thread_model, room=self.obj, threads=children,
-                response=data, view=self)
-        else:
-            data['closed'] = self.obj.closed
-            data['important'] = self.obj.important
-            data['user'] = self.obj.user.to_json(detailed=True)
-            data['media'] = self.obj.media
-        return data
-
 
 class ThreadView(BaseThreadView):
     create_mutation = mutations.ThreadCreateMutation
@@ -98,10 +65,7 @@ class ThreadView(BaseThreadView):
         deleted = bool(self.request.GET.get('deleted'))
         if deleted and not self.user.is_superuser:
             raise exceptions.PermissionDenied()
-        response = self.obj_to_json(deleted=deleted)
-        signals.to_json.send(
-            self.thread_model, instance=self.obj, response=response, view=self)
-        return response
+        return self.obj.to_json(self.user, deleted=deleted)
 
     @transaction.atomic
     def delete(self, request, **kwargs):
@@ -132,10 +96,7 @@ class ThreadView(BaseThreadView):
             view=self)
         transaction.commit()
         # TODO notify clients
-        response = self.obj_to_json()
-        signals.to_json.send(
-            self.thread_model, instance=self.obj, response=response, view=self)
-        return response
+        return self.obj.to_json(self.user)
 
     @transaction.atomic
     def post(self, request, **kwargs):
@@ -152,10 +113,7 @@ class ThreadView(BaseThreadView):
             view=self)
         if not preview:
             self.obj.save()
-        response = self.obj_to_json()
-        signals.to_json.send(
-            self.thread_model, instance=self.obj, response=response, view=self)
-        return response
+        return self.obj.to_json(self.user)
 
 
 class IndexView(BaseThreadView):
@@ -241,10 +199,7 @@ class MoveThreadView(BaseThreadView):
         signals.after_move.send(
             self.thread_model, instance=self.obj, view=self,
             old_parent=old_parent)
-        response = self.obj_to_json()
-        signals.to_json.send(
-            self.thread_model, instance=self.obj, response=response, view=self)
-        return response
+        return self.obj.to_json(self.user)
 
 
 class RestoreThreadView(BaseThreadView):
@@ -258,4 +213,4 @@ class RestoreThreadView(BaseThreadView):
         self.get_parent_thread(for_update=True, deleted=True, **kwargs)
         self.restore_mutation(self.obj).apply()
         self.fix_mutation(self.obj).apply()
-        return self.obj_to_json()
+        return self.obj.to_json(self.user)

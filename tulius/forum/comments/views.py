@@ -34,8 +34,8 @@ def thread_item_to_json(instance, response, user, **_kwargs):
 
 
 @dispatch.receiver(thread_signals.to_json)
-def thread_to_json(instance, response, view, **_kwargs):
-    response['first_comment_id'] = instance.first_comment[view.user]
+def thread_to_json(instance, response, user, **_kwargs):
+    response['first_comment_id'] = instance.first_comment[user]
 
 
 class CommentsBase(views.BaseThreadView):

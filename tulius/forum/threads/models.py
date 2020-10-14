@@ -295,6 +295,40 @@ class AbstractThread(models.Model):
             self.__class__, instance=self, response=data, user=user)
         return data
 
+    def to_json(self, user, deleted=False):
+        data = {
+            'id': self.pk,
+            'title': self.title,
+            'body': bbcodes.bbcode(self.body),
+            'room': self.room,
+            'deleted': self.deleted,
+            'url': self.get_absolute_url() if self.pk else None,
+            'parents': [{
+                'id': parent.id,
+                'title': parent.title,
+                'url': parent.get_absolute_url(),
+            } for parent in self.get_parents()],
+            'rights': self.rights_to_json(user),
+            'default_rights': self.default_rights,
+        }
+        if self.room:
+            children = self.get_children(user, deleted=deleted)
+            data['rooms'] = [
+                t.to_json_as_item(user) for t in children if t.room]
+            data['threads'] = [
+                t.to_json_as_item(user) for t in children if not t.room]
+            signals.prepare_room.send(
+                self.__class__, room=self, threads=children,
+                response=data, user=user)
+        else:
+            data['closed'] = self.closed
+            data['important'] = self.important
+            data['user'] = self.user.to_json(detailed=True)
+            data['media'] = self.media
+        signals.to_json.send(
+            self.__class__, instance=self, response=data, user=user)
+        return data
+
 
 class Thread(AbstractThread):
     pass

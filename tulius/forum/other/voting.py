@@ -109,11 +109,11 @@ class VotingAPI(views.CommentBase):
             data['media']['voting'] = cls.user_voting_data(v, user, comment.pk)
 
     @classmethod
-    def on_thread_to_json(cls, instance, response, view, **_kwargs):
+    def on_thread_to_json(cls, instance, response, user, **_kwargs):
         v = instance.media.get('voting')
         if v:
             response['media']['voting'] = cls.user_voting_data(
-                v, view.user, instance.first_comment[view.user])
+                v, user, instance.first_comment[user])
 
     @classmethod
     def on_before_add_comment(cls, comment, data, view, **_kwargs):

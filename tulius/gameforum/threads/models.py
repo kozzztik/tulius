@@ -134,3 +134,64 @@ class Thread(thread_models.AbstractThread):
         signals.to_json_as_item.send(
             self.__class__, instance=self, response=data, user=user)
         return data
+
+    def write_roles(self, user):
+        rights = self.rights.role
+        result = []
+        admin = self.variation.edit_right(user)
+        if admin:
+            result.append(None)
+        for role in self.variation.all_roles.values():
+            r = rights.all | rights[role.pk]
+            r &= thread_models.ACCESS_WRITE
+            if admin or ((role.user_id == user.pk) and r):
+                result.append(role.pk)
+        return result
+
+    def rights_strict_roles(self, data, user):
+        data['rights']['user_write_roles'] = self.write_roles(user)
+        data['rights']['strict_read'] = None
+        if not self.rights.role.all & thread_models.ACCESS_READ:
+            data['rights']['strict_read'] = [
+                key for key, right in self.rights.role
+                if right & thread_models.ACCESS_READ]
+
+    def to_json(self, user, deleted=False):
+        data = {
+            'id': self.pk,
+            'title': self.title,
+            'body': bbcodes.bbcode(self.body),
+            'room': self.room,
+            'deleted': self.deleted,
+            'url': self.get_absolute_url() if self.pk else None,
+            'parents': [{
+                'id': parent.id,
+                'title': parent.title,
+                'url': parent.get_absolute_url(),
+            } for parent in self.get_parents()],
+            'rights': self.rights_to_json(user),
+            'default_rights': self.default_rights,
+        }
+        if self.room:
+            children = self.get_children(
+                user, deleted=deleted, variation=self.variation)
+            for child in children:
+                child.variation = self.variation  # for cache usage
+            data['rooms'] = [
+                t.to_json_as_item(user) for t in children if t.room]
+            data['threads'] = [
+                t.to_json_as_item(user) for t in children if not t.room]
+            signals.prepare_room.send(
+                self.__class__, room=self, threads=children,
+                response=data, user=user)
+        else:
+            data['closed'] = self.closed
+            data['important'] = self.important
+            data['media'] = self.media
+        data['user'] = self.variation.role_to_json(
+            self.role_id, user, detailed=True)
+        data['edit_role_id'] = self.edit_role_id
+        self.rights_strict_roles(data, user)
+        signals.to_json.send(
+            self.__class__, instance=self, response=data, user=user)
+        return data
