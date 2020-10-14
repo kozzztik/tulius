@@ -49,5 +49,7 @@ export default LazyComponent('game_room_page', {
                 this.load_api(this.$route);
             });
         },
+        loading_start() {this.$parent.loading_start()},
+        loading_end(breadcrumbs) {this.$parent.loading_end(breadcrumbs)},
     },
 })

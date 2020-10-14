@@ -62,8 +62,6 @@ class Comment(comment_models.AbstractComment):
                 self.role_id, user, detailed=detailed),
             'create_time': self.create_time,
         }
-        if not detailed:
-            return data
         data = {
             **data,
             'url': self.get_absolute_url() if self.pk else None,

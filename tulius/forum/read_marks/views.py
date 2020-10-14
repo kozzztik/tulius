@@ -16,17 +16,6 @@ class ReadmarkAPI(views.BaseThreadView):
     read_mark_model = models.ThreadReadMark
     comment_model = comment_models.Comment
 
-    @classmethod
-    def comment_json(cls, pk):
-        comment = cls.comment_model.objects.get(id=pk) if pk else None
-        return {
-            'id': comment.pk,
-            'thread': {
-                'id': comment.parent_id,
-            },
-            'page': comment.page,
-        } if pk else None
-
     def mark_room_as_read(self, room):
         if room:
             threads = room.get_children(self.user, deleted=False)
@@ -170,12 +159,11 @@ class ReadmarkAPI(views.BaseThreadView):
             read_marks = {r.thread_id: r for r in read_marks}
         for thread_response in response:
             read_mark = read_marks.get(thread_response['id'])
-            if not read_mark:
-                pk = threads[thread_response['id']].first_comment[user]
-                thread_response['not_read'] = cls.comment_json(pk)
+            if read_mark:
+                thread_response['not_read'] = read_mark.not_read_comment_id
             else:
                 thread_response['not_read'] = \
-                    cls.comment_json(read_mark.not_read_comment_id)
+                    threads[thread_response['id']].first_comment[user]
 
     @classmethod
     def on_index(cls, groups, user, response, **_kwargs):
@@ -191,8 +179,7 @@ class ReadmarkAPI(views.BaseThreadView):
             not_read = None
             for room in group['rooms']:
                 if room['not_read']:
-                    if (not not_read) or (
-                            room['not_read']['id'] < not_read['id']):
+                    if (not not_read) or (room['not_read'] < not_read):
                         not_read = room['not_read']
             group['not_read'] = not_read
 

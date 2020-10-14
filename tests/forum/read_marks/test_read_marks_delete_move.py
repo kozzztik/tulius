@@ -42,12 +42,12 @@ def test_readmark_delete_comment(room_group, superuser, admin, user):
     response = admin.get(room['url'])
     assert response.status_code == 200
     data = response.json()
-    assert data['threads'][0]['not_read']['id'] == comment['id']
+    assert data['threads'][0]['not_read'] == comment['id']
     # for user
     response = user.get(room['url'])
     assert response.status_code == 200
     data = response.json()
-    assert data['threads'][0]['not_read']['id'] == thread['first_comment_id']
+    assert data['threads'][0]['not_read'] == thread['first_comment_id']
     # check not read on index, read mark counters behavior initial state
     response = superuser.get('/api/forum/')
     assert response.status_code == 200
@@ -59,13 +59,13 @@ def test_readmark_delete_comment(room_group, superuser, admin, user):
     assert response.status_code == 200
     rooms = {g['id']: g for g in response.json()['groups']}
     room_data = rooms[room_group['id']]
-    assert room_data['not_read']['id'] == comment['id']
+    assert room_data['not_read'] == comment['id']
     # for user
     response = user.get('/api/forum/')
     assert response.status_code == 200
     rooms = {g['id']: g for g in response.json()['groups']}
     room_data = rooms[room_group['id']]
-    assert room_data['not_read']['id'] == thread['first_comment_id']
+    assert room_data['not_read'] == thread['first_comment_id']
     # now delete last comment
     response = superuser.delete(comment['url'] + '?comment=foo')
     assert response.status_code == 200
@@ -83,7 +83,7 @@ def test_readmark_delete_comment(room_group, superuser, admin, user):
     response = user.get(room['url'])
     assert response.status_code == 200
     data = response.json()
-    assert data['threads'][0]['not_read']['id'] == thread['first_comment_id']
+    assert data['threads'][0]['not_read'] == thread['first_comment_id']
     # check state for forum index
     response = superuser.get('/api/forum/')
     assert response.status_code == 200
@@ -101,7 +101,7 @@ def test_readmark_delete_comment(room_group, superuser, admin, user):
     assert response.status_code == 200
     rooms = {g['id']: g for g in response.json()['groups']}
     room_data = rooms[room_group['id']]
-    assert room_data['not_read']['id'] == thread['first_comment_id']
+    assert room_data['not_read'] == thread['first_comment_id']
 
 
 def test_readmark_delete_comment2(room_group, superuser, admin):
@@ -160,8 +160,8 @@ def test_readmark_delete_comment2(room_group, superuser, admin):
     assert response.status_code == 200
     data = response.json()
     assert data['threads'][0]['id'] == thread1['id']
-    assert data['threads'][0]['not_read']['id'] == comment['id']
-    assert data['threads'][1]['not_read']['id'] == thread2['first_comment_id']
+    assert data['threads'][0]['not_read'] == comment['id']
+    assert data['threads'][1]['not_read'] == thread2['first_comment_id']
     # check not read on index, read mark counters behavior initial state
     response = superuser.get('/api/forum/')
     assert response.status_code == 200
@@ -173,7 +173,7 @@ def test_readmark_delete_comment2(room_group, superuser, admin):
     assert response.status_code == 200
     rooms = {g['id']: g for g in response.json()['groups']}
     room_data = rooms[room_group['id']]
-    assert room_data['not_read']['id'] == comment['id']
+    assert room_data['not_read'] == comment['id']
     # now delete last comment
     response = superuser.delete(comment['url'] + '?comment=foo')
     assert response.status_code == 200
@@ -190,7 +190,7 @@ def test_readmark_delete_comment2(room_group, superuser, admin):
     data = response.json()
     assert data['threads'][0]['id'] == thread1['id']
     assert data['threads'][0]['not_read'] is None
-    assert data['threads'][1]['not_read']['id'] == thread2['first_comment_id']
+    assert data['threads'][1]['not_read'] == thread2['first_comment_id']
     # check state for forum index
     response = superuser.get('/api/forum/')
     assert response.status_code == 200
@@ -202,7 +202,7 @@ def test_readmark_delete_comment2(room_group, superuser, admin):
     assert response.status_code == 200
     rooms = {g['id']: g for g in response.json()['groups']}
     room_data = rooms[room_group['id']]
-    assert room_data['not_read']['id'] == thread2['first_comment_id']
+    assert room_data['not_read'] == thread2['first_comment_id']
 
 
 def test_readmark_delete_thread(room_group, superuser, admin, user):
@@ -248,13 +248,13 @@ def test_readmark_delete_thread(room_group, superuser, admin, user):
     assert response.status_code == 200
     rooms = {g['id']: g for g in response.json()['groups']}
     room_data = rooms[room_group['id']]
-    assert room_data['not_read']['id'] == thread2['first_comment_id']
+    assert room_data['not_read'] == thread2['first_comment_id']
     # for user
     response = user.get('/api/forum/')
     assert response.status_code == 200
     rooms = {g['id']: g for g in response.json()['groups']}
     room_data = rooms[room_group['id']]
-    assert room_data['not_read']['id'] == thread1['first_comment_id']
+    assert room_data['not_read'] == thread1['first_comment_id']
     # now delete first thread
     response = superuser.delete(thread1['url'] + '?comment=foo')
     assert response.status_code == 200
@@ -269,13 +269,13 @@ def test_readmark_delete_thread(room_group, superuser, admin, user):
     assert response.status_code == 200
     rooms = {g['id']: g for g in response.json()['groups']}
     room_data = rooms[room_group['id']]
-    assert room_data['not_read']['id'] == thread2['first_comment_id']
+    assert room_data['not_read'] == thread2['first_comment_id']
     # for user
     response = user.get('/api/forum/')
     assert response.status_code == 200
     rooms = {g['id']: g for g in response.json()['groups']}
     room_data = rooms[room_group['id']]
-    assert room_data['not_read']['id'] == thread2['first_comment_id']
+    assert room_data['not_read'] == thread2['first_comment_id']
     # delete second thread
     response = superuser.delete(thread2['url'] + '?comment=foo')
     assert response.status_code == 200
@@ -363,17 +363,17 @@ def test_read_mark_move(room_group, superuser, admin, user):
     assert response.status_code == 200
     rooms = {g['id']: g for g in response.json()['groups']}
     room_data = rooms[room_group['id']]
-    assert room_data['not_read']['id'] == comment['id']
+    assert room_data['not_read'] == comment['id']
     room_data = rooms[room_group2['id']]
-    assert room_data['not_read']['id'] == thread2['first_comment_id']
+    assert room_data['not_read'] == thread2['first_comment_id']
     # for user
     response = user.get('/api/forum/')
     assert response.status_code == 200
     rooms = {g['id']: g for g in response.json()['groups']}
     room_data = rooms[room_group['id']]
-    assert room_data['not_read']['id'] == thread1['first_comment_id']
+    assert room_data['not_read'] == thread1['first_comment_id']
     room_data = rooms[room_group2['id']]
-    assert room_data['not_read']['id'] == thread2['first_comment_id']
+    assert room_data['not_read'] == thread2['first_comment_id']
     # do move
     response = superuser.put(
         thread1['url'] + 'move/', {
@@ -392,7 +392,7 @@ def test_read_mark_move(room_group, superuser, admin, user):
     room_data = rooms[room_group['id']]
     assert room_data['not_read'] is None
     room_data = rooms[room_group2['id']]
-    assert room_data['not_read']['id'] == comment['id']
+    assert room_data['not_read'] == comment['id']
     # for user
     response = user.get('/api/forum/')
     assert response.status_code == 200
@@ -400,7 +400,7 @@ def test_read_mark_move(room_group, superuser, admin, user):
     room_data = rooms[room_group['id']]
     assert room_data['not_read'] is None
     room_data = rooms[room_group2['id']]
-    assert room_data['not_read']['id'] == thread1['first_comment_id']
+    assert room_data['not_read'] == thread1['first_comment_id']
 
 
 def test_read_mark_delete_parent_update(room_group, superuser, admin):
@@ -451,4 +451,4 @@ def test_read_mark_delete_parent_update(room_group, superuser, admin):
     assert response.status_code == 200
     rooms = {g['id']: g for g in response.json()['groups']}
     room_data = rooms[room_group['id']]
-    assert room_data['not_read']['id'] == thread1['first_comment_id']
+    assert room_data['not_read'] == thread1['first_comment_id']
