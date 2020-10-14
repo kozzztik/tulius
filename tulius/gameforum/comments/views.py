@@ -1,8 +1,6 @@
 from django import dispatch
 from django.core import exceptions
 from django.db import models as dj_models
-from django.utils import html
-from djfw.wysibb.templatetags import bbcodes
 
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.comments import signals as comment_signals
@@ -37,68 +35,71 @@ def validate_image_data(variation, images_data):
 
 
 @dispatch.receiver(thread_signals.before_create, sender=thread_models.Thread)
-def before_create_thread(instance, data, view, **_kwargs):
+def before_create_thread(instance, data, **_kwargs):
     if instance.room:
         return
     images_data = data['media'].get('illustrations')
     if not images_data:
         return
     instance.media['illustrations'] = validate_image_data(
-        view.variation, images_data)
+        instance.variation, images_data)
 
 
 @dispatch.receiver(comment_signals.before_add, sender=comment_models.Comment)
-def before_add_comment(comment, data, view, **_kwargs):
+def before_add_comment(comment, data, **_kwargs):
     images_data = data['media'].get('illustrations')
     if not images_data:
         return
     if comment.is_thread():
-        comment.media['illustrations'] = view.obj.media['illustrations']
+        comment.media['illustrations'] = comment.parent.media['illustrations']
     else:
         comment.media['illustrations'] = validate_image_data(
-            view.variation, images_data)
+            comment.parent.variation, images_data)
 
 
 @dispatch.receiver(comment_signals.on_update, sender=comment_models.Comment)
-def on_comment_update(comment, data, view, **_kwargs):
+def on_comment_update(comment, data, **_kwargs):
     images_data = data['media'].get('illustrations')
     orig_data = comment.media.get('illustrations')
     if images_data:
-        images_data = validate_image_data(view.variation, images_data)
+        images_data = validate_image_data(
+            comment.parent.variation, images_data)
     if orig_data and not images_data:
         del comment.media['illustrations']
     elif images_data:
         comment.media['illustrations'] = images_data
     if comment.is_thread():
-        if (not images_data) and ('illustrations' in view.obj.media):
-            del view.obj.media['illustrations']
+        if (not images_data) and ('illustrations' in comment.parent.media):
+            del comment.parent.media['illustrations']
         elif images_data:
-            view.obj.media['illustrations'] = images_data
+            comment.parent.media['illustrations'] = images_data
 
 
-@dispatch.receiver(thread_signals.room_to_json, sender=thread_models.Thread)
-def room_to_json(instance, response, view, **_kwargs):
-    last_comment_id = instance.last_comment[view.user]
-    comments_count = instance.comments_count[view.user]
+@dispatch.receiver(thread_signals.to_json_as_item, sender=thread_models.Thread)
+def thread_item_to_json(instance, response, user, **_kwargs):
+    last_comment_id = instance.last_comment[user]
+    comments_count = instance.comments_count[user]
     response['comments_count'] = comments_count
     if (not instance.room) and (comments_count is not None):
-        response['pages_count'] = comments.order_to_page(comments_count - 1)
+        response['pages_count'] = comment_models.Comment.order_to_page(
+            comments_count - 1)
     if last_comment_id is None:
         return
-    try:
-        last_comment = comment_models.Comment.objects.select_related(
-            'user').get(id=last_comment_id)
-    except comment_models.Comment.DoesNotExist:
-        return
-    response['last_comment'] = {
-        'id': last_comment.id,
-        'thread': {
-            'id': last_comment.parent_id,
-        },
-        'page': comments.order_to_page(last_comment.order),
-        'user': view.role_to_json(last_comment.role_id),
-        'create_time': last_comment.create_time,
-    }
+    last_comment = comment_models.Comment.objects.filter(
+        id=last_comment_id).first()
+    if last_comment:
+        # direct to_json to avoid parent loading and force usage of variation
+        # role cache
+        response['last_comment'] = {
+            'id': last_comment.id,
+            'thread': {
+                'id': last_comment.parent_id,
+            },
+            'page': last_comment.page,
+            'user': instance.variation.role_to_json(
+                last_comment.role_id, user),
+            'create_time': last_comment.create_time,
+        }
 
 
 @dispatch.receiver(
@@ -113,30 +114,10 @@ def on_thread_delete(instance, **_kwargs):
 class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
     comment_model = comment_models.Comment
 
-    def comment_to_json(self, c):
-        data = {
-            'id': c.id,
-            'thread': {
-                'id': c.parent_id,
-                'url': c.parent.get_absolute_url(),
-            },
-            'page': comments.order_to_page(c.order),
-            'url': c.get_absolute_url() if c.id else None,
-            'title': html.escape(c.title),
-            'body': bbcodes.bbcode(c.body),
-            'user': self.role_to_json(c.role_id, detailed=True),
-            'create_time': c.create_time,
-            'edit_right': self.comment_edit_right(c),
-            'is_thread': c.is_thread(),
-            'edit_time': c.edit_time,
-            'editor': self.role_to_json(c.edit_role_id) if c.editor else None,
-            'media': c.media,
-            'reply_id': c.reply_id,
-
-        }
-        comment_signals.to_json.send(
-            self.comment_model, comment=c, data=data, view=self)
-        return data
+    def comments_query(self):
+        # use reverse manager, so "parent" is cached correctly
+        # no use of related user
+        return self.obj.comments.exclude(deleted=True)
 
 
 def update_role_comments_count(role_id, value):
@@ -147,11 +128,11 @@ def update_role_comments_count(role_id, value):
 
 class CommentsPageAPI(comments.CommentsPageAPI, CommentsBase):
     @classmethod
-    def create_comment(cls, data, view):
-        comment = super(CommentsPageAPI, cls).create_comment(data, view)
-        comment.role_id = view.process_role(None, data)
+    def create_comment(cls, thread, user, data):
+        comment = super().create_comment(thread, user, data)
+        comment.role_id = cls.process_role(thread, user, None, data)
         update_role_comments_count(comment.role_id, 1)
-        view.variation.comments_count_inc(1)
+        thread.variation.comments_count_inc(1)
         return comment
 
 
@@ -160,30 +141,30 @@ thread_signals.after_create.connect(
 
 
 @dispatch.receiver(comment_signals.on_delete, sender=comment_models.Comment)
-def on_delete(comment, view, **_kwargs):
+def on_delete(comment, **_kwargs):
     update_role_comments_count(comment.role_id, -1)
-    view.variation.comments_count_inc(-1)
+    comment.parent.variation.comments_count_inc(-1)
 
 
 class CommentAPI(comments.CommentAPI, CommentsBase):
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         data['thread']['rights'] = self.obj.rights_to_json(self.user)
-        self._rights_strict_roles(data['thread'])
+        self.obj.rights_strict_roles(data['thread'], user=self.user)
         return data
 
     @classmethod
-    def update_comment(cls, comment, data, preview, view):
-        super(CommentAPI, cls).update_comment(comment, data, preview, view)
+    def update_comment(cls, comment, user, data, preview):
+        super().update_comment(comment, user, data, preview)
         new_role = data['role_id']
         if comment.role_id != new_role:
-            if new_role not in view.write_roles():
+            if new_role not in comment.parent.write_roles(user):
                 raise exceptions.PermissionDenied()
             update_role_comments_count(new_role, 1)
             update_role_comments_count(comment.role_id, -1)
             comment.role_id = new_role
         editor_role = data['edit_role_id']
-        if editor_role not in view.write_roles():
+        if editor_role not in comment.parent.write_roles(user):
             raise exceptions.PermissionDenied()
         comment.edit_role_id = editor_role
 

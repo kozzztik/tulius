@@ -35,9 +35,9 @@
             </div>
             <div class="captionright"></div>
         </div>
-        <router-link v-if="(!user.is_anonymous) && group.not_read" :to="urls.comment(group.not_read)">
+        <a v-if="group.not_read" href="javascript:void(0)" @click="to_comment(group.not_read)">
             <div class="room_group_read_mark not_readed"></div>
-        </router-link>
+        </a>
         <div v-if="(!user.is_anonymous) && (!group.not_read)" class="room_group_read_mark"></div>
         <div v-if="!user.is_anonymous" class="thread_collapse" v-on:click="collapse" :groupid="group.id">
             {{ group.collapsed ? "+" : "-" }}

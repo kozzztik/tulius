@@ -24,10 +24,7 @@ def after_create_thread(instance, data, preview, **_kwargs):
 class BaseGrantedRightsAPI(views.BaseThreadView):
     rights_model = models.ThreadAccessRight
     require_user = True
-
-    @staticmethod
-    def get_mutation(thread):
-        return mutations.UpdateRights(thread)
+    update_mutation = mutations.UpdateRights
 
     def create_right(self, data):
         obj = self.rights_model.objects.get_or_create(
@@ -63,7 +60,7 @@ class GrantedRightsAPI(BaseGrantedRightsAPI):
         data = json.loads(request.body)
         obj = self.create_right(data)
         obj.save()
-        self.get_mutation(self.obj).apply()
+        self.update_mutation(self.obj).apply()
         signals.after_update.send(
             self.thread_model, instance=self.obj, view=self)
         return obj.to_json()
@@ -75,7 +72,7 @@ class GrantedRightsAPI(BaseGrantedRightsAPI):
         if not self.obj.edit_right(self.user):
             raise exceptions.PermissionDenied()
         self.obj.default_rights = data['default_rights']
-        self.get_mutation(self.obj).apply()
+        self.update_mutation(self.obj).apply()
         signals.after_update.send(
             self.thread_model, instance=self.obj, view=self)
         return {'default_rights': self.obj.default_rights}
@@ -96,7 +93,7 @@ class GrantedRightAPI(BaseGrantedRightsAPI):
             raise exceptions.PermissionDenied()
         count = self.rights_model.objects.filter(pk=right_id).delete()
         if count:
-            self.get_mutation(self.obj).apply()
+            self.update_mutation(self.obj).apply()
             signals.after_update.send(
                 self.thread_model, instance=self.obj, view=self)
         return {'count': count}
@@ -111,7 +108,7 @@ class GrantedRightAPI(BaseGrantedRightsAPI):
             self.rights_model.objects.select_for_update(), pk=right_id)
         obj.access_level = data['access_level']
         obj.save()
-        self.get_mutation(self.obj).apply()
+        self.update_mutation(self.obj).apply()
         signals.after_update.send(
             self.thread_model, instance=self.obj, view=self)
         return obj.to_json()

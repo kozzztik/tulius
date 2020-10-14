@@ -30,18 +30,18 @@ def before_create_thread(instance, data, **_kwargs):
 
 
 @dispatch.receiver(comment_signals.before_add)
-def before_add_comment(comment, data, view, **_kwargs):
+def before_add_comment(comment, data, **_kwargs):
     images_data = data['media'].get('images')
     if not images_data:
         return
     if comment.is_thread():
-        comment.media['images'] = view.obj.media['images']
+        comment.media['images'] = comment.parent.media['images']
     else:
         comment.media['images'] = validate_image_data(images_data)
 
 
 @dispatch.receiver(comment_signals.on_update)
-def on_comment_update(comment, data, view, **_kwargs):
+def on_comment_update(comment, data, **_kwargs):
     images_data = data['media'].get('images')
     orig_data = comment.media.get('images')
     if images_data:
@@ -51,10 +51,10 @@ def on_comment_update(comment, data, view, **_kwargs):
     elif images_data:
         comment.media['images'] = images_data
     if comment.is_thread():
-        if (not images_data) and ('images' in view.obj.media):
-            del view.obj.media['images']
+        if (not images_data) and ('images' in comment.parent.media):
+            del comment.parent.media['images']
         elif images_data:
-            view.obj.media['images'] = images_data
+            comment.parent.media['images'] = images_data
 
 
 class Images(core.BaseAPIView):

@@ -5,7 +5,11 @@ from django import urls
 import django.core.serializers.json
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.utils import html
 from django.utils.translation import ugettext_lazy as _
+
+from djfw.wysibb.templatetags import bbcodes
+from tulius.forum.threads import signals
 
 
 User = get_user_model()
@@ -267,6 +271,62 @@ class AbstractThread(models.Model):
     @classmethod
     def to_elastic_mapping(cls, fields):
         fields['parents_ids'] = {'type': 'integer'}
+
+    def to_json_as_item(self, user):
+        accessed_users = self.accessed_users
+        data = {
+            'id': self.pk,
+            'title': html.escape(self.title),
+            'body': bbcodes.bbcode(self.body),
+            'room': self.room,
+            'deleted': self.deleted,
+            'important': self.important,
+            'closed': self.closed,
+            'user': self.user.to_json(),
+            'moderators': [user.to_json() for user in self.moderators],
+            'accessed_users': None if accessed_users is None else [
+                user.to_json() for user in accessed_users
+            ],
+            'threads_count': self.threads_count[user],
+            'rooms_count': self.rooms_count[user],
+            'url': self.get_absolute_url(),
+        }
+        signals.to_json_as_item.send(
+            self.__class__, instance=self, response=data, user=user)
+        return data
+
+    def to_json(self, user, deleted=False):
+        data = {
+            'id': self.pk,
+            'title': self.title,
+            'body': bbcodes.bbcode(self.body),
+            'room': self.room,
+            'deleted': self.deleted,
+            'url': self.get_absolute_url() if self.pk else None,
+            'parents': [{
+                'id': parent.id,
+                'title': parent.title,
+                'url': parent.get_absolute_url(),
+            } for parent in self.get_parents()],
+            'rights': self.rights_to_json(user),
+            'default_rights': self.default_rights,
+        }
+        children = None
+        if self.room:
+            children = self.get_children(user, deleted=deleted)
+            data['rooms'] = [
+                t.to_json_as_item(user) for t in children if t.room]
+            data['threads'] = [
+                t.to_json_as_item(user) for t in children if not t.room]
+        else:
+            data['closed'] = self.closed
+            data['important'] = self.important
+            data['user'] = self.user.to_json(detailed=True)
+            data['media'] = self.media
+        signals.to_json.send(
+            self.__class__, instance=self, response=data, user=user,
+            children=children)
+        return data
 
 
 class Thread(AbstractThread):

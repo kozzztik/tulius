@@ -1,7 +1,6 @@
 from tulius.forum.threads import mutations as base_mutations
 from tulius.forum.threads import models as forum_models
 from tulius.forum.rights import mutations
-from tulius.forum.threads import signals
 from tulius.gameforum import models as rights_models
 from tulius.gameforum.threads import mutations as thread_mutations
 from tulius.stories import models as stories_models
@@ -14,13 +13,11 @@ class VariationMutationMixin(base_mutations.Mutation):
     admins = None
     guests = None
 
-    def __init__(self, thread, variation, **_kwargs):
+    def __init__(self, thread, **_kwargs):
         super().__init__(thread)
-        self.variation = variation
-        self.all_roles = {
-            role.id: role for role in stories_models.Role.objects.filter(
-                variation=self.variation)}
-        if variation.game:
+        self.variation = thread.variation
+        self.all_roles = self.variation.all_roles
+        if self.variation.game:
             self.admins = [
                 a.user_id for a in game_models.GameAdmin.objects.filter(
                     game=self.variation.game)]
@@ -30,10 +27,11 @@ class VariationMutationMixin(base_mutations.Mutation):
         else:
             self.admins = [
                 a.user_id for a in stories_models.StoryAdmin.objects.filter(
-                    story=variation.story)]
+                    story=self.variation.story)]
             self.guests = []
 
 
+@base_mutations.on_mutation(thread_mutations.ThreadFixCounters)
 class UpdateRights(mutations.UpdateRights, VariationMutationMixin):
     def _process_variation(self, rights):
         for user_id in self.admins:
@@ -117,27 +115,13 @@ class UpdateRights(mutations.UpdateRights, VariationMutationMixin):
                             forum_models.ACCESS_READ
 
 
-def on_fix_counters(instance, **_kwargs):
-    variation = stories_models.Variation.objects.get(pk=instance.variation_id)
-    return UpdateRights(instance, variation)
-
-
 base_mutations.on_mutation(UpdateRights)(base_mutations.ThreadCounters)
-
-signals.apply_mutation.connect(
-    on_fix_counters, sender=thread_mutations.ThreadFixCounters)
 
 
 @base_mutations.on_mutation(thread_mutations.ThreadCreateMutation)
 class UpdateRightsOnThreadCreate(
         UpdateRights, mutations.UpdateRightsOnThreadCreate,
         VariationMutationMixin):
-    def __init__(
-            self, thread, parent=None, data=None, variation=None, **kwargs):
-        super().__init__(
-            thread, parent=parent, data=data,
-            variation=variation or parent.variation, **kwargs)
-
     def _query_granted_exceptions(self, instance):
         return [
             rights_models.GameThreadRight(

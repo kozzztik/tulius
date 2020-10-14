@@ -1,18 +1,17 @@
 from django import dispatch
 
 to_json = dispatch.Signal(
-    providing_args=['instance', 'response', 'view'])
+    providing_args=['instance', 'response', 'user', 'children'])
+to_json_as_item = dispatch.Signal(
+    providing_args=['instance', 'response', 'user'])
 
 before_create = dispatch.Signal(
-    providing_args=['instance', 'data', 'view', 'preview'])
+    providing_args=['instance', 'data', 'user', 'preview'])
 after_create = dispatch.Signal(
-    providing_args=['instance', 'data', 'preview', 'view'])
+    providing_args=['instance', 'data', 'preview', 'user'])
 on_update = dispatch.Signal(
-    providing_args=['instance', 'data', 'preview', 'view'])
+    providing_args=['instance', 'data', 'preview', 'user'])
 
-prepare_room = dispatch.Signal(
-    providing_args=['room', 'threads', 'view', 'response'])
-room_to_json = dispatch.Signal(providing_args=['instance', 'response', 'view'])
-index_to_json = dispatch.Signal(providing_args=['groups', 'view', 'response'])
+index_to_json = dispatch.Signal(providing_args=['groups', 'user', 'response'])
 apply_mutation = dispatch.Signal(providing_args=['mutation', 'instance'])
-after_move = dispatch.Signal(providing_args=['instance', 'view', 'old_parent'])
+after_move = dispatch.Signal(providing_args=['instance', 'user', 'old_parent'])

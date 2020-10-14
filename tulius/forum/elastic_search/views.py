@@ -4,7 +4,6 @@ import datetime
 import json
 
 from django import dispatch
-from django import http
 from django.core import exceptions
 from django.contrib import auth
 from django.conf import settings
@@ -12,9 +11,10 @@ from django.utils import timezone
 
 from tulius.forum import core
 from tulius.forum.threads import models as thread_models
+from tulius.forum.threads import views
 from tulius.forum.elastic_search import tasks
 from tulius.forum.rights import signals
-from tulius.forum.comments import views
+from tulius.forum.comments import models as comment_models
 from tulius.forum.comments import pagination
 from tulius.forum.elastic_search import models
 
@@ -57,16 +57,9 @@ def get_datetime(text):
         tzinfo=timezone.get_current_timezone())
 
 
-class Search(core.BaseAPIView):
+class Search(views.BaseThreadView):
     require_user = True
-    comments_class = views.CommentAPI
-
-    def get_view(self, comment):
-        view = self.comments_class()
-        view.setup(self.request)
-        view.user = self.user
-        view.comment = comment
-        return view
+    comment_model = comment_models.Comment
 
     @staticmethod
     def apply_users_filters(search_request, conditions, data):
@@ -125,7 +118,7 @@ class Search(core.BaseAPIView):
     def do_search(self, request, body):
         start_time = time.perf_counter_ns()
         response = models.client.search(
-            index=models.index_name(self.comments_class.comment_model),
+            index=models.index_name(self.comment_model),
             body=body
         )
         hits = response['hits']['total']['value']
@@ -135,30 +128,33 @@ class Search(core.BaseAPIView):
         request.profiling_data['elastic_hits'] = hits
         return response
 
+    def comments_query(self, pks):
+        return self.comment_model.objects.filter(
+            pk__in=pks, deleted=False, parent__deleted=False
+        ).select_related('user', 'parent')
+
     def post(self, request, **_kwargs):
         data = json.loads(request.body)
         page = int(data.get('page', 1))
-        pk = data.get('thread_id', None)
-        thread_view = None
         conditions = []
-        if pk:
-            pk = int(pk)
-            thread_view = self.get_view(None)
-            thread_view.get_parent_thread(pk)
-            conditions.append(f'В: {thread_view.obj.title}')
         search_request = {
             'must': [],
             'filter': {},
             'must_not': [{'term': {'deleted': True}}]
         }
         self.filter_rights(search_request)
+
+        pk = data.get('thread_id', None)
         if pk:
+            self.get_parent_thread(pk)
+            conditions.append(f'В: {self.obj.title}')
             search_request['must'].append(
                 {'term': {'parents_ids': pk}})
-        filter_text = data.get('text', [])
+
         self.apply_users_filters(search_request, conditions, data)
         self.apply_dates_filters(search_request, conditions, data)
 
+        filter_text = data.get('text', [])
         if filter_text:
             conditions.append(f'С текстом: {filter_text}')
             search_request['must'].append({
@@ -172,11 +168,12 @@ class Search(core.BaseAPIView):
         for name in ['must', 'filter', 'must_not']:
             if not search_request[name]:
                 del search_request[name]
+        comments_on_page = self.comment_model.COMMENTS_ON_PAGE
         body = {
             'query': {'bool': search_request},
             '_source': False,
-            'from': (page - 1) * self.comments_class.COMMENTS_ON_PAGE,
-            'size': self.comments_class.COMMENTS_ON_PAGE,
+            'from': (page - 1) * comments_on_page,
+            'size': comments_on_page,
             'explain': settings.DEBUG,
         }
         if filter_text:
@@ -192,38 +189,37 @@ class Search(core.BaseAPIView):
         response = self.do_search(request, body)
 
         hits = response['hits']['total']['value']
-        page_count = math.ceil(hits / self.comments_class.COMMENTS_ON_PAGE)
+        page_count = math.ceil(hits / comments_on_page)
         request.profiling_data['elastic_page'] = page
         request.profiling_data['elastic_page_count'] = page_count
         pks = [int(hit['_id']) for hit in response['hits']['hits']]
-        comments = list(
-            self.comments_class.comment_model.objects.filter(pk__in=pks))
+        comments = list(self.comments_query(pks))
         comments.sort(key=lambda x: pks.index(x.pk))
         search_results = []
         hits = {int(hit['_id']): hit for hit in response['hits']['hits']}
         for comment in comments:
             if filter_text:
+                # found text hightlighting
                 comment.body = hits[comment.pk]['highlight']['body'][0]
-            view = self.get_view(comment)
-            try:
-                view.get_parent_thread(comment.parent_id)
-            except exceptions.PermissionDenied:
+            if not comment.parent.read_right(self.user):
                 continue
-            except http.Http404:
-                continue
-            search_results.append(view)
+            search_results.append(comment)
         return {
             'took': response['took'],
             'page': page,
             'page_count': page_count,
             'pagination': pagination.get_pagination_context(
                 self.request, page, max(page_count, 1)),
-            'thread': thread_view.obj_to_json() if thread_view else None,
+            'thread':
+                self.obj.to_json(self.user) if self.obj else None,
             'conditions': conditions,
             'results': [{
-                'comment': view.comment_to_json(view.comment),
-                'thread': view.obj_to_json(),
-            } for view in search_results]
+                'comment': comment.to_json(self.user, detailed=True),
+                'thread': {
+                    'id': comment.parent.pk,
+                    'rights': comment.parent.rights_to_json(self.user)
+                },
+            } for comment in search_results]
         }
 
     def options(self, request, *args, **kwargs):
@@ -236,5 +232,5 @@ class Search(core.BaseAPIView):
                 is_active=True, username__istartswith=request.GET['query']
             )[:10]
         return {
-            "users": [{"id": u.pk, "title": u.username} for u in users]
+            'users': [{'id': u.pk, 'title': u.username} for u in users]
         }

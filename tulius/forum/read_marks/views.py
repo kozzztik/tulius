@@ -8,7 +8,6 @@ from tulius.forum.threads import models as thread_models
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.threads import views
 from tulius.forum.comments import models as comment_models
-from tulius.forum.comments import views as comment_views
 from tulius.forum.read_marks import tasks
 
 
@@ -16,17 +15,6 @@ class ReadmarkAPI(views.BaseThreadView):
     require_user = True
     read_mark_model = models.ThreadReadMark
     comment_model = comment_models.Comment
-
-    @classmethod
-    def comment_json(cls, pk):
-        comment = cls.comment_model.objects.get(id=pk) if pk else None
-        return {
-            'id': comment.pk,
-            'thread': {
-                'id': comment.parent_id,
-            },
-            'page': comment_views.order_to_page(comment.order),
-        } if pk else None
 
     def mark_room_as_read(self, room):
         if room:
@@ -100,7 +88,7 @@ class ReadmarkAPI(views.BaseThreadView):
         comment = cls.comment_model.objects.get(pk=comment_id)
         return {
             'id': comment.id,
-            'page_num': comment_views.order_to_page(comment.order),
+            'page_num': comment.page,
             'count': cls.comment_model.objects.filter(
                 parent_id=comment.parent_id, deleted=False, id__gt=comment.id
             ).exclude(user=user).count() + 1
@@ -137,8 +125,8 @@ class ReadmarkAPI(views.BaseThreadView):
         }
 
     @classmethod
-    def on_delete_comment(cls, sender, comment, view, **_kwargs):
-        thread = view.obj
+    def on_delete_comment(cls, sender, comment, **_kwargs):
+        thread = comment.parent
         last_comment_id = thread.last_comment.su
         if (not comment.is_thread()) and (last_comment_id <= comment.pk):
             comments = sender.objects.filter(
@@ -151,16 +139,16 @@ class ReadmarkAPI(views.BaseThreadView):
                 tasks.update_read_marks_on_rights_async(thread.parent)
 
     @classmethod
-    def after_add_comment(cls, comment, preview, view, **_kwargs):
+    def after_add_comment(cls, comment, preview, user, **_kwargs):
         if preview:
             return
         if not comment.is_thread():
-            pks = view.obj.parents_ids + [view.obj.pk]
+            pks = comment.parent.parents_ids + [comment.parent.pk]
             cls.read_mark_model.objects.filter(
                 dj_models.Q(not_read_comment_id=None) | dj_models.Q(
                     not_read_comment_id__gt=comment.pk),
                 thread_id__in=pks,
-            ).exclude(user=view.user).update(not_read_comment_id=comment.pk)
+            ).exclude(user=user).update(not_read_comment_id=comment.pk)
 
     @classmethod
     def update_response_with_marks(cls, response, user, threads):
@@ -171,72 +159,67 @@ class ReadmarkAPI(views.BaseThreadView):
             read_marks = {r.thread_id: r for r in read_marks}
         for thread_response in response:
             read_mark = read_marks.get(thread_response['id'])
-            if not read_mark:
-                pk = threads[thread_response['id']].first_comment[user]
-                thread_response['not_read'] = cls.comment_json(pk)
+            if read_mark:
+                thread_response['not_read'] = read_mark.not_read_comment_id
             else:
                 thread_response['not_read'] = \
-                    cls.comment_json(read_mark.not_read_comment_id)
+                    threads[thread_response['id']].first_comment[user]
 
     @classmethod
-    def on_prepare_room_list(cls, threads, view, response, **_kwargs):
-        threads = {t.pk: t for t in threads}
-        response['threads'].sort(
-            key=lambda t: t.get('last_comment', {}).get('id', 0), reverse=True)
-        cls.update_response_with_marks(
-            response['rooms'] + response['threads'], view.user, threads)
-        important = [t for t in response['threads'] if t['important']]
-        not_read_threads = [
-            t for t in response['threads']
-            if (not t['important']) and t['not_read']]
-        read_threads = [
-            t for t in response['threads']
-            if (not t['important']) and not t['not_read']]
-
-        del response['threads'][:]
-        response['threads'] += important + not_read_threads + read_threads
-
-    @classmethod
-    def on_index(cls, groups, response, view, **_kwargs):
+    def on_index(cls, groups, user, response, **_kwargs):
         response_for_update = []
         threads = {}
         for group in groups:
             threads.update({room.pk: room for room in group.rooms})
         for group in response['groups']:
             response_for_update.extend(group['rooms'])
-        cls.update_response_with_marks(response_for_update, view.user, threads)
+        cls.update_response_with_marks(response_for_update, user, threads)
 
         for group in response['groups']:
             not_read = None
             for room in group['rooms']:
                 if room['not_read']:
-                    if (not not_read) or (
-                            room['not_read']['id'] < not_read['id']):
+                    if (not not_read) or (room['not_read'] < not_read):
                         not_read = room['not_read']
             group['not_read'] = not_read
 
     @classmethod
-    def on_thread_to_json(cls, instance, view, response, **_kwargs):
+    def on_thread_to_json(cls, instance, user, response, children, **_kwargs):
         not_read_comment = None
-        if view.user.is_authenticated:
+        if user.is_authenticated:
             readmark = cls.read_mark_model.objects.filter(
-                thread=instance, user=view.user).first()
+                thread=instance, user=user).first()
             if readmark:
                 if readmark.not_read_comment_id:
                     not_read_comment = cls.not_read_comment_json(
-                        readmark.not_read_comment_id, view.user)
-            elif instance.first_comment[view.user]:
+                        readmark.not_read_comment_id, user)
+            elif instance.first_comment[user]:
                 not_read_comment = cls.not_read_comment_json(
-                    instance.first_comment[view.user], view.user)
+                    instance.first_comment[user], user)
         response['not_read'] = not_read_comment
+        if instance.room:
+            threads = {t.pk: t for t in children}
+            response['threads'].sort(
+                key=lambda t: t.get('last_comment', {}).get('id', 0),
+                reverse=True)
+            cls.update_response_with_marks(
+                response['rooms'] + response['threads'], user, threads)
+            important = [t for t in response['threads'] if t['important']]
+            not_read_threads = [
+                t for t in response['threads']
+                if (not t['important']) and t['not_read']]
+            read_threads = [
+                t for t in response['threads']
+                if (not t['important']) and not t['not_read']]
+
+            del response['threads'][:]
+            response['threads'] += important + not_read_threads + read_threads
 
 
 comment_signals.on_delete.connect(
     ReadmarkAPI.on_delete_comment, sender=comment_models.Comment)
 comment_signals.after_add.connect(
     ReadmarkAPI.after_add_comment, sender=comment_models.Comment)
-thread_signals.prepare_room.connect(
-    ReadmarkAPI.on_prepare_room_list, sender=thread_models.Thread)
 thread_signals.to_json.connect(
     ReadmarkAPI.on_thread_to_json, sender=thread_models.Thread)
 thread_signals.index_to_json.connect(

@@ -5,7 +5,6 @@ import gc
 from django.db import migrations, transaction
 
 from tulius.forum.threads import mutations as base_mutations
-from tulius.forum.threads import signals
 from tulius.gameforum.threads import models
 from tulius.gameforum.threads import mutations
 from tulius.gameforum.rights import mutations as rights_mutations
@@ -28,8 +27,7 @@ class FixMutation(mutations.ThreadFixCounters):
     pass
 
 
-signals.apply_mutation.connect(
-    rights_mutations.on_fix_counters, sender=FixMutation)
+base_mutations.on_mutation(FixMutation)(rights_mutations.UpdateRights)
 base_mutations.on_mutation(FixMutation)(FixComments)
 
 

@@ -29,7 +29,7 @@ export default Vue.component('forum_app', {
                 url: thread.room ? this.urls.room(thread.id) : this.urls.thread(thread.id),
             });
             return breadcrumbs;
-        }
+        },
     },
 
 })

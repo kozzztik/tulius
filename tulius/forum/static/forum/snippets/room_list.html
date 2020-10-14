@@ -12,9 +12,9 @@
         <tr v-for="room in rooms">
             <td class="forum-post-icon">
                 <div v-if="room.not_read">
-                    <router-link :to="urls.comment(room.not_read)">
+                    <a href="javascript:void(0)" @click="to_comment(room.not_read)">
                         <img src="/static/forum/img/unreadedmark.gif">
-                    </router-link>
+                    </a>
                 </div>
                 <img v-else="room.not_read" src="/static/forum/img/readedmark.gif">
             </td>

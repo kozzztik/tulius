@@ -3,7 +3,6 @@ import json
 from django import shortcuts
 from django.core import exceptions
 from django.core.cache import cache
-from django.utils import html
 from django.db import transaction
 
 from tulius.core.ckeditor import html_converter
@@ -13,7 +12,6 @@ from tulius.forum.threads import models
 from tulius.forum.threads import signals
 from tulius.forum.threads import mutations
 from tulius.forum.rights import models as rights_models
-from djfw.wysibb.templatetags import bbcodes
 
 
 class BaseThreadView(core.BaseAPIView):
@@ -29,28 +27,6 @@ class BaseThreadView(core.BaseAPIView):
         self.obj = shortcuts.get_object_or_404(query, id=thread_id)
         if not self.obj.read_right(self.user):
             raise exceptions.PermissionDenied()
-
-    def room_to_json(self, thread):
-        data = {
-            'id': thread.pk,
-            'title': html.escape(thread.title),
-            'body': bbcodes.bbcode(thread.body),
-            'room': thread.room,
-            'deleted': thread.deleted,
-            'important': thread.important,
-            'closed': thread.closed,
-            'user': thread.user.to_json(),
-            'moderators': [user.to_json() for user in thread.moderators],
-            'accessed_users': None if thread.accessed_users is None else [
-                user.to_json() for user in thread.accessed_users
-            ],
-            'threads_count': thread.threads_count[self.user],
-            'rooms_count': thread.rooms_count[self.user],
-            'url': thread.get_absolute_url(),
-        }
-        signals.room_to_json.send(
-            self.thread_model, instance=thread, response=data, view=self)
-        return data
 
     def create_thread(self, data):
         room = bool(data['room'])
@@ -72,37 +48,6 @@ class BaseThreadView(core.BaseAPIView):
             self.obj.important = bool(data['important'])
             self.obj.closed = bool(data['closed'])
 
-    def obj_to_json(self, deleted=False):
-        data = {
-            'id': self.obj.pk,
-            'title': self.obj.title,
-            'body': bbcodes.bbcode(self.obj.body),
-            'room': self.obj.room,
-            'deleted': self.obj.deleted,
-            'url': self.obj.get_absolute_url() if self.obj.pk else None,
-            'parents': [{
-                'id': parent.id,
-                'title': parent.title,
-                'url': parent.get_absolute_url(),
-            } for parent in self.obj.get_parents()],
-            'rights': self.obj.rights_to_json(self.user),
-            'default_rights': self.obj.default_rights,
-        }
-        if self.obj.room:
-            children = self.obj.get_children(self.user, deleted=deleted)
-            data['rooms'] = [self.room_to_json(t) for t in children if t.room]
-            data['threads'] = [
-                self.room_to_json(t) for t in children if not t.room]
-            signals.prepare_room.send(
-                self.thread_model, room=self.obj, threads=children,
-                response=data, view=self)
-        else:
-            data['closed'] = self.obj.closed
-            data['important'] = self.obj.important
-            data['user'] = self.obj.user.to_json(detailed=True)
-            data['media'] = self.obj.media
-        return data
-
 
 class ThreadView(BaseThreadView):
     create_mutation = mutations.ThreadCreateMutation
@@ -120,10 +65,7 @@ class ThreadView(BaseThreadView):
         deleted = bool(self.request.GET.get('deleted'))
         if deleted and not self.user.is_superuser:
             raise exceptions.PermissionDenied()
-        response = self.obj_to_json(deleted=deleted)
-        signals.to_json.send(
-            self.thread_model, instance=self.obj, response=response, view=self)
-        return response
+        return self.obj.to_json(self.user, deleted=deleted)
 
     @transaction.atomic
     def delete(self, request, **kwargs):
@@ -145,19 +87,16 @@ class ThreadView(BaseThreadView):
             raise exceptions.PermissionDenied()
         self.obj = self.create_thread(data)
         signals.before_create.send(
-            self.thread_model, instance=self.obj, data=data, view=self,
+            self.thread_model, instance=self.obj, data=data, user=self.user,
             preview=preview)
         if not preview:
             self.create_mutation(self.obj, data=data, view=self).apply()
         signals.after_create.send(
             self.thread_model, instance=self.obj, data=data, preview=preview,
-            view=self)
+            user=self.user)
         transaction.commit()
         # TODO notify clients
-        response = self.obj_to_json()
-        signals.to_json.send(
-            self.thread_model, instance=self.obj, response=response, view=self)
-        return response
+        return self.obj.to_json(self.user)
 
     @transaction.atomic
     def post(self, request, **kwargs):
@@ -171,13 +110,10 @@ class ThreadView(BaseThreadView):
         self.update_thread(data)
         signals.on_update.send(
             self.thread_model, instance=self.obj, data=data, preview=preview,
-            view=self)
+            user=self.user)
         if not preview:
             self.obj.save()
-        response = self.obj_to_json()
-        signals.to_json.send(
-            self.thread_model, instance=self.obj, response=response, view=self)
-        return response
+        return self.obj.to_json(self.user)
 
 
 class IndexView(BaseThreadView):
@@ -205,12 +141,13 @@ class IndexView(BaseThreadView):
             'groups': [{
                 'id': group.id,
                 'title': group.title,
-                'rooms': [self.room_to_json(thread) for thread in group.rooms],
+                'rooms': [t.to_json_as_item(self.user) for t in group.rooms],
                 'url': group.get_absolute_url(),
             } for group in groups]
         }
         signals.index_to_json.send(
-            self.thread_model, groups=groups, view=self, response=response)
+            self.thread_model, groups=groups, user=self.user,
+            response=response)
         return response
 
     def put(self, request, **_kwargs):
@@ -224,12 +161,12 @@ class IndexView(BaseThreadView):
             raise exceptions.PermissionDenied()
         thread = self.create_thread(data)
         signals.before_create.send(
-            self.thread_model, instance=thread, data=data, view=self,
+            self.thread_model, instance=thread, data=data, user=self.user,
             preview=False)
         self.create_mutation(thread, data=data, view=self).apply()
         signals.after_create.send(
             self.thread_model, instance=thread, data=data, preview=False,
-            view=self)
+            user=self.user)
         transaction.commit()
         # TODO notify clients
         return {'id': thread.pk, 'url': thread.get_absolute_url()}
@@ -261,12 +198,9 @@ class MoveThreadView(BaseThreadView):
                 pk=old_parent.pk)
             self.fix_mutation(obj).apply()
         signals.after_move.send(
-            self.thread_model, instance=self.obj, view=self,
+            self.thread_model, instance=self.obj, user=self.user,
             old_parent=old_parent)
-        response = self.obj_to_json()
-        signals.to_json.send(
-            self.thread_model, instance=self.obj, response=response, view=self)
-        return response
+        return self.obj.to_json(self.user)
 
 
 class RestoreThreadView(BaseThreadView):
@@ -280,4 +214,4 @@ class RestoreThreadView(BaseThreadView):
         self.get_parent_thread(for_update=True, deleted=True, **kwargs)
         self.restore_mutation(self.obj).apply()
         self.fix_mutation(self.obj).apply()
-        return self.obj_to_json()
+        return self.obj.to_json(self.user)

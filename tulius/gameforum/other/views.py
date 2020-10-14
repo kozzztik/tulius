@@ -2,8 +2,8 @@ from tulius.forum.comments import signals as comment_signals
 from tulius.forum.threads import signals as thread_signals
 from tulius.forum.other import voting
 from tulius.forum.other import likes
-from tulius.gameforum import base
 from tulius.gameforum.threads import models as thread_models
+from tulius.gameforum.threads import views as thread_views
 from tulius.gameforum.comments import views as comments_api
 from tulius.gameforum.comments import models as comment_models
 from tulius.gameforum.other import models as other_models
@@ -21,13 +21,8 @@ thread_signals.to_json.connect(
     VotingAPI.on_thread_to_json, sender=thread_models.Thread)
 
 
-class Search(elastic_search.Search, base.VariationMixin):
-    comments_class = comments_api.CommentAPI
-
-    def get_view(self, comment):
-        view = super().get_view(comment)
-        view.variation = self.variation
-        return view
+class Search(elastic_search.Search, thread_views.BaseThreadAPI):
+    comment_model = comment_models.Comment
 
     def apply_users_filters(self, search_request, conditions, data):
         filter_users = data.get('users', [])
@@ -59,6 +54,16 @@ class Search(elastic_search.Search, base.VariationMixin):
             search_request['must_not'].append(
                 {'terms': {'role_id': pks}},
             )
+
+    def comments_query(self, pks):
+        comments = list(self.comment_model.objects.filter(
+            pk__in=pks, parent__variation=self.variation, deleted=False,
+            parent__deleted=False,
+        ).select_related('parent'))
+        for comment in comments:
+            # to reuse roles cache
+            comment.parent.variation = self.variation
+        return comments
 
     def options(self, request, *args, **kwargs):
         add_leader = False

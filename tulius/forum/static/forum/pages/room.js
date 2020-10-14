@@ -33,5 +33,7 @@ export default LazyComponent('forum_room_page', {
                 this._load_api(this.$route);
             });
         },
+        loading_start() {this.$parent.loading_start()},
+        loading_end(breadcrumbs) {this.$parent.loading_end(breadcrumbs)},
     },
 })
