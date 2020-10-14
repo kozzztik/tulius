@@ -12,11 +12,11 @@ from djfw.wysibb import models
 
 
 @dispatch.receiver(thread_signals.before_create)
-def before_create_thread(instance, data, view, **_kwargs):
+def before_create_thread(instance, data, user, **_kwargs):
     if instance.room:
         return
     html_data = data['media'].get('html')
-    if html_data and view.user.is_superuser:
+    if html_data and user.is_superuser:
         instance.media['html'] = html_data
 
 

@@ -67,41 +67,41 @@ class CommentsPageAPI(CommentsBase):
         }
 
     @classmethod
-    def on_create_thread(cls, instance, data, preview, view, **_kwargs):
+    def on_create_thread(cls, instance, data, preview, user, **_kwargs):
         if not instance.room:
-            cls.create_comment_process(data, preview, view)
+            cls.create_comment_process(instance, user, data, preview)
             if not preview:
                 instance.save()
 
     @classmethod
-    def create_comment(cls, data, view):
+    def create_comment(cls, thread, user, data):
         reply_id = data.get('reply_id')
-        if reply_id and (reply_id != view.obj.first_comment[view.user]):
+        if reply_id and (reply_id != thread.first_comment[user]):
             obj = shortcuts.get_object_or_404(cls.comment_model, pk=reply_id)
-            if obj.parent_id != view.obj.id:
+            if obj.parent_id != thread.id:
                 raise exceptions.PermissionDenied()
         comment = cls.comment_model()
-        comment.parent = view.obj
-        comment.user = view.user
+        comment.parent = thread
+        comment.user = user
         comment.title = data['title']
         comment.body = data['body']
         comment.reply_id = reply_id
         comment.media = {}
-        comment.order = view.obj.comments_count.su
+        comment.order = thread.comments_count.su
         return comment
 
     @classmethod
-    def create_comment_process(cls, data, preview, view):
-        comment = cls.create_comment(data, view=view)
+    def create_comment_process(cls, thread, user, data, preview):
+        comment = cls.create_comment(thread, user, data)
         comment_signals.before_add.send(
             cls.comment_model, comment=comment, data=data, preview=preview,
-            user=view.user)
+            user=user)
         if not preview:
             comment.save()
-            mutations.ThreadCommentAdd(view.obj, comment).apply()
+            mutations.ThreadCommentAdd(thread, comment).apply()
         results = comment_signals.after_add.send(
             cls.comment_model, comment=comment, data=data, preview=preview,
-            user=view.user)
+            user=user)
         if any(map(lambda a: a[1], results)):
             comment.save()
         return comment
@@ -115,7 +115,8 @@ class CommentsPageAPI(CommentsBase):
         data['body'] = html_converter.html_to_bb(data['body'])
         preview = data.pop('preview', False)
         if data['body']:
-            comment = self.create_comment_process(data, preview, self)
+            comment = self.create_comment_process(
+                self.obj, self.user, data, preview)
             if preview:
                 return comment.to_json(self.user, detailed=True)
             # commit transaction to be sure that clients wouldn't be notified
@@ -181,21 +182,21 @@ class CommentAPI(CommentBase):
         return {'pages_count': self.pages_count(self.obj)}
 
     @classmethod
-    def update_comment(cls, comment, data, preview, view):
+    def update_comment(cls, comment, user, data, preview):
         comment.edit_time = timezone.now()
-        comment.editor = view.request.user
+        comment.editor = user
         comment.title = data['title'][:120]
         comment.body = data['body']
         comment_signals.on_update.send(
             cls.comment_model, comment=comment, data=data,
-            preview=preview, user=view.user)
+            preview=preview, user=user)
 
     @classmethod
-    def on_thread_update(cls, instance, data, preview, view, **_kwargs):
+    def on_thread_update(cls, instance, data, preview, user, **_kwargs):
         if not instance.room:
             comment = instance.comments.select_for_update().get(
-                id=instance.first_comment[view.user])
-            cls.update_comment(comment, data, preview, view)
+                id=instance.first_comment[user])
+            cls.update_comment(comment, user, data, preview)
             if not preview:
                 comment.save()
 
@@ -210,7 +211,7 @@ class CommentAPI(CommentBase):
         if not self.comment.edit_right(self.user):
             raise exceptions.PermissionDenied()
 
-        self.update_comment(self.comment, data, preview, self)
+        self.update_comment(self.comment, self.user, data, preview)
 
         if preview:
             transaction.rollback()

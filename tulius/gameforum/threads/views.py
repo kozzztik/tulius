@@ -23,26 +23,28 @@ class BaseThreadAPI(views.BaseThreadView, base.VariationMixin):
             raise exceptions.PermissionDenied('Wrong variation')
         self.obj.variation = self.variation  # for speedup role cache
 
-    def process_role(self, init_role_id, data):
+    @classmethod
+    def process_role(cls, thread, user, init_role_id, data):
         role_id = data.get('role_id')
         if role_id:
-            if role_id not in self.variation.all_roles:
+            if role_id not in thread.variation.all_roles:
                 raise exceptions.PermissionDenied('Role does not exist')
             if role_id == init_role_id:
                 return role_id
-        if role_id not in self.obj.write_roles(self.user):
+        if role_id not in thread.write_roles(user):
             raise exceptions.PermissionDenied('Role is not accessible here')
         return role_id
 
     def create_thread(self, data):
         obj = super().create_thread(data)
-        obj.role_id = self.process_role(None, data)
         obj.variation = self.variation
+        obj.role_id = self.process_role(self.obj, self.user, None, data)
         return obj
 
     def update_thread(self, data):
         super().update_thread(data)
-        self.obj.role_id = self.process_role(self.obj.role_id, data)
+        self.obj.role_id = self.process_role(
+            self.obj, self.user, self.obj.role_id, data)
         editor_role = data['edit_role_id']
         if editor_role not in self.obj.write_roles(self.user):
             raise exceptions.PermissionDenied()

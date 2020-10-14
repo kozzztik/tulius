@@ -35,14 +35,14 @@ def validate_image_data(variation, images_data):
 
 
 @dispatch.receiver(thread_signals.before_create, sender=thread_models.Thread)
-def before_create_thread(instance, data, view, **_kwargs):
+def before_create_thread(instance, data, **_kwargs):
     if instance.room:
         return
     images_data = data['media'].get('illustrations')
     if not images_data:
         return
     instance.media['illustrations'] = validate_image_data(
-        view.variation, images_data)
+        instance.variation, images_data)
 
 
 @dispatch.receiver(comment_signals.before_add, sender=comment_models.Comment)
@@ -117,11 +117,11 @@ def update_role_comments_count(role_id, value):
 
 class CommentsPageAPI(comments.CommentsPageAPI, CommentsBase):
     @classmethod
-    def create_comment(cls, data, view):
-        comment = super(CommentsPageAPI, cls).create_comment(data, view)
-        comment.role_id = view.process_role(None, data)
+    def create_comment(cls, thread, user, data):
+        comment = super().create_comment(thread, user, data)
+        comment.role_id = cls.process_role(thread, user, None, data)
         update_role_comments_count(comment.role_id, 1)
-        view.variation.comments_count_inc(1)
+        thread.variation.comments_count_inc(1)
         return comment
 
 
@@ -143,17 +143,17 @@ class CommentAPI(comments.CommentAPI, CommentsBase):
         return data
 
     @classmethod
-    def update_comment(cls, comment, data, preview, view):
-        super(CommentAPI, cls).update_comment(comment, data, preview, view)
+    def update_comment(cls, comment, user, data, preview):
+        super().update_comment(comment, user, data, preview)
         new_role = data['role_id']
         if comment.role_id != new_role:
-            if new_role not in comment.parent.write_roles(view.user):
+            if new_role not in comment.parent.write_roles(user):
                 raise exceptions.PermissionDenied()
             update_role_comments_count(new_role, 1)
             update_role_comments_count(comment.role_id, -1)
             comment.role_id = new_role
         editor_role = data['edit_role_id']
-        if editor_role not in comment.parent.write_roles(view.user):
+        if editor_role not in comment.parent.write_roles(user):
             raise exceptions.PermissionDenied()
         comment.edit_role_id = editor_role
 

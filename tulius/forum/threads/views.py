@@ -87,13 +87,13 @@ class ThreadView(BaseThreadView):
             raise exceptions.PermissionDenied()
         self.obj = self.create_thread(data)
         signals.before_create.send(
-            self.thread_model, instance=self.obj, data=data, view=self,
+            self.thread_model, instance=self.obj, data=data, user=self.user,
             preview=preview)
         if not preview:
             self.create_mutation(self.obj, data=data, view=self).apply()
         signals.after_create.send(
             self.thread_model, instance=self.obj, data=data, preview=preview,
-            view=self)
+            user=self.user)
         transaction.commit()
         # TODO notify clients
         return self.obj.to_json(self.user)
@@ -110,7 +110,7 @@ class ThreadView(BaseThreadView):
         self.update_thread(data)
         signals.on_update.send(
             self.thread_model, instance=self.obj, data=data, preview=preview,
-            view=self)
+            user=self.user)
         if not preview:
             self.obj.save()
         return self.obj.to_json(self.user)
@@ -146,7 +146,8 @@ class IndexView(BaseThreadView):
             } for group in groups]
         }
         signals.index_to_json.send(
-            self.thread_model, groups=groups, view=self, response=response)
+            self.thread_model, groups=groups, user=self.user,
+            response=response)
         return response
 
     def put(self, request, **_kwargs):
@@ -160,12 +161,12 @@ class IndexView(BaseThreadView):
             raise exceptions.PermissionDenied()
         thread = self.create_thread(data)
         signals.before_create.send(
-            self.thread_model, instance=thread, data=data, view=self,
+            self.thread_model, instance=thread, data=data, user=self.user,
             preview=False)
         self.create_mutation(thread, data=data, view=self).apply()
         signals.after_create.send(
             self.thread_model, instance=thread, data=data, preview=False,
-            view=self)
+            user=self.user)
         transaction.commit()
         # TODO notify clients
         return {'id': thread.pk, 'url': thread.get_absolute_url()}
@@ -197,7 +198,7 @@ class MoveThreadView(BaseThreadView):
                 pk=old_parent.pk)
             self.fix_mutation(obj).apply()
         signals.after_move.send(
-            self.thread_model, instance=self.obj, view=self,
+            self.thread_model, instance=self.obj, user=self.user,
             old_parent=old_parent)
         return self.obj.to_json(self.user)
 

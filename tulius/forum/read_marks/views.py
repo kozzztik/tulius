@@ -178,14 +178,14 @@ class ReadmarkAPI(views.BaseThreadView):
                     cls.comment_json(read_mark.not_read_comment_id)
 
     @classmethod
-    def on_index(cls, groups, response, view, **_kwargs):
+    def on_index(cls, groups, user, response, **_kwargs):
         response_for_update = []
         threads = {}
         for group in groups:
             threads.update({room.pk: room for room in group.rooms})
         for group in response['groups']:
             response_for_update.extend(group['rooms'])
-        cls.update_response_with_marks(response_for_update, view.user, threads)
+        cls.update_response_with_marks(response_for_update, user, threads)
 
         for group in response['groups']:
             not_read = None
