@@ -27,7 +27,5 @@ comment_signals.on_delete.connect(
     ReadmarkAPI.on_delete_comment, sender=comment_models.Comment)
 comment_signals.after_add.connect(
     ReadmarkAPI.after_add_comment, sender=comment_models.Comment)
-thread_signals.prepare_room.connect(
-    ReadmarkAPI.on_prepare_room_list, sender=thread_models.Thread)
 thread_signals.to_json.connect(
     ReadmarkAPI.on_thread_to_json, sender=thread_models.Thread)

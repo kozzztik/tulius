@@ -311,22 +311,21 @@ class AbstractThread(models.Model):
             'rights': self.rights_to_json(user),
             'default_rights': self.default_rights,
         }
+        children = None
         if self.room:
             children = self.get_children(user, deleted=deleted)
             data['rooms'] = [
                 t.to_json_as_item(user) for t in children if t.room]
             data['threads'] = [
                 t.to_json_as_item(user) for t in children if not t.room]
-            signals.prepare_room.send(
-                self.__class__, room=self, threads=children,
-                response=data, user=user)
         else:
             data['closed'] = self.closed
             data['important'] = self.important
             data['user'] = self.user.to_json(detailed=True)
             data['media'] = self.media
         signals.to_json.send(
-            self.__class__, instance=self, response=data, user=user)
+            self.__class__, instance=self, response=data, user=user,
+            children=children)
         return data
 
 

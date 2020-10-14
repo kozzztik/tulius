@@ -1,7 +1,7 @@
 from django import dispatch
 
 to_json = dispatch.Signal(
-    providing_args=['instance', 'response', 'user'])
+    providing_args=['instance', 'response', 'user', 'children'])
 to_json_as_item = dispatch.Signal(
     providing_args=['instance', 'response', 'user'])
 
@@ -11,9 +11,6 @@ after_create = dispatch.Signal(
     providing_args=['instance', 'data', 'preview', 'view'])
 on_update = dispatch.Signal(
     providing_args=['instance', 'data', 'preview', 'view'])
-
-prepare_room = dispatch.Signal(
-    providing_args=['room', 'threads', 'user', 'response'])
 
 index_to_json = dispatch.Signal(providing_args=['groups', 'view', 'response'])
 apply_mutation = dispatch.Signal(providing_args=['mutation', 'instance'])

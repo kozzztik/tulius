@@ -178,24 +178,6 @@ class ReadmarkAPI(views.BaseThreadView):
                     cls.comment_json(read_mark.not_read_comment_id)
 
     @classmethod
-    def on_prepare_room_list(cls, threads, user, response, **_kwargs):
-        threads = {t.pk: t for t in threads}
-        response['threads'].sort(
-            key=lambda t: t.get('last_comment', {}).get('id', 0), reverse=True)
-        cls.update_response_with_marks(
-            response['rooms'] + response['threads'], user, threads)
-        important = [t for t in response['threads'] if t['important']]
-        not_read_threads = [
-            t for t in response['threads']
-            if (not t['important']) and t['not_read']]
-        read_threads = [
-            t for t in response['threads']
-            if (not t['important']) and not t['not_read']]
-
-        del response['threads'][:]
-        response['threads'] += important + not_read_threads + read_threads
-
-    @classmethod
     def on_index(cls, groups, response, view, **_kwargs):
         response_for_update = []
         threads = {}
@@ -215,7 +197,7 @@ class ReadmarkAPI(views.BaseThreadView):
             group['not_read'] = not_read
 
     @classmethod
-    def on_thread_to_json(cls, instance, user, response, **_kwargs):
+    def on_thread_to_json(cls, instance, user, response, children, **_kwargs):
         not_read_comment = None
         if user.is_authenticated:
             readmark = cls.read_mark_model.objects.filter(
@@ -228,14 +210,29 @@ class ReadmarkAPI(views.BaseThreadView):
                 not_read_comment = cls.not_read_comment_json(
                     instance.first_comment[user], user)
         response['not_read'] = not_read_comment
+        if instance.room:
+            threads = {t.pk: t for t in children}
+            response['threads'].sort(
+                key=lambda t: t.get('last_comment', {}).get('id', 0),
+                reverse=True)
+            cls.update_response_with_marks(
+                response['rooms'] + response['threads'], user, threads)
+            important = [t for t in response['threads'] if t['important']]
+            not_read_threads = [
+                t for t in response['threads']
+                if (not t['important']) and t['not_read']]
+            read_threads = [
+                t for t in response['threads']
+                if (not t['important']) and not t['not_read']]
+
+            del response['threads'][:]
+            response['threads'] += important + not_read_threads + read_threads
 
 
 comment_signals.on_delete.connect(
     ReadmarkAPI.on_delete_comment, sender=comment_models.Comment)
 comment_signals.after_add.connect(
     ReadmarkAPI.after_add_comment, sender=comment_models.Comment)
-thread_signals.prepare_room.connect(
-    ReadmarkAPI.on_prepare_room_list, sender=thread_models.Thread)
 thread_signals.to_json.connect(
     ReadmarkAPI.on_thread_to_json, sender=thread_models.Thread)
 thread_signals.index_to_json.connect(
