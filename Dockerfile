@@ -1,4 +1,4 @@
-FROM kozzztik/tulius:base_3.0.2
+FROM kozzztik/tulius:base_3.0.3
 
 ADD tulius /opt/tulius/tulius
 ADD djfw /opt/tulius/djfw
@@ -14,7 +14,6 @@ ADD scripts/travis_test.sh /opt/tulius/travis_test.sh
 RUN chmod +x /opt/tulius/travis_test.sh
 
 # update requirements
-RUN pip uninstall -y python-coveralls
 RUN pip install -r requirements.txt
 RUN apt-get install git -y
 ADD .git /opt/tulius/.git
