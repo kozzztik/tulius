@@ -145,19 +145,24 @@ class AbstractComment(models.Model):
     def order_to_page(cls, order):
         return int(order / cls.COMMENTS_ON_PAGE) + 1
 
-    def to_json(self, user):
+    def to_json(self, user, detailed=False):
         data = {
             'id': self.pk,
             'thread': {
                 'id': self.parent_id,
-                'url': self.parent.get_absolute_url()
             },
             'page': self.page,
+            'user': self.user.to_json(detailed=detailed),
+            'create_time': self.create_time,
+        }
+        if not detailed:
+            return data
+        data['thread']['url'] = self.parent.get_absolute_url()
+        data = {
+            **data,
             'url': self.get_absolute_url() if self.pk else None,
             'title': html.escape(self.title),
             'body': bbcodes.bbcode(self.body),
-            'user': self.user.to_json(detailed=True),
-            'create_time': self.create_time,
             'edit_right': self.edit_right(user),
             'is_thread': self.is_thread(),
             'edit_time': self.edit_time,

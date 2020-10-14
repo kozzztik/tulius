@@ -84,20 +84,10 @@ def thread_item_to_json(instance, response, user, **_kwargs):
             comments_count - 1)
     if last_comment_id is None:
         return
-    try:
-        last_comment = comment_models.Comment.objects.get(id=last_comment_id)
-    except comment_models.Comment.DoesNotExist:
-        return
-    response['last_comment'] = {
-        'id': last_comment.id,
-        'thread': {
-            'id': last_comment.parent_id,
-        },
-        'page': last_comment.page,
-        'user':
-            instance.variation.role_to_json(last_comment.role_id, user),
-        'create_time': last_comment.create_time,
-    }
+    last_comment = comment_models.Comment.objects.filter(
+        id=last_comment_id).first()
+    if last_comment:
+        response['last_comment'] = last_comment.to_json(user)
 
 
 @dispatch.receiver(

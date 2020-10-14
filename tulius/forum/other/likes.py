@@ -23,7 +23,8 @@ class Likes(views.CommentBase):
 
     def create_like(self):
         like_mark = self.like_model(user=self.user, comment=self.comment)
-        like_mark.data['comment'] = self.comment.to_json(self.user)
+        like_mark.data['comment'] = self.comment.to_json(
+            self.user, detailed=True)
         like_mark.data['thread'] = self.obj_to_json()
         return like_mark
 

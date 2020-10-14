@@ -27,20 +27,10 @@ def thread_item_to_json(instance, response, user, **_kwargs):
             comments_count - 1)
     if last_comment_id is None:
         return
-    try:
-        last_comment = models.Comment.objects.select_related('user').get(
-            id=last_comment_id)
-    except models.Comment.DoesNotExist:
-        return
-    response['last_comment'] = {
-        'id': last_comment.id,
-        'thread': {
-            'id': last_comment.parent_id,
-        },
-        'page': last_comment.page,
-        'user': last_comment.user.to_json(),
-        'create_time': last_comment.create_time,
-    }
+    last_comment = models.Comment.objects.select_related('user').filter(
+        id=last_comment_id).first()
+    if last_comment:
+        response['last_comment'] = last_comment.to_json(user)
 
 
 @dispatch.receiver(thread_signals.to_json)
@@ -73,7 +63,7 @@ class CommentsPageAPI(CommentsBase):
             self.request, page_num, self.pages_count(self.obj))
         return {
             'pagination': pagination_context,
-            'comments': [c.to_json(self.user) for c in comments]
+            'comments': [c.to_json(self.user, detailed=True) for c in comments]
         }
 
     @classmethod
@@ -127,7 +117,7 @@ class CommentsPageAPI(CommentsBase):
         if data['body']:
             comment = self.create_comment_process(data, preview, self)
             if preview:
-                return comment.to_json(self.user)
+                return comment.to_json(self.user, detailed=True)
             # commit transaction to be sure that clients wouldn't be notified
             # before comment will be accessible in DB
             self.obj.save()
@@ -160,7 +150,7 @@ class CommentBase(CommentsBase):
 class CommentAPI(CommentBase):
     def get_context_data(self, **kwargs):
         self.get_comment(**kwargs)
-        data = self.comment.to_json(self.user)
+        data = self.comment.to_json(self.user, detailed=True)
         data['thread']['title'] = self.obj.title
         data['thread']['parents'] = [{
             'id': parent.id,
@@ -227,7 +217,7 @@ class CommentAPI(CommentBase):
         else:
             self.comment.save()
             transaction.commit()
-        return self.comment.to_json(self.user)
+        return self.comment.to_json(self.user, detailed=True)
 
 
 thread_signals.on_update.connect(

@@ -221,7 +221,7 @@ class Search(core.BaseAPIView):
             'thread': thread_view.obj_to_json() if thread_view else None,
             'conditions': conditions,
             'results': [{
-                'comment': comment.to_json(self.user),
+                'comment': comment.to_json(self.user, detailed=True),
                 'thread': {
                     'id': comment.parent.pk,
                     'rights': comment.parent.rights_to_json(self.user)

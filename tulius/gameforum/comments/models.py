@@ -48,21 +48,27 @@ class Comment(comment_models.AbstractComment):
         super().to_elastic_mapping(fields)
         fields['variation_id'] = {'type': 'integer'}
 
-    def to_json(self, user):
+    def to_json(self, user, detailed=False):
         """ Override original method to avoid resolving "user" foreign key. """
         data = {
             'id': self.pk,
             'thread': {
                 'id': self.parent_id,
+                # anyway parent is resolved in user
                 'url': self.parent.get_absolute_url()
             },
-            'page': self.order_to_page(self.order),
+            'page': self.page,
+            'user': self.parent.variation.role_to_json(
+                self.role_id, user, detailed=detailed),
+            'create_time': self.create_time,
+        }
+        if not detailed:
+            return data
+        data = {
+            **data,
             'url': self.get_absolute_url() if self.pk else None,
             'title': html.escape(self.title),
             'body': bbcodes.bbcode(self.body),
-            'user': self.parent.variation.role_to_json(
-                self.role_id, user, detailed=True),
-            'create_time': self.create_time,
             'edit_right': self.edit_right(user),
             'is_thread': self.is_thread(),
             'edit_time': self.edit_time,
