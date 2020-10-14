@@ -85,8 +85,7 @@ def thread_item_to_json(instance, response, user, **_kwargs):
     if last_comment_id is None:
         return
     try:
-        last_comment = comment_models.Comment.objects.select_related(
-            'role').get(id=last_comment_id)
+        last_comment = comment_models.Comment.objects.get(id=last_comment_id)
     except comment_models.Comment.DoesNotExist:
         return
     response['last_comment'] = {
@@ -96,8 +95,7 @@ def thread_item_to_json(instance, response, user, **_kwargs):
         },
         'page': last_comment.page,
         'user':
-            last_comment.role.to_json(user)
-            if last_comment.role else stories_models.leader_json(),
+            instance.variation.role_to_json(last_comment.role_id, user),
         'create_time': last_comment.create_time,
     }
 
@@ -116,9 +114,8 @@ class CommentsBase(threads.BaseThreadAPI, comments.CommentsBase):
 
     def comments_query(self):
         # use reverse manager, so "parent" is cached correctly
-        # use related "role" instead of user
-        return self.obj.comments.select_related(
-            'role', 'role__avatar').exclude(deleted=True)
+        # no use of related user
+        return self.obj.comments.exclude(deleted=True)
 
 
 def update_role_comments_count(role_id, value):

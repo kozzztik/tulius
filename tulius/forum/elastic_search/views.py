@@ -4,7 +4,6 @@ import datetime
 import json
 
 from django import dispatch
-from django import http
 from django.core import exceptions
 from django.contrib import auth
 from django.conf import settings
@@ -137,7 +136,8 @@ class Search(core.BaseAPIView):
 
     def comments_query(self, pks):
         return self.comments_class.comment_model.objects.filter(
-            pk__in=pks).select_related('user', 'parent')
+            pk__in=pks, deleted=False, parent__deleted=False
+        ).select_related('user', 'parent')
 
     def post(self, request, **_kwargs):
         data = json.loads(request.body)
@@ -207,15 +207,11 @@ class Search(core.BaseAPIView):
         hits = {int(hit['_id']): hit for hit in response['hits']['hits']}
         for comment in comments:
             if filter_text:
+                # found text hightlighting
                 comment.body = hits[comment.pk]['highlight']['body'][0]
-            view = self.get_view(comment)
-            try:
-                view.get_parent_thread(comment.parent_id)
-            except exceptions.PermissionDenied:
+            if not comment.parent.read_right(self.user):
                 continue
-            except http.Http404:
-                continue
-            search_results.append(view)
+            search_results.append(comment)
         return {
             'took': response['took'],
             'page': page,
@@ -225,9 +221,12 @@ class Search(core.BaseAPIView):
             'thread': thread_view.obj_to_json() if thread_view else None,
             'conditions': conditions,
             'results': [{
-                'comment': view.comment.to_json(self.user),
-                'thread': view.obj_to_json(),
-            } for view in search_results]
+                'comment': comment.to_json(self.user),
+                'thread': {
+                    'id': comment.parent.pk,
+                    'rights': comment.parent.rights_to_json(self.user)
+                },
+            } for comment in search_results]
         }
 
     def options(self, request, *args, **kwargs):

@@ -91,17 +91,17 @@ class Thread(thread_models.AbstractThread):
 
     @property
     def moderators(self):
-        return story_models.Role.objects.filter(pk__in=[
-            pk for pk, right in self.rights
-            if right & thread_models.ACCESS_READ])
+        return [
+            self.variation.all_roles[pk] for pk, right in self.rights.role
+            if right & thread_models.ACCESS_MODERATE]
 
     @property
     def accessed_users(self):
         if self.default_rights != thread_models.NO_ACCESS:
             return None
-        return story_models.Role.objects.filter(pk__in=[
-            int(pk) for pk, right in self.rights.role
-            if right & thread_models.ACCESS_READ])
+        return [
+            self.variation.all_roles[pk] for pk, right in self.rights.role
+            if right & thread_models.ACCESS_READ]
 
     def rights_to_json(self, user):
         return {
@@ -122,8 +122,7 @@ class Thread(thread_models.AbstractThread):
             'important': self.important,
             'closed': self.closed,
             'user':
-                self.role.to_json(user)
-                if self.role else story_models.leader_json(),
+                self.variation.role_to_json(self.role_id, user),
             'moderators': [user.to_json(user) for user in self.moderators],
             'accessed_users': None if accessed_users is None else [
                 user.to_json(user) for user in accessed_users

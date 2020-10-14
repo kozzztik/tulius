@@ -420,6 +420,30 @@ class Variation(SortableModelMixin):
             comments_count=models.F('comments_count') + value)
         self.comments_count += value
 
+    _all_roles_cache = None
+
+    @property
+    def all_roles(self):
+        if self._all_roles_cache is None:
+            self._all_roles_cache = {
+                role.id: role for role in
+                self.roles.all().select_related('avatar')}
+        return self._all_roles_cache
+
+    def role_to_json(self, role_id, user, detailed=False):
+        if role_id is None:
+            return {
+                'id': None,
+                'title': '---',
+                'url': None,
+                'sex': None,
+                'avatar': None,
+                'online_status': None,
+                'trust': None,
+                'show_trust_marks': False,
+            }
+        return self.all_roles[role_id].to_json(user, detailed=detailed)
+
 
 class Role(SortableModelMixin):
     class Meta:
@@ -564,19 +588,6 @@ class Role(SortableModelMixin):
                 'show_trust_marks': self.show_trust_marks,
             })
         return data
-
-
-def leader_json():
-    return {
-        'id': None,
-        'title': '---',
-        'url': None,
-        'sex': None,
-        'avatar': None,
-        'online_status': None,
-        'trust': None,
-        'show_trust_marks': False,
-    }
 
 
 class RoleDeleteMark(models.Model):

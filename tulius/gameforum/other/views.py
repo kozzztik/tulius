@@ -61,8 +61,14 @@ class Search(elastic_search.Search, base.VariationMixin):
             )
 
     def comments_query(self, pks):
-        return self.comments_class.comment_model.objects.filter(
-            pk__in=pks).select_related('role', 'role__avatar', 'parent')
+        comments = list(self.comments_class.comment_model.objects.filter(
+            pk__in=pks, parent__variation=self.variation, deleted=False,
+            parent__deleted=False,
+        ).select_related('parent'))
+        for comment in comments:
+            # to reuse roles cache
+            comment.parent.variation = self.variation
+        return comments
 
     def options(self, request, *args, **kwargs):
         add_leader = False

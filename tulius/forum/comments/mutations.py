@@ -179,7 +179,11 @@ class ThreadCommentDelete(FixCounters):
         if not instance.room:
             signals.on_thread_delete.send(
                 instance.__class__, instance=instance, mutation=self)
-            instance.comments.update(deleted=True)
+            for comment in instance.comments.all():
+                if not comment.deleted:
+                    # do not use batch delete to reindex all comments.
+                    comment.deleted = True
+                    comment.save()
 
 
 @mutations.on_mutation(mutations.RestoreThread)

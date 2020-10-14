@@ -60,21 +60,18 @@ class Comment(comment_models.AbstractComment):
             'url': self.get_absolute_url() if self.pk else None,
             'title': html.escape(self.title),
             'body': bbcodes.bbcode(self.body),
-            'user':
-                self.role.to_json(user, detailed=True)
-                if self.role else story_models.leader_json(),
+            'user': self.parent.variation.role_to_json(
+                self.role_id, user, detailed=True),
             'create_time': self.create_time,
             'edit_right': self.edit_right(user),
             'is_thread': self.is_thread(),
             'edit_time': self.edit_time,
-            'editor': None,
+            'editor': self.parent.variation.role_to_json(
+                self.edit_role_id, user, detailed=True
+            ) if self.edit_time else None,
             'media': self.media,
             'reply_id': self.reply_id,
         }
-        if self.edit_time:
-            data['editor'] = \
-                self.edit_role.to_json(user, detailed=True) \
-                if self.edit_role else story_models.leader_json()
         signals.to_json.send(
             self.__class__, comment=self, data=data, user=user)
         return data
