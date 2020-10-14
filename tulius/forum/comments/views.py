@@ -95,13 +95,13 @@ class CommentsPageAPI(CommentsBase):
         comment = cls.create_comment(data, view=view)
         comment_signals.before_add.send(
             cls.comment_model, comment=comment, data=data, preview=preview,
-            view=view)
+            user=view.user)
         if not preview:
             comment.save()
             mutations.ThreadCommentAdd(view.obj, comment).apply()
         results = comment_signals.after_add.send(
             cls.comment_model, comment=comment, data=data, preview=preview,
-            view=view)
+            user=view.user)
         if any(map(lambda a: a[1], results)):
             comment.save()
         return comment
@@ -173,7 +173,7 @@ class CommentAPI(CommentBase):
             'description': request.GET['comment'],
         }
         comment_signals.on_delete.send(
-            self.comment_model, comment=self.comment, view=self)
+            self.comment_model, comment=self.comment, user=self.user)
         self.comment.save()
         # update page nums
         mutations.FixCounters(self.obj).apply()
@@ -188,12 +188,12 @@ class CommentAPI(CommentBase):
         comment.body = data['body']
         comment_signals.on_update.send(
             cls.comment_model, comment=comment, data=data,
-            preview=preview, view=view)
+            preview=preview, user=view.user)
 
     @classmethod
     def on_thread_update(cls, instance, data, preview, view, **_kwargs):
         if not instance.room:
-            comment = cls.comment_model.objects.select_for_update().get(
+            comment = instance.comments.select_for_update().get(
                 id=instance.first_comment[view.user])
             cls.update_comment(comment, data, preview, view)
             if not preview:

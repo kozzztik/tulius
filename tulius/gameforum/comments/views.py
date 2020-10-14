@@ -46,32 +46,33 @@ def before_create_thread(instance, data, view, **_kwargs):
 
 
 @dispatch.receiver(comment_signals.before_add, sender=comment_models.Comment)
-def before_add_comment(comment, data, view, **_kwargs):
+def before_add_comment(comment, data, **_kwargs):
     images_data = data['media'].get('illustrations')
     if not images_data:
         return
     if comment.is_thread():
-        comment.media['illustrations'] = view.obj.media['illustrations']
+        comment.media['illustrations'] = comment.parent.media['illustrations']
     else:
         comment.media['illustrations'] = validate_image_data(
-            view.variation, images_data)
+            comment.parent.variation, images_data)
 
 
 @dispatch.receiver(comment_signals.on_update, sender=comment_models.Comment)
-def on_comment_update(comment, data, view, **_kwargs):
+def on_comment_update(comment, data, **_kwargs):
     images_data = data['media'].get('illustrations')
     orig_data = comment.media.get('illustrations')
     if images_data:
-        images_data = validate_image_data(view.variation, images_data)
+        images_data = validate_image_data(
+            comment.parent.variation, images_data)
     if orig_data and not images_data:
         del comment.media['illustrations']
     elif images_data:
         comment.media['illustrations'] = images_data
     if comment.is_thread():
-        if (not images_data) and ('illustrations' in view.obj.media):
-            del view.obj.media['illustrations']
+        if (not images_data) and ('illustrations' in comment.parent.media):
+            del comment.parent.media['illustrations']
         elif images_data:
-            view.obj.media['illustrations'] = images_data
+            comment.parent.media['illustrations'] = images_data
 
 
 @dispatch.receiver(thread_signals.to_json_as_item, sender=thread_models.Thread)
@@ -129,9 +130,9 @@ thread_signals.after_create.connect(
 
 
 @dispatch.receiver(comment_signals.on_delete, sender=comment_models.Comment)
-def on_delete(comment, view, **_kwargs):
+def on_delete(comment, **_kwargs):
     update_role_comments_count(comment.role_id, -1)
-    view.variation.comments_count_inc(-1)
+    comment.parent.variation.comments_count_inc(-1)
 
 
 class CommentAPI(comments.CommentAPI, CommentsBase):

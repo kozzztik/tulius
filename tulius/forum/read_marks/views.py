@@ -136,8 +136,8 @@ class ReadmarkAPI(views.BaseThreadView):
         }
 
     @classmethod
-    def on_delete_comment(cls, sender, comment, view, **_kwargs):
-        thread = view.obj
+    def on_delete_comment(cls, sender, comment, **_kwargs):
+        thread = comment.parent
         last_comment_id = thread.last_comment.su
         if (not comment.is_thread()) and (last_comment_id <= comment.pk):
             comments = sender.objects.filter(
@@ -150,16 +150,16 @@ class ReadmarkAPI(views.BaseThreadView):
                 tasks.update_read_marks_on_rights_async(thread.parent)
 
     @classmethod
-    def after_add_comment(cls, comment, preview, view, **_kwargs):
+    def after_add_comment(cls, comment, preview, user, **_kwargs):
         if preview:
             return
         if not comment.is_thread():
-            pks = view.obj.parents_ids + [view.obj.pk]
+            pks = comment.parent.parents_ids + [comment.parent.pk]
             cls.read_mark_model.objects.filter(
                 dj_models.Q(not_read_comment_id=None) | dj_models.Q(
                     not_read_comment_id__gt=comment.pk),
                 thread_id__in=pks,
-            ).exclude(user=view.user).update(not_read_comment_id=comment.pk)
+            ).exclude(user=user).update(not_read_comment_id=comment.pk)
 
     @classmethod
     def update_response_with_marks(cls, response, user, threads):

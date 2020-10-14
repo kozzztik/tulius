@@ -21,19 +21,19 @@ def before_create_thread(instance, data, view, **_kwargs):
 
 
 @dispatch.receiver(comment_signals.before_add)
-def before_add_comment(comment, data, view, **_kwargs):
+def before_add_comment(comment, data, user, **_kwargs):
     html_data = data['media'].get('html')
-    if (not html_data) or (not view.user.is_superuser):
+    if (not html_data) or (not user.is_superuser):
         return
     if comment.is_thread():
-        comment.media['html'] = view.obj.media['html']
+        comment.media['html'] = comment.parent.media['html']
     else:
         comment.media['html'] = html_data
 
 
 @dispatch.receiver(comment_signals.on_update)
-def on_comment_update(comment, data, view, **_kwargs):
-    if not view.user.is_superuser:
+def on_comment_update(comment, data, user, **_kwargs):
+    if not user.is_superuser:
         return
     html_data = data['media'].get('html')
     orig_data = comment.media.get('html')
@@ -42,10 +42,10 @@ def on_comment_update(comment, data, view, **_kwargs):
     elif html_data:
         comment.media['html'] = html_data
     if comment.is_thread():
-        if (not html_data) and ('html' in view.obj.media):
-            del view.obj.media['html']
+        if (not html_data) and ('html' in comment.parent.media):
+            del comment.parent.media['html']
         elif html_data:
-            view.obj.media['html'] = html_data
+            comment.parent.media['html'] = html_data
 
 
 class UploadFiles(core.BaseAPIView):
