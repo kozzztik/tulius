@@ -1,5 +1,5 @@
 <div v-if="!user.is_anonymous" class="btn-toolbar justify-content-between forum-menu" role="toolbar" aria-label="Toolbar">
-    <b-dropdown id="dropdown-1" text="Действия" class="btn-group-sm" variant="light">
+    <b-dropdown id="dropdown-1"  class="icon-actions btn-group-sm" variant="light">
         <b-dropdown-item data-toggle="modal" href="javascript:void(0);" v-if="!thread.room" v-on:click="$bvModal.show('quoteAnswer')">
             Ответить с цитатой
         </b-dropdown-item>
@@ -69,8 +69,8 @@
     <forum_edit_room ref="edit_room" :thread="thread" :page="$parent" v-if="thread.room"></forum_edit_room>
     <form class="input-group btn-group-sm" @submit.prevent="search_submit">
         <input type="text" name="text" required class="form-control" v-model="search_text">
-        <button class="btn btn-light" id="search" type="submit">
-            Поиск
+        <button class="icon-search btn btn-light" id="search" type="submit">
+
         </button>
     </form>
 </div>

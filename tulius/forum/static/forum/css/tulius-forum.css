@@ -34,10 +34,19 @@ h3 {
     text-align: left;
 }
 
+.forum-room-list {
+	border-style: none;
+	margin-bottom: 0px;
+}
+
+.forum-room-list tbody  a, .forum-thread-list tbody  a {
+	text-decoration: none;
+}
+
 .forum-room-list thead tr th {
-    background-color: rgb(42, 120, 0);
-    background-image: none;
-    color: white;
+    color: rgb(23, 78, 16);
+    font-size: 1.05rem;
+    border-bottom:hidden;
 }
 
 .forum-room-list tbody tr:nth-child(2n),
@@ -49,7 +58,37 @@ h3 {
 .forum-room-list thead tr th,
 .forum-thread-list tbody tr td,
 .forum-thread-list thead tr th {
-    padding: 4px;
+    padding: 1px;
+}
+
+
+/*Украшения*/
+
+.forum-tdfst {
+    background-image: url("../img/bord2-left.png");
+    background-repeat: no-repeat;
+    background-position: right;
+    width: 12px;
+    height: 5px;
+}
+
+.forum-tdlst {
+    background-image: url("../img/bord2-right.png");
+    background-repeat: no-repeat;
+    background-position: left;
+    width: 12px;
+    height: 5px;
+}
+
+.forum-tdcntr {
+    background-image: url("../img/bord2-center.png");
+    background-repeat: repeat-x;
+    background-position: 0% 90%;
+    height: 5px;
+}
+
+.forum-room-list > tbody > tr:last-child {
+	display: none;
 }
 
 .forum-post-description h4 {
@@ -60,15 +99,14 @@ h3 {
     margin-bottom: 0px;
 }
 
-.forum-room-list {
-    margin-bottom: 0px;
+.forum-thread-list thead tr th {
+    color: #bf523e;
+    font-size: 1.05rem;
+    border-bottom:hidden;
 }
 
-
-.forum-thread-list thead tr th {
-    background-color: maroon;
-    background-image: none;
-    color: white;
+.forum-thread-list > tbody > tr:last-child {
+	display: none;
 }
 
 .post-table {
@@ -81,7 +119,7 @@ h3 {
 }
 
 .post-table tbody tr .post-body table tbody .post-head td {
-    border-bottom: 1px solid white;
+    /* border-bottom: 1px solid white; */
 } 
 
 .post-table > tbody > tr > td {
@@ -115,11 +153,11 @@ h3 {
 }
 
 .post-table {
-    border-radius: 10px;
+    border-radius: 4px;
     border-collapse: inherit;
     border-spacing: 0px;
     margin-bottom: 10px;
-
+    margin-top: 10px;
 }
 .post-table tr td {
 }

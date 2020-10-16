@@ -95,7 +95,7 @@ ul {
     text-decoration: underline; 
  }
 .table th, .table td {
-    border-top: 1px solid black;
+    border-top: none;
 }
 
 
@@ -249,7 +249,7 @@ ul {
 .tblhead .addright {
     background-image: url("../img/baselayout/bord1-right-2.png");
     background-repeat: no-repeat;
-    background-position: left;
+    background-position: right;
     width: 12px;  
     padding-left: 0px;
     padding-right: 0px; 
