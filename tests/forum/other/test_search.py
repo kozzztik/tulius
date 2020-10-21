@@ -290,3 +290,56 @@ def test_reindex_room_bulk_failed(superuser, room_group, thread):
     # check calls
     assert bulk.call_count == 1
     assert exc.call_count == 1
+
+
+def test_search_after_move(superuser, room_group):
+    # create root target room
+    response = superuser.put(
+        room_group['url'], {
+            'title': 'target', 'body': 'target description',
+            'room': True, 'default_rights': None,
+            'granted_rights': []})
+    assert response.status_code == 200
+    target = response.json()
+    # create source for move
+    response = superuser.put(
+        room_group['url'], {
+            'title': 'source', 'body': 'source description',
+            'room': True, 'default_rights': None,
+            'granted_rights': []})
+    assert response.status_code == 200
+    source = response.json()
+    # create thread
+    response = superuser.put(
+        source['url'], {
+            'title': 'thread', 'body': 'thread description',
+            'room': False, 'default_rights': None,
+            'granted_rights': [], 'media': {}})
+    assert response.status_code == 200
+    thread = response.json()
+    # check initial state
+    response = superuser.post(
+        '/api/forum/search/', {'thread_id': source['id']})
+    assert response.status_code == 200
+    data = response.json()
+    assert data['results'][0]['thread']['id'] == thread['id']
+    response = superuser.post(
+        '/api/forum/search/', {'thread_id': target['id']})
+    assert response.status_code == 200
+    data = response.json()
+    assert not data['results']
+    # do move
+    response = superuser.put(
+        thread['url'] + 'move/', {'parent_id': target['id']})
+    assert response.status_code == 200
+    # check search results
+    response = superuser.post(
+        '/api/forum/search/', {'thread_id': source['id']})
+    assert response.status_code == 200
+    data = response.json()
+    assert not data['results']
+    response = superuser.post(
+        '/api/forum/search/', {'thread_id': target['id']})
+    assert response.status_code == 200
+    data = response.json()
+    assert data['results'][0]['thread']['id'] == thread['id']
