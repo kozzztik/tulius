@@ -161,6 +161,7 @@ class ThreadCreateMutation(Mutation):
 
 
 class ThreadCounters(Mutation):
+    with_descendants = True
     with_post_process = True
     with_parent = True
 

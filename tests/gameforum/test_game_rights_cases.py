@@ -16,10 +16,9 @@ def test_thread_with_wrong_variation(
 
 
 def test_access_to_variation(variation, variation_forum, client, user):
-    base_url = f'/api/game_forum/variation/{variation.pk}/'
-    response = client.get(base_url + f'thread/{variation_forum.pk}/')
+    response = client.get(variation_forum.get_absolute_url())
     assert response.status_code == 403
-    response = user.get(base_url + f'thread/{variation_forum.pk}/')
+    response = user.get(variation_forum.get_absolute_url())
     assert response.status_code == 403
 
 
