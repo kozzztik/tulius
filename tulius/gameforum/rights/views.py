@@ -48,6 +48,24 @@ def on_stories_models_updates(instance, **_kwargs):
             mutations.UpdateRights(variation.thread).apply()
 
 
+@dispatch.receiver(dj_models.signals.pre_save, sender=stories_models.Role)
+def on_role_pre_save(instance, **_kwargs):
+    if instance.pk:
+        old_role = stories_models.Role.objects.get(pk=instance.pk)
+        instance.old_user = old_role.user
+
+
+@dispatch.receiver(dj_models.signals.post_save, sender=stories_models.Role)
+def on_role_save(instance, created, **_kwargs):
+    game = game_models.Game.objects.filter(
+        variation=instance.variation).first()
+    if created or (not game) or (
+            game.status < game_models.GAME_STATUS_IN_PROGRESS):
+        return
+    if instance.old_user != instance.user:
+        mutations.UpdateRights(instance.variation.thread).apply()
+
+
 class BaseGrantedRightsAPI(
         views.BaseGrantedRightsAPI, threads_api.BaseThreadAPI):
     rights_model = models.GameThreadRight
