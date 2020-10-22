@@ -47,7 +47,7 @@
                 <breadcrumbs :upper="false" :items="breadcrumb_items" v-if="!loading"></breadcrumbs>
                 <footer v-if="show_footer" v-html="footer_content"></footer>
             </div>
-            <script type="module" src="{{ STATIC_URL }}app/index_bundle.js"></script>
+            <script type="module" src="{{ index_bundle }}"></script>
         </div>
     </body>
 </html>

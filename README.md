@@ -115,10 +115,10 @@ To run frontend part you need to install node.js & npm:
 
 Then switch to tulius/static folder and run 
 ```
-npm i webpack-dev-server webpack webpack-cli -D
-npm run build 
+npm install -D
 ```
-To use Tulius on local dev environment you need to run 3 instances. For both of them
+
+To use Tulius on local dev environment you need to run 4 instances. For both of them
 it is needed to set environment variable:
 
 ```bash
@@ -131,8 +131,9 @@ file from template and set needed options there.
 Instances, that needed to run:
 1. `manage.py runserver` - Django instance for normal HTTP requests
 2. `async_app.py` - for web sockets support
-3. `celery -A tulius worker -l info` - for deferred tasks
-
+3. `celery -A tulius worker -l info` - for deferred tasks (optional)
+4. `npm run start` in tulius/static directory for frontend webpack dev server
+ 
 On Windows, as Celery not supports it yet, install gevent:
 
 ```pip install gevent```
@@ -140,6 +141,14 @@ On Windows, as Celery not supports it yet, install gevent:
 and start celery with:
 
 ```celery -A tulius worker -l info -P gevent```
+
+or, instead of starting Celery, you can switch it off, by adding:
+
+```CELERY_TASK_ALWAYS_EAGER = True```
+
+to settings_production.py. However, some heavy requests, like reindexing may
+became too slow to render pages, as deferred tasks will be resolved in request 
+context. But for most things it will be enough.
 
 ## Running tests
 

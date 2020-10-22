@@ -139,6 +139,11 @@ TEMPLATES = [
     },
 ]
 
+if env == 'dev':
+    WEBPACK_BUNDLE = 'http://localhost:9000/index_bundle.js'
+else:
+    WEBPACK_BUNDLE = STATIC_URL + 'app/index_bundle.js'
+
 AUTHENTICATION_BACKENDS = (
     'tulius.vk.backend.VKBackend',
     'django.contrib.auth.backends.ModelBackend',
