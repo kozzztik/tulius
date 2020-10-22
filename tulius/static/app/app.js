@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import routes from './routes.js'
 import breadcrumbs from '../common/components/breadcrumbs.js'
 import main_menu from '../common/components/main_menu.js'
@@ -8,15 +9,20 @@ import Tinybox from '../common/js/vue-tinybox.js';
 import VueMultiselect from '../common/components/vue-multiselect.min.js';
 import VueRouter from '../common/js/vue-router.js';
 import VueNativeSock from '../common/js/vue-native-websocket.js';
-
+import BootstrapVue from '../common/bootstrap-vue/bootstrap-vue.min.js'
+import IconsPlugin from '../common/bootstrap-vue/bootstrap-vue-icons.min.js'
+import popper from '../common/bootstrap-vue/popper.min.js'
 
 axios.defaults.xsrfCookieName = 'csrftoken';
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 
+Vue.use(VueRouter)
+Vue.use(BootstrapVue)
+Vue.use(IconsPlugin)
 Vue.use( CKEditor );
 Vue.use(VueLoading);
 Vue.component('loading', VueLoading)
-Vue.use(Tinybox);
+Vue.component('Tinybox', Tinybox);
 Vue.component('multiselect', VueMultiselect.default)
 
 const NotFound = { template: '<p>Страница не найдена</p>' }

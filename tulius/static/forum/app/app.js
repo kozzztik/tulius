@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import urls from './urls.js'
 
 export default Vue.component('forum_app', {

@@ -1,3 +1,6 @@
+import Vue from 'vue'
+
+
 export function LazyComponent(name, defs) {
     var template_resolved = false;
     return Vue.component(name, function(resolve, reject) {
