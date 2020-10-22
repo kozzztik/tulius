@@ -15,7 +15,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+/lib/
 lib64/
 parts/
 sdist/
@@ -94,3 +94,6 @@ ENV/
 settings_production.py
 /sql-logfile.txt
 /logfile.txt
+/tulius/static/node_modules/
+/tulius/static/app/index_bundle.js
+/tulius/static/package-lock.json

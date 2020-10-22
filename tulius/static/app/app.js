@@ -1,7 +1,7 @@
 import routes from './routes.js'
-import breadcrumbs from '/static/common/components/breadcrumbs.js'
-import main_menu from '/static/common/components/main_menu.js'
-import CKEditor from '/static/ckeditor4/ckeditor4-vue/index.js';
+import breadcrumbs from '../common/components/breadcrumbs.js'
+import main_menu from '../common/components/main_menu.js'
+import CKEditor from '../ckeditor4/ckeditor4-vue/index.js';
 
 Vue.use( CKEditor );
 

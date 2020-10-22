@@ -1,5 +1,7 @@
 FROM kozzztik/tulius:base_3.0.3
 
+RUN apt-get update && apt-get install nodejs -y
+
 ADD tulius /opt/tulius/tulius
 ADD djfw /opt/tulius/djfw
 ADD manage.py /opt/tulius/manage.py

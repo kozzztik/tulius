@@ -107,8 +107,17 @@ Update repo if needed (use separate branch and PR)
     ``` 
 15. Check that everything works. Profit.
 
-## Running on local environment
+# Running on local environment
 
+To run frontend part you need to install node.js & npm:
+- for Windows use installer https://nodejs.org/en/download/ 
+- for Linux (Debian based) ```apt-get install nodejs```
+
+Then switch to tulius/static folder and run 
+```
+npm i webpack-dev-server webpack webpack-cli -D
+npm run build 
+```
 To use Tulius on local dev environment you need to run 3 instances. For both of them
 it is needed to set environment variable:
 
