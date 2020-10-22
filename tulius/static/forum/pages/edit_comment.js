@@ -1,5 +1,7 @@
 import reply_form_component from '../components/reply_form.js'
 import APILoadMixin from '../../app/components/api_load_mixin.js'
+import {LazyComponent} from '../../common/js/vue-common.js'
+import axios from '../../common/js/axios.min.js';
 
 
 export default LazyComponent('forum_edit_comment_page', {

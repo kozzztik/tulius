@@ -1,3 +1,6 @@
+import {LazyComponent} from '../../common/js/vue-common.js'
+
+
 export default LazyComponent('user_avatar', {
     template: '/static/forum/snippets/avatar.html',
     props: ['user', 'thread'],

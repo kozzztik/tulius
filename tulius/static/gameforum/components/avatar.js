@@ -1,3 +1,7 @@
+import {LazyComponent} from '../../common/js/vue-common.js'
+import axios from '../../common/js/axios.min.js';
+
+
 export default LazyComponent('game_forum_comment_avatar', {
     template: '/static/gameforum/components/avatar.html',
     props: ['variation', 'thread', 'role', 'actions'],

@@ -1,5 +1,7 @@
 import APILoadMixin from '../../app/components/api_load_mixin.js'
 import urls from './urls.js'
+import axios from '../../common/js/axios.min.js';
+
 
 export default Vue.component('variation_redirect', {
     mixins: [APILoadMixin,],

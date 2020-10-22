@@ -1,3 +1,7 @@
+import {LazyComponent} from '../../common/js/vue-common.js'
+import axios from '../../common/js/axios.min.js';
+
+
 export default LazyComponent('move_thread', {
     template: '/static/forum/components/move_thread.html',
     props: {

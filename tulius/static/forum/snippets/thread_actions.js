@@ -1,6 +1,8 @@
 import thread_access from '../components/thread_access.js'
 import edit_room from '../components/edit_room.js'
 import move_thread from '../components/move_thread.js'
+import {LazyComponent} from '../../common/js/vue-common.js'
+import axios from '../../common/js/axios.min.js';
 
 
 export default LazyComponent('forum_thread_actions', {

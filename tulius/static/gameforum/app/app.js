@@ -1,5 +1,7 @@
 import APILoadMixin from '../../app/components/api_load_mixin.js'
 import urls from './urls.js'
+import {LazyComponent} from '../../common/js/vue-common.js'
+import axios from '../../common/js/axios.min.js';
 
 
 export default LazyComponent('gameforum_app', {

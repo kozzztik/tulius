@@ -1,5 +1,7 @@
 import thread_access from '../components/thread_access.js'
 import APILoadMixin from '../../app/components/api_load_mixin.js'
+import {LazyComponent} from '../../common/js/vue-common.js'
+import axios from '../../common/js/axios.min.js';
 
 
 export default LazyComponent('forum_add_room_page', {

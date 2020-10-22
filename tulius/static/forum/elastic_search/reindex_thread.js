@@ -1,3 +1,7 @@
+import {LazyComponent} from '../../common/js/vue-common.js'
+import axios from '../../common/js/axios.min.js';
+
+
 export default LazyComponent('forum_elastic_reindex_thread', {
     template: '/static/forum/elastic_search/reindex_thread.html',
     data: function () {

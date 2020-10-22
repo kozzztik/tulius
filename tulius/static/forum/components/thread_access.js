@@ -1,3 +1,7 @@
+import {LazyComponent} from '../../common/js/vue-common.js'
+import axios from '../../common/js/axios.min.js';
+
+
 export default LazyComponent('forum_thread_access', {
     template: '/static/forum/components/thread_access.html',
     props: {

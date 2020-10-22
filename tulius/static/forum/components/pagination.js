@@ -1,3 +1,5 @@
+import {LazyComponent} from '../../common/js/vue-common.js'
+
 export default LazyComponent('pagination', {
     template: '/static/forum/components/pagination.html',
     props: ['pagination', 'page_num'],

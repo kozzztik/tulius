@@ -1,3 +1,6 @@
+import axios from '../../common/js/axios.min.js';
+
+
 export default Vue.component('game_thread_redirect', {
     template: '<div></div>',
     data: function () {

@@ -1,4 +1,6 @@
 import APILoadMixin from '../../app/components/api_load_mixin.js'
+import axios from '../../common/js/axios.min.js';
+
 
 export default Vue.component('forum_comment_redirect', {
     mixins: [APILoadMixin,],

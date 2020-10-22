@@ -1,4 +1,7 @@
 import latest_post from './latest_post.js'
+import {LazyComponent} from '../../common/js/vue-common.js'
+import axios from '../../common/js/axios.min.js';
+
 
 export default LazyComponent('forum_thread_list', {
     template: '/static/forum/snippets/thread_list.html',

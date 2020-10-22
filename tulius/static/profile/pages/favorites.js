@@ -1,6 +1,7 @@
 import favorites from '../../forum/components/favorites.js'
 import game_favorites from '../../gameforum/components/favorite_comment.js'
 import APILoadMixin from '../../app/components/api_load_mixin.js'
+import {LazyComponent} from '../../common/js/vue-common.js'
 
 
 export default LazyComponent('profile_favorites', {

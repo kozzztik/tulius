@@ -1,4 +1,6 @@
 import baseMixin from '../../../forum/components/media/base.js'
+import {LazyComponent} from '../../../common/js/vue-common.js'
+
 
 export default LazyComponent('media_illustrations', {
     template: '/static/gameforum/components/media/illustrations.html',

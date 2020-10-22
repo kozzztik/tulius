@@ -1,4 +1,7 @@
 import baseMixin from './base.js'
+import {LazyComponent} from '../../../common/js/vue-common.js'
+import axios from '../../../common/js/axios.min.js';
+
 
 export default LazyComponent('forum_images', {
     template: '/static/forum/components/media/images.html',

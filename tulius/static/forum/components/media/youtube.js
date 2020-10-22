@@ -1,4 +1,6 @@
 import baseMixin from './base.js'
+import {LazyComponent} from '../../../common/js/vue-common.js'
+
 
 export default LazyComponent('forum_youtube_media', {
     template: '/static/forum/components/media/youtube.html',

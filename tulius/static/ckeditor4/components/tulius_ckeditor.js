@@ -1,3 +1,5 @@
+import {LazyComponent} from '../../common/js/vue-common.js'
+import axios from '../../common/js/axios.min.js';
 
 var cached_smiley_response = {data: null};
 

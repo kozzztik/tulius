@@ -1,5 +1,8 @@
 import avatar from '../snippets/avatar.js'
 import voting from '../components/voting.js'
+import {LazyComponent} from '../../common/js/vue-common.js'
+import axios from '../../common/js/axios.min.js';
+import {forum_datetime} from '../../common/js/vue-common.js'
 
 
 export default LazyComponent('forum_comment', {

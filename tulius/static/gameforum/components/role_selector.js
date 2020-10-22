@@ -1,3 +1,6 @@
+import {LazyComponent} from '../../common/js/vue-common.js'
+
+
 export default LazyComponent('game_forum_role_selector', {
     template: '/static/gameforum/components/role_selector.html',
     props: ['variation', 'thread', 'form', 'editor'],

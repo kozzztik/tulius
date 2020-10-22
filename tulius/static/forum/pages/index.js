@@ -1,5 +1,7 @@
 import room_list from '../snippets/room_list.js'
 import APILoadMixin from '../../app/components/api_load_mixin.js'
+import {LazyComponent} from '../../common/js/vue-common.js'
+import axios from '../../common/js/axios.min.js';
 
 
 export default LazyComponent('forum_index_page', {

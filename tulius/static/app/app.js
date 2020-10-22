@@ -2,8 +2,22 @@ import routes from './routes.js'
 import breadcrumbs from '../common/components/breadcrumbs.js'
 import main_menu from '../common/components/main_menu.js'
 import CKEditor from '../ckeditor4/ckeditor4-vue/index.js';
+import axios from '../common/js/axios.min.js';
+import VueLoading from '../common/js/vue-loading-overlay.js';
+import Tinybox from '../common/js/vue-tinybox.js';
+import VueMultiselect from '../common/components/vue-multiselect.min.js';
+import VueRouter from '../common/js/vue-router.js';
+import VueNativeSock from '../common/js/vue-native-websocket.js';
+
+
+axios.defaults.xsrfCookieName = 'csrftoken';
+axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 
 Vue.use( CKEditor );
+Vue.use(VueLoading);
+Vue.component('loading', VueLoading)
+Vue.use(Tinybox);
+Vue.component('multiselect', VueMultiselect.default)
 
 const NotFound = { template: '<p>Страница не найдена</p>' }
 
@@ -13,7 +27,7 @@ const router = new VueRouter({
 })
 
 axios.get('/api/app_settings/').then(response => {
-    Vue.use(VueNativeSock.default, response.data.websockets_url, {
+    Vue.use(VueNativeSock, response.data.websockets_url, {
         reconnection: true,
         reconnectionDelay: 3000,
         format: 'json'

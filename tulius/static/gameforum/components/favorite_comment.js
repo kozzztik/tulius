@@ -1,4 +1,5 @@
 import urls from '../app/urls.js'
+import {LazyComponent} from '../../common/js/vue-common.js'
 
 
 export default LazyComponent('game_forum_favorite_comment', {

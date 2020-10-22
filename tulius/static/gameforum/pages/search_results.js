@@ -1,3 +1,6 @@
+import {LazyComponent} from '../../common/js/vue-common.js'
+
+
 export default LazyComponent('game_search_results', {
     template: '/static/gameforum/pages/search_results.html',
     data: function () {

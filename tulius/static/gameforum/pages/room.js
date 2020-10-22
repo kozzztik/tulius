@@ -3,6 +3,8 @@ import thread_list from '../../forum/snippets/thread_list.js'
 import thread_actions from '../components/thread_actions.js'
 import online_status from '../components/online_status.js'
 import APILoadMixin from '../../app/components/api_load_mixin.js'
+import {LazyComponent} from '../../common/js/vue-common.js'
+import axios from '../../common/js/axios.min.js';
 
 
 export default LazyComponent('game_room_page', {

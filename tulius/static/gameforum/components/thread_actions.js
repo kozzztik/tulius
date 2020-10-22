@@ -1,5 +1,7 @@
 import edit_room from '../../forum/components/edit_room.js'
 import move_thread from '../../forum/components/move_thread.js'
+import {LazyComponent} from '../../common/js/vue-common.js'
+import axios from '../../common/js/axios.min.js';
 
 
 export default LazyComponent('game_forum_thread_actions', {

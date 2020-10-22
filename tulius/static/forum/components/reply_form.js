@@ -3,6 +3,8 @@ import voting from './voting.js'
 import images from './media/images.js'
 import html_editor from './media/html.js'
 import youtube from './media/youtube.js'
+import {LazyComponent} from '../../common/js/vue-common.js'
+import axios from '../../common/js/axios.min.js';
 
 
 export default LazyComponent('forum_reply_form', {

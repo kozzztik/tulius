@@ -1,4 +1,5 @@
 import edit_thread from '../../forum/pages/edit_thread.js'
+import {LazyComponent} from '../../common/js/vue-common.js'
 
 
 export default LazyComponent('game_forum_edit_thread_page', {

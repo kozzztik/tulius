@@ -1,3 +1,7 @@
+import {LazyComponent} from '../../common/js/vue-common.js'
+import axios from '../../common/js/axios.min.js';
+
+
 export default LazyComponent('game_forum_online_status', {
     template: '/static/gameforum/components/online_status.html',
     props: ['variation', 'thread'],
