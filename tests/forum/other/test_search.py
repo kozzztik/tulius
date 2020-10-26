@@ -232,6 +232,8 @@ def test_reindex_room(superuser, admin, room_group, thread):
     old_value = comment.title
     comment.title = old_value + 'foobar'
     es_models.do_direct_index(comment)
+    # flush index to be sure get will return fresh data
+    es_models.client.indices.flush(es_models.index_name(models.Comment))
     # check it is now broken
     doc = es_models.client.get(
         es_models.index_name(comment.__class__), comment.pk)
