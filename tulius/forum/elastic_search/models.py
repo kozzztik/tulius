@@ -113,6 +113,8 @@ class ReindexQuery:
         bulk = []
         all_count = query.count()
         self.progress(counter, all_count)
+        if not all_count:
+            return
         for instance in queryset_iterator(query, chunk_size=self.chunk_size):
             bulk.append(instance_to_document(instance))
             if len(bulk) >= self.bulk_size:
