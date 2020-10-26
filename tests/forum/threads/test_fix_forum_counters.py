@@ -10,8 +10,8 @@ def test_fix_counters_api(room_group, thread, superuser, admin, on_room):
     assert response.status_code == 403
     # break thread tree_id
     obj = models.Thread.objects.get(pk=thread['id'])
-    orig_tree_id = obj.tree_id
-    obj.tree_id += 1
+    orig_parents = obj.parents_ids
+    obj.parents_ids = None
     obj.save()
     # check it works for root
     if on_room:
@@ -21,6 +21,6 @@ def test_fix_counters_api(room_group, thread, superuser, admin, on_room):
     assert response.status_code == 200
     data = response.json()
     assert data['result']['threads'] > 0
-    # check tree_id is fixed
+    # check parents is fixed
     obj = models.Thread.objects.get(pk=thread['id'])
-    assert obj.tree_id == orig_tree_id
+    assert obj.parents_ids == orig_parents

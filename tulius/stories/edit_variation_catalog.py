@@ -1,5 +1,5 @@
 from django import urls
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from djfw.cataloging.core import CatalogPage
 from .edit_story_cataloging import EditStoryPage
@@ -27,7 +27,7 @@ class EditVariationPage(CatalogPage):
             for (name, url) in EDIT_VARIATION_PAGES]
 
     def __init__(self, variation):
-        super(EditVariationPage, self).__init__(
+        super().__init__(
             parent=EditStoryPage(variation.story),
             name=str(variation),
             url=variation.get_absolute_url(),
@@ -38,7 +38,7 @@ class EditVariationPage(CatalogPage):
 
 class EditVariationSubpage(CatalogPage):
     def __init__(self, variation, name='', url='', parent=None):
-        super(EditVariationSubpage, self).__init__(
+        super().__init__(
             parent=parent or EditVariationPage(variation),
             name=name,
             url=urls.reverse('stories:' + url, args=(variation.pk,))

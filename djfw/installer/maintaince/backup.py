@@ -4,9 +4,14 @@ import os
 import platform
 import subprocess
 import tarfile
+import sys
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.core.management import call_command
+
+from djfw.installer.models import Backup, BackupCategory
+
 
 logger = logging.getLogger('installer')
 
@@ -89,9 +94,7 @@ def add__to_backup(backup_file, file_path):
 def do_backup(category_name):
     log("Starting backup...")
     try:
-        from django.core.management import call_command
         call_command('clearance')
-        from djfw.installer.models import Backup, BackupCategory
         categories = BackupCategory.objects.filter(name=category_name)
         if categories:
             category = categories[0]
@@ -117,7 +120,6 @@ def do_backup(category_name):
             os.remove(path)
         try:
             backupfile = tarfile.open(path, 'w:gz', encoding='utf-8')
-            import sys
             log(
                 "Filesystem %s , system %s" % (
                     sys.getfilesystemencoding(), sys.getdefaultencoding()))

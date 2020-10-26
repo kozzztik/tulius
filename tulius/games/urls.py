@@ -10,157 +10,157 @@ app_name = 'tulius.games'
 
 urlpatterns = [
     # game list and details
-    urls.url(r'^$', views.IndexView.as_view(), name='index'),
-    urls.url(
+    urls.re_path(r'^$', views.IndexView.as_view(), name='index'),
+    urls.re_path(
         r'^announced/$',
         views.AnnouncedGames.as_view(),
         name='announced_games'),
-    urls.url(
+    urls.re_path(
         r'^accepting/$',
         views.RequestAcceptingGames.as_view(),
         name='request_accepting_games'),
-    urls.url(
+    urls.re_path(
         r'^awaiting_start/$',
         views.AwaitingStartGames.as_view(),
         name='awaiting_start_games'),
-    urls.url(
+    urls.re_path(
         r'^current/$',
         views.CurrentGames.as_view(),
         name='current_games'),
-    urls.url(
+    urls.re_path(
         r'^completed/$',
         views.CompletedOpenedGames.as_view(),
         name='completed_opened_games'),
-    urls.url(
+    urls.re_path(
         r'^add_game/(?P<pk>\d+)/$',
         views.CreateGame.as_view(),
         name='add_game'),
-    urls.url(
+    urls.re_path(
         r'^game/(?P<pk>\d+)/$',
         views.GameView.as_view(),
         name='game'),
-    urls.url(
+    urls.re_path(
         r'^delete_game/(?P<pk>\d+)/$',
         views.DeleteGame.as_view(),
         name='delete_game'),
-    urls.url(
+    urls.re_path(
         r'^change_story/(?P<pk>\d+)/$',
         views.ChangeGameStoryView.as_view(),
         name='change_game_story'),
-    urls.url(
+    urls.re_path(
         r'^view_role/(?P<pk>\d+)/$',
         views.GameRoleView.as_view(),
         name='view_role'),
-    urls.url(
+    urls.re_path(
         r'^edit_game/(?P<game_id>\d+)/main/$',
         game_edit_views.GameAdminMain.as_view(),
         name=game_edit_catalog.EDIT_GAME_PAGES_MAIN),
-    urls.url(
+    urls.re_path(
         r'^edit_game/(?P<game_id>\d+)/texts/$',
         game_edit_views.GameAdminTexts.as_view(),
         name=game_edit_catalog.EDIT_GAME_PAGES_TEXTS),
-    urls.url(
+    urls.re_path(
         r'^edit_game/(?P<game_id>\d+)/users/$',
         game_edit_views.GameAdminUsers.as_view(),
         name=game_edit_catalog.EDIT_GAME_PAGES_USERS),
-    urls.url(
+    urls.re_path(
         r'^edit_game/(?P<game_id>\d+)/graphics/$',
         game_edit_views.GameAdminGraphics.as_view(),
         name=game_edit_catalog.EDIT_GAME_PAGES_GRAPHICS),
-    urls.url(
+    urls.re_path(
         r'^edit_game/(?P<game_id>\d+)/roles/$',
         game_edit_views.GameEditRoles.as_view(),
         name=game_edit_catalog.EDIT_GAME_PAGES_ROLES),
-    urls.url(
+    urls.re_path(
         r'^edit_game/(?P<pk>\d+)/illustrations/$',
         game_edit_views.GameEditIllustrationsView.as_view(),
         name=game_edit_catalog.EDIT_GAME_PAGES_ILLUSTRATIONS),
-    urls.url(
+    urls.re_path(
         r'^edit_game/(?P<pk>\d+)/materials/$',
         game_edit_views.GameEditMaterialsView.as_view(),
         name=game_edit_catalog.EDIT_GAME_PAGES_MATERIALS),
-    urls.url(
+    urls.re_path(
         r'^edit_game/(?P<pk>\d+)/request_form/$',
         game_edit_views.EditRequestView.as_view(),
         name=game_edit_catalog.EDIT_GAME_PAGES_REQUEST_FORM),
-    urls.url(
+    urls.re_path(
         r'^edit_game/(?P<pk>\d+)/requests/$',
         game_edit_views.EditRequestsView.as_view(),
         name=game_edit_catalog.EDIT_GAME_PAGES_REQUESTS),
-    urls.url(
+    urls.re_path(
         r'^edit_game/(?P<pk>\d+)/winners/$',
         game_edit_views.EditWinnersView.as_view(),
         name=game_edit_catalog.EDIT_GAME_PAGES_WINNERS),
-    urls.url(
+    urls.re_path(
         r'^edit_game/(?P<pk>\d+)/forum/$',
         game_edit_views.GameForumView.as_view(),
         name=game_edit_catalog.EDIT_GAME_PAGES_FORUM),
-    urls.url(
+    urls.re_path(
         r'^edit_game/(?P<game_id>\d+)/players/$',
         game_edit_views.game_edit_players,
         name='game_edit_players'),
-    urls.url(
+    urls.re_path(
         r'^edit_game/(?P<pk>\d+)/add_role/$',
         game_edit_views.AddRoleView.as_view(),
         name='add_role'),
-    urls.url(
+    urls.re_path(
         r'^edit_game/(?P<pk>\d+)/add_material/$',
         game_edit_views.AddMaterialView.as_view(),
         name='add_material'),
-    urls.url(
+    urls.re_path(
         r'^role/(?P<pk>\d+)/$',
         game_edit_views.GameEditRoleView.as_view(),
         name='role'),
-    urls.url(
+    urls.re_path(
         r'^role/(?P<pk>\d+)/text/$',
         game_edit_views.GameRoleTextView.as_view(),
         name='role_text'),
-    urls.url(
+    urls.re_path(
         r'^role/(?P<pk>\d+)/assign/$',
         game_edit_views.EditRoleAssignView.as_view(),
         name='role_assign'),
-    urls.url(
+    urls.re_path(
         r'^edit_illustration/(?P<pk>\d+)/$',
         game_edit_views.EditIllustrationView.as_view(),
         name='edit_illustration'),
-    urls.url(
+    urls.re_path(
         r'^edit_illustration/(?P<pk>\d+)/delete/$',
         game_edit_views.DeleteIllustration.as_view(),
         name='illustration_delete'),
-    urls.url(
+    urls.re_path(
         r'^edit_material/(?P<pk>\d+)/$',
         game_edit_views.EditMaterialView.as_view(),
         name='edit_material'),
-    urls.url(
+    urls.re_path(
         r'^edit_material/(?P<pk>\d+)/delete/$',
         game_edit_views.DeleteMaterial.as_view(),
         name='material_delete'),
-    urls.url(
+    urls.re_path(
         r'^material/(?P<pk>\d+)/$',
         game_edit_views.MaterialView.as_view(),
         name='material'),
-    urls.url(
+    urls.re_path(
         r'^game_request/(?P<game_id>\d+)/$',
         requests_view.make_game_request,
         name='game_request'),
-    urls.url(
+    urls.re_path(
         r'^game_invite/(?P<game_id>\d+)/$',
         views.invite_player,
         name='game_invite'),
-    urls.url(
+    urls.re_path(
         r'^cancel_request/(?P<game_id>\d+)/$',
         requests_view.cancel_game_request,
         name='cancel_game_request'),
-    urls.url(
+    urls.re_path(
         r'^role/(?P<role_id>\d+)/assign(?P<user_id>\d+)/$',
         requests_view.role_assign_user,
         name='role_assign_user'),
-    urls.url(
+    urls.re_path(
         r'^role/(?P<role_id>\d+)/assign(?P<user_id>\d+)/roles/$',
         requests_view.role_assign_user,
         {'backtoroles': True},
         name='role_assign_user_roles'),
-    urls.url(
+    urls.re_path(
         r'^role/(?P<role_id>\d+)/clearuser/$',
         requests_view.role_clear_user,
         name='role_clear_user'),

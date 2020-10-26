@@ -4,6 +4,8 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from django.template.defaultfilters import filesizeformat
+
 
 class Emotion(models.Model):
     """
@@ -104,7 +106,6 @@ class FileUpload(models.Model):
         return self.body.url if self.body else None
 
     def file_size(self):
-        from django.template.defaultfilters import filesizeformat
         return filesizeformat(self.file_length)
 
     get_absolute_url.short_description = _('URL')

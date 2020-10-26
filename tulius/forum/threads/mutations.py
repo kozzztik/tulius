@@ -57,7 +57,7 @@ class MutationController:
         threads = self._get_descendants(instance)
         processed_threads = []
         for sub_thread in threads:
-            sub_thread = self.thread_model.objects.select_for_update().get(
+            sub_thread = instance.children.select_for_update().get(
                 pk=sub_thread.pk)
             for mutation in mutations:
                 mutation.process_descendant(sub_thread, instance)
@@ -87,15 +87,7 @@ class MutationController:
     def apply(self):
         parents = None
         if self.parent_mutations:
-            if self.instance.pk:
-                parents = list(
-                    self.instance.get_ancestors().select_for_update())
-            elif self.instance.parent:
-                parents = list(
-                    self.instance.parent.get_ancestors(
-                        include_self=True).select_for_update())
-            else:
-                parents = []
+            parents = list(self.instance.get_parents(for_update=True))
         for mutation in self.mutations:
             mutation.process_thread(self.instance)
         descendants_mutations = [
@@ -112,23 +104,109 @@ class MutationController:
             self._apply_parents(self.instance, parents, self.parent_mutations)
 
 
-def on_mutation(mutation, **kwargs):
+def on_mutation(parent_mutation, **kwargs):
     def decorator(mutation_class):
-        def chain_mutations(instance, **_kwargs):
-            return mutation_class(instance, **kwargs)
+        def chain_mutations(instance, mutation, **_kwargs):
+            return mutation_class(instance, parent=mutation, **kwargs)
         signals.apply_mutation.connect(
-            chain_mutations, sender=mutation, weak=False)
+            chain_mutations, sender=parent_mutation, weak=False)
         return mutation_class
     return decorator
 
 
-class ThreadDeleteMutation(Mutation):
+class ThreadCreateMutation(Mutation):
+    with_parent = True
+    with_descendants = False
+    with_post_process = True
+    all_read = True
+    read_list = None
+    data = None
+
+    def __init__(self, thread, data, **kwargs):
+        self.data = data
+        super().__init__(thread, **kwargs)
+
+    def process_thread(self, instance):
+        instance.threads_count.cleanup()
+        instance.rooms_count.cleanup()
+        if instance.parent:
+            instance.parents_ids = \
+                instance.parent.parents_ids + [instance.parent.pk]
+        else:
+            instance.parents_ids = []
+
+    def post_process(self, instance, children):
+        self.all_read &= instance.rights.all & models.ACCESS_READ
+        if not self.all_read:
+            read_list = [
+                u for u, r in instance.rights if r & models.ACCESS_READ]
+            if self.read_list is None:
+                self.read_list = read_list
+            else:
+                self.read_list = [u for u in read_list if u in self.read_list]
+
+    def process_parent(self, instance, updated_child):
+        if self.thread.room:
+            counter = instance.rooms_count
+        else:
+            counter = instance.threads_count
+        counter.su += 1
+        if self.all_read:
+            counter.all += 1
+            for u, v in counter:
+                counter[u] = v + 1
+        else:
+            for u in self.read_list:
+                counter[u] += 1
+
+
+class ThreadCounters(Mutation):
     with_descendants = True
+    with_post_process = True
+    with_parent = True
+
+    @staticmethod
+    def _calc_counters(instance, children):
+        instance.rooms_count.cleanup()
+        instance.threads_count.cleanup()
+        for c in children:
+            instance.rooms_count.su += c.rooms_count.su
+            instance.threads_count.su += c.threads_count.su
+            if c.room:
+                counter = instance.rooms_count
+            else:
+                counter = instance.threads_count
+            counter.su += 1
+            if c.rights.all & models.ACCESS_READ:
+                instance.rooms_count.all += c.rooms_count.all
+                instance.threads_count.all += c.threads_count.all
+                counter.all += 1
+                for u, v in instance.rooms_count:
+                    instance.rooms_count[u] = v + c.rooms_count[u] + (
+                        1 if c.room else 0)
+                for u, v in instance.threads_count:
+                    instance.threads_count[u] = v + c.threads_count[u] + (
+                        0 if c.room else 1)
+            else:
+                for u, r in c.rights:
+                    if r & models.ACCESS_READ:
+                        instance.rooms_count[u] += c.rooms_count[u]
+                        instance.threads_count[u] += c.threads_count[u]
+                        counter[u] += 1
+
+    def post_process(self, instance, children):
+        self._calc_counters(instance, children)
+
+
+class ThreadDeleteMutation(ThreadCounters):
+    with_descendants = True
+    with_parent = True
+    with_post_process = True
     user = None
     comment = ''
 
     def __init__(self, thread, user, comment):
-        super(ThreadDeleteMutation, self).__init__(thread)
+        super().__init__(thread)
         self.user = user
         self.comment = comment
 
@@ -145,14 +223,21 @@ class ThreadDeleteMutation(Mutation):
         # deleted because parent was deleted. It have no record in data.
         instance.deleted = True
 
+    def post_process(self, instance, children):
+        if self.thread.pk in instance.parents_ids or \
+                self.thread.pk == instance.pk:
+            return
+        self._calc_counters(instance, children)
 
-class ThreadFixCounters(Mutation):
+
+class ThreadFixCounters(ThreadCounters):
     result = None
     user = None
     with_descendants = True
+    with_post_process = True
 
     def __init__(self, thread, user=None, result=None):
-        super(ThreadFixCounters, self).__init__(thread)
+        super().__init__(thread)
         self.user = user
         self.result = result or {}
 
@@ -162,11 +247,17 @@ class ThreadFixCounters(Mutation):
             publisher.notify_user_about_fixes(self.user, self.result)
 
     def process_thread(self, instance):
-        instance.__class__.objects.partial_rebuild(instance.tree_id)
+        instance.threads_count.cleanup()
+        instance.rooms_count.cleanup()
+        if instance.parent:
+            instance.parents_ids = \
+                instance.parent.parents_ids + [instance.parent.pk]
+        else:
+            instance.parents_ids = []
         self.update_result(instance)
 
     def process_descendant(self, instance, parent):
-        self.update_result(instance)
+        self.process_thread(instance)
 
 
 class DeletedController(MutationController):

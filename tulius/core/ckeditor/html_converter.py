@@ -15,7 +15,7 @@ class HtmlConverter(parser.HTMLParser):
 
     def parse_starttag(self, i):
         self.new_tag = None
-        k = super(HtmlConverter, self).parse_starttag(i)
+        k = super().parse_starttag(i)
         if self.new_tag:
             self.new_tag.start_pos = i
             self.new_tag.content_start = k
@@ -26,7 +26,7 @@ class HtmlConverter(parser.HTMLParser):
 
     def parse_endtag(self, i):
         self.closed_tag_name = None
-        k = super(HtmlConverter, self).parse_endtag(i)
+        k = super().parse_endtag(i)
         if self.closed_tag_name is not None:
             self.do_close_tag(self.closed_tag_name, i, k)
         return k
@@ -79,7 +79,7 @@ class HtmlConverter(parser.HTMLParser):
         return ''.join(self.root.convert(data))
 
     def close(self):
-        super(HtmlConverter, self).close()
+        super().close()
         while self.current_tag is not None:
             tag = self.current_tag
             self.current_tag = self.current_tag.parent

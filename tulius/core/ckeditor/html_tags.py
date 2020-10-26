@@ -75,7 +75,7 @@ class FontTag(Tag):
     def convert(self, data_str):
         color = self.attrs.get('color', '')
         if not bb_parser.check_color(color):
-            yield from super(FontTag, self).convert(data_str)
+            yield from super().convert(data_str)
         else:
             yield '[color={}]'.format(color)
             yield from self.convert_internal(data_str)

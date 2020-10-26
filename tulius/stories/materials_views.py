@@ -77,8 +77,8 @@ def get_illustration_file(request, illustration_id, is_thumb):
     """
     try:
         illustration_id = int(illustration_id)
-    except:
-        raise Http404()
+    except ValueError as exc:
+        raise Http404() from exc
     illustration = get_object_or_404(Illustration, id=illustration_id)
     if illustration.admins_only and (
             not illustration.edit_right(request.user)):

@@ -6,11 +6,11 @@ from tulius.pm import views
 app_name = 'tulius.pm'
 
 urlpatterns = [
-    urls.url(
+    urls.re_path(
         r'^messages/$',
         views.PlayerMessagesView.as_view(),
         name='messages'),
-    urls.url(
+    urls.re_path(
         r'^user/(?P<pk>\d+)/$',
         views.PlayerSendMessageView.as_view(),
         name='to_user'),

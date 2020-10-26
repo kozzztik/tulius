@@ -1,7 +1,7 @@
 from django import forms
 from django import urls
 from django.utils import text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from tulius.stories import models
 
@@ -28,7 +28,7 @@ class StoryFilterForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        super(StoryFilterForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['filter_by_author'].queryset = self.fields[
             'filter_by_author'].queryset.filter(
                 pk__in=[

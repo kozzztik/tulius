@@ -1,6 +1,7 @@
 from django import template
 from django.template import TemplateSyntaxError
 from django.template.loader_tags import BlockNode, do_block
+from django.template.loader_tags import do_extends
 
 
 register = template.Library()
@@ -69,7 +70,6 @@ def do_enablemacros(parser, token):
 
 
 def do_extends_with_macros(parser, token):
-    from django.template.loader_tags import do_extends
     # parse it as an ExtendsNode, but also create a fake MacroRoot node
     # and add it to the parser, like we do in do_enablemacros().
     parser._macro_root = MacroRoot()
@@ -90,7 +90,7 @@ class MacroNode(BlockNode):
 
     # the render that actually works
     def repeat(self, context):
-        return super(MacroNode, self).render(context)
+        return super().render(context)
 
 
 def do_macro(parser, token):
@@ -139,10 +139,10 @@ def do_repeat(parser, token):
     try:
         args = token.split_contents()
         block_name, extra_context = args[1], args[2:]
-    except IndexError:
+    except IndexError as exc:
         m = ("'%s' tag requires at least one argument (macro name)"
              % token.contents.split()[0])
-        raise template.TemplateSyntaxError(m)
+        raise template.TemplateSyntaxError(m) from exc
         # return as a RepeatNode
     if not hasattr(parser, '_macro_root'):
         raise TemplateSyntaxError(

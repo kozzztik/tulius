@@ -1,13 +1,14 @@
-from datetime import timedelta
+import datetime
 
 from django import dispatch
+from django.conf import settings
+from django.contrib import auth
 from django.core.cache import cache
-from django.utils.timezone import now
 from django.utils import html
+from redis import client
 
 from tulius.forum import core
 from tulius.forum.threads import models as thread_models
-from tulius.forum.other import models
 from tulius.forum import const
 from tulius import signals
 
@@ -32,50 +33,57 @@ def get_user_status(user_id):
     return cache.get(const.USER_ONLINE_CACHE_KEY.format(user_id), False)
 
 
+def thread_key(model, pk):
+    return f'{model._meta.db_table}_{pk}_online'
+
+
 class OnlineStatusAPI(core.BaseAPIView):
-    online_user_model = models.OnlineUser
     thread_model = thread_models.Thread
     thread = None
     online_timeout = 3  # minutes
 
-    def update_online_status(self):
-        if (not self.user.is_anonymous) and self.thread:
-            online_mark = self.online_user_model.objects.get_or_create(
-                user=self.user, thread=self.thread)[0]
-            online_mark.visit_time = now()
-            online_mark.save()
-            set_user_status(self.user.id, self.thread.id)
+    def update_online_status(self, redis, timestamp, timeout):
+        if self.user.is_anonymous:
+            return
+        threads = ['None']
+        if self.thread:
+            threads += self.thread.parents_ids + [self.thread.pk]
+        keys = [thread_key(self.thread_model, key) for key in threads]
+        pipe = redis.pipeline()
+        for key in keys:
+            pipe.zadd(key, {self.user.pk: timestamp})
+            pipe.zremrangebyscore(
+                key, min=float('-inf'), max=timestamp - timeout)
+            pipe.expire(key, timeout)
+        pipe.execute()
+        set_user_status(self.user.id, self.thread.id if self.thread else None)
+
+    def get_online_users_ids(self, do_update=True):
+        redis = client.Redis(**settings.REDIS_CONNECTION)
+        timestamp = datetime.datetime.now().timestamp()
+        timeout = self.online_timeout * 60
+        if do_update:
+            self.update_online_status(redis, timestamp, timeout)
+        return redis.zrangebyscore(
+            thread_key(
+                self.thread_model, self.thread.pk if self.thread else 'None'),
+            min=timestamp - timeout,
+            max=float('+inf')
+        )
 
     def get_online_users(self, do_update=True):
-        if do_update:
-            self.update_online_status()
-        users = self.online_user_model.objects.select_related(
-            'user'
-        ).filter(
-            visit_time__gte=now() - timedelta(minutes=self.online_timeout),
-            thread__tree_id=self.thread.tree_id,
-            thread__lft__gte=self.thread.lft,
-            thread__rght__lte=self.thread.rght)
-        users_list = {u.user.id: u.user for u in users}
-        return users_list.values()
-
-    def get_all_online_users(self):
-        users = self.online_user_model.objects.select_related(
-            'user'
-        ).filter(
-            visit_time__gte=now() - timedelta(minutes=self.online_timeout))
-        users_list = {}
-        for user in users:
-            users_list[user.user.id] = user.user
-        return users_list.values()
+        ids = self.get_online_users_ids(do_update=do_update)
+        # some magic to preserve order
+        users = auth.get_user_model().objects.filter(
+            pk__in=ids)
+        users = {u.pk: u for u in users}
+        return [users.get(int(pk)) for pk in ids]
 
     def get(self, request, *args, **kwargs):
         pk = kwargs['pk'] if 'pk' in kwargs else None
         if pk:
             self.thread = self.thread_model.objects.get(pk=pk)
-            users = self.get_online_users()
-        else:
-            users = self.get_all_online_users()
+        users = self.get_online_users()
         return {
             'users': [{
                 'id': user.pk,

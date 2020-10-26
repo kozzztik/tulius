@@ -1,0 +1,26 @@
+<div class="content container">
+    <div class="caption" align="center">
+        <div class="captionleft"></div>
+        <div class="captioncontent" v-if="pk">
+            Переиндексация комнаты {{pk}}
+        </div>
+        <div class="captioncontent" v-else="pk">
+            Переиндексация форума
+        </div>
+        <div class="captionright"></div>
+    </div>
+    <b v-if="!finished">
+        Идет перерасчет, ждите.
+    </b>
+    <b v-else>
+        Перерасчет завершен.
+    </b>
+    <br>
+    <div class="row">
+        <div class="col"><b>Статистика:</b></div>
+    </div>
+    <div class="row">
+        <div class="col">Тем: {{threads}}</div>
+        <div class="col">Комментариев: {{comments}}</div>
+    </div>
+</div>

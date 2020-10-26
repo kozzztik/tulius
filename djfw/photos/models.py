@@ -3,6 +3,7 @@ import os
 from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.template.defaultfilters import filesizeformat
 
 
 class PhotoAlbum(models.Model):
@@ -127,7 +128,6 @@ class Photo(models.Model):
         return self.image.url if self.image else None
 
     def file_size(self):
-        from django.template.defaultfilters import filesizeformat
         return filesizeformat(self.file_length)
 
     def short_tag(self):

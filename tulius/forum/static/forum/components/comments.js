@@ -55,10 +55,10 @@ export default LazyComponent('forum_thread_comments', {
                     if (comment.id == new_comment.id)
                         return;
                 this.comments.push(new_comment);
-                if (!this.thread.not_read_comment)
-                    this.thread.not_read_comment = {
+                if (!this.thread.not_read)
+                    this.thread.not_read = {
                         id: new_comment.id, page_num: new_comment.page, count: 0}
-                this.thread.not_read_comment.count += 1;
+                this.thread.not_read.count += 1;
             }).catch().then(() => {});
         },
         fast_reply(comment) {
@@ -124,7 +124,9 @@ export default LazyComponent('forum_thread_comments', {
         mark_as_read(comment) {
             if (this.user.is_anonymous)
                 return;
-            if (comment.id <= this.thread.last_read_id)
+            if (!this.thread.not_read)
+                return;
+            if (comment.id < this.thread.not_read.id)
                 return;
             if (this.mark_read_id)
                 return;
@@ -142,8 +144,7 @@ export default LazyComponent('forum_thread_comments', {
         do_mark_mark_as_read(comment_id) {
             // console.log('пошел запрос');
             axios.post(this.thread.url + 'read_mark/', {'comment_id': comment_id}).then(response => {
-                this.thread.last_read_id = response.data.last_read_id;
-                this.thread.not_read_comment = response.data.not_read_comment;
+                this.thread.not_read = response.data.not_read;
             }).catch(error => this.$root.add_message(error, "error")).then(() => {
                 this.mark_read_id = null;
                 this.mark_read_func = null;
@@ -168,15 +169,15 @@ export default LazyComponent('forum_thread_comments', {
             });
         },
         to_not_read_comment() {
-            if (!this.thread.not_read_comment)
+            if (!this.thread.not_read)
                 return;
-            if (this.thread.not_read_comment.page_num != this.value)
+            if (this.thread.not_read.page_num != this.value)
                 this.$router.push({
                     path: this.$router.path,
-                    query: {page: this.thread.not_read_comment.page_num},
-                    hash: '#' + this.thread.not_read_comment.id})
+                    query: {page: this.thread.not_read.page_num},
+                    hash: '#' + this.thread.not_read.id})
             else
-                this.scroll_to_comment(this.thread.not_read_comment.id, 0);
+                this.scroll_to_comment(this.thread.not_read.id, 0);
         },
         scroll_to_comment(comment_id, retry) {
             var found = null;

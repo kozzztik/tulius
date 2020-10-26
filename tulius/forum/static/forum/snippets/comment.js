@@ -29,9 +29,9 @@ export default LazyComponent('forum_comment', {
                 return true;
             if (this.comment.user.id == this.user.id)
                 return true;
-            if (!this.thread.last_read_id)
-                return false;
-            return (this.thread.last_read_id >= this.comment.id);
+            if (!this.thread.not_read)
+                return true;
+            return (this.thread.not_read.id > this.comment.id);
         },
     },
     methods: {

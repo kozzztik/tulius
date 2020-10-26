@@ -58,15 +58,18 @@ export default function(variation_id) {
         thread_fix_api: pk => `/api/game_forum/variation/${variation_id}/thread/${pk}/fix/`,
         comment_api: pk => `/api/game_forum/variation/${variation_id}/comment/${pk}/`,
         root_api: '/api/forum/',
-        search_api: pk => `/api/game_forum/variation/${variation_id}/thread/${pk}/search/`,
-        search_results: (thread_id, query) => ({
+        search_api: `/api/game_forum/variation/${variation_id}/search/`,
+        search_results: (query) => ({
             name: 'game_search_results',
-            params: { id: thread_id, variation_id: variation_id },
+            params: { variation_id: variation_id },
             query: query,
         }),
-        extended_search: pk => ({
+        extended_search: query => ({
             name: 'game_extended_search',
-            params: { id: pk, variation_id: variation_id },
+            params: {variation_id: variation_id },
+            query: query,
         }),
+        elastic_reindex_forum_api: '/api/game_forum/elastic/reindex/forum_all/',
+	    elastic_reindex_thread_api: pk => `/api/game_forum/elastic/reindex/thread/${pk}/`,
 	}
 }

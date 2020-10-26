@@ -9,16 +9,15 @@ def test_user_thread_api_rights(
     with transaction.atomic():
         game.save()
     # Try to create thread without role specified. That is only for admins.
-    base_url = f'/api/game_forum/variation/{game.variation.id}/'
     response = user.put(
-        base_url + f'thread/{variation_forum.id}/', {
+        variation_forum.get_absolute_url(), {
             'title': 'thread', 'body': 'thread description',
             'room': False, 'default_rights': None, 'granted_rights': [],
             'important': True, 'closed': True, 'media': {}})
     assert response.status_code == 403
     # try to create thread with not existing role
     response = user.put(
-        base_url + f'thread/{variation_forum.id}/', {
+        variation_forum.get_absolute_url(), {
             'title': 'thread', 'body': 'thread description',
             'room': False, 'default_rights': None, 'granted_rights': [],
             'role_id': detective.pk + 1,
@@ -26,7 +25,7 @@ def test_user_thread_api_rights(
     assert response.status_code == 403
     # smoke test - create a thread with right role.
     response = user.put(
-        base_url + f'thread/{variation_forum.id}/', {
+        variation_forum.get_absolute_url(), {
             'title': 'thread', 'body': 'thread description',
             'room': False, 'default_rights': None, 'granted_rights': [],
             'role_id': detective.pk,
@@ -71,7 +70,7 @@ def test_user_thread_api_rights(
     assert response.status_code == 403
     # try to create room
     response = user.put(
-        base_url + f'thread/{variation_forum.id}/', {
+        variation_forum.get_absolute_url(), {
             'title': 'room', 'body': 'room description',
             'room': True, 'default_rights': None, 'granted_rights': [],
             'role_id': detective.pk, 'media': {}})
@@ -80,7 +79,7 @@ def test_user_thread_api_rights(
     assert room['title'] == 'room'
     assert room['user']['id'] == detective.id
     # check how it looks on index
-    response = user.get(base_url + f'thread/{variation_forum.id}/')
+    response = user.get(variation_forum.get_absolute_url())
     assert response.status_code == 200
     data = response.json()
     assert len(data['rooms']) == 1
@@ -90,4 +89,5 @@ def test_user_thread_api_rights(
     assert data['threads'][0]['user']['id'] == detective.pk
     assert data['threads'][0]['user']['title'] == detective.name
     assert data['threads'][0]['last_comment']['user']['id'] == detective.pk
-    assert data['threads'][0]['last_comment']['user']['title'] == detective.name
+    assert data['threads'][0]['last_comment']['user']['title'] == \
+           detective.name

@@ -6,5 +6,6 @@ class ForumCommentsConfig(AppConfig):
     label = 'forum_comments'
 
     def ready(self):
+        # pylint: disable=C0415
         from tulius.forum.comments import mutations
         mutations.init()

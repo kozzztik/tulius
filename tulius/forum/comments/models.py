@@ -1,20 +1,19 @@
 """
 Forum comment models for Tulius project
 """
-import jsonfield
 from django import urls
+import django.core.serializers.json
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
-from mptt import models as mptt_models
+from django.utils import html
 
+from djfw.wysibb.templatetags import bbcodes
 from tulius.forum.threads import models as thread_models
+from tulius.forum.comments import signals
+
 
 User = get_user_model()
-
-
-def default_json():
-    return {}
 
 
 class AbstractComment(models.Model):
@@ -27,9 +26,11 @@ class AbstractComment(models.Model):
         ordering = ['id']
         abstract = True
 
+    COMMENTS_ON_PAGE = 25
+
     objects = models.Manager()  # linters don't worry, be happy
 
-    parent = mptt_models.TreeForeignKey(
+    parent = models.ForeignKey(
         thread_models.Thread, models.PROTECT,
         null=False,
         blank=False,
@@ -85,8 +86,16 @@ class AbstractComment(models.Model):
         blank=False,
         verbose_name=_(u'order'),
     )
-    data = jsonfield.JSONField(default=default_json)
-    media = jsonfield.JSONField(default=default_json)
+    data = models.JSONField(
+        default=dict,
+        encoder=django.core.serializers.json.DjangoJSONEncoder)
+    media = models.JSONField(
+        default=dict,
+        encoder=django.core.serializers.json.DjangoJSONEncoder)
+
+    @property
+    def page(self):
+        return self.order_to_page(self.order)
 
     def __str__(self):
         return self.title[:40] if self.title else self.body[:40]
@@ -97,17 +106,82 @@ class AbstractComment(models.Model):
     def get_absolute_url(self):
         return urls.reverse('forum_api:comment', kwargs={'pk': self.pk})
 
+    def edit_right(self, user):
+        if not user.is_authenticated:
+            return False
+        return (self.user_id == user.pk) or self.parent.moderate_right(user)
+
+    def to_elastic_search(self, data):
+        data['parent_id'] = self.parent_id
+        data['parents_ids'] = (
+            (self.parent.parents_ids or []) + [self.parent_id])
+        data['user'] = {
+            'id': self.user.pk,
+            'title': str(self.user),
+            'date_joined': self.user.date_joined,
+            'sex': self.user.sex,
+        }
+        data['public'] = bool(
+            (self.parent.rights.all or 0) & thread_models.ACCESS_READ)
+        data['read_access'] = []
+        for u, r in self.parent.rights:
+            if r & thread_models.ACCESS_READ:
+                data['read_access'].append(u)
+
+    @classmethod
+    def to_elastic_mapping(cls, fields):
+        fields['parent_id'] = {'type': 'integer'}
+        fields['parents_ids'] = {'type': 'integer'}
+        fields['user'] = {'properties': {
+            'id': {'type': 'integer'},
+            'title': {'type': 'keyword'},
+            'date_joined': {'type': 'date'},
+            'sex': {'type': 'integer'},
+        }}
+        fields['public'] = {'type': 'boolean'}
+        fields['read_access'] = {'type': 'integer'}
+
+    @classmethod
+    def order_to_page(cls, order):
+        return int(order / cls.COMMENTS_ON_PAGE) + 1
+
+    def to_json(self, user, detailed=False):
+        data = {
+            'id': self.pk,
+            'thread': {
+                'id': self.parent_id,
+            },
+            'page': self.page,
+            'user': self.user.to_json(detailed=detailed),
+            'create_time': self.create_time,
+        }
+        if not detailed:
+            return data
+        data['thread']['url'] = self.parent.get_absolute_url()
+        data = {
+            **data,
+            'url': self.get_absolute_url() if self.pk else None,
+            'title': html.escape(self.title),
+            'body': bbcodes.bbcode(self.body),
+            'edit_right': self.edit_right(user),
+            'is_thread': self.is_thread(),
+            'edit_time': self.edit_time,
+            'editor': self.editor.to_json() if self.editor else None,
+            'media': self.media,
+            'reply_id': self.reply_id,
+        }
+        signals.to_json.send(
+            self.__class__, comment=self, data=data, user=user)
+        return data
+
 
 class Comment(AbstractComment):
     pass
 
 
-def get_param(param, thread, user_id, superuser=False):
-    data = thread.data.get(param)
-    if not data:
-        return None
-    if superuser:
-        return data['su']
-    if user_id and str(user_id) in data['users']:
-        return data['users'][str(user_id)]
-    return data['all']
+thread_models.AbstractThread.first_comment = thread_models.CounterField(
+    'first_comment')
+thread_models.AbstractThread.last_comment = thread_models.CounterField(
+    'last_comment')
+thread_models.AbstractThread.comments_count = thread_models.CounterField(
+    'comments_count', default=0)

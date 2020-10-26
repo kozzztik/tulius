@@ -1,21 +1,21 @@
-django == 2.2.13
-pytz == 2018.4
+django == 3.1.1
+pytz == 2020.1
 pillow == 6.2.0
-mysqlclient == 1.4.6
-
-# apparently best relational DB trees implementation
-django-mptt == 0.9.0
-jsonfield2 == 4.0.0
-# profiler requirement
-pyyaml == 5.1
+mysqlclient == 2.0.1
 
 django-hamlpy == 1.1.1
 
+# profiler requirement
+pyyaml == 5.3.1
+ua-parser == 0.10.0
+python-logstash == 0.4.6
+
 # sentry
-sentry-sdk == 0.14.3
+sentry-sdk == 0.18.0
 redis == 3.5.3
 django-redis-cache == 2.1.1
-requests == 2.21.0
+requests == 2.24.0
+elasticsearch7 == 7.9.1
 
 # async
 aiohttp == 3.6.2
@@ -26,6 +26,9 @@ django-celery-results == 1.2.1
 # testing
 pytest == 5.4.1
 pytest-cov == 2.8.1
-pylint==2.5.0
-coverage==4.5.4
-python-coveralls==2.9.3
+pylint == 2.6.0
+pycodestyle == 2.6.0
+flake8 == 3.8.3
+pytest-flake8 == 1.0.6
+coverage==5.2.1
+coveralls==2.1.2

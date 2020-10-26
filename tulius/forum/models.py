@@ -51,7 +51,4 @@ class UploadedFile(models.Model):
         return self.mime[0:5] == 'image'
 
     def __str__(self):
-        """
-        Provides unicode string post representation
-        """
-        return self.name
+        return str(self.name)

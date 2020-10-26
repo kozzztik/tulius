@@ -9,6 +9,7 @@ export default LazyComponent('forum_index_page', {
         breadcrumbs: [],
         loading: true,
         index: {groups: []},
+        search_text: '',
     }),
     computed: {
         urls() {return this.$parent.urls},
@@ -53,5 +54,21 @@ export default LazyComponent('forum_index_page', {
                 this.load_api(null);
             });
         },
+        search_submit() {
+            this.$router.push(
+                this.urls.search_results({
+                    text: this.search_text}
+                )
+            );
+        },
+        loading_start() {this.$parent.loading_start()},
+        loading_end(breadcrumbs) {this.$parent.loading_end(breadcrumbs)},
+        to_comment(pk) {
+            this.$parent.loading_start();
+            axios.get(this.urls.comment_api(pk)).then(response => {
+                this.$parent.loading_end()
+                this.$router.push(this.urls.comment(response.data));
+            })
+        }
     },
 })

@@ -34,8 +34,8 @@ class Smiles(TemplateView):
                 emotions_list[emotion.filename] = emotion
                 new_emotions += [emotion]
         emotions = []
-        for i in range(0, len(new_emotions)/10 + 1):
-            emotions += [new_emotions[10*i:10*i+10]]
+        for i in range(0, len(new_emotions) / 10 + 1):
+            emotions += [new_emotions[10 * i:10 * i + 10]]
         return {'emotions': emotions}
 
 
@@ -50,8 +50,8 @@ class Uploaded_files(TemplateView):
         else:
             all_files = []
         files = []
-        for i in range(0, len(all_files)/5 + 1):
-            files += [all_files[5*i:5*i+5]]
+        for i in range(0, len(all_files) / 5 + 1):
+            files += [all_files[5 * i:5 * i + 5]]
         return {'files': files}
 
 

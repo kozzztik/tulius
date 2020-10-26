@@ -12,25 +12,20 @@ from tulius.games import models as game_models
 from tulius.stories import models as stories_models
 
 
-@dispatch.receiver(thread_signals.before_create, sender=thread_models.Thread)
-def before_create_thread(instance, data, preview, view, **_kwargs):
-    if not preview:
-        mutations.UpdateRightsOnThreadCreate(
-            instance, data, variation=view.variation).apply()
-
-
 @dispatch.receiver(thread_signals.after_create, sender=thread_models.Thread)
-def after_create_thread(instance, data, preview, view, **_kwargs):
+def after_create_thread(instance, data, preview, **_kwargs):
     if not preview:
         mutations.UpdateRightsOnThreadCreate(
-            instance, data, variation=view.variation).save_exceptions()
+            instance, data=data).save_exceptions()
 
 
 @dispatch.receiver(game_signals.game_status_changed)
 def game_status_changed(sender, **_kwargs):
     variation = sender.variation
     if variation.thread:
-        mutations.UpdateRights(variation.thread, variation).apply()
+        # to use actual variation info on thread
+        variation.thread.variation = variation
+        mutations.UpdateRights(variation.thread).apply()
 
 
 @dispatch.receiver(dj_models.signals.post_delete, sender=game_models.GameAdmin)
@@ -40,7 +35,7 @@ def game_status_changed(sender, **_kwargs):
 def on_game_models_updates(instance, **_kwargs):
     variation = instance.game.variation
     if variation.thread:
-        mutations.UpdateRights(variation.thread, variation).apply()
+        mutations.UpdateRights(variation.thread).apply()
 
 
 @dispatch.receiver(
@@ -50,15 +45,31 @@ def on_game_models_updates(instance, **_kwargs):
 def on_stories_models_updates(instance, **_kwargs):
     for variation in instance.story.variations.all():
         if variation.thread:
-            mutations.UpdateRights(variation.thread, variation).apply()
+            mutations.UpdateRights(variation.thread).apply()
+
+
+@dispatch.receiver(dj_models.signals.pre_save, sender=stories_models.Role)
+def on_role_pre_save(instance, **_kwargs):
+    if instance.pk:
+        old_role = stories_models.Role.objects.get(pk=instance.pk)
+        instance.old_user = old_role.user
+
+
+@dispatch.receiver(dj_models.signals.post_save, sender=stories_models.Role)
+def on_role_save(instance, created, **_kwargs):
+    game = game_models.Game.objects.filter(
+        variation=instance.variation).first()
+    if created or (not game) or (
+            game.status < game_models.GAME_STATUS_IN_PROGRESS):
+        return
+    if instance.old_user != instance.user:
+        mutations.UpdateRights(instance.variation.thread).apply()
 
 
 class BaseGrantedRightsAPI(
         views.BaseGrantedRightsAPI, threads_api.BaseThreadAPI):
     rights_model = models.GameThreadRight
-
-    def get_mutation(self, thread):
-        return mutations.UpdateRights(thread, self.variation)
+    update_mutation = mutations.UpdateRights
 
     def create_right(self, data):
         obj = self.rights_model.objects.get_or_create(

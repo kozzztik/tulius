@@ -16,18 +16,18 @@ from django.core.exceptions import PermissionDenied
 class LoginRequiredMixin:
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
-        return super(LoginRequiredMixin, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
-        return super(LoginRequiredMixin, self).post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
 
 class DecoratorChainingMixin:
     def dispatch(self, *args, **kwargs):
         decorators = getattr(self, 'decorators', [])
         call_prepare_funcs = getattr(self, 'call_prepare_funcs', [])
-        base = super(DecoratorChainingMixin, self).dispatch
+        base = super().dispatch
 
         for decorator in decorators:
             base = decorator(base)
@@ -41,7 +41,7 @@ class RightsDetailMixin:
     superuser_required = False
 
     def get_object(self):
-        obj = super(RightsDetailMixin, self).get_object()
+        obj = super().get_object()
         user = getattr(self.request, 'user')
         if not self.check_rights(obj, user):
             raise PermissionDenied()
@@ -57,11 +57,10 @@ class RightsDetailMixin:
         return True
 
     def dispatch(self, request, *args, **kwargs):
-        if (self.login_required and (not request.user.is_authenticated)):
+        if self.login_required and (not request.user.is_authenticated):
             return redirect_to_login(request.build_absolute_uri())
         try:
-            return super(RightsDetailMixin, self).dispatch(
-                request, *args, **kwargs)
+            return super().dispatch(request, *args, **kwargs)
         except PermissionDenied:
             if not request.user.is_authenticated:
                 return redirect_to_login(request.build_absolute_uri())
@@ -125,7 +124,7 @@ class AjaxFormsetView(RenderMixin, DetailView):
         return self.html_id or self.submodel.__name__ + '_formset'
 
     def __init__(self, obj=None, request=None, **kwargs):
-        super(AjaxFormsetView, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         if self.model:
             self.fk = forms.models._get_foreign_key(
                 self.model, self.submodel, fk_name=self.fk_name)
@@ -202,8 +201,8 @@ class AjaxFormsetView(RenderMixin, DetailView):
             item_id = request.POST['item_id']
             try:
                 item_id = int(item_id)
-            except:
-                raise Http404()
+            except ValueError as exc:
+                raise Http404() from exc
             query = {'pk': item_id}
             if self.object:
                 query[self.fk.name] = self.object

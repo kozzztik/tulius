@@ -40,10 +40,11 @@ class ParentObjectMixin:
                 'either an object pk or a slug.' % self.__class__.__name__)
         try:
             parent_obj = queryset.get()
-        except exceptions.ObjectDoesNotExist:
+        except exceptions.ObjectDoesNotExist as exc:
             raise http.Http404(
                 _('No %(verbose_name)s found matching the query') %
-                {'verbose_name': queryset.model._meta.verbose_name})
+                {'verbose_name': queryset.model._meta.verbose_name}
+            ) from exc
         if not self.check_parent_rights(parent_obj, self.request.user):
             raise exceptions.PermissionDenied()
 
@@ -109,12 +110,12 @@ class BaseParentCreateView(
     def get(self, request, *args, **kwargs):
         self.object = None
         self.parent_object = self.get_parent_object()
-        return super(BaseParentCreateView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = None
         self.parent_object = self.get_parent_object()
-        return super(BaseParentCreateView, self).post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
@@ -123,7 +124,7 @@ class BaseParentCreateView(
                                  "key for linking models.")
         setattr(self.object, self.parent_obj_foreign_key, self.parent_object)
         self.object.save()
-        return super(BaseParentCreateView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = kwargs

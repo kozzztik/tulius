@@ -52,7 +52,7 @@ class VotingAPI(views.CommentBase):
         voting = self.get_voting(for_update=True, **kwargs)
         data = json.loads(self.request.body)
         if data.get('close'):
-            if not self.comment_edit_right(self.comment):
+            if not self.comment.edit_right(self.user):
                 raise exceptions.PermissionDenied()
             voting['closed'] = True
             self.comment.save()
@@ -92,9 +92,8 @@ class VotingAPI(views.CommentBase):
         data['id'] = comment_id  # backward compatibility with frontend
         data['choice'] = cls.user_choice(data['choices'], user, comment_id)
         with_results = bool(
-            data['closed'] or
-            data['preview_results'] or
-            (data['choice'] and data['show_results']))
+            data['closed'] or data['preview_results'] or (
+                data['choice'] and data['show_results']))
         if not with_results:
             for item in data['choices']['items']:
                 item['count'] = None
@@ -104,31 +103,30 @@ class VotingAPI(views.CommentBase):
         return data
 
     @classmethod
-    def on_comment_to_json(cls, comment, data, view, **_kwargs):
+    def on_comment_to_json(cls, comment, data, user, **_kwargs):
         v = comment.media.get('voting')
         if v:
-            data['media']['voting'] = cls.user_voting_data(
-                v, view.user, comment.pk)
+            data['media']['voting'] = cls.user_voting_data(v, user, comment.pk)
 
     @classmethod
-    def on_thread_to_json(cls, instance, response, view, **_kwargs):
+    def on_thread_to_json(cls, instance, response, user, **_kwargs):
         v = instance.media.get('voting')
         if v:
             response['media']['voting'] = cls.user_voting_data(
-                v, view.user, instance.data.get('first_comment_id'))
+                v, user, instance.first_comment[user])
 
     @classmethod
-    def on_before_add_comment(cls, comment, data, view, **_kwargs):
+    def on_before_add_comment(cls, comment, data, **_kwargs):
         voting_data = data['media'].get('voting')
         if not voting_data:
             return
         voting = create_voting(voting_data)
         comment.media['voting'] = voting
-        if (not view.obj.pk) or comment.is_thread():
-            view.obj.media['voting'] = voting
+        if (not comment.parent.pk) or comment.is_thread():
+            comment.parent.media['voting'] = voting
 
     @classmethod
-    def on_comment_update(cls, comment, data, view, **_kwargs):
+    def on_comment_update(cls, comment, data, **_kwargs):
         voting_data = data['media'].get('voting')
         if not voting_data:
             return
@@ -137,14 +135,14 @@ class VotingAPI(views.CommentBase):
             voting = create_voting(voting_data)
             comment.media['voting'] = voting
             if comment.is_thread():
-                view.obj.media['voting'] = voting
+                comment.parent.media['voting'] = voting
             return
         orig_data['name'] = html_converter.html_to_bb(voting_data['name'])
         orig_data['body'] = html_converter.html_to_bb(voting_data['body'])
         orig_data['show_results'] = bool(voting_data['show_results'])
         orig_data['preview_results'] = voting_data['preview_results']
         if comment.is_thread():
-            view.obj.media['voting'] = orig_data
+            comment.parent.media['voting'] = orig_data
 
 
 comment_signals.to_json.connect(

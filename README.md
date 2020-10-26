@@ -27,6 +27,8 @@ Repo for http://tulius.com project.
     mkdir /home/travis/master/data/mysql
     mkdir /home/travis/master/data/static
     mkdir /home/travis/master/data/media
+    mkdir /home/travis/master/data/elastic
+    chown 1000:1000 /home/travis/master/data/elastic
     mkdir /home/travis/dev/data
     mkdir /home/travis/dev/data/static
     mkdir /home/travis/dev/data/media
@@ -129,3 +131,31 @@ On Windows, as Celery not supports it yet, install gevent:
 and start celery with:
 
 ```celery -A tulius worker -l info -P gevent```
+
+## Running tests
+
+``` 
+python -m pylint tests tulius djfw
+python -m pytest tests tulius djfw
+```
+
+## Configure kibana access
+```
+sudo apt install apache2-utils
+sudo touch /etc/nginx/htpasswd
+sudo htpasswd /etc/nginx/htpasswd bob
+```
+## Remove elastic disk limit on dev environment
+```
+curl -XPUT "http://localhost:9200/_cluster/settings" \
+ -H 'Content-Type: application/json' -d'
+{
+  "persistent": {
+    "cluster": {
+      "routing": {
+        "allocation.disk.threshold_enabled": false
+      }
+    }
+  }
+}'
+```

@@ -8,4 +8,4 @@ class VariationMixin(core.BaseAPIView):
     def dispatch(self, request, *args, **kwargs):
         self.variation = stories_models.Variation.objects.get(
             pk=int(kwargs['variation_id']))
-        return super(VariationMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)

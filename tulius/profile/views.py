@@ -6,7 +6,6 @@ from django.utils import decorators
 from django.contrib import messages
 from django.contrib.auth import decorators as auth_decorators
 from django.contrib.auth import update_session_auth_hash
-from django.db.models import query_utils
 
 from tulius.events.models import UserNotification, Notification
 from tulius.stories.models import StoryAdmin, Role
@@ -41,8 +40,8 @@ class PlayerSettingsView(generic.TemplateView):
             data=request.POST or None, instance=request.user)
         personal_settings_form = PersonalSettingsForm(
             data=request.POST or None, instance=request.user)
-        if (email_form.is_valid() and settings_form.is_valid() and
-                personal_settings_form.is_valid()):
+        valid = email_form.is_valid() and settings_form.is_valid()
+        if valid and personal_settings_form.is_valid():
             if email_form.change_email:
                 request.user.email = email_form.cleaned_data['email']
                 request.user.save()
@@ -60,7 +59,7 @@ class PlayerSettingsView(generic.TemplateView):
 class LoginTemplateView(generic.TemplateView):
     @decorators.method_decorator(auth_decorators.login_required)
     def get(self, request, *args, **kwargs):
-        return super(LoginTemplateView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
 
 class PlayerSubscriptionsView(LoginTemplateView):
@@ -73,7 +72,7 @@ class PlayerSubscriptionsView(LoginTemplateView):
         forms = []
         for n in notifications:
             form = NotificationForm(
-                prefix='n'+str(n.id), initial={'enabled': n not in user_n})
+                prefix='n' + str(n.id), initial={'enabled': n not in user_n})
             form.notification = n
             forms += [form]
         return locals()
@@ -83,7 +82,7 @@ class PlayerSubscriptionsView(LoginTemplateView):
         notifications = list(Notification.objects.all())
         forms = []
         for n in notifications:
-            form = NotificationForm(prefix='n'+str(n.id), data=request.POST)
+            form = NotificationForm(prefix='n' + str(n.id), data=request.POST)
             form.notification = n
             forms += [form]
         for form in forms:
@@ -159,10 +158,7 @@ class PlayerGamesView(LoginTemplateView):
         played = [
             role.variation.game.id for role in Role.objects.filter(
                 user=user, variation__game__isnull=False)]
-        games = Game.objects.filter(
-            query_utils.Q(id__in=admined) |
-            query_utils.Q(id__in=guested) |
-            query_utils.Q(id__in=played))
+        games = Game.objects.filter(id__in=admined + guested + played)
         current_games = set_edit(
             games.filter(
                 status__in=[GAME_STATUS_IN_PROGRESS, GAME_STATUS_FINISHING]),

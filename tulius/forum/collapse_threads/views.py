@@ -8,7 +8,7 @@ class CollapseAPIList(core.BaseAPIView):
     require_user = True
 
     def get_context_data(self, **kwargs):
-        super(CollapseAPIList, self).get_context_data(**kwargs)
+        super().get_context_data(**kwargs)
         objs = models.ThreadCollapseStatus.objects.filter(user=self.user)
         return {
             obj.thread_id: obj.collapse_rooms for obj in objs

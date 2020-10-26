@@ -1,6 +1,6 @@
 <div v-if="!user.is_anonymous" class="btn-toolbar btn-group-sm justify-content-between forum-menu" role="toolbar" aria-label="Toolbar">
     <div class="btn-group-sm">
-        <b-dropdown id="dropdown-1" text="Действия" class="" variant="light">
+        <b-dropdown id="dropdown-1" text="Действия" class="" variant="light" v-if="thread && thread.id">
             <b-dropdown-item data-toggle="modal" href="javascript:void(0);" v-if="!thread.room" v-on:click="$bvModal.show('quoteAnswer')">
                 <img src="/static/games/img/button_blue_heart.png" style="height: 25px">
                 Ответить с цитатой
@@ -38,10 +38,13 @@
             <b-dropdown-item href="javascript:void(0);" :to="urls.thread_fix(thread.id)" v-if="user.superuser">
                 Обновить счетчики
             </b-dropdown-item>
+            <b-dropdown-item href="javascript:void(0);" :to="{name: 'game_forum_reindex_thread', id: thread.id}" v-if="thread.room && user.superuser">
+               Переиндексировать комнату
+            </b-dropdown-item>
             <b-dropdown-item href="javascript:void(0);" :to="urls.deleted_threads(thread.id)" v-if="thread.room && user.superuser">
                 Удаленные комнаты и темы
             </b-dropdown-item>
-            <b-dropdown-item :to="urls.extended_search(thread.id)">
+            <b-dropdown-item :to="urls.extended_search({thread_id: thread.id})">
                 Расширенный поиск
             </b-dropdown-item>
         </b-dropdown>

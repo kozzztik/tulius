@@ -23,13 +23,13 @@ class Likes(views.CommentBase):
 
     def create_like(self):
         like_mark = self.like_model(user=self.user, comment=self.comment)
-        # pylint: disable=E1137
-        like_mark.data['comment'] = self.comment_to_json(self.comment)
-        like_mark.data['thread'] = self.obj_to_json()  # pylint: disable=E1137
+        like_mark.data['comment'] = self.comment.to_json(
+            self.user, detailed=True)
+        like_mark.data['thread'] = self.obj.to_json(self.user)
         return like_mark
 
     @transaction.atomic
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *_args, **_kwargs):
         data = json.loads(request.body)
         comment_id = int(data['id'])
         value = data['value'] in ['true', True]

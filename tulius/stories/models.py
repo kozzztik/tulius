@@ -3,13 +3,13 @@ from datetime import timedelta
 from django import urls
 from django import dispatch
 from django.db import models
+from django.utils import html
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import now
 from django.contrib.auth import get_user_model
 
 from djfw.common import CREATION_YEAR_CHOICES
 from djfw.sortable.models import SortableModelMixin
-from tulius.gameforum.threads import models as thread_models
 
 
 User = get_user_model()
@@ -30,7 +30,7 @@ class Genre(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def get_absolute_url(self):
         return urls.reverse('stories:genre', kwargs={'genre_id': self.pk})
@@ -117,7 +117,7 @@ class Story(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def get_absolute_url(self):
         return urls.reverse('stories:story', kwargs={'pk': self.pk})
@@ -193,8 +193,7 @@ class Avatar(models.Model):
         self.delete_data()
         Character.objects.filter(avatar=self).update(avatar=None)
         Role.objects.filter(avatar=self).update(avatar=None)
-        return super(Avatar, self).delete(
-            using=using, keep_parents=keep_parents)
+        return super().delete(using=using, keep_parents=keep_parents)
 
     def __str__(self):
         return '%s' % (self.name,)
@@ -310,7 +309,7 @@ class Character(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def get_absolute_url(self):
         return urls.reverse('stories:character', args=(self.pk,))
@@ -355,7 +354,7 @@ class Variation(SortableModelMixin):
     )
 
     thread = models.ForeignKey(
-        thread_models.Thread, models.PROTECT,
+        'game_forum_threads.Thread', models.PROTECT,
         verbose_name=_(u'new forum'),
         related_name='variations',
         blank=True,
@@ -375,7 +374,7 @@ class Variation(SortableModelMixin):
     )
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def get_absolute_url(self):
         return urls.reverse('stories:variation', args=(self.pk,))
@@ -420,6 +419,30 @@ class Variation(SortableModelMixin):
         Variation.objects.filter(pk=self.pk).update(
             comments_count=models.F('comments_count') + value)
         self.comments_count += value
+
+    _all_roles_cache = None
+
+    @property
+    def all_roles(self):
+        if self._all_roles_cache is None:
+            self._all_roles_cache = {
+                role.id: role for role in
+                self.roles.all().select_related('avatar')}
+        return self._all_roles_cache
+
+    def role_to_json(self, role_id, user, detailed=False):
+        if role_id is None:
+            return {
+                'id': None,
+                'title': '---',
+                'url': None,
+                'sex': None,
+                'avatar': None,
+                'online_status': None,
+                'trust': None,
+                'show_trust_marks': False,
+            }
+        return self.all_roles[role_id].to_json(user, detailed=detailed)
 
 
 class Role(SortableModelMixin):
@@ -544,6 +567,27 @@ class Role(SortableModelMixin):
         self.comments_count = 0
         self.save()
         return True
+
+    def to_json(self, user, detailed=False):
+        data = {
+            'id': self.id,
+            'title': html.escape(self.name),
+            'url': None,
+        }
+        if detailed:
+            on = self.is_online() if self.show_in_online_character else None
+            data.update({
+                'sex': self.sex,
+                'avatar': self.avatar.image.url if (
+                    self.avatar and self.avatar.image) else '',
+                'online_status': on,
+                'owned': (
+                    user.is_authenticated and (
+                        self.user_id == user.pk)),
+                'trust': self.trust_value if self.show_trust_marks else None,
+                'show_trust_marks': self.show_trust_marks,
+            })
+        return data
 
 
 class RoleDeleteMark(models.Model):
@@ -695,7 +739,7 @@ class AdditionalMaterial(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def get_absolute_url(self):
         if self.variation and self.variation.game:
@@ -779,7 +823,7 @@ class Illustration(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def get_absolute_url(self):
         if self.variation and self.variation.game:
@@ -803,8 +847,7 @@ class Illustration(models.Model):
 
     def delete(self, using=None, keep_parents=False):
         self.delete_data()
-        return super(Illustration, self).delete(
-            using=using, keep_parents=keep_parents)
+        return super().delete(using=using, keep_parents=keep_parents)
 
     def edit_right(self, user):
         if self.story:

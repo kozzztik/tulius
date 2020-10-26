@@ -38,14 +38,16 @@ export default {
     forum_fix_api: pk => `/api/forum/fix/`,
     comment_api: pk => `/api/forum/comment/${pk}/`,
     root_api: '/api/forum/',
-    search_api: pk => `/api/forum/thread/${pk}/search/`,
-    search_results: (thread_id, query) => ({
+    search_api: '/api/forum/search/',
+    search_results: query => ({
         name: 'forum_search_results',
-        params: { id: thread_id },
         query: query,
     }),
-    extended_search: pk => ({
+    extended_search: query => ({
         name: 'forum_extended_search',
-        params: { id: pk },
+        query: query,
 	}),
+	elastic_reindex_all_api: '/api/forum/elastic/reindex/all/',
+	elastic_reindex_forum_api: '/api/forum/elastic/reindex/forum_all/',
+	elastic_reindex_thread_api: pk => `/api/forum/elastic/reindex/thread/${pk}/`,
 }

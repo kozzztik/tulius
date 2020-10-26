@@ -4,7 +4,7 @@ from django import urls
 from django.contrib import messages
 from django.views import generic
 from django.contrib.auth import decorators
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from djfw import custom_views
 from djfw import subviews
@@ -34,7 +34,7 @@ class GameAdminViewMixin(sortable_views.DecoratorChainingMixin):
     paging_class = game_edit_catalog.EditGamePage
 
     def get_object(self, *args, **kwargs):
-        game = super(GameAdminViewMixin, self).get_object(*args, **kwargs)
+        game = super().get_object(*args, **kwargs)
         self.variation = game.variation
         if not game.edit_right(self.request.user):
             raise http.Http404()
@@ -45,7 +45,7 @@ class GameAdminViewMixin(sortable_views.DecoratorChainingMixin):
         return game
 
     def get_context_data(self, **kwargs):
-        context = super(GameAdminViewMixin, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['catalog_page'] = self.catalog_page
         return context
 
@@ -62,7 +62,7 @@ class GameEditFormView(GameAdminViewMixin, generic.UpdateView):
     def form_invalid(self, form):
         messages.error(
             self.request, _('there were some errors during form validation'))
-        return super(GameEditFormView, self).form_invalid(form)
+        return super().form_invalid(form)
 
 
 class GameAdminMain(GameEditFormView):
@@ -115,7 +115,7 @@ class GameAdminGraphics(GameAdminView):
     page_url = game_edit_catalog.EDIT_GAME_PAGES_GRAPHICS
 
     def get_context_data(self, **kwargs):
-        context = super(GameAdminGraphics, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['game_files'] = [
             GraphicFile(self.object, name) for name in GRAPHIC_FIELDS]
         return context
@@ -144,7 +144,7 @@ class GameEditRoles(GameAdminView, sortable_views.SortableDetailViewMixin):
             variation_id=game.variation_id).exclude(deleted=True)
 
     def get_context_data(self, **kwargs):
-        context = super(GameEditRoles, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         roles = self.get_sortable_queryset()
         for role in roles:
             role.invitings = models.GameInvite.objects.filter(
@@ -165,7 +165,7 @@ class EditRoleMixin(djfw_views.RightsDetailMixin):
     template_name = 'base_cataloged_navig_form.haml'
 
     def get_form_kwargs(self):
-        kwargs = super(EditRoleMixin, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         if self.form_class == variation_forms.RoleForm:
             if self.object:
                 kwargs['story'] = self.object.variation.story
@@ -187,7 +187,7 @@ class EditRoleMixin(djfw_views.RightsDetailMixin):
         kwargs['game'] = game
         if not self.object:
             kwargs['form_submit_title'] = _("add")
-        return super(EditRoleMixin, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
     def check_rights(self, obj, user):
         self.game = obj.variation.game
@@ -201,7 +201,7 @@ class AddRoleView(EditRoleMixin, views.MessageMixin, subviews.SubCreateView):
     success_message = _('role was successfully added')
 
     def get_parent_object(self, queryset=None):
-        obj = super(AddRoleView, self).get_parent_object()
+        obj = super().get_parent_object()
         if not obj.edit_right(self.request.user):
             raise http.Http404()
         return obj
@@ -273,7 +273,7 @@ class EditRoleAssignView(djfw_views.RightsDetailMixin, generic.DetailView):
             role_request.assigned = models.Role.objects.filter(
                 variation=self.game.variation, user=role_request.user)
         kwargs['requests'] = requests
-        return super(EditRoleAssignView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class BaseGameDetailView(djfw_views.RightsDetailMixin, generic.DetailView):
@@ -294,8 +294,7 @@ class GameEditIllustrationsView(BaseGameDetailView):
         kwargs['story'] = variation.story
         kwargs['illustrations'] = stories_models.Illustration.objects.filter(
             variation=variation)
-        return super(GameEditIllustrationsView, self).get_context_data(
-            **kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class GameEditMaterialsView(BaseGameDetailView):
@@ -309,7 +308,7 @@ class GameEditMaterialsView(BaseGameDetailView):
         kwargs['story'] = variation.story
         kwargs['materials'] = stories_models.AdditionalMaterial.objects.filter(
             variation=variation)
-        return super(GameEditMaterialsView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class BaseDeleteMaterialView(
@@ -362,7 +361,7 @@ class BaseEditMaterialView(
         kwargs['story'] = self.variation.story
         kwargs['materials'] = stories_models.AdditionalMaterial.objects.filter(
             variation=self.variation)
-        return super(BaseEditMaterialView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
     def get_success_url(self):
         return urls.reverse(
@@ -405,7 +404,7 @@ class MaterialView(djfw_views.RightsDetailMixin, generic.DetailView):
         kwargs['catalog_page'] = game_edit_catalog.CatalogPage(
             instance=self.object, parent=parent)
         kwargs['parent'] = parent
-        return super(MaterialView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 def calc_games(user, status):
@@ -479,7 +478,7 @@ class BaseGameFormsetView(
             extra=1, instance=self.object, params={'game': self.object})
 
     def get_context_data(self, **kwargs):
-        kwargs = super(BaseGameFormsetView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs['formset'] = kwargs.pop('form')
         kwargs['catalog_page'] = game_edit_catalog.EditGameSubpage(
             self.object, url=self.catalog_url)
@@ -508,8 +507,8 @@ class EditWinnersView(BaseGameFormsetView):
 def get_game(user, game_id):
     try:
         game_id = int(game_id)
-    except:
-        raise http.Http404()
+    except ValueError as exc:
+        raise http.Http404() from exc
     game = shortcuts.get_object_or_404(models.Game, id=game_id)
     if not game.edit_right(user):
         raise http.Http404()

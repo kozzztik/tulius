@@ -52,8 +52,8 @@ class GameManager(models.Manager):
 
     def any_completed(self):
         return self.filter(
-            Q(status=GAME_STATUS_COMPLETED) |
-            Q(status=GAME_STATUS_COMPLETED_OPEN)
+            Q(status=GAME_STATUS_COMPLETED) | Q(
+                status=GAME_STATUS_COMPLETED_OPEN)
         )
 
     def current(self):
@@ -105,8 +105,9 @@ class GameManager(models.Manager):
 
     def current_games(self, user, check_read=False, announce=False):
         games = self.filter(
-            Q(status=GAME_STATUS_IN_PROGRESS) |
-            Q(status=GAME_STATUS_FINISHING)).filter(deleted=False)
+            Q(status=GAME_STATUS_IN_PROGRESS) | Q(
+                status=GAME_STATUS_FINISHING)
+        ).filter(deleted=False)
         if announce:
             games = games.filter(show_announcement=True)
         return [
@@ -313,7 +314,7 @@ class Game(models.Model):
         return '%s - %d' % (self.name, int(self.serial_number))
 
     def clean(self):
-        super(Game, self).clean()
+        super().clean()
         if not self.serial_number:
             raise ValidationError(_('Specify game serial number'))
         if not self.variation_id:
@@ -351,7 +352,7 @@ class Game(models.Model):
         if not was_none:
             old_self = Game.objects.select_for_update().get(id=self.id)
 
-        super(Game, self).save(
+        super().save(
             force_insert=force_insert, force_update=force_update, using=using,
             update_fields=update_fields)
         if old_self:
@@ -524,7 +525,7 @@ class RequestQuestion(models.Model):
     )
 
     def __str__(self):
-        return self.question
+        return str(self.question)
 
 
 class RequestQuestionAnswer(models.Model):

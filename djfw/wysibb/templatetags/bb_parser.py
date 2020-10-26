@@ -108,6 +108,11 @@ VALID_BB_COLORS = [
     'blue', 'darkblue', 'indigo', 'violet', 'white', 'black']
 
 
+@register_bb_code('search')
+def bb_search(tagname, param, text):
+    return '<span class="search_highlight">%s</span>' % (text,)
+
+
 @register_bb_code('list')
 def bb_list(tagname, param, text):
     if '<li>' not in text:

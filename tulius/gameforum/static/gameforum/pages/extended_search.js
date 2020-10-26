@@ -12,7 +12,11 @@ export default LazyComponent('game_extended_search', {
         loading_end(breadcrumbs) {this.$parent.loading_end(breadcrumbs)},
         thread_breadcrumbs(thread) {return this.$parent.thread_breadcrumbs(thread)},
         user_search(query) {
-            return this.variation.characters;
+            return [{
+                'id': 0,
+                'title': '---',
+            },
+            ...this.variation.characters];
         },
     },
 })

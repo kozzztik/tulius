@@ -1,11 +1,11 @@
 <div>
     <slot :thread="thread" name="thread_actions">
-        <forum_thread_actions v-if="thread.id" :thread="thread"></forum_thread_actions>
+        <forum_thread_actions v-if="thread && thread.id" :thread="thread"></forum_thread_actions>
     </slot>
-    <div class="content" style="padding: 10px;" v-if="thread.id">
+    <div class="content" style="padding: 10px; margin-bottom: 10px;">
         <div class="row">
             <label class="col-2 col-form-label">
-                <router-link :to="urls.extended_search(thread.id)">
+                <router-link :to="urls.extended_search($route.query)">
                     Условия поиска:
                 </router-link>
             </label>
@@ -17,16 +17,19 @@
             </div>
         </div>
     </div>
-    <div v-if="thread.id && (results.length == 0)" class="content">
+    <div v-if="results.length == 0" class="content">
         <br>
         Ничего не найдено.
         <br>
         <br>
     </div>
+    <pagination :pagination="pagination" :page_num="page"></pagination>
     <div v-for="item of results" :key="item.comment.id">
         <slot :item="item" name="comment">
             <forum_comment :thread="item.thread" :comment="item.comment" :preview="true">
             </forum_comment>
         </slot>
     </div>
+    <pagination :pagination="pagination" :page_num="page"></pagination>
+
 </div>

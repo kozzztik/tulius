@@ -1,5 +1,7 @@
 from django.apps import AppConfig
 
+from tulius import celery
+
 
 class TuliusConfig(AppConfig):
     name = 'tulius'
@@ -8,5 +10,4 @@ class TuliusConfig(AppConfig):
     def ready(self):
         # This will make sure the app is always imported when
         # Django starts so that shared_task will use this app.
-        from tulius import celery
         celery.init()

@@ -1,17 +1,19 @@
-from django.conf.urls import url
-from . import views
+from django.conf import urls
+
+from tulius.login import views
+
 
 app_name = 'tulius.login'
 
 urlpatterns = [
-    url(r'^login/$', views.Login.as_view(), name='login'),
-    url(
+    urls.re_path(r'^login/$', views.Login.as_view(), name='login'),
+    urls.re_path(
         r'^login_choose/$',
         views.TemplateView.as_view(template_name='login/choose.haml'),
         name='login_choose'),
-    url(r'^logout/$', views.Logout.as_view(), name='logout'),
-    url(r'^relogin/$', views.ReLogin.as_view(), name='relogin'),
-    url(
+    urls.re_path(r'^logout/$', views.Logout.as_view(), name='logout'),
+    urls.re_path(r'^relogin/$', views.ReLogin.as_view(), name='relogin'),
+    urls.re_path(
         r'^activate/complete/$',
         views.TemplateView.as_view(
             template_name='login/activation_complete.haml'),
@@ -21,15 +23,15 @@ urlpatterns = [
     # view;
     #  that way it can return a sensible "invalid key" message instead of a
     #  confusing 404.
-    url(
+    urls.re_path(
         r'^registration/activate/(?P<activation_key>\w+)/$',
         views.ActivateView.as_view(),
         name='registration_activate'),
-    url(
+    urls.re_path(
         r'^registration/register/$',
         views.RegisterView.as_view(),
         name='registration_register'),
-    url(
+    urls.re_path(
         r'^registration/register/complete/$',
         views.TemplateView.as_view(
             template_name='login/registration_complete.haml'),

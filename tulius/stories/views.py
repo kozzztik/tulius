@@ -45,8 +45,8 @@ class IndexView(generic.TemplateView):
             story for story in stories
             if ((not story.hidden) or story.edit_right(self.request.user))]
         filtered_stories_count = len(stories)
-        filtered = self.request.GET and (filtered_stories_count
-                                         != total_stories_count)
+        filtered = self.request.GET and (
+            filtered_stories_count != total_stories_count)
         for story in stories:
             story.editable = story.edit_right(self.request.user)
             story.authors.all()
@@ -111,8 +111,8 @@ class CharacterInfoView(generic.DetailView):
 def edit_illustration_reload(request, illustration_id):
     try:
         illustration_id = int(illustration_id)
-    except:
-        raise http.Http404()
+    except ValueError as exc:
+        raise http.Http404() from exc
     illustration = shortcuts.get_object_or_404(
         models.Illustration, id=illustration_id)
     if not illustration.edit_right(request.user):
@@ -133,4 +133,4 @@ class MaterialView(djfw_views.RightsDetailMixin, generic.DetailView):
     def get_context_data(self, **kwargs):
         kwargs['catalog_page'] = cataloging.CatalogPage(
             instance=self.object, parent=get_story_page(self.object.story))
-        return super(MaterialView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)

@@ -5,7 +5,7 @@ from django import shortcuts
 from django import urls
 from django.views import generic
 from django.contrib.auth import decorators
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from djfw import subviews
 from djfw import views as djfw_views
@@ -30,7 +30,7 @@ class VarRightsMixin(djfw_views.RightsDetailMixin):
 
     def get_context_data(self, **kwargs):
         kwargs['story'] = self.story
-        return super(VarRightsMixin, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class VarSubpageMixin:
@@ -40,7 +40,7 @@ class VarSubpageMixin:
         if self.page_url:
             kwargs['catalog_page'] = catalog.EditVariationSubpage(
                 self.object, url=self.page_url)
-        return super(VarSubpageMixin, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
     def get_success_url(self):
         return urls.reverse('stories:' + self.page_url, args=(self.object.pk,))
@@ -56,7 +56,7 @@ class VarMainView(
 
     def get_context_data(self, **kwargs):
         self.object.create_game = self.object.create_right(self.request.user)
-        return super(VarMainView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class EditVariationRoles(
@@ -70,7 +70,7 @@ class EditVariationRoles(
     page_url = catalog.EDIT_VARIATION_PAGES_ROLES
 
     def get_context_data(self, **kwargs):
-        context = super(EditVariationRoles, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['delete_role_form'] = edit_variation_forms.RoleDeleteForm(
             self.object)
         return context
@@ -84,7 +84,7 @@ class VarIllustrationsView(
     def get_context_data(self, **kwargs):
         kwargs['illustrations'] = models.Illustration.objects.filter(
             variation=self.object)
-        return super(VarIllustrationsView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class VarMaterialsView(VarRightsMixin, VarSubpageMixin, generic.DetailView):
@@ -94,12 +94,12 @@ class VarMaterialsView(VarRightsMixin, VarSubpageMixin, generic.DetailView):
     def get_context_data(self, **kwargs):
         kwargs['materials'] = models.AdditionalMaterial.objects.filter(
             variation=self.object)
-        return super(VarMaterialsView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class RoleFormMixin:
     def get_form_kwargs(self):
-        kwargs = super(RoleFormMixin, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs['story'] = self.story
         return kwargs
 
@@ -122,7 +122,7 @@ class AddRole(
             name=_('Add role'),
             parent=catalog.EditVariationSubpage(
                 self.parent_object, url=catalog.EDIT_VARIATION_PAGES_ROLES))
-        return super(AddRole, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class AddVarMaterial(
@@ -142,7 +142,7 @@ class AddVarMaterial(
             parent=catalog.EditVariationSubpage(
                 self.parent_object,
                 url=catalog.EDIT_VARIATION_PAGES_MATERIALS))
-        return super(AddVarMaterial, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
     def get_success_url(self):
         return urls.reverse(
@@ -169,7 +169,7 @@ class BaseRoleEdit(
 
     def get_context_data(self, **kwargs):
         kwargs['catalog_page'] = self.get_role_page()
-        return super(BaseRoleEdit, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
     def get_success_url(self):
         return urls.reverse(
@@ -196,14 +196,14 @@ class RoleTextView(RoleRightsMixin, generic.DetailView):
         kwargs['variation'] = self.object.variation
         kwargs['catalog_page'] = catalog.CatalogPage(
             name=_('text'), parent=self.get_role_page())
-        return super(RoleTextView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 def get_variation(user, variation_id):
     try:
         variation_id = int(variation_id)
-    except:
-        raise http.Http404()
+    except ValueError as exc:
+        raise http.Http404() from exc
     variation = shortcuts.get_object_or_404(models.Variation, id=variation_id)
     story = variation.story
     if not story.edit_right(user):

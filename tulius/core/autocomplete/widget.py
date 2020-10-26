@@ -46,7 +46,7 @@ class AutocompleteWidget(TextInput):
             * ``related_fields`` - Fields that relates to current (value
             of this field will sended to autocomplete view via POST)
         """
-        super(AutocompleteWidget, self).__init__(attrs=attrs)
+        super().__init__(attrs=attrs)
         self.options = options or {}
         self.token = token
         self.model = model
@@ -95,7 +95,7 @@ class AutocompleteWidget(TextInput):
             'function(event, ui)'
             ' { $(this).autocomplete_select(event, ui); }')
         self.options['change'] = (
-            'function(event, ui) ' +
+            'function(event, ui) '
             '{ $(this).autocomplete_change(event, ui); }')
         self.options['appendTo'] = '#' + name + '_autocomplete'
         html_code = HiddenInput().render(
@@ -131,16 +131,15 @@ class AutocompleteWidget(TextInput):
         if value:
             obj = self.model.objects.get(pk=value)
             value = str(obj)
-        html_code += super(AutocompleteWidget, self).render(
-            name + '_autocomplete', value, attrs)
+        html_code += super().render(name + '_autocomplete', value, attrs)
 
         html_code += u"""
 <script type="text/javascript">
     $(document).ready(function() {
         %s$("input[id$='%s_autocomplete']").autocomplete({%s
-        }); 
+        });
     });
-</script> 
+</script>
 """ % (extra, final_attrs['id'], options)
 
         return mark_safe(html_code)

@@ -42,7 +42,7 @@ class SortableDetailViewMixin(SortableViewMixin):
 
     def get_sortable_queryset(self):
         self.object = self.get_object()
-        queryset = super(SortableDetailViewMixin, self).get_sortable_queryset()
+        queryset = super().get_sortable_queryset()
         if self.sortable_model and self.model:
             fk = forms.models._get_foreign_key(
                 self.model, self.sortable_model, fk_name=self.sortable_fk)
@@ -60,7 +60,7 @@ class SortableDetailViewMixin(SortableViewMixin):
 class DecoratorChainingMixin:
     def dispatch(self, *args, **kwargs):
         decorators = getattr(self, 'decorators', [])
-        base = super(DecoratorChainingMixin, self).dispatch
+        base = super().dispatch
 
         for decorator in decorators:
             base = decorator(base)
@@ -107,7 +107,7 @@ class ActionableFormsMixin(ActionableMixin):
         return forms_dict
 
     def get_context_data(self, **kwargs):
-        context = super(ActionableFormsMixin, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update(self.get_forms())
         return context
 
@@ -124,5 +124,4 @@ class ActionableFormsMixin(ActionableMixin):
             if callable(method):
                 return method(form, **kwargs)
             return getattr(self, method)(form, **kwargs)
-        return super(ActionableFormsMixin, self).dispatch_action(
-            action_name, **kwargs)
+        return super().dispatch_action(action_name, **kwargs)

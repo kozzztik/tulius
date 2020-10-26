@@ -49,7 +49,7 @@ def test_user_cant_set_html_on_comments(user, thread):
 
 
 def test_user_cant_set_html_on_threads(user, room_group):
-    response=user.put(
+    response = user.put(
         room_group['url'], {
             'title': 'thread', 'body': 'thread description',
             'room': False, 'default_rights': None, 'granted_rights': [],
@@ -70,7 +70,7 @@ def test_user_cant_set_html_on_threads(user, room_group):
 
 
 def test_html_media_on_threads(room_group, superuser):
-    response=superuser.put(
+    response = superuser.put(
         room_group['url'], {
             'title': 'thread', 'body': 'thread description',
             'room': False, 'default_rights': None, 'granted_rights': [],

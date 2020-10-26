@@ -8,4 +8,6 @@
     %p
         %a{href: '{% url "counters:pm" %}'}
             {% trans "Update personal messages counters" %}
-        
+    %p
+        %a{href: '/forums/reindex_elastic/all/'}
+            Переиндексировать все в ElasticSearch

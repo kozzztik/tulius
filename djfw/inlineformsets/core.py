@@ -17,7 +17,7 @@ class InlineFormset(forms.models.BaseInlineFormSet):
         self.params = params
         self.static = static
         self.dinamic = not static
-        super(InlineFormset, self).__init__(
+        super().__init__(
             data, None, instance, None, None, queryset, **kwargs)
 
     def _after_form_constuct(self, form, i):
@@ -26,7 +26,7 @@ class InlineFormset(forms.models.BaseInlineFormSet):
             proc(self, self.params, i)
 
     def _construct_form(self, i, **kwargs):
-        form = super(InlineFormset, self)._construct_form(i, **kwargs)
+        form = super()._construct_form(i, **kwargs)
         self._after_form_constuct(form, i)
         return form
 
@@ -59,8 +59,7 @@ class SimpleFormset(forms.models.BaseModelFormSet):
         self.params = params
         self.static = static
         self.dinamic = not static
-        super(SimpleFormset, self).__init__(
-            data=data, queryset=queryset, **kwargs)
+        super().__init__(data=data, queryset=queryset, **kwargs)
 
     def _after_form_constuct(self, form, i):
         proc = getattr(form, 'after_constuct', None)
@@ -68,7 +67,7 @@ class SimpleFormset(forms.models.BaseModelFormSet):
             proc(self, self.params, i)
 
     def _construct_form(self, i, **kwargs):
-        form = super(SimpleFormset, self)._construct_form(i, **kwargs)
+        form = super()._construct_form(i, **kwargs)
         self._after_form_constuct(form, i)
         return form
 

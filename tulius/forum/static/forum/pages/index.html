@@ -10,7 +10,19 @@
             <b-dropdown-item href="javascript:void(0);" :to="{name: 'fix_counters_index'}" v-if="user.superuser">
                 Обновить счетчики
             </b-dropdown-item>
+            <b-dropdown-item href="javascript:void(0);" :to="{name: 'forum_reindex_forum'}" v-if="user.superuser">
+                Переиндексировать форум
+            </b-dropdown-item>
+            <b-dropdown-item :to="urls.extended_search({})">
+                Расширенный поиск
+            </b-dropdown-item>
         </b-dropdown>
+        <form class="input-group btn-group-sm" @submit.prevent="search_submit"  v-if="!user.is_anonymous" >
+            <input type="text" name="text" required class="form-control" v-model="search_text">
+            <button class="btn btn-light" id="search" type="submit">
+                Поиск
+            </button>
+        </form>
     </div>
     <div class="content" v-for="group in index.groups" v-if="!loading">
         <div class="caption" align="center">
@@ -23,10 +35,10 @@
             </div>
             <div class="captionright"></div>
         </div>
-        <router-link v-if="(!user.is_anonymous) && group.unreaded" :to="urls.comment(group.unreaded)">
+        <a v-if="group.not_read" href="javascript:void(0)" @click="to_comment(group.not_read)">
             <div class="room_group_read_mark not_readed"></div>
-        </router-link>
-        <div v-if="(!user.is_anonymous) && (!group.unreaded)" class="room_group_read_mark"></div>
+        </a>
+        <div v-if="(!user.is_anonymous) && (!group.not_read)" class="room_group_read_mark"></div>
         <div v-if="!user.is_anonymous" class="thread_collapse" v-on:click="collapse" :groupid="group.id">
             {{ group.collapsed ? "+" : "-" }}
         </div>
