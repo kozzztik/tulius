@@ -57,7 +57,7 @@ def do_direct_index(instance, **_kwargs):
     # pylint: disable=unexpected-keyword-arg
     client.index(
         id=instance.pk, index=index_name(instance.__class__),
-        body=instance_to_document(instance), refresh=True)
+        body=instance_to_document(instance), refresh='wait_for')
 
 
 client = elasticsearch7.Elasticsearch(hosts=settings.ELASTIC_HOSTS)
