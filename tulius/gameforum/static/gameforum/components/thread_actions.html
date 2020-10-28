@@ -1,6 +1,6 @@
 <div v-if="!user.is_anonymous" class="btn-toolbar btn-group-sm justify-content-between forum-menu" role="toolbar" aria-label="Toolbar">
     <div class="btn-group-sm">
-        <b-dropdown id="dropdown-1" text="Действия" class="" variant="light" v-if="thread && thread.id">
+        <b-dropdown id="dropdown-1" class="icon-actions" variant="light" v-if="thread && thread.id">
             <b-dropdown-item data-toggle="modal" href="javascript:void(0);" v-if="!thread.room" v-on:click="$bvModal.show('quoteAnswer')">
                 <img src="/static/games/img/button_blue_heart.png" style="height: 25px">
                 Ответить с цитатой
@@ -48,7 +48,7 @@
                 Расширенный поиск
             </b-dropdown-item>
         </b-dropdown>
-        <b-dropdown id="dropdown-characters" text="Персонажи" class="" variant="light" v-if="variation.characters.length > 0">
+        <b-dropdown id="dropdown-characters" class="icon-characters" variant="light" v-if="variation.characters.length > 0">
             <b-dropdown-item href="javascript:void(0)" v-for="role in variation.characters" :key="role.id" class="card" @click="show_char_modal(role.id)">
                 <table class="character-menu-list card-body">
                     <tbody>
@@ -66,7 +66,7 @@
                 </table>
             </b-dropdown-item>
         </b-dropdown>
-        <b-dropdown id="dropdown-materials" text="Материалы" class="" variant="light" v-if="variation.game||(variation.materials.length > 0)||(variation.illustrations.length>0)">
+        <b-dropdown id="dropdown-materials" class="icon-materials" variant="light" v-if="variation.game||(variation.materials.length > 0)||(variation.illustrations.length>0)">
             <b-dropdown-item :href="'/games/game/' + variation.game.id + '/'" v-if="variation.game">
                 <img src="/static/games/img/clipboard.png" style="height: 25px">
                 Вводная
@@ -80,7 +80,7 @@
                 <span v-html="illustration.title"></span>
             </b-dropdown-item>
         </b-dropdown>
-        <b-dropdown id="dropdown-roles" text="Роли" class="" variant="light" v-if="variation.roles.length > 0">
+        <b-dropdown id="dropdown-roles" class="icon-roles" variant="light" v-if="variation.roles.length > 0">
             <b-dropdown-item :href="'/games/view_role/' + role.id + '/'" v-for="role in variation.roles" :key="role.id">
                 <table class="character-menu-list">
                     <tbody>
@@ -159,8 +159,7 @@
     <Tinybox v-model="image_index" :images="images"></Tinybox>
     <form class="input-group btn-group-sm" @submit.prevent="search_submit">
         <input type="text" name="text" required class="form-control" v-model="search_text">
-        <button class="btn btn-light" id="search" type="submit">
-            Поиск
+        <button class="icon-search btn btn-light" id="search" type="submit">
         </button>
     </form>
 
