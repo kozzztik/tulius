@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('game_forum_threads', '0001_squashed_0006_auto_20201013_1740'),
-        ('games', '0001_initial'),
+        ('games', '0001_squashed_0002_auto_20180418_1722'),
     ]
 
     operations = [
