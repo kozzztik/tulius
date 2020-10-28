@@ -51,7 +51,6 @@ INSTALLED_APPS = (
     'hamlpy',
     'djfw',
     'djfw.datablocks',
-    'djfw.logger',  # TODO remove after release with its files
     'djfw.pagination',
     'djfw.flatpages',
     'djfw.tinymce',
@@ -60,7 +59,6 @@ INSTALLED_APPS = (
     'djfw.cataloging',
     'djfw.news',
     'djfw.uploader',
-    'djfw.profiler',  # TODO remove after release with its files
     'djfw.photos',
     'djfw.sortable',
     'djfw.custom_views',
