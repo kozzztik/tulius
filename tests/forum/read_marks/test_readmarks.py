@@ -1,7 +1,7 @@
 from tulius.forum.threads import models
 
 
-def test_read_marks(room_group, admin, user):
+def test_read_marks(room_group, admin, user, client):
     # create a "real" room in group
     response = admin.put(
         room_group['url'], {
@@ -57,6 +57,13 @@ def test_read_marks(room_group, admin, user):
     rooms = {g['id']: g for g in data['groups']}
     room_data = rooms[room_group['id']]
     assert room_data['not_read'] == comment['id']
+    # check how it looks by anonymous user
+    response = client.get('/api/forum/')
+    assert response.status_code == 200
+    data = response.json()
+    rooms = {g['id']: g for g in data['groups']}
+    room_data = rooms[room_group['id']]
+    assert not room_data['not_read']
     # check how it looks on room
     response = user.get(room['url'])
     assert response.status_code == 200
