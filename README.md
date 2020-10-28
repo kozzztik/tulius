@@ -115,6 +115,7 @@ To run frontend part you need to install node.js & npm:
 
 Then switch to tulius/static folder and run 
 ```
+npm install @vue/cli -g
 npm install -D
 ```
 
@@ -132,7 +133,7 @@ Instances, that needed to run:
 1. `manage.py runserver` - Django instance for normal HTTP requests
 2. `async_app.py` - for web sockets support
 3. `celery -A tulius worker -l info` - for deferred tasks (optional)
-4. `npm run start` in tulius/static directory for frontend webpack dev server
+4. `npm run serve` in tulius/static directory for frontend webpack dev server
  
 On Windows, as Celery not supports it yet, install gevent:
 

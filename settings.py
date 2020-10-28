@@ -138,9 +138,12 @@ TEMPLATES = [
 ]
 
 if env == 'dev':
-    WEBPACK_BUNDLE = 'http://localhost:9000/index_bundle.js'
+    VUE_BUNDLE = [
+        'http://localhost:9000/static/js/chunk-vendors.js',
+        'http://localhost:9000/static/js/app.js'
+    ]
 else:
-    WEBPACK_BUNDLE = STATIC_URL + 'app/index_bundle.js'
+    VUE_BUNDLE = STATIC_URL + 'app/index_bundle.js'
 
 AUTHENTICATION_BACKENDS = (
     'tulius.vk.backend.VKBackend',

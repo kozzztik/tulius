@@ -75,7 +75,7 @@ class IndexVue(generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
-        data['index_bundle'] = settings.WEBPACK_BUNDLE
+        data['index_bundle'] = settings.VUE_BUNDLE
         return data
 
 

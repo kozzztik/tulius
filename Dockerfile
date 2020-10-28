@@ -2,6 +2,7 @@ FROM kozzztik/tulius:base_3.0.3
 
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
 RUN apt-get update && apt-get install nodejs -y
+RUN npm install @vue/cli -g
 
 ADD tulius /opt/tulius/tulius
 ADD djfw /opt/tulius/djfw
