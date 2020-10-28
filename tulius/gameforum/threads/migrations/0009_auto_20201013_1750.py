@@ -32,7 +32,6 @@ class Migration(migrations.Migration):
             model_name='thread',
             name='variation',
             field=models.ForeignKey(
-                blank=True, null=True,
                 on_delete=django.db.models.deletion.PROTECT,
                 related_name='threads', to='stories.variation'),
         ),

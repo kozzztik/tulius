@@ -50,11 +50,7 @@ class Migration(migrations.Migration):
                 ('not_read_comment_id', models.IntegerField(
                     blank=True, db_index=True, null=True)),
             ],
-            options={
-                'verbose_name': 'thread read mark',
-                'verbose_name_plural': 'thread read marks',
-                'abstract': False,
-            },
+            options={},
         ),
         migrations.CreateModel(
             name='VotingVote',
