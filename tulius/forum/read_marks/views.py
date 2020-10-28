@@ -161,6 +161,8 @@ class ReadmarkAPI(views.BaseThreadView):
             read_mark = read_marks.get(thread_response['id'])
             if read_mark:
                 thread_response['not_read'] = read_mark.not_read_comment_id
+            elif user.is_anonymous:
+                thread_response['not_read'] = None
             else:
                 thread_response['not_read'] = \
                     threads[thread_response['id']].first_comment[user]

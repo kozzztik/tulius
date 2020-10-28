@@ -57,10 +57,32 @@ def do_direct_index(instance, **_kwargs):
     # pylint: disable=unexpected-keyword-arg
     client.index(
         id=instance.pk, index=index_name(instance.__class__),
-        body=instance_to_document(instance), refresh=True)
+        body=instance_to_document(instance), refresh='wait_for')
 
 
 client = elasticsearch7.Elasticsearch(hosts=settings.ELASTIC_HOSTS)
+
+
+def queryset_iterator(queryset, chunk_size=1000):
+    """
+    Iterate over a Django Queryset ordered by the primary key
+
+    This method loads a maximum of chunk_size (default: 1000) rows in it's
+    memory at the same time while django normally would load all rows in it's
+    memory. Using the iterator() method only causes it to not preload all the
+    classes.
+
+    Note that the implementation of the iterator does not support ordered
+    query sets.
+    """
+    pk = 0
+    last_pk = queryset.order_by('-pk')[0].pk
+    queryset = queryset.order_by('pk')
+    while pk < last_pk:
+        for row in queryset.filter(pk__gt=pk)[:chunk_size]:
+            pk = row.pk
+            yield row
+        gc.collect()
 
 
 class ReindexQuery:
@@ -91,7 +113,9 @@ class ReindexQuery:
         bulk = []
         all_count = query.count()
         self.progress(counter, all_count)
-        for instance in query.iterator(chunk_size=self.chunk_size):
+        if not all_count:
+            return
+        for instance in queryset_iterator(query, chunk_size=self.chunk_size):
             bulk.append(instance_to_document(instance))
             if len(bulk) >= self.bulk_size:
                 self.bulk_index(bulk)

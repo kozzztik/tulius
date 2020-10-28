@@ -33,7 +33,7 @@ export default LazyComponent('forum_comment', {
             if (this.comment.user.id == this.user.id)
                 return true;
             if (!this.thread.not_read)
-                return false;
+                return true;
             return (this.thread.not_read.id > this.comment.id);
         },
     },

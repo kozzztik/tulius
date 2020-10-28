@@ -1,4 +1,5 @@
 import logging
+import time
 from unittest import mock
 
 from django.db.models import signals
@@ -232,9 +233,18 @@ def test_reindex_room(superuser, admin, room_group, thread):
     old_value = comment.title
     comment.title = old_value + 'foobar'
     es_models.do_direct_index(comment)
+    # flush index to be sure get will return fresh data
+    es_models.client.indices.flush(es_models.index_name(models.Comment))
     # check it is now broken
-    doc = es_models.client.get(
-        es_models.index_name(comment.__class__), comment.pk)
+    # some workaround about index refresh. Sometime it needs some time for
+    # document to appear in index and flush not helps
+    for i in range(3):
+        if i:
+            time.sleep(2)
+        doc = es_models.client.get(
+            es_models.index_name(comment.__class__), comment.pk)
+        if doc['_source']['title'] == old_value + 'foobar':
+            break
     assert doc['_source']['title'] == old_value + 'foobar'
     # try reindex by not superuser
     response = admin.post(
