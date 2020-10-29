@@ -31,9 +31,9 @@
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
       <div id="vue_app">
-            <main_menu :user="user"></main_menu>
+            <main_menu :user="user" v-if="!loading"></main_menu>
             <loading :active="loading" :is-full-page="true"></loading>
-            <div id="content-center" class="container">
+            <div id="content-center" class="container" v-if="!loading">
                 <breadcrumbs upper="true" :items="breadcrumb_items" v-if="!loading"></breadcrumbs>
                 <div id="notification_messages">
                     <b-alert v-for="(message, index) in messages" :variant="message.tag" dismissible show :key="index">

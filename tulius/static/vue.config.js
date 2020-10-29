@@ -18,6 +18,5 @@ module.exports = {
         config.plugins.delete('html')
         config.plugins.delete('preload')
         config.plugins.delete('prefetch')
-        config.entry('./app/index.js')
     },
 }

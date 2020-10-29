@@ -143,7 +143,11 @@ if env == 'dev':
         'http://localhost:9000/static/js/app.js'
     ]
 else:
-    VUE_BUNDLE = STATIC_URL + 'app/index_bundle.js'
+    VUE_BUNDLE = [
+        '/static/dist/js/chunk-vendors.js',
+        '/static/dist/js/app.js'
+    ]
+
 
 AUTHENTICATION_BACKENDS = (
     'tulius.vk.backend.VKBackend',
