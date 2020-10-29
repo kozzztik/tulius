@@ -1,3 +1,7 @@
+import {LazyComponent} from '../js/vue-common.js'
+import axios from '../js/axios.min.js';
+
+
 export default LazyComponent('main_menu', {
     template: '/static/common/components/main_menu.html',
     props: ['user'],

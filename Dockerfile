@@ -1,5 +1,9 @@
 FROM kozzztik/tulius:base_3.0.3
 
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
+RUN apt-get update && apt-get install nodejs -y
+RUN npm install @vue/cli -g
+
 ADD tulius /opt/tulius/tulius
 ADD djfw /opt/tulius/djfw
 ADD manage.py /opt/tulius/manage.py
@@ -20,3 +24,4 @@ ADD .git /opt/tulius/.git
 
 ENV TULIUS_BRANCH local
 RUN python manage.py compilemessages
+RUN cd tulius/static && npm install && npm run build

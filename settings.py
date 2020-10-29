@@ -137,6 +137,18 @@ TEMPLATES = [
     },
 ]
 
+if env == 'dev':
+    VUE_BUNDLE = [
+        'http://localhost:9000/static/js/chunk-vendors.js',
+        'http://localhost:9000/static/js/app.js'
+    ]
+else:
+    VUE_BUNDLE = [
+        '/static/dist/js/chunk-vendors.js',
+        '/static/dist/js/app.js'
+    ]
+
+
 AUTHENTICATION_BACKENDS = (
     'tulius.vk.backend.VKBackend',
     'django.contrib.auth.backends.ModelBackend',

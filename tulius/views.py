@@ -73,6 +73,11 @@ def logic_time(x):
 class IndexVue(generic.TemplateView):
     template_name = 'base_vue.html'
 
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['index_bundle'] = settings.VUE_BUNDLE
+        return data
+
 
 class CeleryStatusAPI(generic.View):
     @staticmethod
