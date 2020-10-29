@@ -81,6 +81,8 @@ def test_game_search(game, variation_forum, user, admin, detective, murderer):
     assert response.status_code == 200
     data = response.json()
     assert len(data['results']) == 2
+    # ordering in responses sometimes may be different, so fix it for checks
+    data['results'].sort(key=lambda x: x['comment']['id'])
     assert data['results'][0]['comment']['id'] == thread['first_comment_id']
     assert data['results'][1]['comment']['id'] == comment1['id']
     # check search leader comments
