@@ -32,9 +32,15 @@ const router = new VueRouter({
     routes: routes,
 })
 
+
+function production_url() {
+    var schema = window.location.protocol == 'https:' ? 'wss://' : 'ws://';
+    return schema + window.location.host + '/ws_new/';
+}
+
 var websockets_url = process.env.NODE_ENV === 'development'
     ? 'ws://localhost:7000/ws_new/'
-    : '/ws_new/';
+    : production_url();
 
 Vue.use(VueNativeSock, websockets_url, {
     reconnection: true,
