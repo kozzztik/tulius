@@ -2,7 +2,7 @@ module.exports = {
     publicPath: '/static/',
     pages: {
         app: {
-            entry: 'app/index.js',
+            entry: 'app/app.js',
             template: 'app/index.html',
         }
     },

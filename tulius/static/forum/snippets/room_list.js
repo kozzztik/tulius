@@ -1,4 +1,4 @@
-import latest_post from './latest_post.js'
+import latest_post from './latest_post.vue'
 import {LazyComponent} from '../../common/js/vue-common.js'
 import axios from '../../common/js/axios.min.js';
 
