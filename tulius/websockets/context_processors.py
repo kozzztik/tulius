@@ -1,21 +1,11 @@
-from django.conf import settings
+from django import urls
 
 
 def default(request, json_format=False):
     """
     Adds additional context variables to the default context.
     """
-    web_url = settings.WEBSOCKET_URL_NEW if json_format \
-        else settings.WEBSOCKET_URL
+    web_url = urls.reverse('websockets:ws') if json_format \
+        else urls.reverse('websockets:old')
     protocol = 'wss://' if request.is_secure() else 'ws://'
-    if settings.ENV == 'dev':
-        uri = ''.join([
-            protocol,
-            settings.ASYNC_SERVER['host'],
-            ':',
-            str(settings.ASYNC_SERVER['port']),
-            web_url
-        ])
-    else:
-        uri = protocol + request.get_host() + web_url
-    return {'WEBSOCKET_URI': uri}
+    return {'WEBSOCKET_URI': protocol + request.get_host() + web_url}

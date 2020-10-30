@@ -1,6 +1,6 @@
 version: '3.5'
 services:
-  uwsgi:
+  web:
     image: kozzztik/tulius:master
     networks:
       tuliusnet:
@@ -16,23 +16,6 @@ services:
       options:
         max-size: "100m"
         max-file: "10"
-
-  websockets:
-    image: kozzztik/tulius:master
-    networks:
-      tuliusnet:
-        ipv4_address: 10.5.0.11
-    restart: unless-stopped
-    command: ["python3", "/opt/tulius/async_app.py"]
-    environment:
-      TULIUS_BRANCH: master
-    volumes:
-      - ../../../settings_production.py:/opt/tulius/settings_production.py
-    logging:
-      driver: json-file
-      options:
-        max-size: "100m"
-        max-file: "2"
 
   celery:
     image: kozzztik/tulius:master
