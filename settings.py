@@ -87,7 +87,7 @@ INSTALLED_APPS = (
     'tulius.events.EventsConfig',
     'tulius.vk',
     'tulius.counters',
-    'tulius.websockets',
+    'tulius.websockets.WebsocketsConfig',
 )
 
 MIDDLEWARE = (
