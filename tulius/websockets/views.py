@@ -17,10 +17,10 @@ redis_cache = RedisCache(redis_location, params)
 
 
 @transaction.non_atomic_requests
-async def web_socket_view(request, socket):
+async def web_socket_view(request, socket, json_format=True):
     await socket.accept()
     session = user_session.UserSession(
-        request, socket, redis_cache, json_format=True)
+        request, socket, redis_cache, json_format=json_format)
     try:
         await session.process()
     except asyncio.CancelledError:
@@ -28,7 +28,7 @@ async def web_socket_view(request, socket):
     except Exception as e:
         logging.exception(e)
         await asyncio.get_event_loop().run_in_executor(
-            sentry_sdk.capture_exception, e)
+            None, sentry_sdk.capture_exception, e)
     finally:
         session.close()
         await socket.close()

@@ -309,14 +309,6 @@ REDIS_CONNECTION = {
     'password': '',
 }
 
-ASYNC_SERVER = {
-    'host': '127.0.0.1' if env == 'dev' else '0.0.0.0',
-    'port': 7000
-}
-
-WEBSOCKET_URL = '/ws/'
-WEBSOCKET_URL_NEW = '/ws_new/'
-
 # Actual credentials are hold in settings_production.py file.
 DATABASES = {
     'default': {

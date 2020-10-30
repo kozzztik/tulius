@@ -186,16 +186,22 @@ class WebSocket:
 
     async def receive_jsonb(self) -> t.Any:
         message = await self.receive()
+        if message["type"] == ReceiveEvent.DISCONNECT:
+            return None
         self._test_if_can_receive(message)
         return json.loads(message["bytes"].decode())
 
-    async def receive_text(self) -> str:
+    async def receive_text(self) -> t.Optional[str]:
         message = await self.receive()
+        if message["type"] == ReceiveEvent.DISCONNECT:
+            return None
         self._test_if_can_receive(message)
         return message["text"]
 
-    async def receive_bytes(self) -> bytes:
+    async def receive_bytes(self) -> t.Optional[bytes]:
         message = await self.receive()
+        if message["type"] == ReceiveEvent.DISCONNECT:
+            return None
         self._test_if_can_receive(message)
         return message["bytes"]
 
@@ -220,12 +226,3 @@ class WebSocket:
             'Invalid message type "%s". Was connection accepted?' %
             message["type"]
         )
-
-    def __aiter__(self):
-        return self
-
-    async def __anext__(self):
-        result = await self.receive_json()
-        if result is None:
-            raise StopAsyncIteration
-        return result
