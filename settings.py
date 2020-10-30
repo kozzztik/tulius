@@ -126,7 +126,6 @@ TEMPLATES = [
                 'django.template.context_processors.media',
                 'django.template.context_processors.request',
                 'django.template.context_processors.static',
-                'tulius.websockets.context_processors.default',
                 'djfw.flatpages.context_processors.flatpages',
                 'djfw.datablocks.context_processors.datablocks',
             ],
