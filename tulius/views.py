@@ -12,7 +12,6 @@ from djfw.flatpages import models as flatpage_models
 
 from tulius.profile import views as profile_views
 from tulius.games import models as games
-from tulius.websockets import context_processors as websock_context
 from tulius import celery
 
 
@@ -57,8 +56,6 @@ class AppSettingsAPI(generic.View):
     def get(self, request, **kwargs):
         return http.JsonResponse({
             'debug': settings.DEBUG,
-            'websockets_url': websock_context.default(
-                request, True)['WEBSOCKET_URI'],
             'user': profile_views.request_user_json(request),
         })
 
