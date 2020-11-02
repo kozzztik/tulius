@@ -174,6 +174,64 @@ def test_thread_author_notified(room_group, thread, admin, user):
     assert room['threads'][0]['not_read'] is None
 
 
+def test_rights_notification(room_group, superuser, admin, user):
+    # create a "real" room in group
+    response = admin.put(
+        room_group['url'], {
+            'title': 'group1', 'body': 'group1 description',
+            'room': True, 'default_rights': None, 'granted_rights': []})
+    assert response.status_code == 200
+    room = response.json()
+    # make a thread for room
+    response = admin.put(
+        room['url'], {
+            'title': 'thread', 'body': 'thread description',
+            'room': False, 'default_rights': models.NO_ACCESS,
+            'granted_rights': [], 'important': False, 'media': {}})
+    assert response.status_code == 200
+    thread = response.json()
+    # mark room as read
+    response = user.post(
+        room['url'] + 'read_mark/',
+        {'comment_id': None})
+    assert response.status_code == 200
+    response = superuser.post(
+        room['url'] + 'read_mark/',
+        {'comment_id': None})
+    assert response.status_code == 200
+    # add comment to closed thread
+    response = admin.post(
+        thread['url'] + 'comments_page/', {
+            'reply_id': thread['first_comment_id'],
+            'title': 'hello', 'body': 'world',
+            'media': {},
+        })
+    assert response.status_code == 200
+    data = response.json()
+    comment = data['comments'][1]
+    # check readmark on room
+    response = user.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['not_read'] is None
+    response = superuser.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['not_read'] == comment['id']
+    # create opened thread
+    response = admin.put(
+        room['url'], {
+            'title': 'thread', 'body': 'thread description',
+            'room': False, 'default_rights': None,
+            'granted_rights': [], 'important': False, 'media': {}})
+    assert response.status_code == 200
+    thread2 = response.json()
+    response = user.get(room_group['url'])
+    assert response.status_code == 200
+    data = response.json()
+    assert data['rooms'][0]['not_read'] == thread2['first_comment_id']
+
+
 def test_deleted_threads_not_marked(room_group, admin, superuser):
     # make a room
     response = admin.put(
