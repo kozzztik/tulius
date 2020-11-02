@@ -230,7 +230,7 @@ class AbstractThread(models.Model):
 
     def write_right(self, user):
         return bool(
-            (not self.closed) and (
+            (not self.closed) and user.is_authenticated and (
                 user.is_superuser or (self.rights[user] & ACCESS_WRITE)))
 
     def moderate_right(self, user):

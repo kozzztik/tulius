@@ -95,6 +95,14 @@ def test_comments_api(client, superuser, admin, user):
     assert comment['user']['id'] == user.user.pk
     assert comment['title'] == 'hello'
     assert comment['body'] == 'world'
+    # check anonymous cant post comments
+    response = client.post(
+        thread['url'] + 'comments_page/', {
+            'reply_id': first_comment['id'],
+            'title': 'hello', 'body': 'world',
+            'media': {},
+        })
+    assert response.status_code == 403
     # check how thread looks on room page
     response = admin.get(group['url'])
     assert response.status_code == 200

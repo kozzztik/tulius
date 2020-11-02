@@ -142,13 +142,18 @@ class ReadmarkAPI(views.BaseThreadView):
     def after_add_comment(cls, comment, preview, user, **_kwargs):
         if preview:
             return
-        if not comment.is_thread():
-            pks = comment.parent.parents_ids + [comment.parent.pk]
-            cls.read_mark_model.objects.filter(
-                dj_models.Q(not_read_comment_id=None) | dj_models.Q(
-                    not_read_comment_id__gt=comment.pk),
-                thread_id__in=pks,
-            ).exclude(user=user).update(not_read_comment_id=comment.pk)
+        pks = comment.parent.parents_ids + [comment.parent.pk]
+        query = cls.read_mark_model.objects.filter(
+            not_read_comment_id=None, thread_id__in=pks,
+        ).exclude(user=user)
+        if not comment.parent.rights.all & thread_models.ACCESS_READ:
+            user_pks = [
+                u for u, r in comment.parent.rights
+                if (u != user.pk) and (r & thread_models.ACCESS_READ)]
+            query = query.filter(
+                dj_models.Q(user_id__in=user_pks) | dj_models.Q(
+                    user__is_superuser=True))
+        query.update(not_read_comment_id=comment.pk)
 
     @classmethod
     def update_response_with_marks(cls, response, user, threads):
