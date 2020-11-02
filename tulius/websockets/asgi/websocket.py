@@ -7,7 +7,11 @@ https://gist.github.com/alex-oleshkevich/
 """
 import json
 import typing as t
-from urllib import parse
+import functools
+
+from django.core import exceptions
+
+from tulius.websockets.asgi import asgi_handler
 
 
 class State:
@@ -51,129 +55,83 @@ class ReceiveEvent:
     DISCONNECT = "websocket.disconnect"
 
 
-class Headers:
-    def __init__(self, scope):
-        self._scope = scope
-
-    def keys(self):
-        return [header[0].decode() for header in self._scope["headers"]]
-
-    def as_dict(self) -> dict:
-        return {h[0].decode(): h[1].decode() for h in self._scope["headers"]}
-
-    def __getitem__(self, item: str) -> str:
-        return self.as_dict()[item.lower()]
-
-    def __repr__(self) -> str:
-        return str(dict(self))
-
-
-class QueryParams:
-    def __init__(self, query_string: str):
-        self._dict = dict(parse.parse_qsl(query_string))
-
-    def keys(self):
-        return self._dict.keys()
-
-    def get(self, item, default=None):
-        return self._dict.get(item, default)
-
-    def __getitem__(self, item: str):
-        return self._dict[item]
-
-    def __repr__(self) -> str:
-        return str(dict(self))
-
-
 class WebSocket:
-    def __init__(self, scope, receive, send):
-        self._scope = scope
-        self._receive = receive
-        self._send = send
-        self._client_state = State.CONNECTING
-        self._app_state = State.CONNECTING
-
-    @property
-    def headers(self):
-        return Headers(self._scope)
-
-    @property
-    def scheme(self):
-        return self._scope["scheme"]
-
-    @property
-    def path(self):
-        return self._scope["path"]
-
-    @property
-    def query_params(self):
-        return QueryParams(self._scope["query_string"].decode())
-
-    @property
-    def query_string(self) -> str:
-        return self._scope["query_string"]
-
-    @property
-    def scope(self):
-        return self._scope
+    def __init__(self, request):
+        transport = getattr(request, 'asgi', None)
+        if transport is None:
+            raise exceptions.ImproperlyConfigured(
+                'Recieved websocket request out of ASGI protocol')
+        if transport.ws:
+            raise exceptions.ImproperlyConfigured(
+                'Websocket connection already created')
+        if transport.scope['type'] != 'websocket':
+            raise exceptions.ValidationError(
+                'User does not request websocket')
+        transport.ws = self
+        self._scope = transport.scope
+        self._receive = transport.receive
+        self._send = transport.send
+        self._state = State.CONNECTING
 
     async def accept(self, subprotocol: str = None):
         """Accept connection.
         :param subprotocol: The subprotocol the server wishes to accept.
         :type subprotocol: str, optional
         """
-        if self._client_state == State.CONNECTING:
-            await self.receive()
         await self.send({"type": SendEvent.ACCEPT, "subprotocol": subprotocol})
 
     async def close(self, code: int = 1000):
         await self.send({"type": SendEvent.CLOSE, "code": code})
 
+    @property
+    def closed(self):
+        return self._state == State.DISCONNECTED
+
     async def send(self, message: t.Mapping):
-        if self._app_state == State.DISCONNECTED:
+        if self._state == State.DISCONNECTED:
             raise RuntimeError("WebSocket is disconnected.")
 
-        if self._app_state == State.CONNECTING:
+        if self._state == State.CONNECTING:
             assert message["type"] in {SendEvent.ACCEPT, SendEvent.CLOSE}, (
                 'Could not write event "%s" into socket in connecting state.'
                 % message["type"]
             )
             if message["type"] == SendEvent.CLOSE:
-                self._app_state = State.DISCONNECTED
+                self._state = State.DISCONNECTED
             else:
-                self._app_state = State.CONNECTED
+                self._state = State.CONNECTED
 
-        elif self._app_state == State.CONNECTED:
+        elif self._state == State.CONNECTED:
             assert message["type"] in {SendEvent.SEND, SendEvent.CLOSE}, (
                 'Connected socket can send "%s" and "%s" events, not "%s"'
                 % (SendEvent.SEND, SendEvent.CLOSE, message["type"])
             )
             if message["type"] == SendEvent.CLOSE:
-                self._app_state = State.DISCONNECTED
+                self._state = State.DISCONNECTED
 
         await self._send(message)
 
     async def receive(self):
-        if self._client_state == State.DISCONNECTED:
+        if self._state == State.DISCONNECTED:
             raise RuntimeError("WebSocket is disconnected.")
 
         message = await self._receive()
 
-        if self._client_state == State.CONNECTING:
+        if self._state == State.CONNECTING:
             assert message["type"] == ReceiveEvent.CONNECT, (
                 'WebSocket is in connecting state but received "%s" event'
                 % message["type"]
             )
-            self._client_state = State.CONNECTED
+            self._state = State.CONNECTED
 
-        elif self._client_state == State.CONNECTED:
+        elif self._state == State.CONNECTED:
             assert message["type"] in {
                 ReceiveEvent.RECEIVE, ReceiveEvent.DISCONNECT}, (
                 'WebSocket is connected but received invalid event "%s".'
                 % message["type"]
             )
             if message["type"] == ReceiveEvent.DISCONNECT:
-                self._client_state = State.DISCONNECTED
+                self._state = State.DISCONNECTED
 
         return message
 
@@ -226,3 +184,18 @@ class WebSocket:
             'Invalid message type "%s". Was connection accepted?' %
             message["type"]
         )
+
+
+def websocket_view(func):
+    @functools.wraps(func)
+    async def wrapper(request, *args, **kwargs):
+        ws = WebSocket(request)
+        await ws.accept()
+        try:
+            await func(request, ws, *args, **kwargs)
+            return asgi_handler.HttpResponseUpgrade()
+        finally:
+            if not ws.closed:
+                await ws.close()
+    wrapper.websocket_wrapper = True
+    return wrapper

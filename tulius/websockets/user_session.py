@@ -6,7 +6,6 @@ import logging
 import aioredis
 from django.conf import settings
 from django.contrib import auth
-from django.contrib.sessions import middleware as session_middleware
 
 from tulius.forum import const as forum_const
 from tulius.websockets import consts
@@ -28,9 +27,7 @@ class UserSession:
         return self._redis_cache.make_key(value)
 
     async def auth(self):
-        session_middleware.SessionMiddleware().process_request(self.request)
-        loop = asyncio.get_event_loop()
-        user = await loop.run_in_executor(
+        user = await asyncio.get_event_loop().run_in_executor(
             None, functools.partial(auth.get_user, self.request))
         self.user = user
         self.user_id = self.user.pk
