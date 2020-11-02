@@ -7,6 +7,7 @@ Repo for http://tulius.com project.
     - [x] Docker and docker-compose installed
     - [x] SSH server with auth by keys
     - [x] Git installed
+    - [x] Nginx installed
 
 2. Create user for travis CI:
     ```bash
@@ -87,30 +88,48 @@ Repo for http://tulius.com project.
     ```
     Edit settings files. Change DB passwords and sentry DSN.
    
-11. Install nginx. Configure it using templates:
+11. Configure Nginx using templates:
     ```bash
-    cp /home/travis/master/scripts/tulius/nginx/sentry.conf /etc/nginx/conf.d/sentry.conf
-    cp /home/travis/master/scripts/tulius/nginx/tulius.conf /etc/nginx/conf.d/tulius.conf
+    cp /home/travis/master/scripts/tulius/nginx_production.conf /etc/nginx/conf.d/tulius_prod.conf
+    cp /home/travis/master/scripts/tulius/nginx_dev.conf /etc/nginx/conf.d/tulius_dev.conf
     ```
     
 12. Install letsEncrypt and configure SSL.
 
-13. Check that known host in repo `.travis.yml` file and ssh host in `scripts/deploy.sh` points on target server. 
+13.  Configure kibana access (dev environment only)
+    ```bash
+    sudo apt install apache2-utils
+    sudo touch /etc/nginx/htpasswd
+    sudo htpasswd /etc/nginx/htpasswd bob
+    ```
+
+14. Check that known host in repo `.travis.yml` file and ssh host in `scripts/deploy.sh` points on target server. 
 Update repo if needed (use separate branch and PR)
 
-14. Trigger build on CI, or run it manually on server:
+15. Trigger build on CI, or run it manually on server:
     ```bash
     cd /home/travis/master
     . scripts/on_update.sh master
     cd /home/travis/dev
     . scripts/on_update.sh dev
     ``` 
-15. Check that everything works. Profit.
+16. Check that everything works. Profit.
 
-## Running on local environment
+# Running on local environment
 
-To use Tulius on local dev environment you need to run 3 instances. For both of them
-it is needed to set environment variable:
+To run frontend part you need to install node.js & npm:
+- for Windows use installer https://nodejs.org/en/download/ 
+- for Linux (Debian based) ```apt-get install nodejs```
+
+Then switch to tulius/static folder and run 
+```
+npm install @vue/cli -g
+npm install -D
+```
+
+To use Tulius on local dev environment you need to at least 2 instances
+3 for correct work of heavy requests). 
+For all of them it is needed to set environment variable:
 
 ```bash
 TULIUS_BRANCH=local
@@ -120,10 +139,10 @@ If you need some special configuration options, you can create `settings_product
 file from template and set needed options there.
 
 Instances, that needed to run:
-1. `manage.py runserver` - Django instance for normal HTTP requests
-2. `async_app.py` - for web sockets support
-3. `celery -A tulius worker -l info` - for deferred tasks
-
+1. `manage.py runserver` - Django instance for backend HTTP requests
+2. `celery -A tulius worker -l info` - for deferred tasks (optional)
+3. `npm run serve` in tulius/static directory for frontend webpack dev server
+ 
 On Windows, as Celery not supports it yet, install gevent:
 
 ```pip install gevent```
@@ -132,6 +151,14 @@ and start celery with:
 
 ```celery -A tulius worker -l info -P gevent```
 
+or, instead of starting Celery, you can switch it off, by adding:
+
+```CELERY_TASK_ALWAYS_EAGER = True```
+
+to settings_production.py. However, some heavy requests, like reindexing may
+became too slow to render pages, as deferred tasks will be resolved in request 
+context. But for most things it will be enough.
+
 ## Running tests
 
 ``` 
@@ -139,12 +166,6 @@ python -m pylint tests tulius djfw
 python -m pytest tests tulius djfw
 ```
 
-## Configure kibana access
-```
-sudo apt install apache2-utils
-sudo touch /etc/nginx/htpasswd
-sudo htpasswd /etc/nginx/htpasswd bob
-```
 ## Remove elastic disk limit on dev environment
 ```
 curl -XPUT "http://localhost:9200/_cluster/settings" \
