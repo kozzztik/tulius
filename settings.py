@@ -98,9 +98,9 @@ MIDDLEWARE = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'djfw.pagination.middleware.PaginationMiddleware',
-    'djfw.flatpages.middleware.FlatpageFallbackMiddleware',
-    'tulius.core.profiler.ProfilerMiddleware',
+    'djfw.pagination.middleware.pagination_middleware',
+    'djfw.flatpages.middleware.flatpage_middleware',
+    'tulius.core.profiler.profiler_middleware',
 )
 
 STATICFILES_FINDERS = (

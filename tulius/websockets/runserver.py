@@ -5,9 +5,8 @@ from aiohttp import web
 from aiohttp.http import WSMsgType
 from django.contrib.staticfiles import handlers as static_handlers
 from django.core.management.commands import runserver as dj_runserver
-from django.core.asgi import get_asgi_application
 
-from tulius.websockets import middleware
+from tulius.websockets.asgi import asgi_handler
 
 logger = logging.getLogger('django.server')
 
@@ -109,7 +108,7 @@ class ASGIRequestHandler:
 class ASGIServer:
     def __init__(self, server_address, handler, ipv6):
         self.app = web.Application()
-        self.asgi_application = middleware.websockets(get_asgi_application())
+        self.asgi_application = asgi_handler.get_asgi_application()
         self.server_address = server_address
         self.app.add_routes([
             web.get('/{tail:.*}', self.aiohttp_handler),
