@@ -105,7 +105,7 @@ Vue.app_error_handler = (message, tag) => app.add_message(message, tag);
 axios.interceptors.request.use(
     config => config,
     error => {
-        Vue.app_error_handler(error, "error")
+        app.add_message(error, "error")
         return Promise.reject(error);
     }
 );
@@ -114,7 +114,7 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
     response => response,
     error => {
-        Vue.app_error_handler(error, "error")
+        app.add_message(error, "error")
         return Promise.reject(error);
     }
 );

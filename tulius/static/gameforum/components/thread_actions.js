@@ -39,8 +39,10 @@ export default LazyComponent('game_forum_thread_actions', {
         mark_all_as_read() {
             this.$parent.mark_all_as_read();
         },
-        mark_not_readed() {
-            this.$parent.mark_all_not_readed();
+        mark_not_read() {
+            axios.delete(this.thread.url + 'read_mark/').then(response => {
+                this.thread.not_read = response.data.not_read;
+            });
         },
         delete_thread(bvModalEvt) {
             axios.delete(this.thread.url, {params: {comment: this.delete_comment}}

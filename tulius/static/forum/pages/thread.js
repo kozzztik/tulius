@@ -33,10 +33,5 @@ export default LazyComponent('forum_thread_page', {
                 this.loading = false;
             })
         },
-        mark_all_not_readed() {
-            axios.delete(this.thread.url + 'read_mark/').then(response => {
-                this.thread.not_read = response.data.not_read;
-            });
-        },
     },
 })

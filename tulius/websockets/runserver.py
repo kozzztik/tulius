@@ -111,10 +111,7 @@ class ASGIServer:
         self.asgi_application = asgi_handler.get_asgi_application()
         self.server_address = server_address
         self.app.add_routes([
-            web.get('/{tail:.*}', self.aiohttp_handler),
-            web.post('/{tail:.*}', self.aiohttp_handler),
-            web.put('/{tail:.*}', self.aiohttp_handler),
-            web.options('/{tail:.*}', self.aiohttp_handler),
+            web.route('*', '/{tail:.*}', self.aiohttp_handler)
         ])
 
     def set_app(self, wsgi_handler):

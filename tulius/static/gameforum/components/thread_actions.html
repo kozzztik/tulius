@@ -32,7 +32,7 @@
                 <img src="/static/games/img/check.png" style="height: 25px">
                 Пометить все как прочитанное
             </b-dropdown-item>
-            <b-dropdown-item data-toggle="modal" href="javascript:void(0);" v-if="!thread.room" v-on:click="mark_not_readed()">
+            <b-dropdown-item data-toggle="modal" href="javascript:void(0);" v-if="!thread.room" v-on:click="mark_not_read()">
                 Пометить все как не прочитанное
             </b-dropdown-item>
             <b-dropdown-item href="javascript:void(0);" :to="urls.thread_fix(thread.id)" v-if="user.superuser">

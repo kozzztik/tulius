@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import comment_component from '../snippets/comment.js'
 import pagination_component from '../components/pagination.js'
 import {LazyComponent} from '../../common/js/vue-common.js'

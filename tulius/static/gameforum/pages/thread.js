@@ -36,12 +36,6 @@ export default LazyComponent('gameforum_thread_page', {
                 this.loading = false;
             });
         },
-        mark_all_not_readed() {
-            axios.delete(this.thread.url + 'read_mark/').then(response => {
-                this.thread.last_read_id = response.data.last_read_id;
-                this.thread.not_read = response.data.not_read;
-            });
-        },
         reply_str(comment) {
             if (comment.user.sex == 1) {
                 return comment.user.title + ' сказал:'
