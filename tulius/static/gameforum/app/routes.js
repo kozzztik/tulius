@@ -1,6 +1,6 @@
 import app from './app.js'
 import room from '../pages/room.js'
-import thread from '../pages/thread.js'
+import thread from '../pages/thread.vue'
 import redirect from './redirect.js'
 import game_redirect from './game_redirect.js'
 import variation_redirect from './variation_redirect.js'

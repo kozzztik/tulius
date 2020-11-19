@@ -3,19 +3,23 @@ import online_status from '../snippets/online_status.js'
 import comments_component from '../components/comments.js'
 import reply_form_component from '../components/reply_form.js'
 import APILoadMixin from '../../app/components/api_load_mixin.js'
-import {LazyComponent} from '../../common/js/vue-common.js'
 import axios from '../../common/js/axios.min.js';
 
 
-export default LazyComponent('forum_thread_page', {
+export default {
     mixins: [APILoadMixin,],
-    template: '/static/forum/pages/thread.html',
     data: function () {
         return {
             loading: true,
             thread: {online_ids: [], id: null},
             comments_page: 1,
         }
+    },
+    components: {
+        'forum_thread_actions': thread_actions,
+        'forum_thread_comments': comments_component,
+        'forum_reply_form': reply_form_component,
+        'forum_online_status': online_status,
     },
     computed: {
         urls() {return this.$parent.urls},
@@ -34,4 +38,4 @@ export default LazyComponent('forum_thread_page', {
             })
         },
     },
-})
+}
