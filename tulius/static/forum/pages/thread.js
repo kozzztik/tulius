@@ -1,7 +1,7 @@
 import thread_actions from '../snippets/thread_actions.js'
 import online_status from '../snippets/online_status.js'
 import comments_component from '../components/comments.js'
-import reply_form_component from '../components/reply_form.js'
+import reply_form_component from '../components/reply_form.vue'
 import APILoadMixin from '../../app/components/api_load_mixin.js'
 import axios from '../../common/js/axios.min.js';
 
