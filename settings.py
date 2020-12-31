@@ -88,7 +88,7 @@ INSTALLED_APPS = (
     'tulius.events.EventsConfig',
     'tulius.vk',
     'tulius.counters',
-    'tulius.websockets',
+    'tulius.websockets.WebsocketsConfig',
 )
 
 MIDDLEWARE = (
@@ -99,9 +99,9 @@ MIDDLEWARE = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'djfw.pagination.middleware.PaginationMiddleware',
-    'djfw.flatpages.middleware.FlatpageFallbackMiddleware',
-    'tulius.core.profiler.ProfilerMiddleware',
+    'djfw.pagination.middleware.pagination_middleware',
+    'djfw.flatpages.middleware.flatpage_middleware',
+    'tulius.core.profiler.profiler_middleware',
 )
 
 STATICFILES_FINDERS = (
@@ -127,7 +127,6 @@ TEMPLATES = [
                 'django.template.context_processors.media',
                 'django.template.context_processors.request',
                 'django.template.context_processors.static',
-                'tulius.websockets.context_processors.default',
                 'djfw.flatpages.context_processors.flatpages',
                 'djfw.datablocks.context_processors.datablocks',
             ],
@@ -137,6 +136,18 @@ TEMPLATES = [
         }
     },
 ]
+
+if env == 'dev':
+    VUE_BUNDLE = [
+        'http://localhost:9000/static/js/chunk-vendors.js',
+        'http://localhost:9000/static/js/app.js'
+    ]
+else:
+    VUE_BUNDLE = [
+        '/static/dist/js/chunk-vendors.js',
+        '/static/dist/js/app.js'
+    ]
+
 
 AUTHENTICATION_BACKENDS = (
     'tulius.vk.backend.VKBackend',
@@ -297,14 +308,6 @@ REDIS_CONNECTION = {
     'db': {'prod': 3, 'qa': 2, 'dev': 1, 'test': 4}[env],
     'password': '',
 }
-
-ASYNC_SERVER = {
-    'host': '127.0.0.1' if env == 'dev' else '0.0.0.0',
-    'port': 7000
-}
-
-WEBSOCKET_URL = '/ws/'
-WEBSOCKET_URL_NEW = '/ws_new/'
 
 # Actual credentials are hold in settings_production.py file.
 DATABASES = {
