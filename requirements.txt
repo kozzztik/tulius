@@ -1,4 +1,4 @@
-django == 3.1.1
+django == 3.1.6
 pytz == 2020.1
 pillow == 6.2.0
 mysqlclient == 2.0.1
