@@ -2,11 +2,11 @@ import os
 import io
 from mimetypes import guess_type
 
+from PIL import Image
 from django.http import Http404, HttpResponseBadRequest
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.shortcuts import get_object_or_404
-from PIL import Image
 
 from djfw.uploader import handle_upload, handle_download_file_path
 from djfw.common import generate_random_id

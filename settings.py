@@ -88,20 +88,20 @@ INSTALLED_APPS = (
     'tulius.events.EventsConfig',
     'tulius.vk',
     'tulius.counters',
-    'tulius.websockets',
+    'django_asyncio.DjangoAsyncio',
 )
 
 MIDDLEWARE = (
     # 'raven.contrib.django.raven_compat.middleware.Sentry404CatchMiddleware',
-    'tulius.core.profiler.ProfilerMiddleware',
+    'tulius.core.profiler.profiler_middleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'djfw.pagination.middleware.PaginationMiddleware',
-    'djfw.flatpages.middleware.FlatpageFallbackMiddleware',
+    'djfw.pagination.middleware.pagination_middleware',
+    'djfw.flatpages.middleware.flatpage_middleware',
 )
 
 STATICFILES_FINDERS = (
@@ -127,7 +127,6 @@ TEMPLATES = [
                 'django.template.context_processors.media',
                 'django.template.context_processors.request',
                 'django.template.context_processors.static',
-                'tulius.websockets.context_processors.default',
                 'djfw.flatpages.context_processors.flatpages',
                 'djfw.datablocks.context_processors.datablocks',
             ],
@@ -297,14 +296,6 @@ REDIS_CONNECTION = {
     'db': {'prod': 3, 'qa': 2, 'dev': 1, 'test': 4}[env],
     'password': '',
 }
-
-ASYNC_SERVER = {
-    'host': '127.0.0.1' if env == 'dev' else '0.0.0.0',
-    'port': 7000
-}
-
-WEBSOCKET_URL = '/ws/'
-WEBSOCKET_URL_NEW = '/ws_new/'
 
 # Actual credentials are hold in settings_production.py file.
 DATABASES = {

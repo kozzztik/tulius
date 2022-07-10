@@ -2,10 +2,10 @@ import io
 from mimetypes import guess_type
 import os
 
+from PIL import Image
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from django.conf import settings
-from PIL import Image
 
 from tulius.stories.models import AVATAR_SIZES, AVATAR_SAVE_SIZE
 from djfw.uploader import handle_upload

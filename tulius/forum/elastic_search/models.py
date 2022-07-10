@@ -4,6 +4,7 @@ import logging
 import datetime
 from logging import handlers
 
+import elasticsearch7
 from django.apps import apps
 from django.conf import settings
 from django.db import models
@@ -11,7 +12,6 @@ from django.db.models import signals
 from django.db.models.fields import related
 from django.db.models.fields import reverse_related
 from django.core.serializers.json import DjangoJSONEncoder
-import elasticsearch7
 
 logger = logging.getLogger('elastic_search_indexing')
 

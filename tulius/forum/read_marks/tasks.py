@@ -1,5 +1,5 @@
-from django.apps import apps
 from celery import shared_task
+from django.apps import apps
 
 
 def update_read_marks_on_rights_async(thread, only_users=None):
