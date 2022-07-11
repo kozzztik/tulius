@@ -1,14 +1,13 @@
 FROM kozzztik/tulius:base_3.0.3
 
-RUN pip install hypercorn==0.11.1
-CMD [ "hypercorn", "-b", "0.0.0.0:7000", "-w", "2", "asgi:application" ]
+CMD [ "app.py" ]
 
 ADD tulius /opt/tulius/tulius
 ADD .git /opt/tulius/.git
 ADD djfw /opt/tulius/djfw
 ADD manage.py /opt/tulius/manage.py
 ADD requirements.txt /opt/tulius/requirements.txt
-ADD asgi.py /opt/tulius/asgi.py
+ADD app.py /opt/tulius/app.py
 ADD settings.py /opt/tulius/settings.py
 ADD .pylintrc /opt/tulius/.pylintrc
 ADD tests /opt/tulius/tests
@@ -20,4 +19,5 @@ RUN chmod +x /opt/tulius/travis_test.sh
 RUN pip install -r requirements.txt
 
 ENV TULIUS_BRANCH local
+ENV HTTP_PORT 7000
 RUN python manage.py compilemessages

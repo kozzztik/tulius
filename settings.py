@@ -181,7 +181,7 @@ ELASTIC_MODELS = (
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': False,
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse'
@@ -353,3 +353,8 @@ CELERY_BROKER_URL = 'redis://{host}:{port}/{db}'.format(**REDIS_CONNECTION)
 CELERY_WORKER_CONCURRENCY = 3
 CELERY_EVENT_QUEUE_PREFIX = f'{env}_'
 CELERY_TASK_ALWAYS_EAGER = TEST_RUN
+
+HTTP_HOST = '0.0.0.0'
+HTTP_PORT = os.environ.get('HTTP_PORT', 7000)
+HTTP_KEEP_ALIVE = 75.0
+HTTP_THREADS = 10

@@ -4,6 +4,7 @@ import json
 import logging
 
 import aioredis
+from aiohttp.web import WSMsgType
 from django.conf import settings
 from django.contrib import auth
 
@@ -104,19 +105,19 @@ class UserSession:
                 self.user_channel)
 
         while True:
-            if self.json:
-                data = await self.ws.receive_json()
-            else:
-                data = await self.ws.receive_text()
-            if data is None:
+            msg = await self.ws.receive()
+            if msg.type == WSMsgType.CLOSE:
                 break
+            data = msg.data
+            if self.json:
+                data = json.loads(data)
             if self.json:
                 method = getattr(
                     self, 'action_' + data.get('action', 'empty'), None)
                 if method:
                     await method(data)
             else:
-                await self.ws.send_text(data + '/answer')
+                await self.ws.send_str(data + '/answer')
         logger.info('User %s closed', self.user_id)
 
     def close(self):

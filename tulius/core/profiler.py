@@ -1,4 +1,5 @@
 import asyncio
+import socket
 
 import threading
 import time
@@ -7,6 +8,7 @@ import logging
 from ua_parser import user_agent_parser
 from django import http
 
+host_name = socket.gethostname()
 
 def get_user_data(request):
     result = {}
@@ -51,9 +53,11 @@ def log_record(request, exec_time, response):
         content_length = None
     else:
         content_length = len(response.content)
-    asgi = getattr(request, 'transport', None)
+    aiohttp = getattr(request, 'aiohttp_context', None)
     logging.getLogger('profiler').info(request.path, extra={
-        'asgi': bool(asgi),
+        'host_name': host_name,
+        'aiohttp': bool(aiohttp),
+        'requests_count': aiohttp["requests"] if aiohttp else 1,
         'method': request.method,
         'status_code': response.status_code,
         'content_length': content_length,

@@ -1,9 +1,9 @@
 import asyncio
-import logging
 
 import sentry_sdk
+from aiohttp.web import WebSocketResponse
 from redis_cache import RedisCache
-from django_asyncio import websocket
+from django_asyncio.aiohttp_handler import websocket_view
 from django.conf import settings
 from django.db import transaction
 
@@ -18,8 +18,8 @@ redis_cache = RedisCache(redis_location, params)
 
 
 @transaction.non_atomic_requests
-@websocket.websocket_view
-async def web_socket_view(request, ws: websocket.WebSocket, json_format=True):
+@websocket_view
+async def web_socket_view(request, ws: WebSocketResponse, json_format=True):
     session = user_session.UserSession(
         request, ws, redis_cache, json_format=json_format)
     try:
@@ -27,8 +27,8 @@ async def web_socket_view(request, ws: websocket.WebSocket, json_format=True):
     except asyncio.CancelledError:
         pass
     except Exception as e:
-        logging.exception(e)
         await asyncio.get_event_loop().run_in_executor(
             None, sentry_sdk.capture_exception, e)
+        raise
     finally:
         session.close()

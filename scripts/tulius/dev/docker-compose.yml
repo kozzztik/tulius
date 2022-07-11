@@ -1,10 +1,27 @@
 version: '3.5'
 services:
-  web:
+  web1:
     image: kozzztik/tulius:dev
     networks:
       tuliusnet:
         ipv4_address: 10.5.0.20
+    restart: unless-stopped
+    environment:
+      TULIUS_BRANCH: dev
+    volumes:
+      - ../../../data/media:/opt/tulius/data/media
+      - ../../../data/mail:/opt/tulius/data/mail
+      - ../../../settings_production.py:/opt/tulius/settings_production.py
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "10"
+  web2:
+    image: kozzztik/tulius:dev
+    networks:
+      tuliusnet:
+        ipv4_address: 10.5.0.21
     restart: unless-stopped
     environment:
       TULIUS_BRANCH: dev
