@@ -8,6 +8,7 @@ services:
     restart: unless-stopped
     environment:
       TULIUS_BRANCH: dev
+      HTTP_THREADS: 10
     volumes:
       - ../../../data/media:/opt/tulius/data/media
       - ../../../data/mail:/opt/tulius/data/mail
@@ -25,6 +26,7 @@ services:
     restart: unless-stopped
     environment:
       TULIUS_BRANCH: dev
+      HTTP_THREADS: 10
     volumes:
       - ../../../data/media:/opt/tulius/data/media
       - ../../../data/mail:/opt/tulius/data/mail

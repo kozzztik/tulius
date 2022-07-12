@@ -10,6 +10,7 @@ from django import http
 
 host_name = socket.gethostname()
 
+
 def get_user_data(request):
     result = {}
     try:
