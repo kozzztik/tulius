@@ -1,3 +1,6 @@
+import asyncio
+
+
 def get_page(self):
     """
     A function which will be monkeypatched onto the request to get the current
@@ -15,6 +18,12 @@ def get_page(self):
         return 1
 
 
+def pagination_middleware(get_response):
+    if asyncio.iscoroutinefunction(get_response):
+        return AsyncPaginationMiddleware(get_response)
+    return PaginationMiddleware(get_response)
+
+
 class PaginationMiddleware:
     """
     Inserts a variable representing the current page onto the request object if
@@ -26,3 +35,17 @@ class PaginationMiddleware:
     def __call__(self, request):
         request.page = get_page(request)
         return self.get_response(request)
+
+
+class AsyncPaginationMiddleware:
+    _is_coroutine = asyncio.coroutines._is_coroutine
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    async def __call__(self, request):
+        request.page = get_page(request)
+        return await self.get_response(request)
+
+
+pagination_middleware.async_capable = True

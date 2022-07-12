@@ -1,11 +1,11 @@
 import datetime
 
+from redis import client
 from django import dispatch
 from django.conf import settings
 from django.contrib import auth
 from django.core.cache import cache
 from django.utils import html
-from redis import client
 
 from tulius.forum import core
 from tulius.forum.threads import models as thread_models

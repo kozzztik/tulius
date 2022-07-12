@@ -88,20 +88,20 @@ INSTALLED_APPS = (
     'tulius.events.EventsConfig',
     'tulius.vk',
     'tulius.counters',
-    'tulius.websockets',
+    'django_asyncio.DjangoAsyncio',
 )
 
 MIDDLEWARE = (
     # 'raven.contrib.django.raven_compat.middleware.Sentry404CatchMiddleware',
-    'tulius.core.profiler.ProfilerMiddleware',
+    'tulius.core.profiler.profiler_middleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'djfw.pagination.middleware.PaginationMiddleware',
-    'djfw.flatpages.middleware.FlatpageFallbackMiddleware',
+    'djfw.pagination.middleware.pagination_middleware',
+    'djfw.flatpages.middleware.flatpage_middleware',
 )
 
 STATICFILES_FINDERS = (
@@ -127,7 +127,6 @@ TEMPLATES = [
                 'django.template.context_processors.media',
                 'django.template.context_processors.request',
                 'django.template.context_processors.static',
-                'tulius.websockets.context_processors.default',
                 'djfw.flatpages.context_processors.flatpages',
                 'djfw.datablocks.context_processors.datablocks',
             ],
@@ -182,7 +181,7 @@ ELASTIC_MODELS = (
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': False,
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse'
@@ -298,14 +297,6 @@ REDIS_CONNECTION = {
     'password': '',
 }
 
-ASYNC_SERVER = {
-    'host': '127.0.0.1' if env == 'dev' else '0.0.0.0',
-    'port': 7000
-}
-
-WEBSOCKET_URL = '/ws/'
-WEBSOCKET_URL_NEW = '/ws_new/'
-
 # Actual credentials are hold in settings_production.py file.
 DATABASES = {
     'default': {
@@ -362,3 +353,8 @@ CELERY_BROKER_URL = 'redis://{host}:{port}/{db}'.format(**REDIS_CONNECTION)
 CELERY_WORKER_CONCURRENCY = 3
 CELERY_EVENT_QUEUE_PREFIX = f'{env}_'
 CELERY_TASK_ALWAYS_EAGER = TEST_RUN
+
+HTTP_HOST = '0.0.0.0'
+HTTP_PORT = os.environ.get('HTTP_PORT', 7000)
+HTTP_KEEP_ALIVE = 75.0
+HTTP_THREADS = os.environ.get('HTTP_THREADS', 10)
