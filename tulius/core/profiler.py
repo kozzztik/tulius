@@ -55,9 +55,11 @@ def log_record(request, exec_time, response):
     else:
         content_length = len(response.content)
     aiohttp = getattr(request, 'aiohttp_context', None)
-    data = {'session_miss_count': aiohttp.get('session_miss', 0)}
-    if 'session' in aiohttp:
-        data['context_session_key'] = aiohttp['session'].session_key
+    data = {}
+    if aiohttp:
+        data['session_miss_count'] = aiohttp.get('session_miss', 0)
+        if 'session' in aiohttp:
+            data['context_session_key'] = aiohttp['session'].session_key
     session = getattr(request, 'session', None)
     if session:
         data['session_key'] = session.session_key
