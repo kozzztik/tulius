@@ -1,6 +1,6 @@
 FROM kozzztik/tulius:base_3.0.3
 
-CMD [ "app.py" ]
+CMD [ "python", "app.py" ]
 
 ADD tulius /opt/tulius/tulius
 ADD .git /opt/tulius/.git
