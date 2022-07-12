@@ -88,6 +88,7 @@ INSTALLED_APPS = (
     'tulius.events.EventsConfig',
     'tulius.vk',
     'tulius.counters',
+    'tulius.websockets',
     'django_asyncio.DjangoAsyncio',
 )
 
@@ -240,11 +241,6 @@ LOGGING = {
         'installer': {
             'handlers': ['null'],
             'level': 'DEBUG',
-            'propagate': True,
-        },
-        'async_app': {
-            'handlers': ['console'],
-            'level': 'DEBUG' if env == 'dev' else 'ERROR',
             'propagate': True,
         },
         'profiler': {
