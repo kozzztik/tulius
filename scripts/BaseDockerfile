@@ -6,7 +6,7 @@ ENV TULIUS_BRANCH local
 RUN mkdir /opt/tulius
 WORKDIR /opt/tulius
 
-CMD [ "app.py" ]
+CMD [ "/opt/app.py" ]
 
 ## install requirements, so they can be cached by Docker
 RUN pip install django==3.1.1 pytz==2020.1 pillow==6.2.0 \
