@@ -8,7 +8,7 @@ services:
     restart: unless-stopped
     environment:
       TULIUS_BRANCH: master
-      HTTP_THREADS: 10
+      HTTP_THREADS: 1
     volumes:
       - ../../../data/media:/opt/tulius/data/media
       - ../../../settings_production.py:/opt/tulius/settings_production.py
@@ -25,7 +25,7 @@ services:
     restart: unless-stopped
     environment:
       TULIUS_BRANCH: master
-      HTTP_THREADS: 10
+      HTTP_THREADS: 1
     volumes:
       - ../../../data/media:/opt/tulius/data/media
       - ../../../settings_production.py:/opt/tulius/settings_production.py
