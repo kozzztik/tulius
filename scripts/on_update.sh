@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -ex
 echo "do on update"
 
 TULIUS_BRANCH=$1
