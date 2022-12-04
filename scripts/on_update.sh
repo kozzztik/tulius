@@ -6,6 +6,7 @@ ROOTDIR=$PWD
 
 if [ $2 ]; then
   ENV = $2
+  echo "Deploy $TULIUS_BRANCH on $ENV environment"
 else
   ENV = TULIUS_BRANCH
 fi
