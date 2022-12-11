@@ -17,8 +17,8 @@ docker-compose stop
 docker-compose exec celery python manage.py wait_celery
 docker-compose down
 docker system prune --force
-docker rm -v $(docker ps --filter status=exited -q 2>/dev/null) 2>/dev/null
-docker rmi $(docker images --filter dangling=true -q 2>/dev/null) 2>/dev/null
+docker rm -v $(docker ps --filter status=exited -q 2>/dev/null) 2>/dev/null || true
+docker rmi $(docker images --filter dangling=true -q 2>/dev/null) 2>/dev/null || true
 cd $ROOTDIR
 
 echo "Pull docker container tulius_$1"
