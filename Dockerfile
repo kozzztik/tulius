@@ -14,7 +14,11 @@ ADD scripts/travis_test.sh /opt/tulius/travis_test.sh
 RUN chmod +x /opt/tulius/travis_test.sh
 
 # update requirements
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
+# for coveralls
+RUN apt-get install git -y
+ADD .git /opt/tulius/.git
 
 ENV TULIUS_BRANCH local
 RUN python manage.py compilemessages
