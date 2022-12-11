@@ -6,10 +6,10 @@ TULIUS_BRANCH=$1
 ROOTDIR=$PWD
 
 if [ $2 ]; then
-  ENV = $2
+  ENV=$2
   echo "Deploy $TULIUS_BRANCH on $ENV environment"
 else
-  ENV = TULIUS_BRANCH
+  ENV=TULIUS_BRANCH
 fi
 echo "Stop existing compose"
 cd scripts/tulius/$ENV
