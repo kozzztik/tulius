@@ -12,5 +12,6 @@ echo "BRANCH_NAME=$BRANCH_NAME" >> build.env
 echo "REF=$REF" >> build.env
 echo "COMMIT=$COMMIT" >> build.env
 echo "GITHUB=$GITHUB" >> build.env
+# set github pending status
 eval "$GITHUB -d '{\"state\":\"pending\",\"target_url\":\"$CI_PIPELINE_URL\",\"description\":\"Build in progress\",\"context\":\"CI/GitLab\"}'"
 docker build -t kozzztik/tulius:${BRANCH_NAME} .
