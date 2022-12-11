@@ -52,7 +52,7 @@ def save_uploaded_image(request, upload, filename):
 
     thumb_size = getattr(settings, 'WYSIBB_THUMB_SIZE', (100, 100))
     thumb_format = getattr(settings, 'WYSIBB_THUMB_FORMAT', 'png')
-    image.thumbnail(thumb_size, Image.ANTIALIAS)
+    image.thumbnail(thumb_size, Image.Resampling.LANCZOS)
 
     image_content = BytesIO()
     image.save(image_content, format=thumb_format)
