@@ -8,7 +8,7 @@ echo "Push to repo"
 docker push kozzztik/tulius:$BRANCH
 
 # Download updates
-ssh -i $1 travis@$ENV.tulius.co-de.org -p 22 "cd ~/$ENV && git fetch --all && git reset --hard && git git checkout -b $BRANCH $COMMIT"
+ssh -i $1 travis@$ENV.tulius.co-de.org -p 22 "cd ~/$ENV && git fetch --all && git reset --hard && git checkout -b $BRANCH $COMMIT"
 echo "Data updated"
 
 # Do after deploy staff
