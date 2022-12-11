@@ -7,6 +7,7 @@ Repo for http://tulius.com project.
     - [x] Docker and docker-compose installed
     - [x] SSH server with auth by keys
     - [x] Git installed
+    - [x] Nginx installed
 
 2. Create user for travis CI:
     ```bash
@@ -71,11 +72,11 @@ Repo for http://tulius.com project.
     docker exec -it tulius_mysql /bin/bash
     mysql -uroot -p tulius_prod < /var/lib/mysql/backup.sql
     ```
- 8. Create Sentry database and super user (not needed if DB restored from lib files):
-     ```bash
-    docker exec -it tulius_sentry sentry upgrade
-    ```
- 9. Use sentry web interface on `http://sentry.co-de.org` (check DNS records), to finalize installation. 
+8. Create Sentry database and super user (not needed if DB restored from lib files):
+   ```bash
+   docker exec -it tulius_sentry sentry upgrade
+   ```
+9. Use sentry web interface on `http://sentry.co-de.org` (check DNS records), to finalize installation. 
  Create two sentry projects and get DSN URLs for them.
  
 10. Configure prod and dev environments.
@@ -95,17 +96,24 @@ Repo for http://tulius.com project.
     
 12. Install letsEncrypt and configure SSL.
 
-13. Check that known host in repo `.travis.yml` file and ssh host in `scripts/deploy.sh` points on target server. 
+13. Configure kibana access (dev environment only)
+    ```bash
+    sudo apt install apache2-utils
+    sudo touch /etc/nginx/htpasswd
+    sudo htpasswd /etc/nginx/htpasswd bob
+    ```
+
+14. Check that known host in repo `.travis.yml` file and ssh host in `scripts/deploy.sh` points on target server. 
 Update repo if needed (use separate branch and PR)
 
-14. Trigger build on CI, or run it manually on server:
+15. Trigger build on CI, or run it manually on server:
     ```bash
     cd /home/travis/master
     . scripts/on_update.sh master
     cd /home/travis/dev
     . scripts/on_update.sh dev
     ``` 
-15. Check that everything works. Profit.
+16. Check that everything works. Profit.
 
 ## Running on local environment
 
@@ -139,12 +147,6 @@ python -m pylint tests tulius djfw
 python -m pytest tests tulius djfw
 ```
 
-## Configure kibana access
-```
-sudo apt install apache2-utils
-sudo touch /etc/nginx/htpasswd
-sudo htpasswd /etc/nginx/htpasswd bob
-```
 ## Remove elastic disk limit on dev environment
 ```
 curl -XPUT "http://localhost:9200/_cluster/settings" \

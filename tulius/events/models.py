@@ -53,7 +53,7 @@ class Notification(models.Model):
     )
 
     def __str__(self):
-        return self.name or self.code_name
+        return str(self.name or self.code_name)
 
 
 class UserNotification(models.Model):

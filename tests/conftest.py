@@ -5,6 +5,8 @@ import django
 from django.test import client as django_client
 from django.test import utils
 
+pytest_plugins = ('celery.contrib.pytest', )
+
 
 class JSONClient(django_client.Client):
     # pylint: disable=too-many-arguments

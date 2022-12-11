@@ -13,7 +13,7 @@ else
 fi
 echo "Stop existing compose"
 cd scripts/tulius/$ENV
-docker-compose stop uwsgi
+docker-compose stop
 docker-compose exec celery python manage.py wait_celery
 docker-compose down
 docker system prune --force
