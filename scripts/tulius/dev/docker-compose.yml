@@ -8,6 +8,8 @@ services:
     restart: unless-stopped
     environment:
       TULIUS_BRANCH: dev
+    ports:
+      - 21000:21000
     volumes:
       - ../../../data/media:/opt/tulius/data/media
       - ../../../data/mail:/opt/tulius/data/mail
