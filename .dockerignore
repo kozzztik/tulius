@@ -1,6 +1,7 @@
 static
 media
 env
+venv
 sql-logfile.txt
 backup.log
 data

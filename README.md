@@ -72,11 +72,11 @@ Repo for http://tulius.com project.
     docker exec -it tulius_mysql /bin/bash
     mysql -uroot -p tulius_prod < /var/lib/mysql/backup.sql
     ```
- 8. Create Sentry database and super user (not needed if DB restored from lib files):
-     ```bash
-    docker exec -it tulius_sentry sentry upgrade
-    ```
- 9. Use sentry web interface on `http://sentry.co-de.org` (check DNS records), to finalize installation. 
+8. Create Sentry database and super user (not needed if DB restored from lib files):
+   ```bash
+   docker exec -it tulius_sentry sentry upgrade
+   ```
+9. Use sentry web interface on `http://sentry.co-de.org` (check DNS records), to finalize installation. 
  Create two sentry projects and get DSN URLs for them.
  
 10. Configure prod and dev environments.
@@ -96,7 +96,7 @@ Repo for http://tulius.com project.
     
 12. Install letsEncrypt and configure SSL.
 
-13.  Configure kibana access (dev environment only)
+13. Configure kibana access (dev environment only)
     ```bash
     sudo apt install apache2-utils
     sudo touch /etc/nginx/htpasswd
