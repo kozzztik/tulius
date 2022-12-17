@@ -25,55 +25,61 @@ Vue.use(VueNativeSock, websockets_url, {
     format: 'json'
 });
 
-axios.get('/api/app_settings/').then(response => {
-    var app = new Vue({
-        el: '#vue_app',
-        router: router,
-        data: {
-            debug: response.data.debug,
-            breadcrumb_items: [],
-            loading: false,
-            loading_counter: 0,
-            show_footer: false,
-            footer_content: '',
-            messages: [],
-            user: response.data.user,
-        },
-        methods: {
-            loading_start() {
-                this.loading_counter = this.loading_counter + 1;
-                const new_loading = (this.loading_counter > 0);
-                if (this.loading != new_loading) {
-                    this.loading = new_loading;
-                }
-            },
-            loading_end(items) {
-                if (items) {
-                    if (items.length > 0)
-                        document.title = items[items.length - 1].title;
-                    this.breadcrumb_items = items;
-                }
-                this.loading_counter = this.loading_counter - 1;
-                if (this.loading_counter < 0)
-                    this.loading_counter = 0;
-                const new_loading = (this.loading_counter > 0);
-                if (this.loading != new_loading) {
-                    this.loading = new_loading;
-                }
-            },
-            update_footer(show, content) {
-                this.show_footer = show;
-                this.footer_content = content;
-            },
-            add_message(message, tag) {
-                if (tag == 'error') tag = 'danger';
-                this.messages.push({'tag': tag, 'text': message})
+var app = new Vue({
+    el: '#vue_app',
+    router: router,
+    data: {
+        debug: false,
+        breadcrumb_items: [],
+        loading: true,
+        loading_counter: 0,
+        show_footer: false,
+        footer_content: '',
+        messages: [],
+        user: {},
+    },
+    methods: {
+        loading_start() {
+            this.loading_counter = this.loading_counter + 1;
+            const new_loading = (this.loading_counter > 0);
+            if (this.loading != new_loading) {
+                this.loading = new_loading;
             }
         },
-    });
+        loading_end(items) {
+            if (items) {
+                if (items.length > 0)
+                    document.title = items[items.length - 1].title;
+                this.breadcrumb_items = items;
+            }
+            this.loading_counter = this.loading_counter - 1;
+            if (this.loading_counter < 0)
+                this.loading_counter = 0;
+            const new_loading = (this.loading_counter > 0);
+            if (this.loading != new_loading) {
+                this.loading = new_loading;
+            }
+        },
+        update_footer(show, content) {
+            this.show_footer = show;
+            this.footer_content = content;
+        },
+        add_message(message, tag) {
+            if (tag == 'error') tag = 'danger';
+            this.messages.push({'tag': tag, 'text': message})
+        }
+    },
+    mounted() {
+        axios.get('/api/app_settings/').then(response => {
+            this.debug = response.data.debug;
+            this.user = response.data.user;
+            this.loading = false;
+        })
+    },
+});
 
-    Vue.app_error_handler = (message, tag) => app.add_message(message, tag);
-})
+Vue.app_error_handler = (message, tag) => app.add_message(message, tag);
+
 
 // Add a request interceptor
 axios.interceptors.request.use(
