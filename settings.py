@@ -93,6 +93,7 @@ INSTALLED_APPS = (
 
 MIDDLEWARE = (
     # 'raven.contrib.django.raven_compat.middleware.Sentry404CatchMiddleware',
+    'tulius.core.profiler.profiler_middleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -101,7 +102,6 @@ MIDDLEWARE = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'djfw.pagination.middleware.pagination_middleware',
     'djfw.flatpages.middleware.flatpage_middleware',
-    'tulius.core.profiler.profiler_middleware',
 )
 
 STATICFILES_FINDERS = (

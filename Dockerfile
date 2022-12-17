@@ -7,7 +7,6 @@ RUN pip install hypercorn==0.11.1
 CMD [ "hypercorn", "-b", "0.0.0.0:7000", "-w", "2", "asgi:application" ]
 
 ADD tulius /opt/tulius/tulius
-ADD .git /opt/tulius/.git
 ADD djfw /opt/tulius/djfw
 ADD manage.py /opt/tulius/manage.py
 ADD requirements.txt /opt/tulius/requirements.txt
@@ -20,7 +19,11 @@ ADD scripts/travis_test.sh /opt/tulius/travis_test.sh
 RUN chmod +x /opt/tulius/travis_test.sh
 
 # update requirements
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
+# for coveralls
+RUN apt-get install git -y
+ADD .git /opt/tulius/.git
 
 ENV TULIUS_BRANCH local
 RUN python manage.py compilemessages

@@ -34,7 +34,7 @@ class BaseGrantedRightsAPI(views.BaseThreadView):
         obj.access_level = obj.access_level | data['access_level']
         return obj
 
-    def options(self, request, **kwargs):
+    def options(self, request, *args, **kwargs):
         users = auth.get_user_model().objects.filter(
             is_active=True, username__istartswith=request.GET['query'])[:10]
         return {
