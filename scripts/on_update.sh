@@ -6,19 +6,20 @@ TULIUS_BRANCH=$1
 ROOTDIR=$PWD
 
 if [ $2 ]; then
-  ENV = $2
+  ENV=$2
   echo "Deploy $TULIUS_BRANCH on $ENV environment"
 else
-  ENV = TULIUS_BRANCH
+  ENV=TULIUS_BRANCH
 fi
 echo "Stop existing compose"
 cd scripts/tulius/$ENV
+# First stop web then wait till celery will finish all tasks
 docker-compose stop
-docker-compose exec celery python manage.py wait_celery
-docker-compose down
+docker-compose exec celery python manage.py wait_celery || true
+docker-compose down --remove-orphans
 docker system prune --force
-docker rm -v $(docker ps --filter status=exited -q 2>/dev/null) 2>/dev/null
-docker rmi $(docker images --filter dangling=true -q 2>/dev/null) 2>/dev/null
+docker rm -v $(docker ps --filter status=exited -q 2>/dev/null) 2>/dev/null || true
+docker rmi $(docker images --filter dangling=true -q 2>/dev/null) 2>/dev/null || true
 cd $ROOTDIR
 
 echo "Pull docker container tulius_$1"

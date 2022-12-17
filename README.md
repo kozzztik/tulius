@@ -73,7 +73,7 @@ Repo for http://tulius.com project.
     mysql -uroot -p tulius_prod < /var/lib/mysql/backup.sql
     ```
 8. Create Sentry database and super user (not needed if DB restored from lib files):
-    ```bash
+   ```bash
    docker exec -it tulius_sentry sentry upgrade
    ```
 9. Use sentry web interface on `http://sentry.co-de.org` (check DNS records), to finalize installation. 
