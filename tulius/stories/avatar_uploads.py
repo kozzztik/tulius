@@ -2,12 +2,12 @@ import os
 import io
 from mimetypes import guess_type
 
+from PIL import Image
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from django.core.files.base import ContentFile
 from django.conf import settings
-from PIL import Image
 
 from djfw.uploader import handle_upload
 from tulius.stories.models import AvatarAlternative

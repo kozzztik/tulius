@@ -1,11 +1,12 @@
 import datetime
 
+from redis import client
 from django import dispatch
 from django.conf import settings
 from django.contrib import auth
 from django.core.cache import cache
 from django.utils import html
-from redis import client
+from django.db import transaction
 
 from tulius.forum import core
 from tulius.forum.threads import models as thread_models
@@ -79,6 +80,7 @@ class OnlineStatusAPI(core.BaseAPIView):
         users = {u.pk: u for u in users}
         return [users.get(int(pk)) for pk in ids]
 
+    @transaction.non_atomic_requests
     def get(self, request, *args, **kwargs):
         pk = kwargs['pk'] if 'pk' in kwargs else None
         if pk:

@@ -90,8 +90,8 @@ Repo for http://tulius.com project.
    
 11. Install nginx. Configure it using templates:
     ```bash
-    cp /home/travis/master/scripts/tulius/nginx/sentry.conf /etc/nginx/conf.d/sentry.conf
-    cp /home/travis/master/scripts/tulius/nginx/tulius.conf /etc/nginx/conf.d/tulius.conf
+    cp /home/travis/master/scripts/tulius/nginx_production.conf /etc/nginx/conf.d/tulius_prod.conf
+    cp /home/travis/master/scripts/tulius/nginx_dev.conf /etc/nginx/conf.d/tulius_dev.conf
     ```
     
 12. Install letsEncrypt and configure SSL.
@@ -117,7 +117,7 @@ Update repo if needed (use separate branch and PR)
 
 ## Running on local environment
 
-To use Tulius on local dev environment you need to run 3 instances. For both of them
+To use Tulius on local dev environment you need to run 2 instances. For both of them
 it is needed to set environment variable:
 
 ```bash
@@ -129,8 +129,7 @@ file from template and set needed options there.
 
 Instances, that needed to run:
 1. `manage.py runserver` - Django instance for normal HTTP requests
-2. `async_app.py` - for web sockets support
-3. `celery -A tulius worker -l info` - for deferred tasks
+2. `celery -A tulius worker -l info` - for deferred tasks (optional)
 
 On Windows, as Celery not supports it yet, install gevent:
 
@@ -140,6 +139,12 @@ and start celery with:
 
 ```celery -A tulius worker -l info -P gevent```
 
+or, instead of starting Celery, you can switch it off, by adding:
+```CELERY_TASK_ALWAYS_EAGER = True```
+to settings_production.py. However, some heavy requests, like reindexing may
+became too slow to render pages, as deferred tasks will be resolved in request 
+context. But for most things it will be enough.
+
 ## Running tests
 
 ``` 
@@ -147,6 +152,7 @@ python -m pylint tests tulius djfw
 python -m pytest tests tulius djfw
 ```
 
+```
 ## Remove elastic disk limit on dev environment
 ```
 curl -XPUT "http://localhost:9200/_cluster/settings" \

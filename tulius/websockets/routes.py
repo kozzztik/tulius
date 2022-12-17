@@ -3,8 +3,9 @@ import logging
 
 import sentry_sdk
 from aiohttp import web
-from django.conf import settings
 from redis_cache import RedisCache
+from django.conf import settings
+
 from tulius.websockets import user_session
 
 
@@ -35,11 +36,3 @@ class WebsocketHandler:
 
     async def json_handler(self, request):
         return await self.handler(request, json_format=True)
-
-
-def setup_routes(app):
-    websock_handler = WebsocketHandler()
-    app.add_routes([
-        web.get(settings.WEBSOCKET_URL, websock_handler.handler),
-        web.get(settings.WEBSOCKET_URL_NEW, websock_handler.json_handler),
-    ])

@@ -2,8 +2,8 @@ import json
 import logging
 import urllib.parse
 
-from django.conf import settings
 import requests
+from django.conf import settings
 
 
 logger = logging.getLogger('tulius.vk')

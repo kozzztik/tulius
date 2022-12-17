@@ -12,8 +12,15 @@ const router = new VueRouter({
     routes: routes,
 })
 
+function production_url() {
+    var schema = window.location.protocol == 'https:' ? 'wss://' : 'ws://';
+    return schema + window.location.host + '/api/ws/';
+}
+
+var websockets_url = production_url();
+
 axios.get('/api/app_settings/').then(response => {
-    Vue.use(VueNativeSock.default, response.data.websockets_url, {
+    Vue.use(VueNativeSock.default, websockets_url, {
         reconnection: true,
         reconnectionDelay: 3000,
         format: 'json'
