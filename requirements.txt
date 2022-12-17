@@ -32,3 +32,6 @@ flake8 == 3.8.3
 pytest-flake8 == 1.0.6
 coverage==5.2.1
 coveralls==2.1.2
+
+# remote debug
+pydevd
