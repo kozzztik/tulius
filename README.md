@@ -88,10 +88,14 @@ Repo for http://tulius.com project.
     ```
     Edit settings files. Change DB passwords and sentry DSN.
    
-11. Install nginx. Configure it using templates:
+11. Configure Nginx using templates:
+    For production:
     ```bash
-    cp /home/travis/master/scripts/tulius/nginx/sentry.conf /etc/nginx/conf.d/sentry.conf
-    cp /home/travis/master/scripts/tulius/nginx/tulius.conf /etc/nginx/conf.d/tulius.conf
+    cp /home/travis/master/scripts/tulius/nginx_production.conf /etc/nginx/conf.d/tulius_prod.conf
+    ```
+    For dev:
+    ```bash
+    cp /home/travis/master/scripts/tulius/nginx_dev.conf /etc/nginx/conf.d/tulius_dev.conf    
     ```
     
 12. Install letsEncrypt and configure SSL.
@@ -115,10 +119,11 @@ Update repo if needed (use separate branch and PR)
     ``` 
 16. Check that everything works. Profit.
 
-## Running on local environment
+# Running on local environment
 
-To use Tulius on local dev environment you need to run 3 instances. For both of them
-it is needed to set environment variable:
+To use Tulius on local dev environment you need to at least 1 instance]
+(2 for correct work of heavy requests). 
+For all of them it is needed to set environment variable:
 
 ```bash
 TULIUS_BRANCH=local
@@ -128,9 +133,8 @@ If you need some special configuration options, you can create `settings_product
 file from template and set needed options there.
 
 Instances, that needed to run:
-1. `manage.py runserver` - Django instance for normal HTTP requests
-2. `async_app.py` - for web sockets support
-3. `celery -A tulius worker -l info` - for deferred tasks
+1. `manage.py runserver` - Django instance for backend HTTP requests
+2. `celery -A tulius worker -l info` - for deferred tasks (optional)
 
 On Windows, as Celery not supports it yet, install gevent:
 
@@ -139,6 +143,12 @@ On Windows, as Celery not supports it yet, install gevent:
 and start celery with:
 
 ```celery -A tulius worker -l info -P gevent```
+
+or, instead of starting Celery, you can switch it off, by adding:
+```CELERY_TASK_ALWAYS_EAGER = True```
+to settings_production.py. However, some heavy requests, like reindexing may
+became too slow to render pages, as deferred tasks will be resolved in request 
+context. But for most things it will be enough.
 
 ## Running tests
 

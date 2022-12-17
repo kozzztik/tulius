@@ -12,13 +12,20 @@ const router = new VueRouter({
     routes: routes,
 })
 
-axios.get('/api/app_settings/').then(response => {
-    Vue.use(VueNativeSock.default, response.data.websockets_url, {
-        reconnection: true,
-        reconnectionDelay: 3000,
-        format: 'json'
-    });
+function production_url() {
+    var schema = window.location.protocol == 'https:' ? 'wss://' : 'ws://';
+    return schema + window.location.host + '/api/ws/';
+}
 
+var websockets_url = production_url();
+
+Vue.use(VueNativeSock, websockets_url, {
+    reconnection: true,
+    reconnectionDelay: 3000,
+    format: 'json'
+});
+
+axios.get('/api/app_settings/').then(response => {
     var app = new Vue({
         el: '#vue_app',
         router: router,
