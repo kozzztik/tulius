@@ -185,15 +185,20 @@ class WebSocket:
 
 
 def websocket_view(func):
-    @functools.wraps(func)
-    async def wrapper(request, *args, **kwargs):
-        ws = WebSocket(request)
+    async def websocket_handler(request, ws, *args, **kwargs):
         await ws.accept()
         try:
-            await func(request, ws, *args, **kwargs)
-            return asgi_handler.HttpResponseUpgrade()
+            return await func(request, ws, *args, **kwargs)
         finally:
             if not ws.closed:
                 await ws.close()
+
+    @functools.wraps(func)
+    def wrapper(request, *args, **kwargs):
+        ws = WebSocket(request)
+        request.asgi.ws = ws
+        return asgi_handler.HttpResponseUpgrade(
+            functools.partial(websocket_handler, request, ws, *args, **kwargs))
+
     wrapper.websocket_wrapper = True
     return wrapper

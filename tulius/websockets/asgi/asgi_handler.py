@@ -5,6 +5,11 @@ from django.core.handlers import asgi as dj_asgi
 
 class HttpResponseUpgrade(http.HttpResponse):
     status_code = 101
+    handler = None
+
+    def __init__(self, handler, content=b'', *args, **kwargs):
+        super(HttpResponseUpgrade, self).__init__(content=content, *args, **kwargs)
+        self.handler = handler
 
 
 class ASGITransport:
@@ -86,6 +91,7 @@ class ASGIHandler(dj_asgi.ASGIHandler):
     async def send_response(self, response, send):
         if isinstance(response, HttpResponseUpgrade):
             # websocket view already send reponse, nothing needs to be done.
+            await response.handler()
             return
         return await super().send_response(response, send)
 
