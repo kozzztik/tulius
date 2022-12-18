@@ -7,8 +7,8 @@ class HttpResponseUpgrade(http.HttpResponse):
     status_code = 101
     handler = None
 
-    def __init__(self, handler, content=b'', *args, **kwargs):
-        super(HttpResponseUpgrade, self).__init__(content=content, *args, **kwargs)
+    def __init__(self, handler, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.handler = handler
 
 
