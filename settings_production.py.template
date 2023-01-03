@@ -13,5 +13,5 @@ sentry_sdk.init(**RAVEN_CONFIG)
 DEBUG = False
 CELERY_TASK_ALWAYS_EAGER = False
 
-from pydev import pydevd
-pydevd.settrace('0.0.0.0', port=21000, suspend=False)
+# import pydevd
+# pydevd.settrace('127.0.0.1', port=21000, suspend=False)

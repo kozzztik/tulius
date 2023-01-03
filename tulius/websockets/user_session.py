@@ -28,9 +28,24 @@ class UserSession:
 
     async def auth(self):
         user = await asyncio.get_event_loop().run_in_executor(
-            None, functools.partial(auth.get_user, self.request))
+            None, functools.partial(self.threaded_auth, self.request))
         self.user = user
         self.user_id = self.user.pk
+
+    @staticmethod
+    def threaded_auth(request):
+        try:
+            if hasattr(asyncio, "current_task"):
+                # Python 3.7 and up
+                task = asyncio.current_task()
+            else:
+                # Python 3.6
+                task = asyncio.Task.current_task()
+        except RuntimeError:
+            task = None
+        if task is not None:
+            raise Exception('That is not thread and loop safe operation!')
+        return auth.get_user(request)
 
     async def _channel_listener_task(self, channel, name, func):
         async for message in channel.iter():
