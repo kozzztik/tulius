@@ -3,11 +3,9 @@ import functools
 import json
 import logging
 
-import aiohttp
 import aioredis
 from django.conf import settings
 from django.contrib import auth
-from django.contrib.sessions.backends import cached_db
 
 from tulius.forum import const as forum_const
 from tulius.websockets import consts
@@ -23,20 +21,31 @@ class UserSession:
         self.user_id = None
         self._redis_cache = redis_cache
         self.json = json_format
+        self.user = None
 
     def cache_key(self, value):
         return self._redis_cache.make_key(value)
 
     async def auth(self):
-        session_id = self.request.cookies.get(settings.SESSION_COOKIE_NAME)
-        if session_id:
-            session = await self.redis.get(
-                self.cache_key(cached_db.KEY_PREFIX + session_id))
-            if session:
-                session = self._redis_cache.get_value(session)
-            if session:
-                self.user_id = session.get(auth.SESSION_KEY)
-                # TODO here validation is needed
+        user = await asyncio.get_event_loop().run_in_executor(
+            None, functools.partial(self.threaded_auth, self.request))
+        self.user = user
+        self.user_id = self.user.pk
+
+    @staticmethod
+    def threaded_auth(request):
+        try:
+            if hasattr(asyncio, "current_task"):
+                # Python 3.7 and up
+                task = asyncio.current_task()
+            else:
+                # Python 3.6
+                task = asyncio.Task.current_task()
+        except RuntimeError:
+            task = None
+        if task is not None:
+            raise Exception('That is not thread and loop safe operation!')
+        return auth.get_user(request)
 
     async def _channel_listener_task(self, channel, name, func):
         async for message in channel.iter():
@@ -109,22 +118,20 @@ class UserSession:
                 consts.CHANNEL_USER.format(self.user_id),
                 self.user_channel)
 
-        async for msg in self.ws:
-            if msg.type == aiohttp.WSMsgType.TEXT:
-                if msg.data == 'close':
-                    await self.ws.close()
-                elif msg.data.startswith('{'):
-                    data = json.loads(msg.data)
-                    method = getattr(
-                        self, 'action_' + data.get('action', 'empty'), None)
-                    if method:
-                        await method(data)
-                else:
-                    await self.ws.send_str(msg.data + '/answer')
-            elif msg.type == aiohttp.WSMsgType.ERROR:
-                logger.exception(
-                    'ws connection closed with exception %s',
-                    self.ws.exception())
+        while True:
+            if self.json:
+                data = await self.ws.receive_json()
+            else:
+                data = await self.ws.receive_text()
+            if data is None:
+                break
+            if self.json:
+                method = getattr(
+                    self, 'action_' + data.get('action', 'empty'), None)
+                if method:
+                    await method(data)
+            else:
+                await self.ws.send_text(data + '/answer')
         logger.info('User %s closed', self.user_id)
 
     def close(self):
