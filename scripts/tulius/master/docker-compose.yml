@@ -1,4 +1,4 @@
-version: '3.5'
+version: '2.4'
 services:
   web:
     image: kozzztik/tulius:master
@@ -11,6 +11,7 @@ services:
     volumes:
       - ../../../data/media:/opt/tulius/data/media
       - ../../../settings_production.py:/opt/tulius/settings_production.py
+    mem_limit: 1G
     logging:
       driver: json-file
       options:
@@ -28,6 +29,7 @@ services:
       TULIUS_BRANCH: master
     volumes:
       - ../../../settings_production.py:/opt/tulius/settings_production.py
+    mem_limit: 1G
     logging:
       driver: json-file
       options:
