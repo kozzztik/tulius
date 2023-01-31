@@ -44,7 +44,12 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=false
       - xpack.ml.enabled=false
+      - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
     volumes:
       - ../../data/elastic:/usr/share/elasticsearch/data
     ports:

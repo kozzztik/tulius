@@ -14,7 +14,7 @@ services:
       - ../../../data/media:/opt/tulius/data/media
       - ../../../data/mail:/opt/tulius/data/mail
       - ../../../settings_production.py:/opt/tulius/settings_production.py
-    mem_limit: 1G
+    mem_limit: 512M
     logging:
       driver: json-file
       options:
@@ -33,7 +33,7 @@ services:
     volumes:
       - ../../../data/mail:/opt/tulius/data/mail
       - ../../../settings_production.py:/opt/tulius/settings_production.py
-    mem_limit: 1G
+    mem_limit: 512M
     logging:
       driver: json-file
       options:
