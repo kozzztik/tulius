@@ -1,5 +1,8 @@
 FROM kozzztik/tulius:base_3.0.3
 
+RUN pip install hypercorn==0.11.1
+CMD [ "hypercorn", "-b", "0.0.0.0:7000", "-w", "2", "asgi:application" ]
+
 ADD tulius /opt/tulius/tulius
 ADD djfw /opt/tulius/djfw
 ADD manage.py /opt/tulius/manage.py
@@ -21,5 +24,3 @@ ADD .git /opt/tulius/.git
 
 ENV TULIUS_BRANCH local
 RUN python manage.py compilemessages
-
-CMD [ "gunicorn", "asgi:application", "-k", "uvicorn.workers.UvicornWorker","-b", "0.0.0.0:7000", "-w", "2", "--max-requests=500", "--preload", "--keep-alive=60"]
