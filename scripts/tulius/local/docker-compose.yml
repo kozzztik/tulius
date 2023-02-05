@@ -1,5 +1,35 @@
 version: '3.5'
 services:
+  redis:
+    image: redis
+    restart: always
+    networks:
+      tuliusnet:
+        ipv4_address: 10.5.0.3
+    container_name: tulius_redis
+    ports:
+      - 127.0.0.1:6379:6379
+
+  mysql:
+    image: mysql/mysql-server:5.7.22
+    restart: always
+    networks:
+      tuliusnet:
+        ipv4_address: 10.5.0.2
+    ports:
+      - 127.0.0.1:3306:3306
+    command: --user=root
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+      MYSQL_USER: tulius
+      MYSQL_PASSWORD: tulius
+    volumes:
+      - type: bind
+        source: "../../../data/mysql"
+        target: "/var/lib/mysql"
+      - ../mysql.cnf:/etc/my.cnf:ro
+    container_name: tulius_mysql
+
   elastic_search:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
     restart: "no"
