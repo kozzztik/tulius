@@ -6,7 +6,7 @@ ENV TULIUS_BRANCH local
 RUN mkdir /opt/tulius
 WORKDIR /opt/tulius
 
-CMD [ "gunicorn", "asgi:application", "-k", "uvicorn.workers.UvicornWorker","-b", "0.0.0.0:7000", "-w", "2", "--max-requests=500", "--preload", "--keep-alive=60"]
+CMD [ "gunicorn" ]
 
 ## install requirements, so they can be cached by Docker
 RUN pip install gunicorn==20.1.0 uvicorn==0.20.0 django==3.1.1 pytz==2020.1 pillow==6.2.0 \
