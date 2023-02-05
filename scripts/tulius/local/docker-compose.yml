@@ -1,4 +1,4 @@
-version: '3.5'
+version: '2.4'
 services:
   redis:
     image: redis
@@ -76,6 +76,27 @@ services:
     environment:
       SERVER_NAME: 127.0.0.1
       ELASTICSEARCH_HOSTS: http://10.5.0.30:9200
+
+  web:
+    build:
+      context: ../../..
+    networks:
+      tuliusnet:
+        ipv4_address: 10.5.0.20
+    environment:
+      TULIUS_BRANCH: local
+    ports:
+      - 7000:7000
+    volumes:
+      - ../../../data/media:/opt/tulius/data/media
+      - ../../../data/mail:/opt/tulius/data/mail
+      - ../../../settings_production.py:/opt/tulius/settings_production.py
+    mem_limit: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "10"
 
 networks:
   tuliusnet:

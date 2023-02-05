@@ -204,12 +204,12 @@ LOGGING = {
         'logfile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.WatchedFileHandler',
-            'filename': BASE_DIR + 'logfile.txt',
+            'filename': os.path.join(BASE_DIR, 'data', 'logfile.txt'),
         },
         'sqllogfile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.WatchedFileHandler',
-            'filename': BASE_DIR + 'sql-logfile.txt',
+            'filename': os.path.join(BASE_DIR, 'data', 'sql-logfile.txt'),
         },
         'log_stash': {
             'level': 'DEBUG',
@@ -267,7 +267,11 @@ LOGGING = {
             'level': 'DEBUG' if env == 'dev' else 'ERROR',
             'propagate': True,
         },
-    }
+    },
+    'root': {
+        'handlers': ['console' if env == 'dev' else 'log_stash'],
+        'level': 'WARNING',
+    },
 }
 
 if DEBUG:
