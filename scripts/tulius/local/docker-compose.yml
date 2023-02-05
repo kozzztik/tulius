@@ -84,7 +84,7 @@ services:
       tuliusnet:
         ipv4_address: 10.5.0.20
     environment:
-      TULIUS_BRANCH: local
+      TULIUS_ENV: local_docker
     ports:
       - 7000:7000
     volumes:

@@ -3,13 +3,16 @@ import os
 
 from sentry_sdk.integrations.django import DjangoIntegration
 
-branch = os.environ.get("TULIUS_BRANCH", '')
-env = {
-    'master': 'prod',  # production env
-    'dev': 'qa',  # test staging env
-    'local': 'dev',  # local development env
-    'test': 'test'  # ci tests env
-}[branch]
+env = os.environ.get('TULIUS_ENV', None)
+if not env:
+    branch = os.environ.get("TULIUS_BRANCH", '')
+    env = {
+        'master': 'prod',  # production env
+        'dev': 'qa',  # test staging env
+        'local': 'dev',  # local development env
+        'test': 'test',  # ci tests env
+        'local_docker': 'local_docker'  # local docker env
+    }[branch]
 TEST_RUN = bool(os.environ.get("TULIUS_TEST", ''))
 
 ENV = env
@@ -244,7 +247,7 @@ LOGGING = {
         },
         'async_app': {
             'handlers': ['console'],
-            'level': 'DEBUG' if env == 'dev' else 'ERROR',
+            'level': 'DEBUG' if env in ['dev', 'local_docker'] else 'ERROR',
             'propagate': True,
         },
         'profiler': {
@@ -259,17 +262,17 @@ LOGGING = {
         },
         'elasticsearch': {
             'handlers': ['console'],
-            'level': 'DEBUG' if env == 'dev' else 'ERROR',
+            'level': 'DEBUG' if env in ['dev', 'local_docker'] else 'ERROR',
             'propagate': True,
         },
         'celery.task': {
             'handlers': ['console'],
-            'level': 'DEBUG' if env == 'dev' else 'ERROR',
+            'level': 'DEBUG' if env in ['dev', 'local_docker'] else 'ERROR',
             'propagate': True,
         },
     },
     'root': {
-        'handlers': ['console' if env == 'dev' else 'log_stash'],
+        'handlers': ['console' if env in ['dev', 'local_docker'] else 'log_stash'],
         'level': 'WARNING',
     },
 }
@@ -297,7 +300,7 @@ MAIL_RECEIVERS = ['pm.mail.get_mail']
 REDIS_CONNECTION = {
     'host': '127.0.0.1' if env in ['dev', 'test'] else 'tulius_redis',
     'port': 6379,
-    'db': {'prod': 3, 'qa': 2, 'dev': 1, 'test': 4}[env],
+    'db': {'prod': 3, 'qa': 2, 'dev': 1, 'test': 4, 'local_docker': 1}[env],
     'password': '',
 }
 

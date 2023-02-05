@@ -79,7 +79,9 @@ class ASGIHandler(dj_asgi.ASGIHandler):
             response.block_size = self.chunk_size
         # Send the response.
         if scope['type'] == 'websocket':
-            if not isinstance(response, HttpResponseUpgrade):
+            if isinstance(response, HttpResponseUpgrade):
+                await response.handler()
+            else:
                 await transport.send({'type': 'websocket.close'})
         else:
             await self.send_response(response, send)
