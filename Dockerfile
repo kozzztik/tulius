@@ -1,7 +1,10 @@
 FROM kozzztik/tulius:base_3.0.3
 
-RUN pip install hypercorn==0.11.1
-CMD [ "hypercorn", "-b", "0.0.0.0:7000", "-w", "2", "asgi:application" ]
+RUN mkdir /opt/tulius/data
+RUN pip install --upgrade pip
+# for coveralls
+RUN apt-get install git -y
+ENV TULIUS_BRANCH local
 
 ADD tulius /opt/tulius/tulius
 ADD djfw /opt/tulius/djfw
@@ -16,11 +19,11 @@ ADD scripts/travis_test.sh /opt/tulius/travis_test.sh
 RUN chmod +x /opt/tulius/travis_test.sh
 
 # update requirements
-RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 # for coveralls
-RUN apt-get install git -y
 ADD .git /opt/tulius/.git
 
-ENV TULIUS_BRANCH local
 RUN python manage.py compilemessages
+
+ADD gunicorn.conf.py /opt/tulius/gunicorn.conf.py
+CMD [ "gunicorn" ]

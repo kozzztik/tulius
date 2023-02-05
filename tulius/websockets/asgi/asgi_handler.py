@@ -65,7 +65,10 @@ class ASGIHandler(dj_asgi.ASGIHandler):
         # Get the request and check for basic issues.
         request, error_response = self.create_request(transport, body_file)
         if request is None:
-            await self.send_response(error_response, send)
+            if scope['type'] == 'websocket':
+                await transport.send({'type': 'websocket.close'})
+            else:
+                await self.send_response(error_response, send)
             return
         # Get the response, using the async mode of BaseHandler.
         response = await self.get_response_async(request)
@@ -75,7 +78,13 @@ class ASGIHandler(dj_asgi.ASGIHandler):
         if isinstance(response, dj_asgi.FileResponse):
             response.block_size = self.chunk_size
         # Send the response.
-        await self.send_response(response, send)
+        if scope['type'] == 'websocket':
+            if isinstance(response, HttpResponseUpgrade):
+                await response.handler()
+            else:
+                await transport.send({'type': 'websocket.close'})
+        else:
+            await self.send_response(response, send)
 
     @staticmethod
     async def handle_lifespan(transport):
@@ -87,13 +96,6 @@ class ASGIHandler(dj_asgi.ASGIHandler):
             elif message['type'] == 'lifespan.shutdown':
                 # Do some shutdown here!
                 await transport.send({'type': 'lifespan.shutdown.complete'})
-
-    async def send_response(self, response, send):
-        if isinstance(response, HttpResponseUpgrade):
-            # websocket view already send reponse, nothing needs to be done.
-            await response.handler()
-            return
-        return await super().send_response(response, send)
 
 
 def get_asgi_application():

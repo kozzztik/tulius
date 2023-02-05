@@ -33,5 +33,8 @@ pytest-flake8 == 1.0.6
 coverage==5.2.1
 coveralls==2.1.2
 
+gunicorn == 20.1.0
+uvicorn == 0.20.0
+websockets == 10.4
 # remote debug
 pydevd
