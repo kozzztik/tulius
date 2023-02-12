@@ -3,9 +3,9 @@ import functools
 import json
 import logging
 
-import aioredis
 from django.conf import settings
 from django.contrib import auth
+from redis import asyncio as aioredis
 
 from tulius.forum import const as forum_const
 from tulius.websockets import consts
@@ -22,6 +22,8 @@ class UserSession:
         self._redis_cache = redis_cache
         self.json = json_format
         self.user = None
+        self.pubsub = None
+        self.pubsub_task = None
 
     def cache_key(self, value):
         return self._redis_cache.make_key(value)
@@ -44,31 +46,24 @@ class UserSession:
         except RuntimeError:
             task = None
         if task is not None:
-            raise Exception('That is not thread and loop safe operation!')
+            raise ValueError('That is not thread and loop safe operation!')
         return auth.get_user(request)
 
-    async def _channel_listener_task(self, channel, name, func):
-        async for message in channel.iter():
-            try:
-                await func(name, json.loads(message.decode('utf-8')))
-            except asyncio.CancelledError:
-                return
-            except Exception as e:
-                logger.error(e)
+    @staticmethod
+    def _pubsub_exc_handler(e, *args):
+        logging.exception(e)
 
     async def subscribe_channel(self, name, func):
         logger.debug(
             'subscribe channel %s %s', self.user_id, name)
-        channels = await self.redis.subscribe(consts.make_channel_name(name))
-        for channel in channels:
-            asyncio.get_event_loop().create_task(
-                self._channel_listener_task(channel, name, func))
+        await self.pubsub.subscribe(**{consts.make_channel_name(name): func})
 
-    async def public_channel(self, name, message):
+    async def public_channel(self, message):
         pass
 
-    async def user_channel(self, name, message):
+    async def user_channel(self, message):
         logger.debug('User %s message %s', self.user_id, message)
+        message = json.loads(message['data'])
         direct = message.pop('.direct')
         if direct:
             if self.json:
@@ -76,8 +71,9 @@ class UserSession:
             else:
                 await self.ws.send_str("new_pm {}".format(message['id']))
 
-    async def thread_comments_channel(self, name, message, thread_id):
+    async def thread_comments_channel(self, message):
         logger.debug('User %s message %s', self.user_id, message)
+        message = json.loads(message['data'])
         direct = message.pop('.direct')
         if direct:
             message['.namespaced'] = 'thread_comments'
@@ -85,31 +81,30 @@ class UserSession:
 
     async def action_subscribe_comments(self, data):
         thread_id = data['id']
-        rights = await self.redis.get(
-            self.cache_key(
-                forum_const.USER_THREAD_RIGHTS.format(
-                    user_id=self.user_id, thread_id=thread_id)))
+        async with self.redis.client() as client:
+            rights = await client.get(
+                self.cache_key(
+                    forum_const.USER_THREAD_RIGHTS.format(
+                        user_id=self.user_id, thread_id=thread_id)))
         if not rights:
             return
         await self.subscribe_channel(
             consts.THREAD_COMMENTS_CHANNEL.format(thread_id=thread_id),
-            functools.partial(
-                self.thread_comments_channel, thread_id=thread_id)
+            self.thread_comments_channel
         )
 
     async def action_unsubscribe_comments(self, data):
         logging.debug('unsubscribe %s %s', self.user_id, data['id'])
-        await self.redis.unsubscribe(consts.make_channel_name(
+        await self.pubsub.unsubscribe(consts.make_channel_name(
             consts.THREAD_COMMENTS_CHANNEL.format(thread_id=data['id'])))
 
     async def process(self):
-        self.redis = await aioredis.create_redis_pool((
-            settings.REDIS_CONNECTION['host'],
-            settings.REDIS_CONNECTION['port'],
-        ), db=settings.REDIS_CONNECTION['db'])
-
         await self.auth()
         logger.info('User %s logged in', self.user_id)
+        self.redis = aioredis.from_url(settings.REDIS_LOCATION)
+        self.pubsub = self.redis.pubsub()
+        self.pubsub_task = asyncio.create_task(
+            self.pubsub.run(exception_handler=self._pubsub_exc_handler))
 
         await self.subscribe_channel(
             consts.CHANNEL_PUBLIC, self.public_channel)
@@ -134,6 +129,9 @@ class UserSession:
                 await self.ws.send_text(data + '/answer')
         logger.info('User %s closed', self.user_id)
 
-    def close(self):
+    async def close(self):
+        if self.pubsub_task:
+            self.pubsub_task.cancel()
+            self.pubsub = None
         if self.redis:
-            self.redis.close()
+            await self.redis.close()

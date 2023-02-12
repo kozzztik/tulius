@@ -4,7 +4,7 @@ from django.db import models as django_models
 from django.views import generic
 from django.utils import decorators
 from django.contrib.auth import decorators as auth_decorators
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from tulius import models as tulius
 from tulius.forum import models as forum

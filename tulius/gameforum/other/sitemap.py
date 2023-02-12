@@ -19,5 +19,5 @@ class GameForumSitemap(sitemap.ForumSitemap):
     def items(self):
         return list(self.iterate_games())
 
-    def location(self, obj):
-        return f'/play/thread/{obj.pk}/'
+    def location(self, item):
+        return f'/play/thread/{item.pk}/'

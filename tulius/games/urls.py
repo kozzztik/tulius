@@ -1,4 +1,4 @@
-from django.conf import urls
+from django import urls
 
 from tulius.games import views
 from tulius.games import game_edit_catalog

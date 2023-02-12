@@ -11,8 +11,7 @@ def autocomplete_result(func):
         if not name:
             raise http.Http404()
         limit = int(request.GET.get('limit', 10))
-        if limit > 40:
-            limit = 40
+        limit = min(limit, 40)
         args = (request, ) + args + (name, limit)
         items = func(*args, **kwargs)
         result = []

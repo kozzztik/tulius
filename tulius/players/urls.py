@@ -1,4 +1,4 @@
-from django.conf import urls
+from django import urls
 
 from tulius.players import views
 from tulius.players import avatar_upload

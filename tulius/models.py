@@ -8,7 +8,7 @@ from django.core.mail import send_mail
 from django.core import validators
 from django.utils import timezone
 from django.utils import html
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from tulius import signals
 from tulius.core.autocomplete.models import add_autocomplete_widget

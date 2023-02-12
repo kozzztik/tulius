@@ -8,7 +8,7 @@
 	{{ characters.count }} active characters{{ character|pluralize }}
 %p
 	{{ same_page_characters.count }} of {{ characters.count }} active characters{{ character|pluralize }}
-	{% ifequal same_page_characters.count 1 %}is{% else %}are{% endifequal %} on this page
+	{% if same_page_characters.count == 1 %}is{% else %}are{% endif %} on this page
 %p
 	Characters in game:
 	- for character in characters

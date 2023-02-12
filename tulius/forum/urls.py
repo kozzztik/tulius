@@ -1,4 +1,4 @@
-from django.conf import urls
+from django import urls
 
 from tulius.forum.threads import views as threads_api
 from tulius.forum.threads import counters

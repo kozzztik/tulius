@@ -219,7 +219,7 @@ class AddRoleView(EditRoleMixin, views.MessageMixin, subviews.SubCreateView):
 
 class AddMaterialView(AddRoleView):
     model = stories_models.AdditionalMaterial
-    catalog_page_name = ('Add material')
+    catalog_page_name = _('Add material')
     catalog_page_url = game_edit_catalog.EDIT_GAME_PAGES_MATERIALS
     success_message = _('Additional material was successfully added')
     form_class = materials_forms.AdditionalMaterialForm

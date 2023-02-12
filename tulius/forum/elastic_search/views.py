@@ -61,8 +61,7 @@ class Search(views.BaseThreadView):
     require_user = True
     comment_model = comment_models.Comment
 
-    @staticmethod
-    def apply_users_filters(search_request, conditions, data):
+    def apply_users_filters(self, search_request, conditions, data):
         filter_users = data.get('users', [])
         filter_not_users = data.get('not_users', [])
         if filter_users:

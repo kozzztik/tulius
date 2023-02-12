@@ -81,7 +81,11 @@ def user_fixture(user_factory):
 
 def init_settings():
     os.environ["TULIUS_TEST"] = "1"
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", 'settings')
+    if os.path.exists('settings_production.py'):
+        settings_file = 'settings_production'
+    else:
+        settings_file = 'settings'
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", settings_file)
     django.setup()
     utils.setup_test_environment()
 
