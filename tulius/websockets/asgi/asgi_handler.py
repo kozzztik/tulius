@@ -44,35 +44,45 @@ class ASGIHandler(dj_asgi.ASGIHandler):
         """
         Async entrypoint - parses the request and hands off to get_response.
         """
+        if scope['type'] not in ['http', 'websocket', 'lifespan']:
+            raise ValueError(
+                "Django can only handle ASGI/HTTP connections, not %s." % scope["type"]
+            )
+
+        async with dj_asgi.ThreadSensitiveContext():
+            await self.handle(scope, receive, send)
+
+    async def handle(self, scope, receive, send):
+        """
+        Handles the ASGI request. Called via the __call__ method.
+        """
         transport = ASGITransport(scope, receive, send)
         if scope['type'] == 'lifespan':
             return await self.handle_lifespan(transport)
-        if scope['type'] not in ['http', 'websocket']:
-            raise ValueError(
-                'Django can only handle ASGI/HTTP connections, not %s.'
-                % scope['type']
-            )
         # Receive the HTTP request body as a stream object.
         try:
             body_file = await self.read_body(receive)
         except dj_asgi.RequestAborted:
             return
         # Request is complete and can be served.
-        dj_asgi.set_script_prefix(self.get_script_prefix(scope))
-        await dj_asgi.sync_to_async(
-            dj_asgi.signals.request_started.send, thread_sensitive=True
-        )(sender=self.__class__, scope=scope)
-        # Get the request and check for basic issues.
-        request, error_response = self.create_request(transport, body_file)
-        if request is None:
-            if scope['type'] == 'websocket':
-                await transport.send({'type': 'websocket.close'})
-            else:
-                await self.send_response(error_response, send)
-            return
-        # Get the response, using the async mode of BaseHandler.
-        response = await self.get_response_async(request)
-        response._handler_class = self.__class__
+        try:
+            dj_asgi.set_script_prefix(self.get_script_prefix(scope))
+            await dj_asgi.sync_to_async(
+                dj_asgi.signals.request_started.send, thread_sensitive=True
+            )(sender=self.__class__, scope=scope)
+            # Get the request and check for basic issues.
+            request, error_response = self.create_request(transport, body_file)
+            if request is None:
+                if scope['type'] == 'websocket':
+                    await transport.send({'type': 'websocket.close'})
+                else:
+                    await self.send_response(error_response, send)
+                return
+            # Get the response, using the async mode of BaseHandler.
+            response = await self.get_response_async(request)
+            response._handler_class = self.__class__
+        finally:
+            body_file.close()
         # Increase chunk size on file responses (ASGI servers handles low-level
         # chunking).
         if isinstance(response, dj_asgi.FileResponse):
