@@ -4,7 +4,6 @@ import time
 import logging
 
 from django import http
-from django.conf import settings
 from django.core import exceptions
 from ua_parser import user_agent_parser
 
