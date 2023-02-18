@@ -19,12 +19,6 @@ class BaseAPIView(base.ContextMixin, base.View):
 
     def dispatch(self, request, *args, **kwargs):
         self.user = self.request.user
-        import logging  # pylint: disable=W,C,R
-        logger = logging.getLogger('forum_debug')  # pylint: disable=W,C,R
-        # pylint: disable=W,C,R
-        logger.error(
-            f'{request.path} - {request.user.is_authenticated}'
-            f' - {self.user} - {request.session.session_key}')
         if self.require_user and (not request.user.is_authenticated):
             return http.HttpResponseForbidden()
         response = super().dispatch(request, *args, **kwargs)

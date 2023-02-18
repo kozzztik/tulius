@@ -54,6 +54,11 @@ def log_record(request, exec_time, response):
         'method': request.method,
         'status_code': response.status_code,
         'content_length': content_length,
+        'host': "%s://%s" % (
+            "https" if request.is_secure() else "http",
+            request.get_host(),
+        ),
+        'origin': request.META["HTTP_ORIGIN"],
         **({
             'app_name': request.resolver_match.app_name,
             'url_name': request.resolver_match.url_name,
