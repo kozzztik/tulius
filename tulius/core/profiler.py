@@ -63,10 +63,6 @@ def log_record(request, exec_time, response):
         'method': request.method,
         'status_code': response.status_code,
         'content_length': content_length,
-        'scheme_header': {
-            'name': settings.SECURE_PROXY_SSL_HEADER,
-            'value': request.META.get(settings.SECURE_PROXY_SSL_HEADER),
-        },
         **({
             'app_name': request.resolver_match.app_name,
             'url_name': request.resolver_match.url_name,
