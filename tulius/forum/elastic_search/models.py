@@ -104,7 +104,7 @@ class ReindexQuery:
                 }
             })
             data.append(instance)
-        response = client.bulk(body=data)
+        response = client.bulk(operations=data)
         if response['errors']:
             raise ValueError('errors occurred during request')
 
