@@ -1,5 +1,5 @@
 from django.db import models
-from elasticsearch7 import exceptions
+from elasticsearch8 import exceptions
 
 from tulius.forum.elastic_search import models as elastic_models
 

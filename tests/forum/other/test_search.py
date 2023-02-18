@@ -6,7 +6,7 @@ from django.db.models import signals
 from django.conf import settings
 from django.utils import timezone
 import pytest
-from elasticsearch7 import exceptions
+from elasticsearch8 import exceptions
 
 from tulius.forum.threads import models as thread_models
 from tulius.forum.comments import models

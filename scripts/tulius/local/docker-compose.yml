@@ -31,7 +31,7 @@ services:
     container_name: tulius_mysql
 
   elastic_search:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.6.1
     restart: "no"
     networks:
       tuliusnet:
@@ -50,7 +50,7 @@ services:
     container_name: tulius_elastic
 
   log_stash:
-    image: docker.elastic.co/logstash/logstash:7.9.2
+    image: docker.elastic.co/logstash/logstash:8.6.1
     restart: "no"
     networks:
       tuliusnet:
@@ -66,7 +66,7 @@ services:
     container_name: tulius_log_stash
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.9.2
+    image: docker.elastic.co/kibana/kibana:8.6.1
     networks:
       tuliusnet:
         ipv4_address: 10.5.0.32

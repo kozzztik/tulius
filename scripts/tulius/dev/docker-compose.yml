@@ -41,7 +41,7 @@ services:
         max-file: "2"
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.9.2
+    image: docker.elastic.co/kibana/kibana:8.6.1
     networks:
       tuliusnet:
         ipv4_address: 10.5.0.23
@@ -51,7 +51,7 @@ services:
       ELASTICSEARCH_HOSTS: http://10.5.0.30:9200
 
   prod_kibana:
-    image: docker.elastic.co/kibana/kibana:7.9.2
+    image: docker.elastic.co/kibana/kibana:8.6.1
     networks:
       tuliusnet:
         ipv4_address: 10.5.0.13

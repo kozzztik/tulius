@@ -169,7 +169,7 @@ INSTALLER_BACKUPS_DIR = BASE_DIR + 'backups/'
 
 WYSIBB_THUMB_SIZE = (350, 350)
 
-ELASTIC_HOSTS = ['localhost:9200'] if env == 'dev' else ['10.5.0.30:9200']
+ELASTIC_HOSTS = ['http://localhost:9200'] if env == 'dev' else ['http://10.5.0.30:9200']
 ELASTIC_PREFIX = 'test' if TEST_RUN else env
 
 ELASTIC_MODELS = (
