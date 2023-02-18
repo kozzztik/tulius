@@ -4,7 +4,7 @@ from django import urls
 from django import dispatch
 from django.db import models
 from django.utils import html
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils.timezone import now
 from django.contrib.auth import get_user_model
 
@@ -859,11 +859,8 @@ class Illustration(models.Model):
     def _copy_file(self, source_path, dest):
         if source_path:
             try:
-                source = open(source_path)
-                try:
+                with open(source_path, mode='wb') as source:
                     dest.save('%s.jpg' % (self.pk,), source)
-                finally:
-                    source.close()
             except:
                 pass
 

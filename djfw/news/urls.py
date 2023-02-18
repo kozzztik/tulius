@@ -1,4 +1,4 @@
-from django.conf import urls
+from django import urls
 from django.views.generic import RedirectView
 
 from .feed import NewsFeed

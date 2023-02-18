@@ -96,7 +96,10 @@ class MutationController:
             self._apply_descendants(self.instance, descendants_mutations)
         post_process = [m for m in self.mutations if m.with_post_process]
         if post_process:
-            children = self.instance.children.filter(deleted=False)
+            if self.instance.pk:
+                children = self.instance.children.filter(deleted=False)
+            else:
+                children = []
             for mutation in post_process:
                 mutation.post_process(self.instance, children)
         self.instance.save()

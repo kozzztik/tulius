@@ -160,11 +160,9 @@ def paginate(context, window=DEFAULT_WINDOW, hashtag=''):
         # Now we look around our current page, making sure that we don't wrap
         # around.
         current_start = page_obj.number - 1 - window
-        if current_start < 0:
-            current_start = 0
+        current_start = max(current_start, 0)
         current_end = page_obj.number - 1 + window
-        if current_end < 0:
-            current_end = 0
+        current_end = max(current_end, 0)
         current = set(page_range[current_start:current_end])
         pages = []
         # If there's no overlap between the first set of pages and the current

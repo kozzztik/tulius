@@ -1,5 +1,4 @@
 import json
-from wsgiref import util
 
 from django import http
 from django.core.files import base
@@ -38,22 +37,3 @@ def handle_field_upload(request, field, target_filename):
         field.save(target_filename, upload)
 
     return handle_upload(request, save, field, target_filename)
-
-
-def handle_download(file_obj, file_name, mime_type=''):
-    if mime_type:
-        response = http.HttpResponse(file_obj, mimetype='image')
-    else:
-        response = http.HttpResponse(file_obj)
-    response['Content-Disposition'] = 'filename=' + file_name
-    return response
-
-
-def handle_download_file_path(file_path, file_name, mime_type=''):
-    file_obj = util.FileWrapper(open(file_path, "rb"))
-    return handle_download(file_obj, file_name, mime_type)
-
-
-def handle_field_download(field, file_name, mime_type=''):
-    field.open()
-    return handle_download(field, file_name, mime_type)

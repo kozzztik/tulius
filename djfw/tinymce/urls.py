@@ -1,4 +1,4 @@
-from django.conf import urls
+from django import urls
 
 from djfw.tinymce import views
 

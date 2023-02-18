@@ -3,7 +3,7 @@ import typing
 import django.core.serializers.json
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from tulius.forum.comments import models as comment_models
 

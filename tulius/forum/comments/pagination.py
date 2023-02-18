@@ -7,11 +7,9 @@ def get_pagination_context(request, page_num, pages_count, window=4):
         # Now we look around our current page, making sure that we don't wrap
         # around.
         current_start = page_num - 1 - window
-        if current_start < 0:
-            current_start = 0
+        current_start = max(current_start, 0)
         current_end = page_num - 1 + window
-        if current_end < 0:
-            current_end = 0
+        current_end = max(current_end, 0)
         current = set(page_range[current_start:current_end])
         pages = []
         # If there's no overlap between the first set of pages and the current

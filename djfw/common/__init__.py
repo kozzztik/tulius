@@ -88,7 +88,7 @@ def do_gauss_analyze(query, field_name, intervals):
         model_max=models.Max(field_name))
     min_val = values['model_min']
     max_val = values['model_max']
-    delta = (float(max_val - min_val) / intervals)
+    delta = float(max_val - min_val) / intervals
     data = []
     for i in range(intervals):
         interval_start = int(min_val + (delta * i))

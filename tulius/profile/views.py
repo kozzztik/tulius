@@ -1,6 +1,6 @@
 from django import http
 from django import urls
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views import generic
 from django.utils import decorators
 from django.contrib import messages

@@ -24,7 +24,8 @@ class VKConnector():
             url += '&'
         if access_token:
             url += urllib.parse.urlencode({'access_token': access_token})
-        response = requests.request(http_method, url)
+        response = requests.request(
+            http_method, url, timeout=settings.REQUESTS_TIMEOUT)
         if response.status_code in [200, 201]:
             content = json.loads(response.text)
             return content
@@ -38,7 +39,7 @@ class VKConnector():
         args['redirect_uri'] = old_reddirect
         url = 'https://oauth.vk.com/access_token?' + urllib.parse.urlencode(
             args)
-        response = requests.get(url)
+        response = requests.get(url, timeout=settings.REQUESTS_TIMEOUT)
         if response.status_code not in [200, 201]:
             raise Exception(response.text)
         return json.loads(response.text)

@@ -106,7 +106,8 @@ class ReindexQuery:
             data.append(instance)
         response = client.bulk(data)
         if response['errors']:
-            raise Exception('errors occurred during request')
+            raise elasticsearch7.ElasticsearchException(
+                'errors occurred during request')
 
     def __call__(self, query):
         counter = 0
