@@ -46,7 +46,8 @@ class ASGIHandler(dj_asgi.ASGIHandler):
         """
         if scope['type'] not in ['http', 'websocket', 'lifespan']:
             raise ValueError(
-                "Django can only handle ASGI/HTTP connections, not %s." % scope["type"]
+                "Django can only handle ASGI/HTTP connections, not %s."
+                % scope["type"]
             )
 
         async with dj_asgi.ThreadSensitiveContext():
