@@ -52,68 +52,68 @@ class Genre(models.Model):
 
 class Story(models.Model):
     class Meta:
-        verbose_name = _(u'story')
-        verbose_name_plural = _(u'stories')
+        verbose_name = _('story')
+        verbose_name_plural = _('stories')
 
     name = models.CharField(
         max_length=200,
         default='',
         blank=False,
         null=False,
-        verbose_name=_(u'name')
+        verbose_name=_('name')
     )
     announcement = models.TextField(
         default='',
         blank=True,
-        verbose_name=_(u'announcement'),
+        verbose_name=_('announcement'),
     )
     announcement_preview = models.TextField(
         default='',
         blank=True,
-        verbose_name=_(u'announcement preview')
+        verbose_name=_('announcement preview')
     )
     short_comment = models.CharField(
         max_length=500,
         default='',
         blank=True,
-        verbose_name=_(u'short comment')
+        verbose_name=_('short comment')
     )
     introduction = models.TextField(
         default='',
         blank=True,
-        verbose_name=_(u'introduction'),
+        verbose_name=_('introduction'),
     )
     creation_year = models.PositiveIntegerField(
         choices=CREATION_YEAR_CHOICES,
-        verbose_name=_(u'creation year'),
+        verbose_name=_('creation year'),
     )
     genres = models.ManyToManyField(
         Genre,
         blank=True,
-        verbose_name=_(u'genres'),
+        verbose_name=_('genres'),
         related_name='stories',
     )
     card_image = models.FileField(
         null=True,
         blank=True,
-        verbose_name=_(u'playing card image'),
+        verbose_name=_('playing card image'),
         upload_to='stories/card_image',
     )
     top_banner = models.FileField(
         blank=True,
         null=True,
-        verbose_name=_(u'top banner'),
+        verbose_name=_('top banner'),
         upload_to='stories/top_banner',
     )
     bottom_banner = models.FileField(
         blank=True,
         null=True,
-        verbose_name=_(u'bottom banner'),
+        verbose_name=_('bottom banner'),
         upload_to='stories/bottom_banner',
     )
     hidden = models.BooleanField(
         default=True,
-        verbose_name=_(u'hidden')
+        verbose_name=_('hidden')
     )
 
     def __str__(self):
@@ -155,14 +155,14 @@ AVATAR_ALT_PATH = AVATAR_PATH + '-alt'
 
 class Avatar(models.Model):
     class Meta:
-        verbose_name = _(u'avatar')
-        verbose_name_plural = _(u'avatars')
+        verbose_name = _('avatar')
+        verbose_name_plural = _('avatars')
 
     story = models.ForeignKey(
         Story, models.PROTECT,
         blank=False,
         null=False,
-        verbose_name=_(u'story'),
+        verbose_name=_('story'),
         related_name='avatars',
     )
     name = models.CharField(
@@ -170,7 +170,7 @@ class Avatar(models.Model):
         default='',
         blank=False,
         null=False,
-        verbose_name=_(u'name')
+        verbose_name=_('name')
     )
     image = models.FileField(
         upload_to=AVATAR_PATH,
@@ -207,25 +207,25 @@ class Avatar(models.Model):
 
 class AvatarAlternative(models.Model):
     class Meta:
-        verbose_name = _(u'avatar alternative')
-        verbose_name_plural = _(u'avatars alternaties')
+        verbose_name = _('avatar alternative')
+        verbose_name_plural = _('avatars alternaties')
 
     avatar = models.ForeignKey(
         Avatar, models.PROTECT,
         blank=False,
         null=False,
-        verbose_name=_(u'avatar'),
+        verbose_name=_('avatar'),
         related_name='alternatives',
     )
 
     height = models.IntegerField(
         default=0,
-        verbose_name=_(u'height'),
+        verbose_name=_('height'),
     )
 
     width = models.IntegerField(
         default=0,
-        verbose_name=_(u'width'),
+        verbose_name=_('width'),
     )
 
     image = models.FileField(
@@ -260,15 +260,15 @@ CHAR_SEX_CHOICES = (
 
 class Character(models.Model):
     class Meta:
-        verbose_name = _(u'character')
-        verbose_name_plural = _(u'characters')
+        verbose_name = _('character')
+        verbose_name_plural = _('characters')
         ordering = ['order', 'id']
 
     story = models.ForeignKey(
         Story, models.PROTECT,
         blank=False,
         null=False,
-        verbose_name=_(u'story'),
+        verbose_name=_('story'),
         related_name='characters',
     )
     name = models.CharField(
@@ -276,23 +276,23 @@ class Character(models.Model):
         default='',
         blank=False,
         null=False,
-        verbose_name=_(u'name')
+        verbose_name=_('name')
     )
     order = models.IntegerField(
         default=0,
         blank=False,
         null=False,
-        verbose_name=_(u'order'),
+        verbose_name=_('order'),
         editable=False
     )
     sex = models.SmallIntegerField(
         default=CHAR_SEX_UNDEFINED,
-        verbose_name=_(u'sex'),
+        verbose_name=_('sex'),
         choices=CHAR_SEX_CHOICES,
     )
 
     description = models.TextField(
-        verbose_name=_(u'description'),
+        verbose_name=_('description'),
         blank=True,
         null=True,
     )
@@ -300,12 +300,12 @@ class Character(models.Model):
         Avatar, models.PROTECT,
         blank=True,
         null=True,
-        verbose_name=_(u'avatar'),
+        verbose_name=_('avatar'),
         related_name='characters',
     )
     show_in_character_list = models.BooleanField(
         default=False,
-        verbose_name=_(u'show in character list')
+        verbose_name=_('show in character list')
     )
 
     def __str__(self):
@@ -320,8 +320,8 @@ class Character(models.Model):
 
 class Variation(SortableModelMixin):
     class Meta:
-        verbose_name = _(u'variation')
-        verbose_name_plural = _(u'variations')
+        verbose_name = _('variation')
+        verbose_name_plural = _('variations')
         ordering = ['order', 'id']
 
     objects = models.Manager()  # linters don't worry, be happy
@@ -330,7 +330,7 @@ class Variation(SortableModelMixin):
         Story, models.PROTECT,
         blank=False,
         null=False,
-        verbose_name=_(u'story'),
+        verbose_name=_('story'),
         related_name='variations',
     )
     name = models.CharField(
@@ -338,16 +338,16 @@ class Variation(SortableModelMixin):
         default='',
         blank=False,
         null=False,
-        verbose_name=_(u'name')
+        verbose_name=_('name')
     )
     description = models.TextField(
-        verbose_name=_(u'description'),
+        verbose_name=_('description'),
         blank=True,
         null=True,
     )
     game = models.ForeignKey(
         'games.Game', models.PROTECT,
-        verbose_name=_(u'game'),
+        verbose_name=_('game'),
         related_name='story_variation',
         blank=True,
         null=True,
@@ -355,7 +355,7 @@ class Variation(SortableModelMixin):
 
     thread = models.ForeignKey(
         'game_forum_threads.Thread', models.PROTECT,
-        verbose_name=_(u'new forum'),
+        verbose_name=_('new forum'),
         related_name='variations',
         blank=True,
         null=True,
@@ -365,12 +365,12 @@ class Variation(SortableModelMixin):
         default=0,
         blank=False,
         null=False,
-        verbose_name=_(u'comments_count'),
+        verbose_name=_('comments_count'),
     )
 
     deleted = models.BooleanField(
         default=False,
-        verbose_name=_(u'deleted')
+        verbose_name=_('deleted')
     )
 
     def __str__(self):
@@ -447,8 +447,8 @@ class Variation(SortableModelMixin):
 
 class Role(SortableModelMixin):
     class Meta:
-        verbose_name = _(u'role')
-        verbose_name_plural = _(u'roles')
+        verbose_name = _('role')
+        verbose_name_plural = _('roles')
         ordering = ['order', 'id']
 
     objects = models.Manager()  # linters don't worry, be happy
@@ -457,21 +457,21 @@ class Role(SortableModelMixin):
         Variation, models.PROTECT,
         blank=False,
         null=False,
-        verbose_name=_(u'variation'),
+        verbose_name=_('variation'),
         related_name='roles',
     )
     character = models.ForeignKey(
         Character, models.PROTECT,
         blank=True,
         null=True,
-        verbose_name=_(u'character'),
+        verbose_name=_('character'),
         related_name='roles',
     )
     avatar = models.ForeignKey(
         Avatar, models.PROTECT,
         blank=True,
         null=True,
-        verbose_name=_(u'avatar'),
+        verbose_name=_('avatar'),
         related_name='roles',
     )
     name = models.CharField(
@@ -479,34 +479,34 @@ class Role(SortableModelMixin):
         default='',
         blank=False,
         null=False,
-        verbose_name=_(u'name')
+        verbose_name=_('name')
     )
     sex = models.SmallIntegerField(
         default=CHAR_SEX_UNDEFINED,
-        verbose_name=_(u'sex'),
+        verbose_name=_('sex'),
         choices=CHAR_SEX_CHOICES,
     )
     description = models.TextField(
-        verbose_name=_(u'description'),
+        verbose_name=_('description'),
         blank=True,
         null=True,
     )
     body = models.TextField(
-        verbose_name=_(u'text'),
+        verbose_name=_('text'),
         blank=True,
         null=True,
     )
     show_in_character_list = models.BooleanField(
         default=False,
-        verbose_name=_(u'show in character list')
+        verbose_name=_('show in character list')
     )
     show_in_online_character = models.BooleanField(
         default=True,
-        verbose_name=_(u'show in online characters')
+        verbose_name=_('show in online characters')
     )
     show_trust_marks = models.BooleanField(
         default=True,
-        verbose_name=_(u'show trust marks')
+        verbose_name=_('show trust marks')
     )
     user = models.ForeignKey(
         User, models.PROTECT,
@@ -517,14 +517,14 @@ class Role(SortableModelMixin):
     )
     requestable = models.BooleanField(
         default=True,
-        verbose_name=_(u'requestable')
+        verbose_name=_('requestable')
     )
 
     deleted = models.BooleanField(
         default=False,
         blank=False,
         null=False,
-        verbose_name=_(u'deleted')
+        verbose_name=_('deleted')
     )
 
     visit_time = models.DateTimeField(
@@ -537,14 +537,14 @@ class Role(SortableModelMixin):
         default=0,
         blank=False,
         null=False,
-        verbose_name=_(u'comments count'),
+        verbose_name=_('comments count'),
     )
 
     trust_value = models.PositiveIntegerField(
         default=0,
         blank=False,
         null=False,
-        verbose_name=_(u'trust value'),
+        verbose_name=_('trust value'),
     )
 
     def __str__(self):
@@ -592,25 +592,25 @@ class Role(SortableModelMixin):
 
 class RoleDeleteMark(models.Model):
     class Meta:
-        verbose_name = _(u'role delete mark')
-        verbose_name_plural = _(u'roles delete marks')
+        verbose_name = _('role delete mark')
+        verbose_name_plural = _('roles delete marks')
 
     role = models.ForeignKey(
         Role, models.PROTECT,
         blank=False,
         null=False,
-        verbose_name=_(u'role'),
+        verbose_name=_('role'),
         related_name='delete_marks',
     )
     user = models.ForeignKey(
         User, models.PROTECT,
         blank=False,
         null=False,
-        verbose_name=_(u'user'),
+        verbose_name=_('user'),
         related_name='role_delete_marks',
     )
     description = models.TextField(
-        verbose_name=_(u'description'),
+        verbose_name=_('description'),
         blank=True,
         null=True,
     )
@@ -628,8 +628,8 @@ class RoleDeleteMark(models.Model):
 
 class StoryAdmin(models.Model):
     class Meta:
-        verbose_name = _(u'story admin')
-        verbose_name_plural = _(u'story admins')
+        verbose_name = _('story admin')
+        verbose_name_plural = _('story admins')
         unique_together = ('story', 'user')
 
     CREATE_CHOICES = (
@@ -640,19 +640,19 @@ class StoryAdmin(models.Model):
         Story, models.PROTECT,
         blank=False,
         null=False,
-        verbose_name=_(u'story'),
+        verbose_name=_('story'),
         related_name='admins',
     )
     user = models.ForeignKey(
         User, models.PROTECT,
         blank=False,
         null=False,
-        verbose_name=_(u'user'),
+        verbose_name=_('user'),
         related_name='admined_stories',
     )
     create_game = models.BooleanField(
         default=False,
-        verbose_name=_(u'create game'),
+        verbose_name=_('create game'),
         choices=CREATE_CHOICES
     )
 
@@ -666,22 +666,22 @@ class StoryAdmin(models.Model):
 
 class StoryAuthor(models.Model):
     class Meta:
-        verbose_name = _(u'story author')
-        verbose_name_plural = _(u'story authors')
+        verbose_name = _('story author')
+        verbose_name_plural = _('story authors')
         unique_together = ('story', 'user')
 
     story = models.ForeignKey(
         Story, models.PROTECT,
         blank=False,
         null=False,
-        verbose_name=_(u'story'),
+        verbose_name=_('story'),
         related_name='authors',
     )
     user = models.ForeignKey(
         User, models.PROTECT,
         blank=False,
         null=False,
-        verbose_name=_(u'user'),
+        verbose_name=_('user'),
         related_name='authored_stories',
     )
 
@@ -701,8 +701,8 @@ def on_story_author_updates(instance, **_kwargs):
 
 class AdditionalMaterial(models.Model):
     class Meta:
-        verbose_name = _(u'additional material')
-        verbose_name_plural = _(u'additional materials')
+        verbose_name = _('additional material')
+        verbose_name_plural = _('additional materials')
 
     objects = models.Manager()  # linters don't worry, be happy
 
@@ -710,7 +710,7 @@ class AdditionalMaterial(models.Model):
         Story, models.PROTECT,
         blank=True,
         null=True,
-        verbose_name=_(u'story'),
+        verbose_name=_('story'),
         related_name='additional_materials',
     )
 
@@ -718,7 +718,7 @@ class AdditionalMaterial(models.Model):
         Variation, models.PROTECT,
         blank=True,
         null=True,
-        verbose_name=_(u'variation'),
+        verbose_name=_('variation'),
         related_name='additional_materials',
     )
 
@@ -730,12 +730,12 @@ class AdditionalMaterial(models.Model):
 
     body = models.TextField(
         default='',
-        verbose_name=_(u'body')
+        verbose_name=_('body')
     )
 
     admins_only = models.BooleanField(
         default=True,
-        verbose_name=_(u'Hide in materials')
+        verbose_name=_('Hide in materials')
     )
 
     def __str__(self):
@@ -789,7 +789,7 @@ class Illustration(models.Model):
         Story, models.PROTECT,
         blank=True,
         null=True,
-        verbose_name=_(u'story'),
+        verbose_name=_('story'),
         related_name='illustrations',
     )
 
@@ -797,7 +797,7 @@ class Illustration(models.Model):
         Variation, models.PROTECT,
         blank=True,
         null=True,
-        verbose_name=_(u'variation'),
+        verbose_name=_('variation'),
         related_name='illustrations',
     )
 
@@ -809,7 +809,7 @@ class Illustration(models.Model):
 
     admins_only = models.BooleanField(
         default=True,
-        verbose_name=_(u'Hide in materials')
+        verbose_name=_('Hide in materials')
     )
 
     image = models.FileField(

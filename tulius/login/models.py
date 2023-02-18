@@ -12,7 +12,7 @@ class RegistrationProfile(models.Model):
         settings.AUTH_USER_MODEL, models.PROTECT,
         verbose_name=_('user'))
     activation_key = models.CharField(_('activation key'), max_length=40)
-    ACTIVATED = u"ALREADY_ACTIVATED"
+    ACTIVATED = "ALREADY_ACTIVATED"
 
     class Meta:
         verbose_name = _('registration profile')

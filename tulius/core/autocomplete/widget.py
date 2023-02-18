@@ -71,7 +71,7 @@ class AutocompleteWidget(TextInput):
             choices = urls.reverse(str(self.choices_url))
         except urls.NoReverseMatch:
             choices = self.choices_url
-        choices = u"""function(request, response){
+        choices = """function(request, response){
             $.ajax({
                 url: "%s",
                 data: {q: request.term},
@@ -121,10 +121,10 @@ class AutocompleteWidget(TextInput):
             for k, v in self.extra.items():
                 options = options.replace(json.dumps(v), v)
                 extra.append(
-                    u"function %s() { return $('#id_%s').val(); }\n" % (
+                    "function %s() { return $('#id_%s').val(); }\n" % (
                         v, k))
 
-            extra = u''.join(extra)
+            extra = ''.join(extra)
         else:
             extra, options = '', ''
         attrs['id'] = attrs['id'] + '_autocomplete'
@@ -133,7 +133,7 @@ class AutocompleteWidget(TextInput):
             value = str(obj)
         html_code += super().render(name + '_autocomplete', value, attrs)
 
-        html_code += u"""
+        html_code += """
 <script type="text/javascript">
     $(document).ready(function() {
         %s$("input[id$='%s_autocomplete']").autocomplete({%s

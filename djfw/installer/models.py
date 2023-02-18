@@ -32,13 +32,13 @@ class BackupCategory(models.Model):
         blank=False,
         null=False,
         default=0,
-        verbose_name=_(u'saved backups'),
+        verbose_name=_('saved backups'),
     )
     enabled = models.BooleanField(
         blank=False,
         null=False,
         default=True,
-        verbose_name=_(u'enabled'),
+        verbose_name=_('enabled'),
     )
     description = models.CharField(
         max_length=255,
@@ -86,7 +86,7 @@ class Backup(models.Model):
         blank=False,
         null=False,
         default=0,
-        verbose_name=_(u'size'),
+        verbose_name=_('size'),
     )
 
     def __str__(self):
@@ -104,7 +104,7 @@ class Backup(models.Model):
     def file_size(self):
         return filesizeformat(self.size)
 
-    file_size.short_description = _(u'size')
+    file_size.short_description = _('size')
 
     def path(self):
         return os.path.join(self.backups_dir(), self.file_name())
@@ -116,7 +116,7 @@ class Backup(models.Model):
         return '<a href="%s">%s</a>' % (
             self.get_absolute_url(), self.get_absolute_url())
 
-    url.short_description = _(u'URL')
+    url.short_description = _('URL')
     url.allow_tags = True
 
     def delete(self, using=None, keep_parents=False):

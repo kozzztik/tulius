@@ -8,7 +8,7 @@ from tulius.models import User
 class NotificationForm(forms.Form):
     enabled = forms.BooleanField(
         required=False,
-        label=_(u'enabled'),
+        label=_('enabled'),
     )
 
 
@@ -32,21 +32,21 @@ class PersonalSettingsForm(forms.models.ModelForm):
 class ChangeEmailForm(forms.Form):
     email = forms.EmailField(
         required=False,
-        label=_(u'Email'),
+        label=_('Email'),
     )
     new_pass = forms.CharField(
         required=False,
-        label=_(u'New password'),
+        label=_('New password'),
         widget=forms.PasswordInput
     )
     repeat_pass = forms.CharField(
         required=False,
-        label=_(u'Repeat password'),
+        label=_('Repeat password'),
         widget=forms.PasswordInput
     )
     current_pass = forms.CharField(
         required=False,
-        label=_(u'Current password'),
+        label=_('Current password'),
         widget=forms.PasswordInput
     )
 

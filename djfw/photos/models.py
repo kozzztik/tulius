@@ -25,7 +25,7 @@ class PhotoAlbum(models.Model):
         blank=False,
         null=False,
         default=False,
-        verbose_name=_(u'enabled'),
+        verbose_name=_('enabled'),
     )
 
     title_photo = models.ForeignKey(
@@ -106,7 +106,7 @@ class Photo(models.Model):
 
     file_length = models.IntegerField(
         default=0,
-        verbose_name=_(u'file length'),
+        verbose_name=_('file length'),
     )
 
     created_at = models.DateTimeField(

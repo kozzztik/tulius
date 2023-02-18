@@ -78,7 +78,7 @@ class UploadedFile(models.Model):
 
     file_size = models.IntegerField(
         default=0,
-        verbose_name=_(u'file length'),
+        verbose_name=_('file length'),
     )
 
     def __unicode__(self):
@@ -148,7 +148,7 @@ class UploadedImage(models.Model):
 
     file_size = models.IntegerField(
         default=0,
-        verbose_name=_(u'file length'),
+        verbose_name=_('file length'),
     )
 
     def __unicode__(self):

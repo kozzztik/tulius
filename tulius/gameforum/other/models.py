@@ -45,7 +45,7 @@ class VotingVote(other_models.AbstractVotingVote):
         User, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'user'),
+        verbose_name=_('user'),
         related_name='game_voting_votes',
     )
     comment = models.ForeignKey(
@@ -53,5 +53,5 @@ class VotingVote(other_models.AbstractVotingVote):
         null=False,
         blank=False,
         related_name='votes',
-        verbose_name=_(u'comment'),
+        verbose_name=_('comment'),
     )

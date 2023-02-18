@@ -108,14 +108,14 @@ class AutoPaginateNode(template.Node):
                 ) from exc
             context[key] = []
             context['invalid_page'] = True
-            return u''
+            return ''
         if self.context_var is not None:
             context[self.context_var] = page_obj.object_list
         else:
             context[key] = page_obj.object_list
         context['paginator'] = paginator
         context['page_obj'] = page_obj
-        return u''
+        return ''
 
 
 # pylint: disable=too-many-branches,too-many-statements

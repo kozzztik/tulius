@@ -82,7 +82,7 @@ class FileUpload(models.Model):
 
     file_length = models.IntegerField(
         default=0,
-        verbose_name=_(u'file length'),
+        verbose_name=_('file length'),
     )
 
     def is_image(self):

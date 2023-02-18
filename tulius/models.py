@@ -108,20 +108,20 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
     )
     sex = models.SmallIntegerField(
         default=USER_SEX_UNDEFINED,
-        verbose_name=_(u'sex'),
+        verbose_name=_('sex'),
         choices=USER_SEX_CHOICES,
     )
 
     game_inline = models.SmallIntegerField(
         default=USER_GAME_INLINE_TIME,
         blank=False,
-        verbose_name=_(u'Show in game'),
+        verbose_name=_('Show in game'),
         choices=USER_GAME_INLINE_CHOICES,
     )
     animation_speed = models.PositiveIntegerField(
         default=1000,
         blank=False,
-        verbose_name=_(u'Animation speed'),
+        verbose_name=_('Animation speed'),
     )
 
     vk_profile = models.ForeignKey(
@@ -135,7 +135,7 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
         default=0,
         blank=False,
         editable=False,
-        verbose_name=_(u'Show in game'),
+        verbose_name=_('Show in game'),
     )
 
     last_read_pm_id = models.PositiveIntegerField(
@@ -159,7 +159,7 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
 
     def __str__(self):
         v = self.username
-        return u'%s' % (v, )
+        return '%s' % (v, )
 
     def get_absolute_url(self):
         return urls.reverse(
