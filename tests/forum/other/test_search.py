@@ -193,7 +193,7 @@ def test_reindex_all(superuser, admin):
         es_models.do_direct_index(admin.user)
         # check it is now broken
         doc = es_models.client.get(
-            es_models.index_name(admin.user.__class__), admin.user.pk)
+            index=es_models.index_name(admin.user.__class__), id=admin.user.pk)
         assert doc['_source']['animation_speed'] == old_value + 100
         # try reindex by not superuser
         response = admin.post('/api/forum/elastic/reindex/all/')
@@ -205,25 +205,26 @@ def test_reindex_all(superuser, admin):
         assert response.status_code == 200
         # check user is fixed
         doc = es_models.client.get(
-            es_models.index_name(admin.user.__class__), admin.user.pk)
+            index=es_models.index_name(admin.user.__class__), id=admin.user.pk)
         assert doc['_source']['animation_speed'] == old_value
     finally:
         admin.user.animation_speed = old_value
 
 
 def test_index_restore(superuser, admin):
-    es_models.client.indices.delete(es_models.index_name(admin.user.__class__))
+    es_models.client.indices.delete(
+        index=es_models.index_name(admin.user.__class__))
     # check it is now broken
     with pytest.raises(exceptions.NotFoundError):
         es_models.client.get(
-            es_models.index_name(admin.user.__class__), admin.user.pk)
+            index=es_models.index_name(admin.user.__class__), id=admin.user.pk)
     # do reindex all (but only users)
     with mock.patch.object(settings, 'ELASTIC_MODELS', (('tulius', 'User'),)):
         response = superuser.post('/api/forum/elastic/reindex/all/')
     assert response.status_code == 200
     # check user is fixed
     doc = es_models.client.get(
-        es_models.index_name(admin.user.__class__), admin.user.pk)
+        index=es_models.index_name(admin.user.__class__), id=admin.user.pk)
     assert doc['_source']['animation_speed'] == admin.user.animation_speed
 
 
@@ -234,15 +235,15 @@ def test_reindex_room(superuser, admin, room_group, thread):
     comment.title = old_value + 'foobar'
     es_models.do_direct_index(comment)
     # flush index to be sure get will return fresh data
-    es_models.client.indices.flush(es_models.index_name(models.Comment))
+    es_models.client.indices.flush(index=es_models.index_name(models.Comment))
     # check it is now broken
-    # some workaround about index refresh. Sometime it needs some time for
+    # some workaround about index refresh. Sometimes it needs some time for
     # document to appear in index and flush not helps
     for i in range(3):
         if i:
             time.sleep(2)
         doc = es_models.client.get(
-            es_models.index_name(comment.__class__), comment.pk)
+            index=es_models.index_name(comment.__class__), id=comment.pk)
         if doc['_source']['title'] == old_value + 'foobar':
             break
     assert doc['_source']['title'] == old_value + 'foobar'
@@ -256,7 +257,7 @@ def test_reindex_room(superuser, admin, room_group, thread):
     assert response.status_code == 200
     # check user is fixed
     doc = es_models.client.get(
-        es_models.index_name(comment.__class__), comment.pk)
+        index=es_models.index_name(comment.__class__), id=comment.pk)
     assert doc['_source']['title'] == old_value
 
 

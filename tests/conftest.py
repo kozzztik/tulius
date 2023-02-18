@@ -93,7 +93,7 @@ def init_settings():
 init_settings()
 
 
-@pytest.mark.trylast
+@pytest.hookimpl(trylast=True)
 def pytest_sessionstart(session):
     session.django_db_cfg = utils.setup_databases(
         verbosity=session.config.option.verbose,
@@ -102,7 +102,7 @@ def pytest_sessionstart(session):
     )
 
 
-@pytest.mark.trylast
+@pytest.hookimpl(trylast=True)
 def pytest_sessionfinish(session, exitstatus):
     db_cfg = getattr(session, 'django_db_cfg')
     if db_cfg:

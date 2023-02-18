@@ -26,11 +26,9 @@ def rebuild_index(model):
         model.to_elastic_mapping(fields)
     index_name = elastic_models.index_name(model)
     try:
-        elastic_models.client.indices.delete(index_name)
+        elastic_models.client.indices.delete(index=index_name)
     except exceptions.NotFoundError:
         pass
-    elastic_models.client.indices.create(index_name, body={
-        'mappings': {
-            'properties': fields
-        }
+    elastic_models.client.indices.create(index=index_name, mappings={
+        'properties': fields
     })

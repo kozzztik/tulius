@@ -194,8 +194,11 @@ class ReadmarkAPI(views.BaseThreadView):
     def on_thread_to_json(cls, instance, user, response, children, **_kwargs):
         not_read_comment = None
         if user.is_authenticated:
-            readmark = cls.read_mark_model.objects.filter(
-                thread=instance, user=user).first()
+            if instance.pk:
+                readmark = cls.read_mark_model.objects.filter(
+                    thread=instance, user=user).first()
+            else:
+                readmark = None  # for preview mode
             if readmark:
                 if readmark.not_read_comment_id:
                     not_read_comment = cls.not_read_comment_json(

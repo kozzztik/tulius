@@ -118,7 +118,7 @@ class Search(views.BaseThreadView):
         start_time = time.perf_counter_ns()
         response = models.client.search(
             index=models.index_name(self.comment_model),
-            body=body
+            **body
         )
         hits = response['hits']['total']['value']
         request.profiling_data['elastic_time'] = response['took']
@@ -171,7 +171,7 @@ class Search(views.BaseThreadView):
         body = {
             'query': {'bool': search_request},
             '_source': False,
-            'from': (page - 1) * comments_on_page,
+            'from_': (page - 1) * comments_on_page,
             'size': comments_on_page,
             'explain': settings.DEBUG,
         }
