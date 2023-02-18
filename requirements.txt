@@ -25,8 +25,8 @@ pytest == 7.2.1
 pytest-cov == 4.0.0
 pylint == 2.16.1
 billiard == 4.1.0
-pycodestyle == 2.6.0
-flake8 == 3.8.3
+pycodestyle == 2.8.0
+flake8 == 4.0.1
 pytest-flake8 == 1.1.1
 coverage==6.5.0
 coveralls==3.3.1
