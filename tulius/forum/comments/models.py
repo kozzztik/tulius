@@ -79,12 +79,12 @@ class AbstractComment(models.Model):
     )
     deleted = models.BooleanField(
         default=False,
-        verbose_name=_(u'deleted')
+        verbose_name=_('deleted')
     )
     order = models.IntegerField(
         null=False,
         blank=False,
-        verbose_name=_(u'order'),
+        verbose_name=_('order'),
     )
     data = models.JSONField(
         default=dict,

@@ -26,11 +26,11 @@ ACCESS_OPEN = ACCESS_READ + ACCESS_WRITE
 ACCESS_MODERATOR = ACCESS_READ + ACCESS_WRITE + ACCESS_MODERATE
 
 DEFAULT_RIGHTS_CHOICES = (
-    (None, _(u'access not set')),
-    (ACCESS_READ + ACCESS_WRITE, _(u'free access')),
-    (ACCESS_READ, _(u'read only access')),
-    (ACCESS_READ + ACCESS_NO_INHERIT, _(u'read only access(no inherit)')),
-    (NO_ACCESS, _(u'private(no access)')),
+    (None, _('access not set')),
+    (ACCESS_READ + ACCESS_WRITE, _('free access')),
+    (ACCESS_READ, _('read only access')),
+    (ACCESS_READ + ACCESS_NO_INHERIT, _('read only access(no inherit)')),
+    (NO_ACCESS, _('private(no access)')),
 )
 
 
@@ -156,7 +156,7 @@ class AbstractThread(models.Model):
     )
     room = models.BooleanField(
         default=False,
-        verbose_name=_(u'room')
+        verbose_name=_('room')
     )
     user = models.ForeignKey(
         User, models.PROTECT,
@@ -165,7 +165,7 @@ class AbstractThread(models.Model):
     )
     default_rights = models.SmallIntegerField(
         default=None, blank=True, null=True,
-        verbose_name=_(u'access type'),
+        verbose_name=_('access type'),
         choices=DEFAULT_RIGHTS_CHOICES,
     )
     create_time = models.DateTimeField(
@@ -174,15 +174,15 @@ class AbstractThread(models.Model):
     )
     closed = models.BooleanField(
         default=False,
-        verbose_name=_(u'closed')
+        verbose_name=_('closed')
     )
     important = models.BooleanField(
         default=False,
-        verbose_name=_(u'important')
+        verbose_name=_('important')
     )
     deleted = models.BooleanField(
         default=False,
-        verbose_name=_(u'deleted')
+        verbose_name=_('deleted')
     )
     data = models.JSONField(
         default=dict, editable=False,

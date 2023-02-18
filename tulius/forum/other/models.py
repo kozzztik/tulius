@@ -60,7 +60,7 @@ class AbstractVotingVote(models.Model):
         User, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'user'),
+        verbose_name=_('user'),
         related_name='voting_votes',
     )
     comment = models.ForeignKey(
@@ -68,7 +68,7 @@ class AbstractVotingVote(models.Model):
         null=False,
         blank=False,
         related_name='votes',
-        verbose_name=_(u'comment'),
+        verbose_name=_('comment'),
     )
 
     def __str__(self):

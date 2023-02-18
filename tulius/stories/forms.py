@@ -14,17 +14,17 @@ class StoryFilterForm(forms.Form):
     filter_by_author = forms.ModelChoiceField(
         required=False,
         queryset=models.User.objects.all(),
-        label=_(u'Author'),
+        label=_('Author'),
     )
     filter_by_genre = forms.ModelChoiceField(
         required=False,
         queryset=models.Genre.objects.all(),
-        label=_(u'Genre'),
+        label=_('Genre'),
     )
     filter_by_creation_year = forms.ChoiceField(
         required=False,
         choices=EMPTY_CHOICE + models.CREATION_YEAR_CHOICES,
-        label=_(u'Creation year'),
+        label=_('Creation year'),
     )
 
     def __init__(self, *args, **kwargs):

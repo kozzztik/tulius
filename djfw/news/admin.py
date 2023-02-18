@@ -38,12 +38,12 @@ class NewsItemAdmin(CustomModelAdmin):
     def make_published(self, request, queryset):
         queryset.update(is_published=True)
 
-    make_published.short_description = u'publish selected news'
+    make_published.short_description = 'publish selected news'
 
     def make_unpublished(self, request, queryset):
         queryset.update(is_published=False)
 
-    make_unpublished.short_description = u'unpublish selected news'
+    make_unpublished.short_description = 'unpublish selected news'
 
     actions = [
         make_published,
