@@ -4,6 +4,7 @@ import time
 import logging
 
 from django import http
+from django.conf import settings
 from django.core import exceptions
 from ua_parser import user_agent_parser
 
@@ -62,6 +63,10 @@ def log_record(request, exec_time, response):
         'method': request.method,
         'status_code': response.status_code,
         'content_length': content_length,
+        'scheme_header': {
+            'name': settings.SECURE_PROXY_SSL_HEADER,
+            'value': request.META.get(settings.SECURE_PROXY_SSL_HEADER),
+        },
         **({
             'app_name': request.resolver_match.app_name,
             'url_name': request.resolver_match.url_name,
