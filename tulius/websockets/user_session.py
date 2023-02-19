@@ -69,7 +69,7 @@ class UserSession:
             if self.json:
                 await self.ws.send_json(message)
             else:
-                await self.ws.send_str("new_pm {}".format(message['id']))
+                await self.ws.send_text("new_pm {}".format(message['id']))
 
     async def thread_comments_channel(self, message):
         logger.debug('User %s message %s', self.user_id, message)

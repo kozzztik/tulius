@@ -8,6 +8,7 @@ import typing as t
 import functools
 
 from django.core import exceptions
+from django import http
 
 from tulius.websockets.asgi import asgi_handler
 
@@ -195,6 +196,9 @@ def websocket_view(func):
 
     @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
+        if request.asgi.scope['type'] != 'websocket':
+            return http.HttpResponseBadRequest(
+                'Expected websocket connection.')
         ws = WebSocket(request)
         request.asgi.ws = ws
         return asgi_handler.HttpResponseUpgrade(
