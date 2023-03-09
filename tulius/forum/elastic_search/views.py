@@ -197,7 +197,7 @@ class Search(views.BaseThreadView):
         search_results = []
         hits = {int(hit['_id']): hit for hit in response['hits']['hits']}
         for comment in comments:
-            if filter_text:
+            if filter_text and 'highlight' in hits[comment.pk]:
                 # found text hightlighting
                 comment.body = hits[comment.pk]['highlight']['body'][0]
             if not comment.parent.read_right(self.user):
