@@ -1,6 +1,8 @@
 import pytest
 from django.core import exceptions
 
+from tulius.forum.other import voting
+
 
 voting_data = {
     'name': 'Vote for <u>best</u> future',
@@ -397,3 +399,24 @@ def test_vote_with_wrong_id(thread, user):
             comment['url'] + 'voting/',
             {'choice': voting['choices']['items'][0]['id'] + 100})
         assert response.status_code == 404
+
+
+def test_broken_voting(room_group, user):
+    data = {
+        'body': 'some body',
+        'choice': None,
+        'choices': {
+            'items': [
+                {"count": None, "id": 0, "name": 'option 1'},
+                {"count": None, "id": 1, "name": 'option 2'}
+            ],
+            'votes': 7,
+            'with_results': False
+        },
+        'closed': False,
+        'id': 3446262,
+        'name': 'some name',
+        'preview_results': False,
+        'show_results': True,
+    }
+    voting.VotingAPI.user_voting_data(data, user.user, 0)
