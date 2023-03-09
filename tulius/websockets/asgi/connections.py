@@ -1,5 +1,6 @@
-from django.db import utils
 import threading
+
+from django.db import utils
 
 
 class ConnectionHandler(utils.ConnectionHandler):
@@ -11,9 +12,11 @@ class ConnectionHandler(utils.ConnectionHandler):
     def __getitem__(self, alias):
         try:
             return getattr(self._connections, alias)
-        except AttributeError:
+        except AttributeError as exc:
             if alias not in self.settings:
-                raise self.exception_class(f"The connection '{alias}' doesn't exist.")
+                raise self.exception_class(
+                    f"The connection '{alias}' doesn't exist."
+                ) from exc
         with self._lock:
             pool = self._connection_pools.setdefault(alias, [])
             if pool:

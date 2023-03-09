@@ -48,15 +48,18 @@ def monkey_patch_connections():
     Django db connections does not really support asgi, so it doesn't correctly
     close connections and have no support of connection pools needed for async.
 
-    We patch connections object in place, as it can be already imported somewere.
+    We patch connections object in place, as it can be already imported
+    somewhere.
     """
     if getattr(db.connections, '_lock', None):
         return
     db.connections._connection_pools = {}
     db.connections._lock = threading.Lock()
     db.connections._connections = Local(False)
-    db.connections.__class__.__getitem__ = connections.ConnectionHandler.__getitem__
-    db.connections.__class__.close_context = connections.ConnectionHandler.close_context
+    db.connections.__class__.__getitem__ = \
+        connections.ConnectionHandler.__getitem__
+    db.connections.__class__.close_context = \
+        connections.ConnectionHandler.close_context
 
 
 class ASGIHandler(dj_asgi.ASGIHandler):
