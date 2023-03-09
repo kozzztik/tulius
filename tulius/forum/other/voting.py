@@ -97,7 +97,7 @@ class VotingAPI(views.CommentBase):
         if not with_results:
             for item in data['choices']['items']:
                 item['count'] = None
-                del item['percent']
+                item.pop('percent', None)
         data['choices']['with_results'] = bool(
             data['closed'] or (data['choice'] and data['show_results']))
         return data

@@ -354,3 +354,31 @@ def test_search_after_move(superuser, room_group):
     assert response.status_code == 200
     data = response.json()
     assert data['results'][0]['thread']['id'] == thread['id']
+
+
+def test_search_result_no_highlight(admin, thread):
+    response = admin.post(
+        thread['url'] + 'comments_page/', {
+            'reply_id': thread['first_comment_id'],
+            'title': 'title', 'body': 'Some foo text',
+            'media': {},
+        })
+    assert response.status_code == 200
+    data = response.json()
+    response = {
+        'took': 3,
+        'timed_out': False,
+        'hits': {
+            'total': {'value': 1, 'relation': 'eq'},
+            'max_score': 2.5207777,
+            'hits': [{'_id': data['comments'][1]['id']}],
+        }
+    }
+    search = mock.MagicMock(return_value=response)
+    with mock.patch.object(es_models.client, 'search', search):
+        response = admin.post(
+            '/api/forum/search/',
+            {'text': 'foo', 'thread_id': thread["id"]})
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data['results']) == 1
