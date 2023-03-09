@@ -16,4 +16,4 @@ RUN pip install gunicorn==20.1.0 uvicorn==0.20.0 django==4.1.6 pillow==9.4.0 \
     pylint==2.16.1 pycodestyle==2.8.0 pytest==7.2.1 pytest-cov==4.0.0 \
     coverage==6.5.0 coveralls==3.3.1 flake8==4.0.1 \
     pytest-flake8==1.1.1 python-logstash==0.4.8 ua-parser==0.10.0 \
-    elasticsearch8==8.6.2 websockets==10.4
+    elasticsearch8==8.6.2 websockets==10.4 pytest-asyncio==0.20.3

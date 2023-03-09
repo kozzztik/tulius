@@ -5,7 +5,7 @@ import django
 from django.test import client as django_client
 from django.test import utils
 
-pytest_plugins = ('celery.contrib.pytest', )
+pytest_plugins = ('celery.contrib.pytest', 'pytest_asyncio')
 
 
 class JSONClient(django_client.Client):
