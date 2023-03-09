@@ -1,6 +1,12 @@
+import threading
+
+from asgiref.local import Local
 import django
 from django import http
+from django import db
+
 from django.core.handlers import asgi as dj_asgi
+from tulius.websockets.asgi import connections
 
 
 class HttpResponseUpgrade(http.HttpResponse):
@@ -37,8 +43,25 @@ class ASGIRequest(dj_asgi.ASGIRequest):
         super().__init__(transport.scope, body_file)
 
 
+def monkey_patch_connections():
+    """
+    Django db connections does not really support asgi, so it doesn't correctly
+    close connections and have no support of connection pools needed for async.
+
+    We patch connections object in place, as it can be already imported somewere.
+    """
+    if getattr(db.connections, '_lock', None):
+        return
+    db.connections._connection_pools = {}
+    db.connections._lock = threading.Lock()
+    db.connections._connections = Local(False)
+    db.connections.__class__.__getitem__ = connections.ConnectionHandler.__getitem__
+    db.connections.__class__.close_context = connections.ConnectionHandler.close_context
+
+
 class ASGIHandler(dj_asgi.ASGIHandler):
     request_class = ASGIRequest
+    context_pool = None
 
     async def __call__(self, scope, receive, send):
         """
@@ -51,7 +74,10 @@ class ASGIHandler(dj_asgi.ASGIHandler):
             )
 
         async with dj_asgi.ThreadSensitiveContext():
-            await self.handle(scope, receive, send)
+            try:
+                await self.handle(scope, receive, send)
+            finally:
+                db.connections.close_context()
 
     async def handle(self, scope, receive, send):
         """
@@ -116,4 +142,5 @@ def get_asgi_application():
     internal implementation changes or moves in the future.
     """
     django.setup(set_prefix=False)
+    monkey_patch_connections()
     return ASGIHandler()

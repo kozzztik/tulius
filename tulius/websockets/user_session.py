@@ -1,11 +1,11 @@
 import asyncio
-import functools
 import json
 import logging
 
 from django.conf import settings
 from django.contrib import auth
 from redis import asyncio as aioredis
+from asgiref.sync import sync_to_async
 
 from tulius.forum import const as forum_const
 from tulius.websockets import consts
@@ -29,25 +29,10 @@ class UserSession:
         return self._redis_cache.make_key(value)
 
     async def auth(self):
-        user = await asyncio.get_event_loop().run_in_executor(
-            None, functools.partial(self.threaded_auth, self.request))
+        user = await sync_to_async(
+            auth.get_user, thread_sensitive=False)(self.request)
         self.user = user
         self.user_id = self.user.pk
-
-    @staticmethod
-    def threaded_auth(request):
-        try:
-            if hasattr(asyncio, "current_task"):
-                # Python 3.7 and up
-                task = asyncio.current_task()
-            else:
-                # Python 3.6
-                task = asyncio.Task.current_task()
-        except RuntimeError:
-            task = None
-        if task is not None:
-            raise ValueError('That is not thread and loop safe operation!')
-        return auth.get_user(request)
 
     @staticmethod
     def _pubsub_exc_handler(e, *args):
