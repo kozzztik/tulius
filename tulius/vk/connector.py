@@ -45,7 +45,7 @@ class VKConnector():
         return json.loads(response.text)
 
     def user_get(self, pk, fields, access_token):
-        params = {'user_id': pk, 'fields': ','.join(fields), 'v': '5.28'}
+        params = {'user_id': pk, 'fields': ','.join(fields), 'v': '5.131'}
         data = self.request('users.get', access_token=access_token, **params)
         if data:
             return data['response'][0]
