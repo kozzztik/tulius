@@ -90,29 +90,31 @@ class UserSession:
         self.pubsub = self.redis.pubsub()
         self.pubsub_task = asyncio.create_task(
             self.pubsub.run(exception_handler=self._pubsub_exc_handler))
-
-        await self.subscribe_channel(
-            consts.CHANNEL_PUBLIC, self.public_channel)
-        if self.user_id:
+        try:
             await self.subscribe_channel(
-                consts.CHANNEL_USER.format(self.user_id),
-                self.user_channel)
+                consts.CHANNEL_PUBLIC, self.public_channel)
+            if self.user_id:
+                await self.subscribe_channel(
+                    consts.CHANNEL_USER.format(self.user_id),
+                    self.user_channel)
 
-        while True:
-            if self.json:
-                data = await self.ws.receive_json()
-            else:
-                data = await self.ws.receive_text()
-            if data is None:
-                break
-            if self.json:
-                method = getattr(
-                    self, 'action_' + data.get('action', 'empty'), None)
-                if method:
-                    await method(data)
-            else:
-                await self.ws.send_text(data + '/answer')
-        logger.info('User %s closed', self.user_id)
+            while True:
+                if self.json:
+                    data = await self.ws.receive_json()
+                else:
+                    data = await self.ws.receive_text()
+                if data is None:
+                    break
+                if self.json:
+                    method = getattr(
+                        self, 'action_' + data.get('action', 'empty'), None)
+                    if method:
+                        await method(data)
+                else:
+                    await self.ws.send_text(data + '/answer')
+        finally:
+            logger.info('User %s closed', self.user_id)
+            await self.close()
 
     async def close(self):
         if self.pubsub_task:

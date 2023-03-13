@@ -41,8 +41,8 @@ class ASGIRequest:
 class BaseASGIContext(ASGIRequest):
     def __init__(self, app, scope):
         super().__init__(app, scope)
-        self._send_queue = []
-        self._receive_queue = []
+        self.send_queue = []
+        self.receive_queue = []
         self._send_futures = []
         self._receive_futures = []
         self.closed = asyncio.Future()
@@ -77,13 +77,13 @@ class BaseASGIContext(ASGIRequest):
         if self._receive_futures:
             self._receive_futures.pop(0).set_result(data)
         else:
-            self._receive_queue.append(data)
+            self.receive_queue.append(data)
 
     async def _receive(self):
         if self.closed.done():
             raise asyncio.CancelledError()
-        if self._send_queue:
-            return self._send_queue.pop(0)
+        if self.send_queue:
+            return self.send_queue.pop(0)
         future = asyncio.Future()
         self._send_futures.append(future)
         await future
@@ -95,13 +95,13 @@ class BaseASGIContext(ASGIRequest):
         if self._send_futures:
             self._send_futures.pop(0).set_result(message)
         else:
-            self._send_queue.append(message)
+            self.send_queue.append(message)
 
     async def _internal_read(self):
         if self.closed.done():
             raise asyncio.CancelledError()
-        if self._receive_queue:
-            return self._receive_queue.pop(0)
+        if self.receive_queue:
+            return self.receive_queue.pop(0)
         future = asyncio.Future()
         self._receive_futures.append(future)
         await future
@@ -142,6 +142,9 @@ class ASGIWebsocket(BaseASGIContext):
                 self.connected.set_exception(exc)
             else:
                 self.connected.set_result(False)
+        while self.receive_queue:
+            f = self.receive_queue.pop()
+            f.set_result({'type': 'websocket.disconnect'})
         super().close(exc)
 
 
@@ -191,13 +194,7 @@ class AsyncClient(django_client.AsyncClient):
         self.handler = AsyncClientHandler(enforce_csrf_checks)
 
     def ws(self, path, secure=False, **extra):
-        """Construct a GET request."""
-        return self.generic(
-            "WS",
-            path,
-            secure=secure,
-            **extra,
-        )
+        return self.generic("WS", path, secure=secure, **extra)
 
     def _base_scope(self, **request):
         scope = super()._base_scope(**request)
@@ -206,3 +203,22 @@ class AsyncClient(django_client.AsyncClient):
             scope['scheme'] = 'ws'
             scope.pop('method')
         return scope
+
+    # pylint: disable=too-many-arguments
+    def post(
+            self, path, data=None,
+            content_type=django_client.MULTIPART_CONTENT,
+            secure=False, **extra):
+        if isinstance(data, dict):
+            content_type = 'application/json'
+        return super().post(
+            path, data, content_type=content_type, secure=secure, **extra)
+
+    # pylint: disable=too-many-arguments
+    def put(
+            self, path, data='', content_type='application/octet-stream',
+            secure=False, **extra):
+        if isinstance(data, dict):
+            content_type = 'application/json'
+        return super().put(
+            path, data=data, content_type=content_type, secure=secure, **extra)
