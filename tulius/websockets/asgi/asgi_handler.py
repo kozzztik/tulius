@@ -15,33 +15,7 @@ class HttpResponseUpgrade(http.HttpResponse):
         self.handler = handler
 
 
-class ASGITransport:
-    scope = None
-    receive = None
-    send = None
-    ws = None
-
-    def __init__(self, scope, receive, send):
-        self.scope = scope
-        self.receive = receive
-        self.send = send
-
-
-class ASGIRequest(dj_asgi.ASGIRequest):
-    asgi = None
-    scope_type = None
-
-    def __init__(self, transport: ASGITransport, body_file):
-        self.asgi = transport
-        # for backward capability. In websocket there is no "method" in scope
-        if transport.scope['type'] == 'websocket':
-            transport.scope['method'] = 'GET'
-        transport.scope.setdefault('method', 'GET')
-        super().__init__(transport.scope, body_file)
-
-
 class ASGIHandler(dj_asgi.ASGIHandler):
-    request_class = ASGIRequest
     context_pool = None
 
     async def __call__(self, scope, receive, send):
@@ -64,9 +38,11 @@ class ASGIHandler(dj_asgi.ASGIHandler):
         """
         Handles the ASGI request. Called via the __call__ method.
         """
-        transport = ASGITransport(scope, receive, send)
         if scope['type'] == 'lifespan':
-            return await self.handle_lifespan(transport)
+            return await self.handle_lifespan(scope, receive, send)
+        # for backward capability. In websocket there is no "method" in scope
+        if scope['type'] == 'websocket':
+            scope['method'] = 'GET'
         # Receive the HTTP request body as a stream object.
         try:
             body_file = await self.read_body(receive)
@@ -79,12 +55,10 @@ class ASGIHandler(dj_asgi.ASGIHandler):
                 dj_asgi.signals.request_started.send, thread_sensitive=True
             )(sender=self.__class__, scope=scope)
             # Get the request and check for basic issues.
-            request, error_response = self.create_request(transport, body_file)
+            request, error_response = self.create_request(scope, body_file)
             if request is None:
-                if scope['type'] == 'websocket':
-                    await transport.send({'type': 'websocket.close'})
-                else:
-                    await self.send_response(error_response, send)
+                await self.handle_response(
+                    error_response, scope, receive, send)
                 return
             # Get the response, using the async mode of BaseHandler.
             response = await self.get_response_async(request)
@@ -96,24 +70,27 @@ class ASGIHandler(dj_asgi.ASGIHandler):
         if isinstance(response, dj_asgi.FileResponse):
             response.block_size = self.chunk_size
         # Send the response.
+        await self.handle_response(response, scope, receive, send)
+
+    async def handle_response(self, response, scope, receive, send):
         if scope['type'] == 'websocket':
             if isinstance(response, HttpResponseUpgrade):
-                await response.handler()
+                await response.handler(scope, receive, send)
             else:
-                await transport.send({'type': 'websocket.close'})
+                await send({'type': 'websocket.close'})
         else:
             await self.send_response(response, send)
 
     @staticmethod
-    async def handle_lifespan(transport):
+    async def handle_lifespan(scope, receive, send):
         while True:
-            message = await transport.receive()
+            message = await receive()
             if message['type'] == 'lifespan.startup':
                 # Do some startup here!
-                await transport.send({'type': 'lifespan.startup.complete'})
+                await send({'type': 'lifespan.startup.complete'})
             elif message['type'] == 'lifespan.shutdown':
                 # Do some shutdown here!
-                await transport.send({'type': 'lifespan.shutdown.complete'})
+                await send({'type': 'lifespan.shutdown.complete'})
 
 
 def get_asgi_application():

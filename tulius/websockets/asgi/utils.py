@@ -136,9 +136,9 @@ class TestASGIHandler(asgi_handler.ASGIHandler):
 
     def create_request(self, scope, body_file):
         request, error_response = super().create_request(scope, body_file)
-        request._dont_enforce_csrf_checks = not scope.scope.get(
+        request._dont_enforce_csrf_checks = not scope.get(
             '_enforce_csrf_checks')
-        scope.scope['_test_asgi_context'].request = request
+        scope['_test_asgi_context'].request = request
         return request, error_response
 
 
