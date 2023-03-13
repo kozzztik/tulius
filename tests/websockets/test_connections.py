@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+from unittest import mock
 
 from django.test import override_settings
 from django import urls
@@ -12,6 +13,7 @@ from asgiref.sync import sync_to_async
 
 from tulius.websockets.asgi import websocket
 from tulius.websockets.asgi.utils import AsyncClient
+from tulius.websockets.asgi import connections
 
 
 def _test_view(_, pk):
@@ -146,3 +148,24 @@ async def test_parallel_views():
         for ws in wss:
             ws.close()
     assert results == [str(i) for i in range(10)]
+
+
+def test_missing_connection():
+    handler = connections.ConnectionHandler()
+    with pytest.raises(handler.exception_class):
+        handler['foobar']
+
+
+def test_closing_connections_in_pool():
+    handler = connections.ConnectionHandler()
+    handler['default'] = conn = mock.MagicMock()
+    handler.close_context()
+    handler.close_all()
+    assert conn.close.called
+
+
+def test_closing_connections_in_context():
+    handler = connections.ConnectionHandler()
+    handler['default'] = conn = mock.MagicMock()
+    handler.close_all()
+    assert conn.close.called

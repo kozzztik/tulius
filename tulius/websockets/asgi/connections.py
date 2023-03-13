@@ -31,7 +31,7 @@ class ConnectionHandler(utils.ConnectionHandler):
         old_cls = db.connections.__class__
         old_cls.__getitem__ = cls.__getitem__
         old_cls.close_context = cls.close_context
-        old_cls.close_old_connections = cls.close_old_connections
+        # old_cls.close_old_connections = cls.close_old_connections
         db.connections.close_all = functools.partial(
             cls.close_all, db.connections)
 
@@ -58,16 +58,16 @@ class ConnectionHandler(utils.ConnectionHandler):
         setattr(self._connections, alias, conn)
         return conn
 
-    def close_old_connections(self, **kwargs):
-        with self._lock:
-            for alias in self:
-                new_pool = []
-                pool = self._connection_pools.get(alias, [])
-                for conn in pool:
-                    conn.close_if_unusable_or_obsolete()
-                    if conn.health_check_done:
-                        new_pool.append(conn)
-                self._connection_pools[alias] = new_pool
+    # def close_old_connections(self, **kwargs):
+    #     with self._lock:
+    #         for alias in self:
+    #             new_pool = []
+    #             pool = self._connection_pools.get(alias, [])
+    #             for conn in pool:
+    #                 conn.close_if_unusable_or_obsolete()
+    #                 if conn.health_check_done:
+    #                     new_pool.append(conn)
+    #             self._connection_pools[alias] = new_pool
 
     def close_context(self):
         with self._lock:
@@ -81,8 +81,9 @@ class ConnectionHandler(utils.ConnectionHandler):
     def close_all(self):
         # not super because of monkey patching
         utils.ConnectionHandler.close_all(self)
-        for alias in self:
-            pool = self._connection_pools.get(alias, [])
-            while pool:
-                conn = pool.pop()
-                conn.close()
+        with self._lock:
+            for alias in self:
+                pool = self._connection_pools.get(alias, [])
+                while pool:
+                    conn = pool.pop()
+                    conn.close()

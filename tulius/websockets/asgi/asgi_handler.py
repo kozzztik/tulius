@@ -91,6 +91,7 @@ class ASGIHandler(dj_asgi.ASGIHandler):
             elif message['type'] == 'lifespan.shutdown':
                 # Do some shutdown here!
                 await send({'type': 'lifespan.shutdown.complete'})
+                return
 
 
 def get_asgi_application():
