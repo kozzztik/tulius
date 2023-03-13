@@ -1,6 +1,3 @@
-import threading
-
-from asgiref.local import Local
 import django
 from django import http
 from django import db
@@ -41,25 +38,6 @@ class ASGIRequest(dj_asgi.ASGIRequest):
             transport.scope['method'] = 'GET'
         transport.scope.setdefault('method', 'GET')
         super().__init__(transport.scope, body_file)
-
-
-def monkey_patch_connections():
-    """
-    Django db connections does not really support asgi, so it doesn't correctly
-    close connections and have no support of connection pools needed for async.
-
-    We patch connections object in place, as it can be already imported
-    somewhere.
-    """
-    if getattr(db.connections, '_lock', None):
-        return
-    db.connections._connection_pools = {}
-    db.connections._lock = threading.Lock()
-    db.connections._connections = Local(False)
-    db.connections.__class__.__getitem__ = \
-        connections.ConnectionHandler.__getitem__
-    db.connections.__class__.close_context = \
-        connections.ConnectionHandler.close_context
 
 
 class ASGIHandler(dj_asgi.ASGIHandler):
@@ -145,5 +123,5 @@ def get_asgi_application():
     internal implementation changes or moves in the future.
     """
     django.setup(set_prefix=False)
-    monkey_patch_connections()
+    connections.ConnectionHandler.monkey_patch()
     return ASGIHandler()

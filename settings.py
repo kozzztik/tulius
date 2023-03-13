@@ -299,7 +299,7 @@ MAIL_RECEIVERS = ['pm.mail.get_mail']
 
 
 REDIS_CONNECTION = {
-    'host': '127.0.0.1' if env in ['dev',] else 'tulius_redis',
+    'host': '127.0.0.1' if env in ['dev', ] else 'tulius_redis',
     'port': 6379,
     'db': {'prod': 3, 'qa': 2, 'dev': 1, 'test': 4, 'local_docker': 1, 'local': 1}[env],
     'password': '',
@@ -315,7 +315,8 @@ DATABASES = {
         'USER': 'travis' if env == 'test' else 'tulius_{}'.format(env),
         'PASSWORD': '' if env == 'test' else 'tulius',
         'PORT': '',
-        'CONN_MAX_AGE': 20,
+        'CONN_MAX_AGE': None,
+        'CONN_HEALTH_CHECKS': True,
         'ATOMIC_REQUESTS': True,
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
