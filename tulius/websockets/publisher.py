@@ -12,13 +12,13 @@ def publish_message(channel, message):
         settings.REDIS_CONNECTION['port'],
         db=settings.REDIS_CONNECTION['db']
     )
-    redis_client.publish(
+    return redis_client.publish(
         consts.make_channel_name(channel), json.dumps(message)
     )
 
 
 def publish_message_to_user(user, action, pk):
-    publish_message(
+    return publish_message(
         consts.CHANNEL_USER.format(user.id), {
             '.direct': True,
             '.action': 'new_pm',
@@ -28,7 +28,7 @@ def publish_message_to_user(user, action, pk):
 
 
 def notify_user_about_fixes(user, data):
-    publish_message(
+    return publish_message(
         consts.CHANNEL_USER.format(user.id), {
             '.direct': True,
             '.action': 'fixes_update',
@@ -38,7 +38,7 @@ def notify_user_about_fixes(user, data):
 
 
 def notify_thread_about_new_comment(sender, thread, comment, page):
-    publish_message(
+    return publish_message(
         consts.THREAD_COMMENTS_CHANNEL.format(thread_id=thread.id),
         {
             '.direct': True,
