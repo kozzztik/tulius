@@ -97,15 +97,18 @@ class BaseASGIContext(ASGIRequest):
         else:
             self.send_queue.append(message)
 
-    async def _internal_read(self):
+    async def _internal_read(self, timeout=60):
         if self.closed.done():
             raise asyncio.CancelledError()
         if self.receive_queue:
             return self.receive_queue.pop(0)
         future = asyncio.Future()
         self._receive_futures.append(future)
-        await future
-        return future.result()
+        await asyncio.wait([future], timeout=timeout)
+        if future.done():
+            return future.result()
+        self._receive_futures.remove(future)
+        raise asyncio.TimeoutError()
 
 
 class ASGIWebsocket(BaseASGIContext):
@@ -132,8 +135,8 @@ class ASGIWebsocket(BaseASGIContext):
     async def send_text(self, text):
         await self._internal_send({"type": "websocket.receive", "text": text})
 
-    async def receive_text(self):
-        message = await self._internal_read()
+    async def receive_text(self, timeout=60):
+        message = await self._internal_read(timeout=timeout)
         return message.get('bytes') or message.get('text')
 
     def close(self, exc=None):
@@ -207,10 +210,12 @@ class AsyncClient(django_client.AsyncClient):
     # pylint: disable=too-many-arguments
     def post(
             self, path, data=None,
-            content_type=django_client.MULTIPART_CONTENT,
+            content_type=None,
             secure=False, **extra):
-        if isinstance(data, dict):
+        if isinstance(data, dict) and content_type is None:
             content_type = 'application/json'
+        else:
+            content_type = content_type or django_client.MULTIPART_CONTENT
         return super().post(
             path, data, content_type=content_type, secure=secure, **extra)
 

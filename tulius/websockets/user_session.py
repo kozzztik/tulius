@@ -88,11 +88,12 @@ class UserSession:
         logger.info('User %s logged in', self.user_id)
         self.redis = aioredis.from_url(settings.REDIS_LOCATION)
         self.pubsub = self.redis.pubsub()
+        await self.subscribe_channel(
+            consts.CHANNEL_PUBLIC, self.public_channel)
         self.pubsub_task = asyncio.create_task(
-            self.pubsub.run(exception_handler=self._pubsub_exc_handler))
+            self.pubsub.run(
+                exception_handler=self._pubsub_exc_handler, poll_timeout=30))
         try:
-            await self.subscribe_channel(
-                consts.CHANNEL_PUBLIC, self.public_channel)
             if self.user_id:
                 await self.subscribe_channel(
                     consts.CHANNEL_USER.format(self.user_id),
