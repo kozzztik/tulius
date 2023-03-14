@@ -1,3 +1,5 @@
+import json
+
 import asyncio
 
 from django.test import client as django_client
@@ -138,6 +140,15 @@ class ASGIWebsocket(BaseASGIContext):
     async def receive_text(self, timeout=60):
         message = await self._internal_read(timeout=timeout)
         return message.get('bytes') or message.get('text')
+
+    async def send_json(self, data):
+        await self._internal_send({
+            "type": "websocket.receive", "text": json.dumps(data)})
+
+    async def receive_json(self, timeout=60):
+        message = await self._internal_read(timeout=timeout)
+        data = message.get('bytes') or message.get('text')
+        return json.loads(data)
 
     def close(self, exc=None):
         if not self.connected.done():

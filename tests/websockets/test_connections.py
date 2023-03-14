@@ -77,7 +77,7 @@ def test_wsgi_connection_reusage(client):
 @pytest.mark.asyncio
 async def test_connection_reusage():
     client = AsyncClient()
-    db.connections.close_all()
+    await sync_to_async(db.connections.close_all)()
     response = await client.get('/test1/1/')
     data = json.loads(response.content)
     assert data['value'] == '1'

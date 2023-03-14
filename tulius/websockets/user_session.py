@@ -83,6 +83,15 @@ class UserSession:
         await self.pubsub.unsubscribe(consts.make_channel_name(
             consts.THREAD_COMMENTS_CHANNEL.format(thread_id=data['id'])))
 
+    async def action_ping(self, data):
+        logger.debug('User %s message %s', self.user_id, data)
+        await self.ws.send_json({
+            '.direct': True,
+            '.namespaced': 'session',
+            '.action': 'ping',
+            'data': data['data'] + '/answer',
+        })
+
     async def process(self):
         await self.auth()
         logger.info('User %s logged in', self.user_id)
