@@ -1,8 +1,15 @@
+import asyncio
+import sys
+
 import django
 from django import http
 from django import db
-
+from django.core import signals
 from django.core.handlers import asgi as dj_asgi
+from django import urls
+from django.utils import log
+from django.core.handlers import exception
+
 from tulius.websockets.asgi import connections
 
 
@@ -13,6 +20,16 @@ class HttpResponseUpgrade(http.HttpResponse):
     def __init__(self, handler, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.handler = handler
+
+
+def handle_exception(request, exc):
+    signals.got_request_exception.send(sender=None, request=request)
+    response = exception.handle_uncaught_exception(
+        request, urls.get_resolver(urls.get_urlconf()), sys.exc_info()
+    )
+    log.log_response(
+        "%s: %s", response.reason_phrase, request.path,
+        response=response, request=request, exception=exc)
 
 
 class ASGIHandler(dj_asgi.ASGIHandler):
@@ -58,7 +75,7 @@ class ASGIHandler(dj_asgi.ASGIHandler):
             request, error_response = self.create_request(scope, body_file)
             if request is None:
                 await self.handle_response(
-                    error_response, scope, receive, send)
+                    request, error_response, scope, receive, send)
                 return
             # Get the response, using the async mode of BaseHandler.
             response = await self.get_response_async(request)
@@ -70,12 +87,19 @@ class ASGIHandler(dj_asgi.ASGIHandler):
         if isinstance(response, dj_asgi.FileResponse):
             response.block_size = self.chunk_size
         # Send the response.
-        await self.handle_response(response, scope, receive, send)
+        await self.handle_response(request, response, scope, receive, send)
 
-    async def handle_response(self, response, scope, receive, send):
+    # pylint: disable=too-many-arguments
+    async def handle_response(self, request, response, scope, receive, send):
         if scope['type'] == 'websocket':
             if isinstance(response, HttpResponseUpgrade):
-                await response.handler(scope, receive, send)
+                try:
+                    await response.handler(scope, receive, send)
+                except asyncio.CancelledError:
+                    pass
+                except Exception as exc:
+                    await dj_asgi.sync_to_async(
+                        handle_exception, thread_sensitive=False)(request, exc)
             else:
                 await send({'type': 'websocket.close'})
         else:
