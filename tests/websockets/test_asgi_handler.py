@@ -1,14 +1,17 @@
 import asyncio
+from unittest import mock
 
 import pytest
 from django import urls
 from django import http
 from django.test import override_settings
+from django.core import signals
 from django.core.handlers import asgi as dj_asgi
 
 from tulius.websockets.asgi import asgi_handler
 from tulius.websockets.asgi import utils
 from tulius.websockets.asgi import connections
+from tulius.websockets.asgi import websocket
 
 
 def setup_module(_):
@@ -91,9 +94,21 @@ def _test_file_view(_):
     return http.FileResponse(streaming_content=[b'123'])
 
 
+@websocket.websocket_view
+def _ws_exc_view(_, __):
+    raise ValueError()
+
+
+@websocket.websocket_view
+def _ws_cancel_view(_, __):
+    raise asyncio.CancelledError()
+
+
 class UrlConf:
     urlpatterns = [
         urls.re_path(r'^file_response/$', _test_file_view),
+        urls.re_path(r'^ws_exc/$', _ws_exc_view),
+        urls.re_path(r'^ws_cancel/$', _ws_cancel_view),
     ]
 
 
@@ -126,3 +141,44 @@ async def test_websocket_bad_request():
     ws = await client.ws('/file_response/')
     assert ws.connected.result() is False
     assert ws.closed.done()
+
+
+@override_settings(ROOT_URLCONF=UrlConf)
+@pytest.mark.asyncio
+async def test_websocket_exc():
+    client = utils.AsyncClient(raise_request_exception=False)
+    future = asyncio.Future()
+
+    def receiver(**kwargs):
+        future.set_result(None)
+
+    signals.got_request_exception.connect(receiver)
+    ws = None
+    try:
+        ws = await client.ws('/ws_exc/')
+        assert ws.connected.result() is True
+        await asyncio.wait([future], timeout=10)
+        assert ws.closed.result() is None
+        assert future.result() is None
+    finally:
+        signals.got_request_exception.disconnect(receiver)
+        if ws:
+            ws.close()
+
+
+@override_settings(ROOT_URLCONF=UrlConf)
+@pytest.mark.asyncio
+async def test_websocket_timeout():
+    client = utils.AsyncClient(raise_request_exception=False)
+    receiver = mock.MagicMock()
+    signals.got_request_exception.connect(receiver)
+    ws = None
+    try:
+        ws = await client.ws('/ws_cancel/')
+        assert ws.connected.result() is True
+        assert ws.closed.result() is None
+        assert not receiver.called
+    finally:
+        signals.got_request_exception.disconnect(receiver)
+        if ws:
+            ws.close()
