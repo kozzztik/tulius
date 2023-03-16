@@ -11,7 +11,7 @@ from django.db.models import signals
 from django.db.models.fields import related
 from django.db.models.fields import reverse_related
 from django.core.serializers.json import DjangoJSONEncoder
-import elasticsearch7
+import elasticsearch8
 
 logger = logging.getLogger('elastic_search_indexing')
 
@@ -57,10 +57,10 @@ def do_direct_index(instance, **_kwargs):
     # pylint: disable=unexpected-keyword-arg
     client.index(
         id=instance.pk, index=index_name(instance.__class__),
-        body=instance_to_document(instance), refresh='wait_for')
+        document=instance_to_document(instance), refresh='wait_for')
 
 
-client = elasticsearch7.Elasticsearch(hosts=settings.ELASTIC_HOSTS)
+client = elasticsearch8.Elasticsearch(hosts=settings.ELASTIC_HOSTS)
 
 
 def queryset_iterator(queryset, chunk_size=1000):
@@ -104,9 +104,9 @@ class ReindexQuery:
                 }
             })
             data.append(instance)
-        response = client.bulk(data)
+        response = client.bulk(operations=data)
         if response['errors']:
-            raise Exception('errors occurred during request')
+            raise ValueError('errors occurred during request')
 
     def __call__(self, query):
         counter = 0

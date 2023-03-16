@@ -54,21 +54,13 @@ class ReceiveEvent:
 
 
 class WebSocket:
-    def __init__(self, request):
-        transport = getattr(request, 'asgi', None)
-        if transport is None:
-            raise exceptions.ImproperlyConfigured(
-                'Recieved websocket request out of ASGI protocol')
-        if transport.ws:
-            raise exceptions.ImproperlyConfigured(
-                'Websocket connection already created')
-        if transport.scope['type'] != 'websocket':
+    def __init__(self, scope, receive, send):
+        if scope['type'] != 'websocket':
             raise exceptions.ValidationError(
                 'User does not request websocket')
-        transport.ws = self
-        self._scope = transport.scope
-        self._receive = transport.receive
-        self._send = transport.send
+        self._scope = scope
+        self._receive = receive
+        self._send = send
         self._state = State.CONNECTING
 
     async def accept(self, subprotocol: str = None):
@@ -185,7 +177,9 @@ class WebSocket:
 
 
 def websocket_view(func):
-    async def websocket_handler(request, ws, *args, **kwargs):
+    async def websocket_handler(
+            request, /, asgi_scope, asgi_receive, asgi_send, *args, **kwargs):
+        ws = WebSocket(asgi_scope, asgi_receive, asgi_send)
         await ws.accept()
         try:
             return await func(request, ws, *args, **kwargs)
@@ -195,10 +189,8 @@ def websocket_view(func):
 
     @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
-        ws = WebSocket(request)
-        request.asgi.ws = ws
         return asgi_handler.HttpResponseUpgrade(
-            functools.partial(websocket_handler, request, ws, *args, **kwargs))
+            functools.partial(websocket_handler, request, *args, **kwargs))
 
     wrapper.websocket_wrapper = True
     return wrapper

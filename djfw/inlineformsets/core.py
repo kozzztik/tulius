@@ -83,8 +83,9 @@ class SimpleFormset(forms.models.BaseModelFormSet):
             }
         )
 
-    def get_default_prefix(self):
-        model = getattr(self, 'model', None)
+    @classmethod
+    def get_default_prefix(cls):
+        model = getattr(cls, 'model', None)
         if model:
             return model._meta.object_name.lower() + '_form'
         return ''

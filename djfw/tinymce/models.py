@@ -2,7 +2,7 @@ import os
 
 from django.conf import settings
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from django.template.defaultfilters import filesizeformat
 
@@ -82,7 +82,7 @@ class FileUpload(models.Model):
 
     file_length = models.IntegerField(
         default=0,
-        verbose_name=_(u'file length'),
+        verbose_name=_('file length'),
     )
 
     def is_image(self):

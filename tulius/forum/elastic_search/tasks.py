@@ -83,8 +83,8 @@ def reindex_forum(app_label, model_name, parent_id, user_id):
     }
     for thread in threads_query.iterator(chunk_size=100):
         models.client.index(
-            models.index_name(thread_model),
-            models.instance_to_document(thread),
+            index=models.index_name(thread_model),
+            document=models.instance_to_document(thread),
             id=thread.pk)
         counters['threads'] += 1
         if not thread.room:

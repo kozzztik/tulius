@@ -17,8 +17,8 @@ class Smiles(TemplateView):
         emotions = Emotion.objects.all()
         if not emotions:
             path = settings.STATIC_ROOT + '/tinymce/list.json'
-            f = open(path, 'r')
-            emotions_list = json.load(f)
+            with open(path, 'r', encoding='utf8') as f:
+                emotions_list = json.load(f)
             with transaction.commit_on_success():
                 for emotion in emotions_list:
                     emotion_obj = Emotion(

@@ -13,6 +13,8 @@ export default LazyComponent('forum_thread_comments', {
             mark_read_id: null,
             delete_comment_obj: null,
             delete_comment_message: '',
+            old_page: null,
+            old_thread: null,
         }
     },
     computed: {
@@ -110,7 +112,15 @@ export default LazyComponent('forum_thread_comments', {
                 if (this.$route.hash)
                     Vue.nextTick( () => {
                         this.scroll_to_comment(this.$route.hash.replace('#', ''), 0);
-                    });
+                    })
+                else if (this.old_thread == this.thread.url) {
+                    if (this.old_page == page - 1)
+                        Vue.nextTick( () => this.scroll_to_comment(response.data.comments[0].id, 0));
+                    else if (this.old_page == page + 1)
+                        Vue.nextTick( () => this.$refs.bottom_pagination.$el.scrollIntoView(true));
+                }
+                this.old_thread = this.thread.url;
+                this.old_page = page;
             }).catch(error => this.$root.add_message(error, "error")).then(() => {
                 this.$root.loading_end(null);
                 if (this.$parent.$refs.reply_form)

@@ -33,7 +33,7 @@ services:
     container_name: tulius_mail
 
   elastic_search:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.6.1
     restart: always
     networks:
       tuliusnet:
@@ -57,7 +57,7 @@ services:
     container_name: tulius_elastic
 
   log_stash:
-    image: docker.elastic.co/logstash/logstash:7.9.2
+    image: docker.elastic.co/logstash/logstash:8.6.1
     restart: always
     environment:
       - MONITORING_ENABLED=false

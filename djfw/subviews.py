@@ -3,7 +3,7 @@ from django import forms
 from django.core import exceptions
 from django.views.generic import edit
 from django.utils.encoding import smart_str
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 class ParentObjectMixin:

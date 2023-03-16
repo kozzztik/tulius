@@ -18,18 +18,18 @@ class AddGameForm(forms.ModelForm):
 class GameInviteForm(forms.Form):
     role = forms.ModelChoiceField(
         queryset=Role.objects.all(),
-        label=_(u'Role'),
+        label=_('Role'),
         empty_label=None,
     )
     user = forms.ModelChoiceField(
         required=True,
         queryset=User.objects.all(),
-        label=_(u'User'),
+        label=_('User'),
         widget=User.autocomplete_widget,
     )
     message = forms.CharField(
         required=False,
-        label=_(u'Message'),
+        label=_('Message'),
         widget=forms.Textarea,
     )
 
@@ -42,7 +42,7 @@ class GameInviteForm(forms.Form):
 class GameChangeStoryForm(forms.Form):
     story = forms.ModelChoiceField(
         queryset=Story.objects.all(),
-        label=_(u'New story'),
+        label=_('New story'),
         required=True,
         empty_label=None,
     )
@@ -52,5 +52,5 @@ class GameUserForm(forms.Form):
     user = forms.ModelChoiceField(
         required=True,
         queryset=User.objects.all(),
-        label=_(u'User'),
+        label=_('User'),
     )

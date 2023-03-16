@@ -5,7 +5,7 @@ import django
 from django.test import client as django_client
 from django.test import utils
 
-pytest_plugins = ('celery.contrib.pytest', )
+pytest_plugins = ('celery.contrib.pytest', 'pytest_asyncio')
 
 
 class JSONClient(django_client.Client):
@@ -53,7 +53,7 @@ def create_user_fixture():
         from tulius import models as tulius_models
 
         username = username or f'user_{user_number}'
-        user = tulius_models.User(
+        user, _ = tulius_models.User.objects.get_or_create(
             username=username, email=f'{username}@tulius.com', **kwargs)
         user.set_password(username)
         user.save()
@@ -81,7 +81,11 @@ def user_fixture(user_factory):
 
 def init_settings():
     os.environ["TULIUS_TEST"] = "1"
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", 'settings')
+    if os.path.exists('settings_production.py'):
+        settings_file = 'settings_production'
+    else:
+        settings_file = 'settings'
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", settings_file)
     django.setup()
     utils.setup_test_environment()
 
@@ -89,18 +93,22 @@ def init_settings():
 init_settings()
 
 
-@pytest.mark.trylast
+def pytest_addoption(parser):
+    parser.addoption("--keep-db", action="store_true", default=False)
+
+
+@pytest.hookimpl(trylast=True)
 def pytest_sessionstart(session):
     session.django_db_cfg = utils.setup_databases(
         verbosity=session.config.option.verbose,
         interactive=False,
-        keepdb=False
+        keepdb=session.config.option.keep_db
     )
 
 
-@pytest.mark.trylast
+@pytest.hookimpl(trylast=True)
 def pytest_sessionfinish(session, exitstatus):
     db_cfg = getattr(session, 'django_db_cfg')
-    if db_cfg:
+    if db_cfg and not session.config.option.keep_db:
         utils.teardown_databases(
             db_cfg, verbosity=session.config.option.verbose)

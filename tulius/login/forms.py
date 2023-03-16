@@ -18,7 +18,7 @@ class ReLoginForm(forms.Form):
     login_by_user = forms.ModelChoiceField(
         required=True,
         queryset=user_model.objects.all(),
-        label=_(u'User'),
+        label=_('User'),
         widget=user_model.autocomplete_widget
     )
 

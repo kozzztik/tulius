@@ -4,7 +4,7 @@ from django import urls
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.template.defaultfilters import filesizeformat
 
 
@@ -32,13 +32,13 @@ class BackupCategory(models.Model):
         blank=False,
         null=False,
         default=0,
-        verbose_name=_(u'saved backups'),
+        verbose_name=_('saved backups'),
     )
     enabled = models.BooleanField(
         blank=False,
         null=False,
         default=True,
-        verbose_name=_(u'enabled'),
+        verbose_name=_('enabled'),
     )
     description = models.CharField(
         max_length=255,
@@ -86,7 +86,7 @@ class Backup(models.Model):
         blank=False,
         null=False,
         default=0,
-        verbose_name=_(u'size'),
+        verbose_name=_('size'),
     )
 
     def __str__(self):
@@ -104,7 +104,7 @@ class Backup(models.Model):
     def file_size(self):
         return filesizeformat(self.size)
 
-    file_size.short_description = _(u'size')
+    file_size.short_description = _('size')
 
     def path(self):
         return os.path.join(self.backups_dir(), self.file_name())
@@ -116,7 +116,7 @@ class Backup(models.Model):
         return '<a href="%s">%s</a>' % (
             self.get_absolute_url(), self.get_absolute_url())
 
-    url.short_description = _(u'URL')
+    url.short_description = _('URL')
     url.allow_tags = True
 
     def delete(self, using=None, keep_parents=False):
@@ -263,11 +263,8 @@ class MaintenanceLog(models.Model):
         file_name = get_lock_file_name()
         was_none = not self.pk
         if (not was_none) and self.end_time and (os.path.exists(file_name)):
-            f = open(file_name, 'r')
-            try:
+            with open(file_name, 'r', encoding='utf8') as f:
                 old_id = int(f.read())
-            finally:
-                f.close()
             if old_id == self.id:
                 os.remove(file_name)
         super().save(
@@ -276,9 +273,8 @@ class MaintenanceLog(models.Model):
         if was_none and not self.end_time:
             if os.path.exists(file_name):
                 os.remove(file_name)
-            f = open(file_name, 'w')
-            f.write(str(self.id))
-            f.close()
+            with open(file_name, 'w', encoding='utf8') as f:
+                f.write(str(self.id))
 
 
 class MaintenanceLogMessage(models.Model):

@@ -67,7 +67,7 @@ def set_edit(games, user):
                 if not game.text_hint:
                     game.text_hint = _("You can`t join this game, it is full")
         if game.read_right(user):
-            game.enter = (game.status >= models.GAME_STATUS_IN_PROGRESS)
+            game.enter = game.status >= models.GAME_STATUS_IN_PROGRESS
             game.full = False
             game.enter_url = f'/play/game/{game.pk}/'
             if not game.text_hint:

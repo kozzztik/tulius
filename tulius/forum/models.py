@@ -3,7 +3,7 @@ Forum engine models for Tulius project
 """
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 User = get_user_model()
@@ -40,7 +40,7 @@ class UploadedFile(models.Model):
     )
     file_length = models.IntegerField(
         default=0,
-        verbose_name=_(u'file length'),
+        verbose_name=_('file length'),
     )
     create_time = models.DateTimeField(
         auto_now_add=True,

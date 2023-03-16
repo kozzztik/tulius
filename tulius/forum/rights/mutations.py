@@ -15,8 +15,9 @@ class UpdateRights(mutations.Mutation):
         self._process_granted_exceptions(instance)
         self._process_author(instance)
 
-    @staticmethod
-    def _query_granted_exceptions(instance: models.AbstractThread):
+    def _query_granted_exceptions(self, instance: models.AbstractThread):
+        if not instance.pk:
+            return []
         return instance.granted_rights.all()
 
     def _process_granted_exceptions(self, instance: models.AbstractThread):
@@ -27,12 +28,10 @@ class UpdateRights(mutations.Mutation):
                 access_level |= models.ACCESS_OWN
             instance.rights[right.user_id] = access_level
 
-    @staticmethod
-    def _process_author(instance):
+    def _process_author(self, instance):
         instance.rights[instance.user.pk] |= models.ACCESS_OWN
 
-    @staticmethod
-    def _process_parent_rights(instance: models.AbstractThread, parent):
+    def _process_parent_rights(self, instance: models.AbstractThread, parent):
         parent_all = parent.rights.all
         if parent_all & models.ACCESS_NO_INHERIT:
             parent_all = parent.rights.all_inherit

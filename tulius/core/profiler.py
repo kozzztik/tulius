@@ -4,6 +4,7 @@ import time
 import logging
 
 from django import http
+from django.core import exceptions
 from ua_parser import user_agent_parser
 
 
@@ -50,7 +51,14 @@ def log_record(request, exec_time, response):
         content_length = None
     else:
         content_length = len(response.content)
+    host = None
+    try:
+        host = request.get_host()
+    except exceptions.DisallowedHost:
+        pass
     logging.getLogger('profiler').info(request.path, extra={
+        'scheme': request.scheme,
+        'host': host,
         'method': request.method,
         'status_code': response.status_code,
         'content_length': content_length,

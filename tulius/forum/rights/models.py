@@ -1,7 +1,7 @@
 from django import urls
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from tulius.forum.threads import models as thread_models
 
@@ -11,19 +11,19 @@ User = get_user_model()
 THREAD_ACCESS_CHOICES = (
     (
         thread_models.ACCESS_READ + thread_models.ACCESS_WRITE,
-        _(u'read and write rights')),
+        _('read and write rights')),
     (
         thread_models.ACCESS_READ,
-        _(u'read right')),
+        _('read right')),
     (
         thread_models.ACCESS_MODERATOR,
-        _(u'read, write and moderate')),
+        _('read, write and moderate')),
     (
         thread_models.ACCESS_WRITE,
-        _(u'write only right')),
+        _('write only right')),
     (
         thread_models.ACCESS_READ + thread_models.ACCESS_MODERATE,
-        _(u'read and moderate right(no write)')),
+        _('read and moderate right(no write)')),
 )
 
 
@@ -54,7 +54,7 @@ class ThreadAccessRight(models.Model):
     )
     access_level = models.SmallIntegerField(
         default=thread_models.ACCESS_READ + thread_models.ACCESS_WRITE,
-        verbose_name=_(u'access rights'),
+        verbose_name=_('access rights'),
         choices=THREAD_ACCESS_CHOICES,
     )
 

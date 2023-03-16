@@ -5,7 +5,7 @@ from django import urls
 import django.core.serializers.json
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils import html
 
 from djfw.wysibb.templatetags import bbcodes
@@ -79,12 +79,12 @@ class AbstractComment(models.Model):
     )
     deleted = models.BooleanField(
         default=False,
-        verbose_name=_(u'deleted')
+        verbose_name=_('deleted')
     )
     order = models.IntegerField(
         null=False,
         blank=False,
-        verbose_name=_(u'order'),
+        verbose_name=_('order'),
     )
     data = models.JSONField(
         default=dict,

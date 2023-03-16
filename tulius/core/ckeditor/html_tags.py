@@ -97,7 +97,7 @@ class SpanTag(Tag):
             value = params[1].strip()
             if key == 'color' and bb_parser.check_color(value):
                 styles['color'] = value
-            elif key == 'font-size' and value in self.font_sizes.keys():
+            elif key == 'font-size' and value in self.font_sizes:
                 styles['size'] = self.font_sizes[value]
         return styles
 

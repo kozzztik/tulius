@@ -29,12 +29,12 @@ class PlayersFilterForm(forms.Form):
     filter_by_player = forms.ModelChoiceField(
         required=False,
         queryset=User.objects.all(),
-        label=_(u'Player'),
+        label=_('Player'),
         widget=User.autocomplete_widget
     )
 
     sort_type = forms.ChoiceField(
         required=False,
         choices=PLAYERS_SORT_TYPE,
-        label=_(u'sort by'),
+        label=_('sort by'),
     )

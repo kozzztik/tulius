@@ -44,8 +44,9 @@ class UpdateRights(mutations.UpdateRights, VariationMutationMixin):
                 rights[role.user_id] = \
                     (rights[role.user_id] or 0) | rights.role.all
 
-    @staticmethod
-    def _query_granted_exceptions(instance):
+    def _query_granted_exceptions(self, instance):
+        if not instance.pk:
+            return []
         return instance.access_roles.all()
 
     def _rights_for_root(self, instance: forum_models.AbstractThread):

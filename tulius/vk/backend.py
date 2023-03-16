@@ -2,6 +2,7 @@ import io
 import requests
 
 from django.utils import timezone
+from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
 from tulius.models import User, USER_SEX_FEMALE, USER_SEX_MALE, \
     USER_SEX_UNDEFINED
@@ -39,7 +40,8 @@ class VKBackend(ModelBackend):
         else:
             user.sex = USER_SEX_UNDEFINED
         user.username = self.get_valid_name(profile)
-        response = requests.get(profile.photo)
+        response = requests.get(
+            profile.photo, timeout=settings.REQUESTS_TIMEOUT)
         if response.status_code in [200, 201]:
             img = io.BytesIO(response.content)
             user.avatar.save('vk_' + str(profile.vk_id), img, False)
@@ -62,3 +64,4 @@ class VKBackend(ModelBackend):
                     user.save()
                     return user
                 return self.register_user(vk_profile, email)
+            return None

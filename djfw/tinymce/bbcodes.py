@@ -1,6 +1,6 @@
 import logging
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from djfw.datablocks.models import DataBlock
 
@@ -121,7 +121,7 @@ def bb_color(tagname, param, text):
                 param_checked = False
                 break
     if not param_checked:
-        raise Exception('Invalid color')
+        raise ValueError('Invalid color')
     return '<span style="color: %s;">%s</span>' % (param, text)
 
 

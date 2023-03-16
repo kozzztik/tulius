@@ -7,7 +7,7 @@
             </slot>
         </div>
     </div>
-    <pagination :pagination="pagination" :page_num="value"></pagination>
+    <pagination :pagination="pagination" :page_num="value" ref="bottom_pagination"></pagination>
     <a v-if="thread.not_read" v-html="thread.not_read.count" id="not_read_counter" href="javascript:void(0)" @click="to_not_read_comment()"></a>
     <b-modal id="commentDelete"
          title="Удалить комнентарий" ok-title="Удалить" ok-variant="danger"

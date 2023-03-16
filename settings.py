@@ -24,7 +24,6 @@ ROOT_URLCONF = 'tulius.urls'
 TIME_ZONE = 'Europe/Moscow'
 LANGUAGE_CODE = 'ru'
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 SITE_ID = 1
 
@@ -40,7 +39,9 @@ MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'tulius.User'
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10Mb
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -168,7 +169,7 @@ INSTALLER_BACKUPS_DIR = BASE_DIR + 'backups/'
 
 WYSIBB_THUMB_SIZE = (350, 350)
 
-ELASTIC_HOSTS = ['localhost:9200'] if env == 'dev' else ['10.5.0.30:9200']
+ELASTIC_HOSTS = ['http://localhost:9200'] if env == 'dev' else ['http://10.5.0.30:9200']
 ELASTIC_PREFIX = 'test' if TEST_RUN else env
 
 ELASTIC_MODELS = (
@@ -298,11 +299,12 @@ MAIL_RECEIVERS = ['pm.mail.get_mail']
 
 
 REDIS_CONNECTION = {
-    'host': '127.0.0.1' if env in ['dev', 'test'] else 'tulius_redis',
+    'host': '127.0.0.1' if env in ['dev', ] else 'tulius_redis',
     'port': 6379,
-    'db': {'prod': 3, 'qa': 2, 'dev': 1, 'test': 4, 'local_docker': 1}[env],
+    'db': {'prod': 3, 'qa': 2, 'dev': 1, 'test': 4, 'local_docker': 1, 'local': 1}[env],
     'password': '',
 }
+REDIS_LOCATION = 'redis://{host}:{port}?db={db}'.format(**REDIS_CONNECTION)
 
 # Actual credentials are hold in settings_production.py file.
 DATABASES = {
@@ -313,7 +315,8 @@ DATABASES = {
         'USER': 'travis' if env == 'test' else 'tulius_{}'.format(env),
         'PASSWORD': '' if env == 'test' else 'tulius',
         'PORT': '',
-        'CONN_MAX_AGE': 20,
+        'CONN_MAX_AGE': None,
+        'CONN_HEALTH_CHECKS': True,
         'ATOMIC_REQUESTS': True,
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
@@ -326,14 +329,8 @@ DATABASES = {
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 CACHES = {
     'default': {
-        'BACKEND': 'redis_cache.RedisCache',
-        'LOCATION': '{host}:{port}'.format(**REDIS_CONNECTION),
-        'OPTIONS': {
-            'DB': REDIS_CONNECTION['db'],
-            'PARSER_CLASS': 'redis.connection.HiredisParser',
-            'CONNECTION_POOL_CLASS': 'redis.BlockingConnectionPool',
-            'PICKLE_VERSION': -1,
-        },
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': REDIS_LOCATION,
     },
 }
 
@@ -360,3 +357,4 @@ CELERY_BROKER_URL = 'redis://{host}:{port}/{db}'.format(**REDIS_CONNECTION)
 CELERY_WORKER_CONCURRENCY = 3
 CELERY_EVENT_QUEUE_PREFIX = f'{env}_'
 CELERY_TASK_ALWAYS_EAGER = TEST_RUN
+REQUESTS_TIMEOUT = 60

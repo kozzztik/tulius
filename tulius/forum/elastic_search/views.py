@@ -61,8 +61,7 @@ class Search(views.BaseThreadView):
     require_user = True
     comment_model = comment_models.Comment
 
-    @staticmethod
-    def apply_users_filters(search_request, conditions, data):
+    def apply_users_filters(self, search_request, conditions, data):
         filter_users = data.get('users', [])
         filter_not_users = data.get('not_users', [])
         if filter_users:
@@ -119,7 +118,7 @@ class Search(views.BaseThreadView):
         start_time = time.perf_counter_ns()
         response = models.client.search(
             index=models.index_name(self.comment_model),
-            body=body
+            **body
         )
         hits = response['hits']['total']['value']
         request.profiling_data['elastic_time'] = response['took']
@@ -172,7 +171,7 @@ class Search(views.BaseThreadView):
         body = {
             'query': {'bool': search_request},
             '_source': False,
-            'from': (page - 1) * comments_on_page,
+            'from_': (page - 1) * comments_on_page,
             'size': comments_on_page,
             'explain': settings.DEBUG,
         }
@@ -198,7 +197,7 @@ class Search(views.BaseThreadView):
         search_results = []
         hits = {int(hit['_id']): hit for hit in response['hits']['hits']}
         for comment in comments:
-            if filter_text:
+            if filter_text and 'highlight' in hits[comment.pk]:
                 # found text hightlighting
                 comment.body = hits[comment.pk]['highlight']['body'][0]
             if not comment.parent.read_right(self.user):

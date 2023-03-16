@@ -1,5 +1,5 @@
 from django import urls
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.utils import translation
 
@@ -8,8 +8,8 @@ from djfw.common.models import AbstractBaseModel
 
 class NewsItem(AbstractBaseModel):
     class Meta(AbstractBaseModel.Meta):
-        verbose_name = _(u'news item')
-        verbose_name_plural = _(u'news items')
+        verbose_name = _('news item')
+        verbose_name_plural = _('news items')
         ordering = ['-published_at']
 
     caption = models.CharField(
@@ -17,26 +17,26 @@ class NewsItem(AbstractBaseModel):
         default='',
         blank=False,
         null=False,
-        verbose_name=_(u'caption')
+        verbose_name=_('caption')
     )
     announcement = models.TextField(
         default='',
         blank=True,
         null=True,
-        verbose_name=_(u'announcement')
+        verbose_name=_('announcement')
     )
     full_text = models.TextField(
         default='',
         blank=True,
         null=True,
-        verbose_name=_(u'full text')
+        verbose_name=_('full text')
     )
     is_published = models.BooleanField(
         default=False,
-        verbose_name=_(u'is published')
+        verbose_name=_('is published')
     )
     published_at = models.DateTimeField(
-        verbose_name=_(u'published at')
+        verbose_name=_('published at')
     )
     language = models.CharField(
         verbose_name=_('language'),

@@ -1,4 +1,4 @@
-FROM kozzztik/tulius:base_3.0.3
+FROM kozzztik/tulius:base_3.1.0
 
 RUN mkdir /opt/tulius/data
 RUN pip install --upgrade pip
