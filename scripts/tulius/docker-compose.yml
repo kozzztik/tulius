@@ -61,6 +61,11 @@ services:
     restart: always
     environment:
       - MONITORING_ENABLED=false
+      - XPACK_SECURITY_ENABLED=false
+      - XPACK_REPORTING_ENABLED=false
+      - XPACK_MONITORING_ENABLED=false
+      - ELASTIC_HOST=10.5.0.30:9200
+      - "LS_JAVA_OPTS=-Xms512m -Xmx512m"
     networks:
       tuliusnet:
         ipv4_address: 10.5.0.31
