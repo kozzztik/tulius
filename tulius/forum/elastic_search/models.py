@@ -1,8 +1,5 @@
 import gc
-import json
-import logging
 import datetime
-from logging import handlers
 
 from django.apps import apps
 from django.conf import settings
@@ -10,10 +7,9 @@ from django.db import models
 from django.db.models import signals
 from django.db.models.fields import related
 from django.db.models.fields import reverse_related
-from django.core.serializers.json import DjangoJSONEncoder
 import elasticsearch8
 
-logger = logging.getLogger('elastic_search_indexing')
+from tulius.core import elastic_indexer
 
 
 def index_name(model):
@@ -39,17 +35,15 @@ def instance_to_document(instance):
             data[field.column] = value
     if hasattr(instance, 'to_elastic_search'):
         instance.to_elastic_search(data)
-    data['pk'] = instance.pk
-    data['message'] = index_name(instance.__class__)
     return data
 
 
 def do_index(instance, **_kwargs):
-    data = instance_to_document(instance)
-    record = bytes(json.dumps(data, cls=DjangoJSONEncoder), 'utf-8') + b'\n'
-    for h in logger.handlers:
-        if isinstance(h, (handlers.SocketHandler, handlers.DatagramHandler)):
-            h.send(record)
+    doc = instance_to_document(instance)
+    doc['_action'] = 'index'
+    doc['_id'] = instance.pk
+    doc['_index'] = index_name(instance.__class__)
+    elastic_indexer.indexer.index(doc)
 
 
 def do_direct_index(instance, **_kwargs):
@@ -57,7 +51,7 @@ def do_direct_index(instance, **_kwargs):
     # pylint: disable=unexpected-keyword-arg
     client.index(
         id=instance.pk, index=index_name(instance.__class__),
-        document=instance_to_document(instance), refresh='wait_for')
+        document=instance_to_document(instance), refresh='true')
 
 
 client = elasticsearch8.Elasticsearch(hosts=settings.ELASTIC_HOSTS)
@@ -94,16 +88,7 @@ class ReindexQuery:
         pass
 
     @staticmethod
-    def bulk_index(bulk):
-        data = []
-        for instance in bulk:
-            data.append({
-                'index': {
-                    '_index': instance['message'],
-                    '_id': instance['pk']
-                }
-            })
-            data.append(instance)
+    def bulk_index(data):
         response = client.bulk(operations=data)
         if response['errors']:
             raise ValueError('errors occurred during request')
@@ -116,8 +101,14 @@ class ReindexQuery:
         if not all_count:
             return
         for instance in queryset_iterator(query, chunk_size=self.chunk_size):
+            bulk.append({
+                'index': {
+                    '_index': index_name(instance.__class__),
+                    '_id': instance.pk
+                }
+            })
             bulk.append(instance_to_document(instance))
-            if len(bulk) >= self.bulk_size:
+            if len(bulk) >= self.bulk_size * 2:
                 self.bulk_index(bulk)
                 bulk = []
             counter += 1

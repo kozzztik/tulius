@@ -183,6 +183,17 @@ ELASTIC_MODELS = (
     ('game_forum_comments', 'Comment'),
 )
 
+ELASTIC_INDEXING = {
+    'BASE_DIR': os.path.join(BASE_DIR, 'data', 'indexing'),
+    'SEND_PERIOD': 15,
+    'PACK_SIZE': 1000,
+    'TIMEOUT': 60,
+    'INDEX_TEMPLATES': {
+        'requests': 'tulius.core.elastic_templates.REQUESTS_TEMPLATE',
+        'logging': 'tulius.core.elastic_templates.LOGGING_TEMPLATE',
+    },
+}
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
@@ -215,20 +226,11 @@ LOGGING = {
             'class': 'logging.handlers.WatchedFileHandler',
             'filename': os.path.join(BASE_DIR, 'data', 'sql-logfile.txt'),
         },
-        'log_stash': {
+        'elastic_search': {
             'level': 'DEBUG',
-            'class': 'logstash.TCPLogstashHandler',
-            'host': '127.0.0.1' if env == 'dev' else '10.5.0.31',
-            'port': 11011,
-            'version': 1,
+            'class': 'tulius.core.elastic_indexer.Handler',
+            'index_name': 'logging_{year}_{month:02}'
         },
-        'elastic_search_indexing': {
-            'level': 'DEBUG',
-            'class': 'logstash.TCPLogstashHandler',
-            'host': '127.0.0.1' if env == 'dev' else '10.5.0.31',
-            'port': 11012,
-            'version': 1,
-        }
     },
     'loggers': {
         'django.db.backends': {
@@ -236,45 +238,31 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
-        'django.request': {
-            'handlers': ['logfile', 'mail_admins'],
-            'level': 'WARNING',
-            'propagate': True,
-        },
-        'installer': {
-            'handlers': ['null'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'async_app': {
-            'handlers': ['console'],
-            'level': 'DEBUG' if env in ['dev', 'local_docker'] else 'ERROR',
-            'propagate': True,
-        },
-        'profiler': {
-            'handlers': ['null' if TEST_RUN else 'log_stash'],
-            'level': 'DEBUG',
+        'tulius.core.elastic_indexer': {
+            'handlers': ['console'] if env in ['dev', 'local_docker'] else [],
+            'level': 'INFO' if env in ['dev', 'local_docker'] else 'ERROR',
             'propagate': False,
         },
-        'elastic_search_indexing': {
-            'handlers': ['elastic_search_indexing'],
-            'level': 'DEBUG',
+        'elastic_transport': {
+            'handlers': ['console'] if env in ['dev', 'local_docker'] else [],
+            'level': 'INFO' if env in ['dev', 'local_docker'] else 'ERROR',
             'propagate': False,
         },
-        'elasticsearch': {
-            'handlers': ['console'],
-            'level': 'DEBUG' if env in ['dev', 'local_docker'] else 'ERROR',
-            'propagate': True,
+        'urllib3': {
+            'handlers': ['console'] if env in ['dev', 'local_docker'] else [],
+            'level': 'INFO' if env in ['dev', 'local_docker'] else 'ERROR',
+            'propagate': False,
         },
         'celery.task': {
-            'handlers': ['console'],
-            'level': 'DEBUG' if env in ['dev', 'local_docker'] else 'ERROR',
+            'level': 'DEBUG' if env in ['dev', 'local_docker'] else 'WARNING',
             'propagate': True,
         },
     },
     'root': {
-        'handlers': ['console' if env in ['dev', 'local_docker'] else 'log_stash'],
-        'level': 'WARNING',
+        'handlers':
+            (['console'] if env in ['dev', 'local_docker'] else []) +
+            ['elastic_search'],
+        'level': 'DEBUG' if env in ['dev', 'local_docker'] else 'WARNING',
     },
 }
 

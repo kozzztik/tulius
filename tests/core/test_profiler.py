@@ -2,6 +2,7 @@ import logging
 from unittest import mock
 
 from ua_parser import user_agent_parser
+from tulius.core import elastic_indexer
 
 
 def test_profiler_minor_versions(client):
@@ -20,15 +21,14 @@ def test_profiler_minor_versions(client):
             'family': 'iPhone',
         }
     })
-    logger = logging.getLogger('profiler')
-    info = mock.MagicMock()
+    index = mock.MagicMock()
     with mock.patch.object(user_agent_parser, 'Parse', parser):
-        with mock.patch.object(logger, 'info', info):
+        with mock.patch.object(elastic_indexer.indexer, 'index', index):
             response = client.get('/')
     assert response.status_code == 200
-    assert info.called
-    assert info.call_args[1]['extra']['browser_version'] == '5.0'
-    assert info.call_args[1]['extra']['os_version'] == '4.0'
+    assert index.called
+    assert index.call_args[0][0]['browser_version'] == '5.0'
+    assert index.call_args[0][0]['os_version'] == '4.0'
 
 
 def test_profiler_parse_exception(client):
