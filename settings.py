@@ -189,8 +189,8 @@ ELASTIC_INDEXING = {
     'PACK_SIZE': 1000,
     'TIMEOUT': 60,
     'INDEX_TEMPLATES': {
-        'requests': 'tulius.core.elastic_templates.REQUESTS_TEMPLATE',
-        'logging': 'tulius.core.elastic_templates.LOGGING_TEMPLATE',
+        'requests': 'tulius.core.elastic.templates.REQUESTS_TEMPLATE',
+        'logging': 'tulius.core.elastic.templates.LOGGING_TEMPLATE',
     },
 }
 
@@ -228,7 +228,7 @@ LOGGING = {
         },
         'elastic_search': {
             'level': 'DEBUG',
-            'class': 'tulius.core.elastic_indexer.Handler',
+            'class': 'tulius.core.elastic.handler.Handler',
             'index_name': 'logging_{year}_{month:02}'
         },
     },
@@ -238,7 +238,7 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
-        'tulius.core.elastic_indexer': {
+        'tulius.core.elastic.indexer': {
             'handlers': ['console'] if env in ['dev', 'local_docker'] else [],
             'level': 'INFO' if env in ['dev', 'local_docker'] else 'ERROR',
             'propagate': False,
