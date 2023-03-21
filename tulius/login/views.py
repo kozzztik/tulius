@@ -6,7 +6,6 @@ from django import urls
 from django.contrib import auth
 from django.contrib import messages
 from django.contrib.sites.models import Site
-from django.contrib.sites.requests import RequestSite
 from django.http import Http404, HttpResponseRedirect
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView, View, FormView
