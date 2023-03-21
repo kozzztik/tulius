@@ -88,10 +88,6 @@ class RegisterView(FormView):
         data = form.cleaned_data
         username, email, password = \
             data['username'], data['email'], data['password1']
-        if Site._meta.installed:
-            site = Site.objects.get_current()
-        else:
-            site = RequestSite(self.request)
         new_user = auth.get_user_model().objects.create_user(
             username, email, password)
         new_user.is_active = False
@@ -103,7 +99,7 @@ class RegisterView(FormView):
             (salt + username).encode('utf-8')).hexdigest()
         registration_profile = RegistrationProfile.objects.create(
             user=new_user, activation_key=activation_key)
-        registration_profile.send_activation_email(site)
+        registration_profile.send_activation_email(Site.objects.get_current())
         return super().form_valid(form)
 
 
