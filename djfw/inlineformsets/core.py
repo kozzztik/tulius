@@ -1,10 +1,13 @@
 from django.forms.formsets import DEFAULT_MAX_NUM
 from django.template import loader
+from django.forms import renderers
 from django.conf import settings
 from django import forms
 
 
 class InlineFormset(forms.models.BaseInlineFormSet):
+    can_delete_extra = True
+
     # pylint: disable=too-many-arguments
     def __init__(
             self, data=None, instance=None, queryset=None,
@@ -48,6 +51,8 @@ class InlineFormset(forms.models.BaseInlineFormSet):
 
 
 class SimpleFormset(forms.models.BaseModelFormSet):
+    can_delete_extra = True
+
     # pylint: disable=too-many-arguments
     def __init__(
             self, data=None, queryset=None, errorclass='help-inline',
@@ -124,7 +129,8 @@ def get_formset_factory(
         'min_num': min_num,
         'max_num': max_num,
         'params': params, 'absolute_max': absolute_max,
-        'validate_min': validate_min, 'validate_max': validate_max
+        'validate_min': validate_min, 'validate_max': validate_max,
+        "renderer": renderers.get_default_renderer(),
     }
     if fk:
         FormSet = type(form.__name__ + 'FormSet', (InlineFormset,), attrs)

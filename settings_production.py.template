@@ -2,6 +2,11 @@ from settings import *
 
 import sentry_sdk
 
+SECRET_KEY = 'ADD SECRET HERE'
+
+VK_APP_KEY = 'ADD KEY'
+VK_APP_SECRET = 'ADD SECRET'
+
 RAVEN_CONFIG['dsn'] = ""
 
 DATABASES['default']['PASSWORD'] = 'db_password'
