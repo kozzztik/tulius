@@ -10,7 +10,7 @@ from django import http
 from django.core import exceptions
 from ua_parser import user_agent_parser
 
-from tulius.core.elastic import indexer
+from tulius.core.elastic import indexing
 
 
 def get_user_data(request):
@@ -62,7 +62,7 @@ def log_record(request, exec_time, response):
     except exceptions.DisallowedHost:
         pass
     now = datetime.datetime.utcnow()
-    indexer.get_indexer().index({
+    indexing.get_indexer().index({
         '_action': 'index',
         '_index': f'requests_{now.year}_{now.month}',
         '_id': str(uuid.uuid4()),

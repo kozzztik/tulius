@@ -5,23 +5,39 @@ import threading
 from django.core.serializers import json as dj_json
 
 
+class FileFormatError(Exception):
+    pass
+
+
 class Entity:
-    def __init__(self, start_pos, end_pos, data):
+    def __init__(self, start_pos, end_pos, data, exc):
         self.start_pos = start_pos
         self.end_pos = end_pos
         self.data = data
+        self.exc = exc
 
     @classmethod
     def read(cls, fd):
+        start_pos = fd.tell()
+        exc = None
         data = fd.readline()
-        return json.loads(data)
+        try:
+            data = json.loads(data)
+        except ValueError as json_exc:
+            exc = json_exc
+        return cls(start_pos, fd.tell(), data, exc)
 
     @classmethod
     def write(cls, fd, data):
-        # TODO escaping \n?
-        fd.write(
-            json.dumps(data, cls=dj_json.DjangoJSONEncoder).encode('utf-8'))
+        start_pos = fd.tell()
+        raw_data = data
+        if not isinstance(raw_data, bytes):
+            raw_data = json.dumps(raw_data, cls=dj_json.DjangoJSONEncoder)
+            raw_data = raw_data.replace('\n', r'\n').encode('utf-8')
+        # TODO escaping test
+        fd.write(raw_data)
         fd.write(b'\n')
+        return cls(start_pos, fd.tell(), data, None)
 
 
 class WorkFile:
@@ -101,10 +117,8 @@ class WorkFile:
         with self._lock:
             # move to end of file
             self._data_fd.seek(0, 2)
-            start_pos = self._data_fd.tell()
-            self.entity_cls.write(self._data_fd, data)
-            self.size = self._data_fd.tell()
-            entity = self.entity_cls(start_pos, self.size, data)
+            entity = self.entity_cls.write(self._data_fd, data)
+            self.size = entity.end_pos
             self._data_fd.flush()
             if not self.write_caching:
                 return
@@ -114,7 +128,7 @@ class WorkFile:
                 cache_end = self.cache[-1].end_pos
             else:
                 cache_end = self._send_position
-            if cache_end != start_pos:
+            if cache_end != entity.start_pos:
                 # for some reason cache have missed some values, keep it
                 # consistent
                 return
@@ -122,17 +136,16 @@ class WorkFile:
 
     def read_bulk(self, count):
         with self._lock:
-            while len(self.cache) < count:
+            if len(self.cache) < count:
                 if self.cache:
                     start_pos = self.cache[-1].end_pos
                 else:
                     start_pos = self._send_position
+                self._data_fd.seek(start_pos, 0)
+            while len(self.cache) < count:
                 if start_pos >= self.size:
                     break
-                self._data_fd.seek(start_pos, 0)
-                data = self.entity_cls.read(self._data_fd)
-                self.cache.append(
-                    self.entity_cls(start_pos, self._data_fd.tell(), data))
+                self.cache.append(self.entity_cls.read(self._data_fd))
             return self.cache[:count]
 
     def data_sent(self, position):
@@ -173,18 +186,24 @@ class WorkFile:
 class DeadQueueEntity(Entity):
     @classmethod
     def read(cls, fd):
+        start_pos = fd.tell()
         while True:
             data = fd.readline()
             if data.startswith('#'):
                 continue
-        return json.loads(data)
+        entity = super().read(fd)
+        entity.start_pos = start_pos
+        return entity
 
     @classmethod
     def write(cls, fd, data):
+        start_pos = fd.tell()
         error_lines = [
             ('# ' + line).encode('utf-8') for line in str(data[0]).split('\n')]
         fd.writelines(error_lines)
-        super().write(fd, data[1])
+        entity = super().write(fd, data[1])
+        entity.start_pos = start_pos
+        return entity
 
 
 class DeadQueueFile(WorkFile):

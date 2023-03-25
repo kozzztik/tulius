@@ -5,7 +5,7 @@ import pytest
 from django.conf import settings
 import elasticsearch8
 
-from tulius.core import elastic_indexer
+from tulius.core.elastic import indexing
 
 
 def test_creating_dirs(tmp_path):
@@ -13,11 +13,11 @@ def test_creating_dirs(tmp_path):
         'BASE_DIR': os.path.join(tmp_path, 'queue')
     }
     assert not os.path.exists(config['BASE_DIR'])
-    with elastic_indexer.ElasticIndexer(config):
+    with indexing.ElasticIndexer(config):
         pass
     # check created
     assert os.path.exists(config['BASE_DIR'])
-    with elastic_indexer.ElasticIndexer(config):
+    with indexing.ElasticIndexer(config):
         # check not fails when dirs already exist
         pass
 
@@ -95,7 +95,7 @@ def test_full_cycle(tmp_path, es_index, es_index_template):
     }
     event = threading.Event()
 
-    with elastic_indexer.ElasticIndexer(config) as indexer:
+    with indexing.ElasticIndexer(config) as indexer:
         indexer.file_send_signal.connect(lambda **kwargs: event.set())
         indexer.index({
             '_index': es_index,
@@ -123,7 +123,7 @@ def test_completely_invalid_templates(tmp_path, es_index):
         'PACK_SIZE': 1,
     }
     event = threading.Event()
-    with elastic_indexer.ElasticIndexer(config) as indexer:
+    with indexing.ElasticIndexer(config) as indexer:
         indexer.file_send_signal.connect(lambda **kwargs: event.set())
         indexer.index({
             '_index': es_index,

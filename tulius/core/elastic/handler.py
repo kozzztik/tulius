@@ -6,7 +6,7 @@ import decimal
 
 from django.utils import functional
 
-from tulius.core.elastic import indexer
+from tulius.core.elastic import indexing
 
 
 class Handler(logging.Handler):
@@ -34,7 +34,7 @@ class Handler(logging.Handler):
         message.update(self.get_extra_fields(record))
         if record.exc_info:
             message.update(self.get_debug_fields(record))
-        indexer.get_indexer().index(message)
+        indexing.get_indexer().index(message)
 
     @staticmethod
     def get_extra_fields(record):

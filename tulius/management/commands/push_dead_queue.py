@@ -1,8 +1,8 @@
 from django.core.management.base import BaseCommand
 
-from tulius.core import elastic_indexer
+from tulius.core.elastic import indexing
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        elastic_indexer.indexer.push_dead_queue()
+        indexing.get_indexer().push_dead_queue()

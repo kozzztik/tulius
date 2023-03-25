@@ -2,7 +2,7 @@ import logging
 from unittest import mock
 
 from ua_parser import user_agent_parser
-from tulius.core import elastic_indexer
+from tulius.core.elastic import indexing
 
 
 def test_profiler_minor_versions(client):
@@ -23,7 +23,7 @@ def test_profiler_minor_versions(client):
     })
     index = mock.MagicMock()
     with mock.patch.object(user_agent_parser, 'Parse', parser):
-        with mock.patch.object(elastic_indexer.indexer, 'index', index):
+        with mock.patch.object(indexing._indexer, 'index', index):
             response = client.get('/')
     assert response.status_code == 200
     assert index.called

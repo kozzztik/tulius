@@ -9,7 +9,7 @@ from django.db.models.fields import related
 from django.db.models.fields import reverse_related
 import elasticsearch8
 
-from tulius.core.elastic import indexer
+from tulius.core.elastic import indexing
 
 
 def index_name(model):
@@ -43,7 +43,7 @@ def do_index(instance, **_kwargs):
     doc['_action'] = 'index'
     doc['_id'] = instance.pk
     doc['_index'] = index_name(instance.__class__)
-    indexer.get_indexer().index(doc)
+    indexing.get_indexer().index(doc)
 
 
 def do_direct_index(instance, **_kwargs):

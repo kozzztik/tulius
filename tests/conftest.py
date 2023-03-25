@@ -113,5 +113,5 @@ def pytest_sessionfinish(session, exitstatus):
         utils.teardown_databases(
             db_cfg, verbosity=session.config.option.verbose)
     # pylint: disable=import-outside-toplevel
-    from tulius.core import elastic_indexer
-    elastic_indexer.indexer.close()
+    from tulius.core.elastic import indexing
+    indexing.close()

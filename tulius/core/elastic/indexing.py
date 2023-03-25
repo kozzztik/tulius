@@ -4,7 +4,6 @@ import uuid
 import datetime
 import logging
 import random
-import shutil
 import time
 import signal
 
@@ -17,10 +16,6 @@ from django.utils import module_loading
 from tulius.core.elastic import files
 
 logger = logging.getLogger(__name__)
-
-
-class FormatException(Exception):
-    pass
 
 
 class ClosedException(Exception):
@@ -109,8 +104,6 @@ class ElasticIndexer:
                 return files.WorkFile(self.config, name)
             except OSError:
                 pass
-            except FormatException:
-                shutil.move(f.path, os.path.join(self._dead_queue_dir, f.name))
 
     def _push_deferred_queue(self):
         # until new pack is ready
@@ -119,9 +112,10 @@ class ElasticIndexer:
             work_file = self._get_deferred_file()
             if not work_file:
                 break
-            while not self._waiter.is_set():
+            while not self._waiter.is_set() and work_file:
                 if not self._send_file(work_file):
                     work_file.remove()
+                    work_file = None  # TODO test for that
                 if time.time() - start > self.send_period:
                     # it's time to get back to current file
                     return time.time() - start
@@ -129,32 +123,45 @@ class ElasticIndexer:
 
     def _send_file(self, work_file: files.WorkFile):
         operations = []
-        queue = work_file.read_bulk(self.pack_size)
-        if not queue:
-            # TODO case where no data in file, but there is more size
+        queue = []
+        dead_queue = []
+        pack = work_file.read_bulk(self.pack_size)
+        if not pack:
             return 0
-        for entity in queue:
+        for entity in pack:
+            if entity.exc:
+                dead_queue.append(entity)
+                continue
             doc = entity.data.copy()
-            # TODO case where no index in doc
+            if '_index' not in doc:
+                entity.exc = "No _index in document"
+                dead_queue.append(entity)
+                continue
             operations.append({
                 doc.pop('_action', 'index'): {
-                    '_index': doc.pop('_index', 'noindex'),
+                    '_index': doc.pop('_index'),
                     '_id': doc.pop('_id', None)
                 }
             })
+            queue.append(entity)
             operations.append(doc)
-        response = self.client.bulk(operations=operations, refresh=False)
-        if response['errors']:
-            for i, item in enumerate(response['items']):
-                item = list(item.values())[0]
-                if item['status'] == 200:
-                    continue
-                self._write_to_dead_queue(item.get('error'), queue[i].data)
-        work_file.data_sent(queue[-1].end_pos)
-        logger.debug('File send', extra={'file_name': work_file.name})
+        if operations:
+            response = self.client.bulk(operations=operations, refresh=False)
+            if response['errors']:
+                for i, item in enumerate(response['items']):
+                    item = list(item.values())[0]
+                    if item['status'] == 200:
+                        continue
+                    queue[i].exc = item.get('error')
+                    dead_queue.append(queue[i])
+        for entity in dead_queue:
+            self._write_to_dead_queue(entity.exc, entity.data)
+        # commit
+        work_file.data_sent(pack[-1].end_pos)
+        logger.debug('File send %s - pos %s', work_file.name, pack[-1].end_pos)
         self.file_send_signal.send(
-            sender=self, work_file=work_file, errors=response['errors'])
-        return len(queue)
+            sender=self, work_file=work_file, errors=dead_queue)
+        return len(pack)
 
     def push_dead_queue(self):
         logger.warning('Pushing dead queue')
@@ -168,9 +175,6 @@ class ElasticIndexer:
                 work_file = files.DeadQueueFile(self.config, name)
             except OSError:
                 logger.error('File is busy %s', f.name)
-                continue
-            except FormatException:
-                logger.error('File is broken %s', f.name)
                 continue
             while True:
                 if not self._send_file(work_file):
@@ -260,18 +264,19 @@ _indexer = None
 
 
 def get_indexer() -> ElasticIndexer:
-    global _indexer
+    global _indexer  # pylint: disable=global-statement
     if not _indexer:
         _indexer = ElasticIndexer(
             getattr(settings, 'ELASTIC_INDEXING', None) or {})
     return _indexer
 
 
-def _close_indexer(*args):
-    global _indexer
+def close(*_):
+    global _indexer  # pylint: disable=global-statement
     if _indexer:
         _indexer.close()
     _indexer = None
 
-signal.signal(signal.SIGINT, _close_indexer)
-signal.signal(signal.SIGTERM, _close_indexer)
+
+signal.signal(signal.SIGINT, close)
+signal.signal(signal.SIGTERM, close)
