@@ -74,11 +74,4 @@ class Handler(logging.Handler):
         if record.exc_info:
             fields['stack_trace'] = ''.join(
                 traceback.format_exception(*record.exc_info))
-
-        if not getattr(record, 'funcName', None):
-            fields['funcName'] = record.funcName
-
-        if not getattr(record, 'processName', None):
-            fields['processName'] = record.processName
-
         return fields

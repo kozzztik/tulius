@@ -7,15 +7,14 @@ import random
 import time
 import signal
 
-import elasticsearch8
 from django.conf import settings
 from django.core import signals
-from django.core import exceptions
 from django.utils import module_loading
 
 from tulius.core.elastic import files
+from tulius.core.elastic import transport
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('deferred_indexing')
 
 
 class ClosedException(Exception):
@@ -23,29 +22,45 @@ class ClosedException(Exception):
 
 
 class ElasticIndexer:
-    def __init__(self, config):
+    def __init__(self, config, autostart=True):
         self.config = config.copy()
         self.send_period = self.config.get('SEND_PERIOD', 15)
         self.pack_size = self.config.get('PACK_SIZE', 1000)
-        self.timeout = self.config.get('TIMEOUT', 60)
         self.file_size_limit = self.config.get(
             'FILE_SIZE_LIMIT', 1024 * 1024 * 50)
         self._closing = False
-        self.client = elasticsearch8.Elasticsearch(
-            hosts=settings.ELASTIC_HOSTS, request_timeout=self.timeout)
+        cls = self.config.get('transport', transport.ElasticTransport)
+        if isinstance(cls, str):
+            cls = module_loading.import_string(cls)
+        self.transport: transport.BaseTransport | None = cls(self.config)
         self._base_dir = self.config['BASE_DIR']
         os.makedirs(self._base_dir, exist_ok=True)
-        self._dead_queue_dir = self.config.setdefault(
+        self.dead_queue_dir = self.config.setdefault(
             'DEAD_QUEUE_DIR', os.path.join(self._base_dir, 'dead'))
-        os.makedirs(self._dead_queue_dir, exist_ok=True)
+        os.makedirs(self.dead_queue_dir, exist_ok=True)
         self._lock = threading.Lock()
         self._waiter = threading.Event()
         self._current_file = None
         self._sending_file = None
         self._dead_queue_file = None
-        self._thread = threading.Thread(target=self._run)
-        self._thread.start()
+        self._thread = None
+        self._stop_indexing = False
         self.file_send_signal = signals.Signal()
+        if autostart:
+            self.start_indexing()
+
+    def start_indexing(self):
+        if not self._thread:
+            self._stop_indexing = False
+            self._thread = threading.Thread(target=self._run)
+            self._thread.start()
+
+    def stop_indexing(self):
+        if self._thread:
+            self._stop_indexing = True
+            self._waiter.set()
+            self._thread.join()
+            self._thread = None
 
     @staticmethod
     def _gen_file_name():
@@ -122,7 +137,6 @@ class ElasticIndexer:
         return time.time() - start
 
     def _send_file(self, work_file: files.WorkFile):
-        operations = []
         queue = []
         dead_queue = []
         pack = work_file.read_bulk(self.pack_size)
@@ -131,41 +145,29 @@ class ElasticIndexer:
         for entity in pack:
             if entity.exc:
                 dead_queue.append(entity)
-                continue
-            doc = entity.data.copy()
-            if '_index' not in doc:
-                entity.exc = "No _index in document"
-                dead_queue.append(entity)
-                continue
-            operations.append({
-                doc.pop('_action', 'index'): {
-                    '_index': doc.pop('_index'),
-                    '_id': doc.pop('_id', None)
-                }
-            })
-            queue.append(entity)
-            operations.append(doc)
-        if operations:
-            response = self.client.bulk(operations=operations, refresh=False)
-            if response['errors']:
-                for i, item in enumerate(response['items']):
-                    item = list(item.values())[0]
-                    if item['status'] == 200:
-                        continue
-                    queue[i].exc = item.get('error')
-                    dead_queue.append(queue[i])
+            else:
+                queue.append(entity)
+        if queue:
+            self.transport.do_index(queue)
+            pack = queue
+            queue = []
+            for item in pack:
+                if item.exc:
+                    dead_queue.append(item)
+                else:
+                    queue.append(item)
         for entity in dead_queue:
             self._write_to_dead_queue(entity.exc, entity.data)
         # commit
         work_file.data_sent(pack[-1].end_pos)
         logger.debug('File send %s - pos %s', work_file.name, pack[-1].end_pos)
         self.file_send_signal.send(
-            sender=self, work_file=work_file, errors=dead_queue)
+            sender=self, work_file=work_file, data=queue, errors=dead_queue)
         return len(pack)
 
     def push_dead_queue(self):
         logger.warning('Pushing dead queue')
-        for f in os.scandir(self._dead_queue_dir):
+        for f in os.scandir(self.dead_queue_dir):
             if not f.is_file:
                 continue
             name, ext = os.path.splitext(f.name)
@@ -184,30 +186,17 @@ class ElasticIndexer:
             logger.warning('File is removed from dead queue %s', f.name)
         logger.warning('Dead queue processing finished.')
 
-    def put_index_templates(self):
-        templates = self.config.get('INDEX_TEMPLATES') or {}
-        for name, template in templates.items():
-            try:
-                if isinstance(template, str):
-                    template = module_loading.import_string(template)
-                elif isinstance(template, dict):
-                    template = template.copy()
-                else:
-                    raise exceptions.ImproperlyConfigured(
-                        'Elastic index template must be str or dict')
-                self.client.indices.put_index_template(name=name, **template)
-            except Exception as exc:
-                logger.error('Failed to install template %s: %s', name, exc)
-
     def _run(self):
-        try:
-            self.put_index_templates()
-        except Exception as exc:
-            logger.exception('Failed to install index templates: %s', exc)
+        transport_inited = False
         while True:
             try:
-                if self._closing:
+                if self._stop_indexing:
                     return
+                if not transport_inited:
+                    self.transport.init_indexing()
+                    transport_inited = True
+                    # TODO test cases: no init if close, no send before init
+                    # retry init on fail
                 if self._sending_file:
                     # if we send not current file, send it until it ends
                     while True:
@@ -231,27 +220,18 @@ class ElasticIndexer:
                 wait_time = self.send_period - self._push_deferred_queue()
                 if wait_time > 0:
                     self._waiter.wait(wait_time)
-            except elasticsearch8.ConnectionError as exc:
+            except transport.TransportNotReady as exc:
                 logging.warning(exc)
                 time.sleep(self.send_period)
             except Exception as e:
                 logger.exception(e)
 
     def close(self):
-        if self._closing:
-            return
-        self._closing = True
-        self._waiter.set()
-        self._thread.join()
         with self._lock:
-            if self._sending_file:
-                self._send_file(self._sending_file)
-                self._sending_file.close()
-                self._sending_file = None
-            if self._current_file:
-                self._send_file(self._current_file)
-                self._current_file.close()
-                self._current_file = None
+            if self._closing:
+                return
+            self._closing = True
+        self.stop_indexing()
 
     def __enter__(self):
         return self
@@ -260,7 +240,7 @@ class ElasticIndexer:
         self.close()
 
 
-_indexer = None
+_indexer: ElasticIndexer | None = None
 
 
 def get_indexer() -> ElasticIndexer:

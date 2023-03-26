@@ -143,8 +143,8 @@ class WorkFile:
                     start_pos = self._send_position
                 self._data_fd.seek(start_pos, 0)
             while len(self.cache) < count:
-                if start_pos >= self.size:
-                    break
+                if self._data_fd.tell() >= self.size:
+                    break  # TODO test that no infinite read
                 self.cache.append(self.entity_cls.read(self._data_fd))
             return self.cache[:count]
 
@@ -186,20 +186,26 @@ class WorkFile:
 class DeadQueueEntity(Entity):
     @classmethod
     def read(cls, fd):
+        exc = []
         start_pos = fd.tell()
         while True:
             data = fd.readline()
-            if data.startswith('#'):
+            if data.startswith(b'#'):
+                exc.append(data.decode('utf-8'))
                 continue
-        entity = super().read(fd)
-        entity.start_pos = start_pos
-        return entity
+            try:
+                exc = ''.join(exc)
+                data = json.loads(data)
+            except ValueError as json_exc:
+                exc = json_exc
+            return cls(start_pos, fd.tell(), data, exc)
 
     @classmethod
     def write(cls, fd, data):
         start_pos = fd.tell()
         error_lines = [
-            ('# ' + line).encode('utf-8') for line in str(data[0]).split('\n')]
+            ('# ' + line + '\n').encode('utf-8')
+            for line in str(data[0]).split('\n')]
         fd.writelines(error_lines)
         entity = super().write(fd, data[1])
         entity.start_pos = start_pos

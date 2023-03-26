@@ -238,7 +238,7 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
-        'tulius.core.elastic.indexing': {
+        'deferred_indexing': {
             'handlers': ['console'] if env in ['dev', 'local_docker'] else [],
             'level': 'DEBUG' if env in ['dev', 'local_docker'] else 'ERROR',
             'propagate': False,
