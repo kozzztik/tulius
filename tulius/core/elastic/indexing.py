@@ -39,9 +39,8 @@ class ElasticIndexer:
             'DEAD_QUEUE_DIR', os.path.join(self._base_dir, 'dead'))
         os.makedirs(self.dead_queue_dir, exist_ok=True)
         self._lock = threading.Lock()
+        self._work_files = []
         self._waiter = threading.Event()
-        self._current_file = None
-        self._sending_file = None
         self._dead_queue_file = None
         self._thread = None
         self._stop_indexing = False
@@ -81,23 +80,26 @@ class ElasticIndexer:
         if self._closing:
             raise ClosedException()
         with self._lock:
-            if not self._current_file:
-                self._current_file = files.WorkFile(
-                    self.config, self._gen_file_name(),
-                    write_caching=not self._sending_file)
-            self._current_file.write_data(data)
-            if len(self._current_file.cache) >= self.pack_size:
+            if not self._work_files:
+                self._work_files.append(files.WorkFile(
+                    self.config, self._gen_file_name(), write_caching=True))
+            self._work_files[-1].write_data(data)
+            if len(self._work_files[-1].cache) >= self.pack_size:
                 self._waiter.set()
-            if self._current_file.size < self.file_size_limit:
+            if self._work_files[-1].size < self.file_size_limit:
                 return
-            # file too big, need to close. But first - need to send it
-            if self._sending_file is None:
-                self._sending_file = self._current_file
-                self._waiter.set()
+            # we got here because current file too big
+            if len(self._work_files) > 1:
+                # that is not file that is sending now, so just close it
+                # but we never close _work_files[0] here
+                self._work_files.pop(-1).close()
             else:
-                # previous file is still in work, just close current one
-                self._current_file.close()
-            self._current_file = None
+                # that is file that is about to send, trigger sending
+                self._waiter.set()
+            # anyway we need new file with no write caching
+            self._work_files.append(files.WorkFile(
+                self.config, self._gen_file_name(),
+                write_caching=False))
 
     def _check_ext(self, ext):
         return ext[1:] in [
@@ -112,10 +114,9 @@ class ElasticIndexer:
                 name, ext = os.path.splitext(f.name)
                 if not self._check_ext(ext):
                     continue
-                if self._current_file and name == self._current_file.name:
-                    continue
-                if self._sending_file and name == self._sending_file.name:
-                    continue
+                with self._lock:
+                    if [w for w in self._work_files if w.name == name]:
+                        continue
                 return files.WorkFile(self.config, name)
             except OSError:
                 pass
@@ -167,15 +168,19 @@ class ElasticIndexer:
 
     def push_dead_queue(self):
         logger.warning('Pushing dead queue')
+        processed = set()
         for f in os.scandir(self.dead_queue_dir):
-            if not f.is_file:
+            if not f.is_file():
                 continue
             name, ext = os.path.splitext(f.name)
             if not self._check_ext(ext):
                 continue
+            if name in processed:
+                continue
             try:
                 work_file = files.DeadQueueFile(self.config, name)
             except OSError:
+                processed.add(name)
                 logger.error('File is busy %s', f.name)
                 continue
             while True:
@@ -183,8 +188,39 @@ class ElasticIndexer:
                     break
             logger.warning('File is send %s', f.name)
             work_file.remove()
+            processed.add(name)
             logger.warning('File is removed from dead queue %s', f.name)
         logger.warning('Dead queue processing finished.')
+
+    def _send_working_files(self):
+        while True:
+            if self._stop_indexing:
+                return
+            if not self._work_files:
+                break
+            sending_file: files.WorkFile = self._work_files[0]
+            # if we send not current file, send it until it ends
+            while True:
+                self._send_file(sending_file)
+                with self._lock:
+                    # read more under lock
+                    pack = self._work_files[0].read_bulk(self.pack_size)
+                    if len(self._work_files) > 1:
+                        # if we send not current file, stop only it is
+                        # empty, then remove it
+                        if not pack:
+                            self._work_files.pop(0).remove()
+                            self._work_files[0].write_caching = True
+                            break
+                    else:
+                        # if we send current file stop if there are no
+                        # full pack to send
+                        if len(pack) < self.pack_size:
+                            if not self._stop_indexing:
+                                # if stop indexing was called after triggering
+                                # new send this will drop flag that makes stop
+                                self._waiter.clear()
+                            return
 
     def _run(self):
         transport_inited = False
@@ -197,25 +233,7 @@ class ElasticIndexer:
                     transport_inited = True
                     # TODO test cases: no init if close, no send before init
                     # retry init on fail
-                if self._sending_file:
-                    # if we send not current file, send it until it ends
-                    while True:
-                        if not self._send_file(self._sending_file):
-                            break
-                    with self._lock:
-                        self._sending_file.remove()
-                        self._sending_file = None
-                # send it at least once as we got here
-                if self._current_file:
-                    self._send_file(self._current_file)
-                    while True:
-                        # send more if there is one more full pack
-                        with self._lock:
-                            pack = self._current_file.read_bulk(self.pack_size)
-                            if len(pack) < self.pack_size:
-                                self._waiter.clear()
-                                break
-                        self._send_file(self._current_file)
+                self._send_working_files()
                 # until new pack is ready send data in other files in queue
                 wait_time = self.send_period - self._push_deferred_queue()
                 if wait_time > 0:
@@ -232,6 +250,12 @@ class ElasticIndexer:
                 return
             self._closing = True
         self.stop_indexing()
+        with self._lock:
+            while self._work_files:
+                self._work_files.pop(0).close()
+            if self._dead_queue_file:
+                self._dead_queue_file.close()
+                self._dead_queue_file = None
 
     def __enter__(self):
         return self

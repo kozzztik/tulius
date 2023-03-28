@@ -2,6 +2,7 @@ import json
 import os
 import threading
 
+import portalocker
 from django.core.serializers import json as dj_json
 
 
@@ -24,6 +25,9 @@ class Entity:
         try:
             data = json.loads(data)
         except ValueError as json_exc:
+            if data.endswith(b'\n'):
+                # if failed to parse, dont include trailing sep in data
+                data = data[:-1]
             exc = json_exc
         return cls(start_pos, fd.tell(), data, exc)
 
@@ -31,7 +35,9 @@ class Entity:
     def write(cls, fd, data):
         start_pos = fd.tell()
         raw_data = data
-        if not isinstance(raw_data, bytes):
+        if isinstance(raw_data, bytes):
+            raw_data = raw_data.replace(b'\n', rb'\n')
+        else:
             raw_data = json.dumps(raw_data, cls=dj_json.DjangoJSONEncoder)
             raw_data = raw_data.replace('\n', r'\n').encode('utf-8')
         # TODO escaping test
@@ -61,35 +67,14 @@ class WorkFile:
         self.cache = []
         self._cache_limit = config.get('CACHE_LIMIT') or 2000
         try:
-            # Posix based file locking (Linux, Ubuntu, MacOS, etc.)
-            # pylint: disable=import-outside-toplevel
-            import fcntl
-
-            def lock_file(f):
-                fcntl.lockf(f, fcntl.LOCK_EX)
-
-            def unlock_file(f):
-                fcntl.lockf(f, fcntl.LOCK_UN)
-        except ModuleNotFoundError:
-            # Windows file locking
-            # pylint: disable=import-outside-toplevel
-            import msvcrt
-
-            def file_size(f):
-                return os.path.getsize(os.path.realpath(f.name))
-
-            def lock_file(f):
-                msvcrt.locking(f.fileno(), msvcrt.LK_RLCK, file_size(f))
-
-            def unlock_file(f):
-                msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, file_size(f))
-        self.unlock_file = unlock_file
-        try:
-            lock_file(self._data_fd)
+            portalocker.lock(
+                self._data_fd,
+                portalocker.LockFlags.EXCLUSIVE
+                + portalocker.LockFlags.NON_BLOCKING)
             self._locked = True
-        except OSError:
+        except portalocker.exceptions.LockException as exc:
             self.close()
-            raise
+            raise OSError() from exc
         self._read_config()
         self.size = self._data_fd.seek(0, 2)
 
@@ -122,8 +107,8 @@ class WorkFile:
             self._data_fd.flush()
             if not self.write_caching:
                 return
-            if len(self.cache) < self._cache_limit:
-                return
+            if len(self.cache) >= self._cache_limit:
+                return  # todo test caching works
             if self.cache:
                 cache_end = self.cache[-1].end_pos
             else:
@@ -158,7 +143,7 @@ class WorkFile:
         with self._lock:
             try:
                 if self._locked:
-                    self.unlock_file(self._data_fd)
+                    portalocker.unlock(self._data_fd)
                 self._locked = False
             except OSError:
                 pass
@@ -184,21 +169,27 @@ class WorkFile:
 
 
 class DeadQueueEntity(Entity):
+    def __init__(self, start_pos, end_pos, data, exc):
+        super().__init__(start_pos, end_pos, data, exc)
+        self.orig_exc = None
+
     @classmethod
     def read(cls, fd):
-        exc = []
+        exc = None
+        orig_exc = []
         start_pos = fd.tell()
         while True:
             data = fd.readline()
             if data.startswith(b'#'):
-                exc.append(data.decode('utf-8'))
+                orig_exc.append(data.decode('utf-8'))
                 continue
             try:
-                exc = ''.join(exc)
                 data = json.loads(data)
             except ValueError as json_exc:
                 exc = json_exc
-            return cls(start_pos, fd.tell(), data, exc)
+            entity = cls(start_pos, fd.tell(), data, exc)
+            entity.orig_exc = ''.join(orig_exc)
+            return entity
 
     @classmethod
     def write(cls, fd, data):

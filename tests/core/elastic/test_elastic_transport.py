@@ -124,7 +124,7 @@ def test_full_cycle(tmp_path, es_index, es_index_template):
     bulk = queue.read_bulk(10)
     assert len(bulk) == 1
     assert bulk[0].data['_id'] == 3
-    assert 'failed to parse' in bulk[0].exc
+    assert 'failed to parse' in bulk[0].orig_exc
 
 
 def test_completely_invalid_templates(tmp_path, es_index):
