@@ -39,8 +39,7 @@ class Entity:
             raw_data = raw_data.replace(b'\n', rb'\n')
         else:
             raw_data = json.dumps(raw_data, cls=dj_json.DjangoJSONEncoder)
-            raw_data = raw_data.replace('\n', r'\n').encode('utf-8')
-        # TODO escaping test
+            raw_data = raw_data.encode('utf-8')
         fd.write(raw_data)
         fd.write(b'\n')
         return cls(start_pos, fd.tell(), data, None)
@@ -88,9 +87,6 @@ class WorkFile:
             self._send_position = int(data.strip())
         except ValueError:
             self._send_position = 0
-        except Exception:
-            # TODO correct exception
-            self._send_position = 0
 
     def _update_config(self):
         self._config_fd.truncate(0)
@@ -108,14 +104,14 @@ class WorkFile:
             if not self.write_caching:
                 return
             if len(self.cache) >= self._cache_limit:
-                return  # todo test caching works
+                return
             if self.cache:
                 cache_end = self.cache[-1].end_pos
             else:
                 cache_end = self._send_position
             if cache_end != entity.start_pos:
-                # for some reason cache have missed some values, keep it
-                # consistent
+                # cache was read after it was full. So there are some values
+                # missed. Don't appent data to cache to keep it consistent.
                 return
             self.cache.append(entity)
 
@@ -129,7 +125,7 @@ class WorkFile:
                 self._data_fd.seek(start_pos, 0)
             while len(self.cache) < count:
                 if self._data_fd.tell() >= self.size:
-                    break  # TODO test that no infinite read
+                    break
                 self.cache.append(self.entity_cls.read(self._data_fd))
             return self.cache[:count]
 
@@ -153,7 +149,6 @@ class WorkFile:
             self._config_fd = None
 
     def remove(self):
-        # TODO add close_or_remove
         with self._lock:
             self._data_fd.truncate(0)
             self._data_fd.flush()
@@ -163,9 +158,18 @@ class WorkFile:
         try:
             os.remove(self._data_fd_name)
             os.remove(self._config_fd_name)
-        except PermissionError:
+        except FileNotFoundError:
             # someone took file to delete after we closed it.
             pass
+        except PermissionError:
+            # someone opened file after we closed it.
+            pass
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
 
 
 class DeadQueueEntity(Entity):
@@ -208,22 +212,3 @@ class DeadQueueFile(WorkFile):
 
     def _get_folder(self):
         return self.config.get('DEAD_QUEUE_DIR')
-
-    def _read_config(self):
-        # TODO
-        self._config_fd.seek(0, 0)
-        data = self._config_fd.readline()
-        try:
-            self._send_position = int(data.strip())
-        except ValueError:
-            self._send_position = 0
-        except Exception:
-            # TODO correct exception
-            self._send_position = 0
-
-    def _update_config(self):
-        # TODO
-        self._config_fd.truncate(0)
-        self._config_fd.seek(0, 0)
-        self._config_fd.write(str(self._send_position))
-        self._config_fd.flush()
