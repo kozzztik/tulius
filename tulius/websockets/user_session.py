@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import inspect
 
 from django.conf import settings
 from django.contrib import auth
@@ -11,6 +12,41 @@ from tulius.forum import const as forum_const
 from tulius.websockets import consts
 
 logger = logging.getLogger('async_app')
+
+
+class PubSub(aioredis.client.PubSub):
+    async def run(
+        self,
+        *,
+        exception_handler=None,
+        poll_timeout: float = 1.0,
+    ) -> None:
+        for channel, handler in self.channels.items():
+            if handler is None:
+                raise aioredis.PubSubError(
+                    f"Channel: '{channel}' has no handler registered")
+        for pattern, handler in self.patterns.items():
+            if handler is None:
+                raise aioredis.PubSubError(
+                    f"Pattern: '{pattern}' has no handler registered")
+
+        await self.connect()
+        while True:
+            try:
+                await self.get_message(
+                    ignore_subscribe_messages=True, timeout=poll_timeout
+                )
+            except (asyncio.CancelledError, GeneratorExit):
+                raise
+            except BaseException as e:
+                if exception_handler is None:
+                    raise
+                res = exception_handler(e, self)
+                if inspect.isawaitable(res):
+                    await res
+            # Ensure that other tasks on the event loop get a chance to run
+            # if we didn't have to block for I/O anywhere.
+            await asyncio.sleep(0)
 
 
 class UserSession:
@@ -96,7 +132,7 @@ class UserSession:
         await self.auth()
         logger.info('User %s logged in', self.user_id)
         self.redis = aioredis.from_url(settings.REDIS_LOCATION)
-        self.pubsub = self.redis.pubsub()
+        self.pubsub = PubSub(self.redis.connection_pool)
         await self.subscribe_channel(
             consts.CHANNEL_PUBLIC, self.public_channel)
         self.pubsub_task = asyncio.create_task(
