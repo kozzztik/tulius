@@ -56,6 +56,16 @@ services:
       - 127.0.0.1:9200:9200
     container_name: tulius_elastic
 
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.6.1
+    networks:
+      tuliusnet:
+        ipv4_address: 10.5.0.31
+    restart: unless-stopped
+    environment:
+      SERVER_NAME: tulius-kibana
+      ELASTICSEARCH_HOSTS: http://10.5.0.30:9200
+
 networks:
   tuliusnet:
     driver: bridge

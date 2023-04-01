@@ -40,26 +40,6 @@ services:
         max-size: "100m"
         max-file: "2"
 
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.6.1
-    networks:
-      tuliusnet:
-        ipv4_address: 10.5.0.23
-    restart: unless-stopped
-    environment:
-      SERVER_NAME: kibana.test.tulius.co-de.org
-      ELASTICSEARCH_HOSTS: http://10.5.0.30:9200
-
-  prod_kibana:
-    image: docker.elastic.co/kibana/kibana:8.6.1
-    networks:
-      tuliusnet:
-        ipv4_address: 10.5.0.13
-    restart: unless-stopped
-    environment:
-      SERVER_NAME: kibana.tulius.co-de.org
-      ELASTICSEARCH_HOSTS: http://tulius.com:9201
-
 networks:
   tuliusnet:
     driver: bridge
