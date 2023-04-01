@@ -30,7 +30,7 @@ SITE_ID = 1
 DEBUG = (env != 'prod')
 TEMPLATE_DEBUG = DEBUG
 
-SECRET_KEY = '0q^^#b-w#ae@i%h$da%chx@3ldu52c5%6v)_fiaorkl+4#r%=1'
+SECRET_KEY = 'ADD SECRET KEY'
 
 VK_APP_KEY = '4782118'
 VK_APP_SECRET = 'm6GcbXexyppJ4cv1p94y'
