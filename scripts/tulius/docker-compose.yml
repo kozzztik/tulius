@@ -56,24 +56,6 @@ services:
       - 127.0.0.1:9200:9200
     container_name: tulius_elastic
 
-  log_stash:
-    image: docker.elastic.co/logstash/logstash:8.6.1
-    restart: always
-    environment:
-      - MONITORING_ENABLED=false
-      - XPACK_SECURITY_ENABLED=false
-      - XPACK_REPORTING_ENABLED=false
-      - XPACK_MONITORING_ENABLED=false
-      - ELASTIC_HOST=10.5.0.30:9200
-      - "LS_JAVA_OPTS=-Xms512m -Xmx512m"
-    networks:
-      tuliusnet:
-        ipv4_address: 10.5.0.31
-    volumes:
-      - ./logstash/configs:/usr/share/logstash/pipeline/
-      - ./logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml
-    container_name: tulius_log_stash
-
 networks:
   tuliusnet:
     driver: bridge

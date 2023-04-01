@@ -1,4 +1,0 @@
-- pipeline.id: logging
-  path.config: "/usr/share/logstash/pipeline/indexing.conf"
-- pipeline.id: indexing
-  path.config: "/usr/share/logstash/pipeline/logstash.conf"
