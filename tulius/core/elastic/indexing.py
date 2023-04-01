@@ -131,7 +131,7 @@ class ElasticIndexer:
             while not self._waiter.is_set() and work_file:
                 if not self._send_file(work_file):
                     work_file.remove()
-                    work_file = None  # TODO test for that
+                    work_file = None
                 if time.time() - start > self.send_period:
                     # it's time to get back to current file
                     return time.time() - start
@@ -231,8 +231,6 @@ class ElasticIndexer:
                 if not transport_inited:
                     self.transport.init_indexing()
                     transport_inited = True
-                    # TODO test cases: no init if close, no send before init
-                    # retry init on fail
                 self._send_working_files()
                 # until new pack is ready send data in other files in queue
                 wait_time = self.send_period - self._push_deferred_queue()

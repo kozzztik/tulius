@@ -1,3 +1,5 @@
+import time
+
 import json
 
 import os
@@ -232,14 +234,110 @@ def test_deferred_queue(indexer_config):
         with indexing.ElasticIndexer(
                 indexer_config, autostart=False) as indexer:
             indexer.file_send_signal.connect(send_signal)
-            # generate 2 work file (one empty) and 1 deferred file
+            # generate 2 work file (one empty) and 2 deferred file
+            # needed 2 files, to be sure that not only one file will
+            # be sent
             indexer.index({'param': 0})
             indexer.index({'param': 1})
+            indexer.index({'param': 2})
             indexer.start_indexing()
             assert event.wait(60)
     finally:
         process.finish.set()
         process.join(50)
-    assert len(indexer.transport.queue) == 2
+    assert len(indexer.transport.queue) == 3
     assert indexer.transport.queue[0][0].data['param'] == 0
+    indexer.transport.queue.sort(key=lambda x: x[0].data['param'])
     assert indexer.transport.queue[1][0].data['param'] == 1
+    assert indexer.transport.queue[2][0].data['param'] == 2
+
+
+def test_deferred_queue_timer(indexer_config):
+    indexer_config['PACK_SIZE'] = 1
+    indexer_config['FILE_SIZE_LIMIT'] = 1
+    indexer_config['SEND_PERIOD'] = 60
+    event = threading.Event()
+    waiter = mock.MagicMock()
+    orig_waiter = None
+    indexer = None
+    more_index = [{'param': 3}]
+
+    def on_wait(t):
+        event.set()
+        waiter.timing = t
+        indexer._waiter = orig_waiter
+        indexer._stop_indexing = True
+
+    def send_signal(data, **_):
+        if data[0].data['param'] == 0:
+            # mock 'waiter.wait' so we can be sure that all deferred queue
+            # will be processed
+            nonlocal orig_waiter
+            orig_waiter = indexer._waiter
+            indexer._waiter = waiter
+            indexer._waiter.is_set.return_value = False
+            indexer._waiter.wait = on_wait
+            # make timer exprired, only one defered file should be sent
+            indexer.send_period = 0
+        else:
+            if more_index:
+                # first deferred send
+                # write directly to working file so waiter trigger is not set
+                # to check just timer
+                indexer._work_files[-1].write_data(more_index.pop(0))
+            else:
+                # get timer back
+                indexer.send_period = 60
+
+    with indexing.ElasticIndexer(indexer_config, autostart=False) as indexer:
+        indexer.file_send_signal.connect(send_signal)
+        # generate 2 work file (one empty) and 2 deferred file
+        indexer.index({'param': 0})
+        indexer.index({'param': 1})
+        indexer.index({'param': 2})
+        indexer.start_indexing()
+        assert event.wait(60)
+    # all data is sent but order - 1 current, 1 deferred, 1 current, 1 def
+    assert len(indexer.transport.queue) == 4
+    assert indexer.transport.queue[0][0].data['param'] == 0
+    assert indexer.transport.queue[1][0].data['param'] != 0
+    assert indexer.transport.queue[2][0].data['param'] == 3
+    assert waiter.timing > 50
+
+
+class InitFailingTransport(transport.TestTransport):
+    init_calls = 0
+
+    def init_indexing(self):
+        self.init_calls += 1
+        if self.init_calls == 1:
+            self.queue.append('init failed')
+            raise ValueError()
+        self.queue.append('init success')
+
+
+def test_retry_init(indexer_config):
+    indexer_config['PACK_SIZE'] = 1
+    indexer_config['FILE_SIZE_LIMIT'] = 1
+    indexer_config['transport'] = InitFailingTransport
+    event = threading.Event()
+
+    def send_signal(data, **_):
+        if data[0].data['param'] == 1:
+            # deferred send
+            indexer.index({'param': 2})
+        elif data[0].data['param'] == 2:
+            event.set()
+
+    with indexing.ElasticIndexer(indexer_config, autostart=False) as indexer:
+        indexer.file_send_signal.connect(send_signal)
+        indexer.index({'param': 0})
+        indexer.index({'param': 1})
+        with mock.patch.object(indexing.logger, 'exception') as error_mock:
+            indexer.start_indexing()
+            assert event.wait(60)
+    assert error_mock.called
+    assert len(indexer.transport.queue) == 5
+    assert indexer.transport.queue[0] == 'init failed'
+    assert indexer.transport.queue[1] == 'init success'
+    assert indexer.transport.queue[2][0].data['param'] == 0
