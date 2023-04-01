@@ -74,6 +74,7 @@ services:
     volumes:
       - ../../../data/media:/opt/tulius/data/media
       - ../../../data/mail:/opt/tulius/data/mail
+      - ../../../data/indexing:/opt/tulius/data/indexing
       - ../../../settings_production.py:/opt/tulius/settings_production.py
     mem_limit: 512M
     logging:
