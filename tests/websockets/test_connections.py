@@ -116,7 +116,7 @@ async def test_parallel_websockets():
             await ws.send_text('@GET')
         results = []
         for ws in wss:
-            results.append(await ws.receive_text())
+            results.append(await ws.receive_text(timeout=10))
     finally:
         for ws in wss:
             ws.close()

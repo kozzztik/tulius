@@ -10,6 +10,7 @@ services:
       TULIUS_BRANCH: master
     volumes:
       - ../../../data/media:/opt/tulius/data/media
+      - ../../../data/indexing:/opt/tulius/data/indexing
       - ../../../settings_production.py:/opt/tulius/settings_production.py
     mem_limit: 512M
     logging:

@@ -131,6 +131,7 @@ class ASGIServer:
             self.asgi_application,
             host=self.server_address[0],
             port=self.server_address[1],
+            workers=1,
             log_level="info")
 
         # web.run_app(

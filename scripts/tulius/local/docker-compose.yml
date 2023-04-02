@@ -49,22 +49,6 @@ services:
       - 127.0.0.1:9200:9200
     container_name: tulius_elastic
 
-  log_stash:
-    image: docker.elastic.co/logstash/logstash:8.6.1
-    restart: "no"
-    networks:
-      tuliusnet:
-        ipv4_address: 10.5.0.31
-    volumes:
-      - ../logstash/configs:/usr/share/logstash/pipeline/
-      - ../logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml
-    environment:
-      - MONITORING_ENABLED=false
-    ports:
-      - 11011:11011
-      - 11012:11012
-    container_name: tulius_log_stash
-
   kibana:
     image: docker.elastic.co/kibana/kibana:8.6.1
     networks:
@@ -90,6 +74,7 @@ services:
     volumes:
       - ../../../data/media:/opt/tulius/data/media
       - ../../../data/mail:/opt/tulius/data/mail
+      - ../../../data/indexing:/opt/tulius/data/indexing
       - ../../../settings_production.py:/opt/tulius/settings_production.py
     mem_limit: 512M
     logging:

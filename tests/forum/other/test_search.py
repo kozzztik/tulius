@@ -103,7 +103,7 @@ def test_search_conditions(admin, user, thread):
     data = response.json()
     assert len(data['results']) == 1
     assert data['results'][0]['comment']['id'] == comment1.pk
-    # do combined time search
+    # do combine time search
     response = user.post(
         '/api/forum/search/', {
             'date_from': '2019-10-10',
