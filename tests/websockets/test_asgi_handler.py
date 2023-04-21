@@ -157,7 +157,7 @@ async def test_websocket_exc():
     try:
         ws = await client.ws('/ws_exc/')
         assert ws.connected.result() is True
-        await asyncio.wait([future], timeout=10)
+        await asyncio.wait([future, ws.closed], timeout=10)
         assert ws.closed.result() is None
         assert future.result() is None
     finally:

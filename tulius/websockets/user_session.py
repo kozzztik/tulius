@@ -143,14 +143,11 @@ class UserSession:
                 await self.subscribe_channel(
                     consts.CHANNEL_USER.format(self.user_id),
                     self.user_channel)
-
             while True:
                 if self.json:
                     data = await self.ws.receive_json()
                 else:
                     data = await self.ws.receive_text()
-                if data is None:
-                    break
                 if self.json:
                     method = getattr(
                         self, 'action_' + data.get('action', 'empty'), None)

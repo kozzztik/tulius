@@ -150,6 +150,10 @@ class ASGIWebsocket(BaseASGIContext):
         data = message.get('bytes') or message.get('text')
         return json.loads(data)
 
+    async def run(self):
+        await self._internal_send({"type": "websocket.connect"})
+        return await super().run()
+
     def close(self, exc=None):
         if not self.connected.done():
             if exc:
