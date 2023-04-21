@@ -31,10 +31,9 @@ class WebSocket:
     async def accept(self, response: HttpResponseUpgrade):
         if self._accepted:
             raise WSProtoException('Websocket can be accepted only once')
-        message = await self._receive()
-        if message['type'] != 'websocket.connect':
-            raise WSProtoException(
-                'Wrong websocket handshake message type: %s' % message['type'])
+        # By ASGI spec we should receive 'websocket.connect' first. But some
+        # server send it after 'accept'. Communication is async, so just send
+        # our part of handshake first - it covers both cases.
         response_headers = []
         for header, value in response.items():
             if isinstance(header, str):
@@ -47,6 +46,10 @@ class WebSocket:
             'subprotocol': response.sub_protocol,
             'headers': response_headers
         })
+        message = await self._receive()
+        if message['type'] != 'websocket.connect':
+            raise WSProtoException(
+                'Wrong websocket handshake message type: %s' % message['type'])
         self._accepted = True
 
     async def close(self, code: int = 1000):
