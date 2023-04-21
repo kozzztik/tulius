@@ -2,24 +2,16 @@ import asyncio
 import sys
 
 import django
-from django import http
 from django import db
 from django.core import signals
 from django.core.handlers import asgi as dj_asgi
 from django import urls
 from django.utils import log
 from django.core.handlers import exception
+from django.core import exceptions
 
 from tulius.websockets.asgi import connections
-
-
-class HttpResponseUpgrade(http.HttpResponse):
-    status_code = 101
-    handler = None
-
-    def __init__(self, handler, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.handler = handler
+from tulius.websockets.asgi import websocket
 
 
 def handle_exception(request, exc):
@@ -92,14 +84,21 @@ class ASGIHandler(dj_asgi.ASGIHandler):
     # pylint: disable=too-many-arguments
     async def handle_response(self, request, response, scope, receive, send):
         if scope['type'] == 'websocket':
-            if isinstance(response, HttpResponseUpgrade):
+            if isinstance(response, websocket.HttpResponseUpgrade):
+                ws = websocket.WebSocket(receive, send)
+                await ws.accept(response)
                 try:
-                    await response.handler(scope, receive, send)
-                except asyncio.CancelledError:
-                    pass
-                except Exception as exc:
-                    await dj_asgi.sync_to_async(
-                        handle_exception, thread_sensitive=False)(request, exc)
+                    try:
+                        await response.handler(ws)
+                    except (asyncio.CancelledError, exceptions.RequestAborted):
+                        pass
+                    except Exception as exc:
+                        await dj_asgi.sync_to_async(
+                            handle_exception, thread_sensitive=False
+                        )(request, exc)
+                finally:
+                    if not ws.closed:
+                        await ws.close()
             else:
                 await send({'type': 'websocket.close'})
         else:

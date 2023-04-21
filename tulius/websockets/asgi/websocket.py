@@ -1,196 +1,124 @@
-"""
-This file is from https://vk.com/@python_django_ru-veb-sokety-v-django-31
-https://gist.github.com/alex-oleshkevich/
-77a9386cc01c730eccaa45d366bae459#file-connection-py
-"""
 import json
 import typing as t
 import functools
 
+from django import http
 from django.core import exceptions
 
-from tulius.websockets.asgi import asgi_handler
+
+class HttpResponseUpgrade(http.HttpResponse):
+    status_code = 101
+    handler = None
+    sub_protocol = None
+
+    def __init__(self, handler, *args, sub_protocol: str = None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.handler = handler
+        self.sub_protocol = sub_protocol
 
 
-class State:
-    CONNECTING = 1
-    CONNECTED = 2
-    DISCONNECTED = 3
-
-
-class SendEvent:
-    """Lists events that application can send.
-    ACCEPT - Sent by the application when it wishes to accept an incoming
-    connection.
-    SEND - Sent by the application to send a data message to the client.
-    CLOSE - Sent by the application to tell the server to close the connection.
-        If this is sent before the socket is accepted, the server must close
-        the connection with a HTTP 403 error code (Forbidden), and not complete
-        the WebSocket handshake; this may present on some browsers as
-        a different WebSocket error code (such as 1006, Abnormal Closure).
-    """
-
-    ACCEPT = "websocket.accept"
-    SEND = "websocket.send"
-    CLOSE = "websocket.close"
-
-
-class ReceiveEvent:
-    """Enumerates events that application can receive from protocol server.
-    CONNECT - Sent to the application when the client initially
-        opens  a connection and is about to finish the WebSocket handshake.
-        This message must be responded to with either an Accept message or a
-        Close message before the socket will pass websocket.receive messages.
-    RECEIVE - Sent to the application when a data message is received from the
-    client.
-    DISCONNECT - Sent to the application when either connection to the client
-        is lost, either from the client closing the connection,
-        the server closing the connection, or loss of the socket.
-    """
-
-    CONNECT = "websocket.connect"
-    RECEIVE = "websocket.receive"
-    DISCONNECT = "websocket.disconnect"
+class WSProtoException(Exception):
+    pass
 
 
 class WebSocket:
-    def __init__(self, scope, receive, send):
-        if scope['type'] != 'websocket':
-            raise exceptions.ValidationError(
-                'User does not request websocket')
-        self._scope = scope
+    def __init__(self, receive, send):
         self._receive = receive
         self._send = send
-        self._state = State.CONNECTING
+        self._accepted = False
+        self.closed = False
 
-    async def accept(self, subprotocol: str = None):
-        """Accept connection.
-        :param subprotocol: The subprotocol the server wishes to accept.
-        :type subprotocol: str, optional
-        """
-        await self.send({"type": SendEvent.ACCEPT, "subprotocol": subprotocol})
+    async def accept(self, response: HttpResponseUpgrade):
+        if self._accepted:
+            raise WSProtoException('Websocket can be accepted only once')
+        # By ASGI spec we should receive 'websocket.connect' first. But some
+        # server send it after 'accept'. Communication is async, so just send
+        # our part of handshake first - it covers both cases.
+        response_headers = []
+        for header, value in response.items():
+            if isinstance(header, str):
+                header = header.encode("ascii")
+            if isinstance(value, str):
+                value = value.encode("latin1")
+            response_headers.append((bytes(header).lower(), bytes(value)))
+        await self._send({
+            'type': 'websocket.accept',
+            'subprotocol': response.sub_protocol,
+            'headers': response_headers
+        })
+        message = await self._receive()
+        if message['type'] != 'websocket.connect':
+            raise WSProtoException(
+                'Wrong websocket handshake message type: %s' % message['type'])
+        self._accepted = True
 
     async def close(self, code: int = 1000):
-        await self.send({"type": SendEvent.CLOSE, "code": code})
-
-    @property
-    def closed(self):
-        return self._state == State.DISCONNECTED
+        await self._send({'type': 'websocket.close', 'code': code})
+        self.closed = True
 
     async def send(self, message: t.Mapping):
-        if self._state == State.DISCONNECTED:
-            raise RuntimeError("WebSocket is disconnected.")
-
-        if self._state == State.CONNECTING:
-            assert message["type"] in {SendEvent.ACCEPT, SendEvent.CLOSE}, (
-                'Could not write event "%s" into socket in connecting state.'
-                % message["type"]
-            )
-            if message["type"] == SendEvent.CLOSE:
-                self._state = State.DISCONNECTED
-            else:
-                self._state = State.CONNECTED
-
-        elif self._state == State.CONNECTED:
-            assert message["type"] in {SendEvent.SEND, SendEvent.CLOSE}, (
-                'Connected socket can send "%s" and "%s" events, not "%s"'
-                % (SendEvent.SEND, SendEvent.CLOSE, message["type"])
-            )
-            if message["type"] == SendEvent.CLOSE:
-                self._state = State.DISCONNECTED
-
+        if not self._accepted:
+            raise WSProtoException(
+                'Websocket needs to be accepted before send')
+        if self.closed:
+            raise WSProtoException('WebSocket is closed')
         await self._send(message)
 
-    async def receive(self):
-        if self._state == State.DISCONNECTED:
-            raise RuntimeError("WebSocket is disconnected.")
+    async def receive(self) -> t.Mapping:
+        if not self._accepted:
+            raise WSProtoException(
+                'Websocket needs to be accepted before receive data')
+        if self.closed:
+            raise WSProtoException('WebSocket is closed')
 
         message = await self._receive()
-
-        if self._state == State.CONNECTING:
-            assert message["type"] == ReceiveEvent.CONNECT, (
-                'WebSocket is in connecting state but received "%s" event'
-                % message["type"]
-            )
-            self._state = State.CONNECTED
-
-        elif self._state == State.CONNECTED:
-            assert message["type"] in {
-                ReceiveEvent.RECEIVE, ReceiveEvent.DISCONNECT}, (
-                'WebSocket is connected but received invalid event "%s".'
-                % message["type"]
-            )
-            if message["type"] == ReceiveEvent.DISCONNECT:
-                self._state = State.DISCONNECTED
-
+        if message['type'] == 'websocket.disconnect':
+            self.closed = True
+            raise exceptions.RequestAborted()
+        if message['type'] != 'websocket.receive':
+            raise WSProtoException(
+                'Wrong websocket receive message type: %s' % message['type'])
         return message
 
-    async def receive_json(self) -> t.Any:
+    async def receive_json(self):
         message = await self.receive()
-        if message["type"] == ReceiveEvent.DISCONNECT:
-            return None
-        self._test_if_can_receive(message)
-        return json.loads(message["text"])
+        if 'text' in message:
+            return json.loads(message['text'])
+        return json.loads(message['bytes'].decode())
 
-    async def receive_jsonb(self) -> t.Any:
+    async def receive_text(self) -> str:
         message = await self.receive()
-        if message["type"] == ReceiveEvent.DISCONNECT:
-            return None
-        self._test_if_can_receive(message)
-        return json.loads(message["bytes"].decode())
+        if 'text' in message:
+            return message['text']
+        return message['bytes'].decode()
 
-    async def receive_text(self) -> t.Optional[str]:
+    async def receive_bytes(self) -> bytes:
         message = await self.receive()
-        if message["type"] == ReceiveEvent.DISCONNECT:
-            return None
-        self._test_if_can_receive(message)
-        return message["text"]
+        if 'text' in message:
+            return message['text'].encode()
+        return message['bytes']
 
-    async def receive_bytes(self) -> t.Optional[bytes]:
-        message = await self.receive()
-        if message["type"] == ReceiveEvent.DISCONNECT:
-            return None
-        self._test_if_can_receive(message)
-        return message["bytes"]
-
-    async def send_json(self, data: t.Any, **dump_kwargs):
-        data = json.dumps(data, **dump_kwargs)
-        await self.send({"type": SendEvent.SEND, "text": data})
-
-    async def send_jsonb(self, data: t.Any, **dump_kwargs):
-        data = json.dumps(data, **dump_kwargs)
-        await self.send({"type": SendEvent.SEND, "bytes": data.encode()})
+    async def send_json(self, data, **dumps_kwargs):
+        await self.send({
+            'type': 'websocket.send',
+            'text': json.dumps(data, **dumps_kwargs)
+        })
 
     async def send_text(self, text: str):
-        await self.send({"type": SendEvent.SEND, "text": text})
+        if not isinstance(text, str):
+            raise WSProtoException('Only text can be send, not %s' % text)
+        await self.send({'type': 'websocket.send', 'text': text})
 
-    async def send_bytes(self, text: t.Union[str, bytes]):
-        if isinstance(text, str):
-            text = text.encode()
-        await self.send({"type": SendEvent.SEND, "bytes": text})
-
-    def _test_if_can_receive(self, message: t.Mapping):
-        assert message["type"] == ReceiveEvent.RECEIVE, (
-            'Invalid message type "%s". Was connection accepted?' %
-            message["type"]
-        )
+    async def send_bytes(self, text: bytes):
+        if not isinstance(text, bytes):
+            raise WSProtoException('Only bytes can be send, not %s' % text)
+        await self.send({'type': 'websocket.send', 'bytes': text})
 
 
 def websocket_view(func):
-    async def websocket_handler(
-            request, /, asgi_scope, asgi_receive, asgi_send, *args, **kwargs):
-        ws = WebSocket(asgi_scope, asgi_receive, asgi_send)
-        await ws.accept()
-        try:
-            return await func(request, ws, *args, **kwargs)
-        finally:
-            if not ws.closed:
-                await ws.close()
-
     @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
-        return asgi_handler.HttpResponseUpgrade(
-            functools.partial(websocket_handler, request, *args, **kwargs))
-
-    wrapper.websocket_wrapper = True
+        async def websocket_handler(ws: WebSocket):
+            return await func(request, ws, *args, **kwargs)
+        return HttpResponseUpgrade(handler=websocket_handler)
     return wrapper
