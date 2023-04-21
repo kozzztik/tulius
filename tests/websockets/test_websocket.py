@@ -262,3 +262,22 @@ async def test_send_bytes():
     assert data[0]['type'] == 'websocket.accept'
     assert data[1]['type'] == 'websocket.send'
     assert data[1]['bytes'] == b'foo'
+
+
+@pytest.mark.asyncio
+async def test_accept_wrong_order():
+    """ Some servers send connect on handshake finish. """
+    data = []
+
+    async def _receive():
+        if not data:
+            raise ValueError()
+        return {'type': 'websocket.connect'}
+
+    async def _send(message):
+        data.append(message)
+
+    ws = websocket.WebSocket(_receive, _send)
+    await ws.accept(websocket.HttpResponseUpgrade(handler=None))
+    assert len(data) == 1
+    assert data[0]['type'] == 'websocket.accept'
