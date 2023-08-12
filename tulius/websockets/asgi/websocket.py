@@ -46,10 +46,6 @@ class WebSocket:
             'subprotocol': response.sub_protocol,
             'headers': response_headers
         })
-        message = await self._receive()
-        if message['type'] != 'websocket.connect':
-            raise WSProtoException(
-                'Wrong websocket handshake message type: %s' % message['type'])
         self._accepted = True
 
     async def close(self, code: int = 1000):

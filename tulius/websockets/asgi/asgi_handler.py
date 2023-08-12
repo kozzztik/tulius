@@ -1,10 +1,12 @@
 import asyncio
 import sys
+import tempfile
 
 import django
 from django import db
 from django.core import signals
 from django.core.handlers import asgi as dj_asgi
+from django.conf import settings
 from django import urls
 from django.utils import log
 from django.core.handlers import exception
@@ -52,11 +54,18 @@ class ASGIHandler(dj_asgi.ASGIHandler):
         # for backward capability. In websocket there is no "method" in scope
         if scope['type'] == 'websocket':
             scope['method'] = 'GET'
-        # Receive the HTTP request body as a stream object.
-        try:
-            body_file = await self.read_body(receive)
-        except dj_asgi.RequestAborted:
-            return
+            message = await receive()
+            if message["type"] != "websocket.connect":
+                return
+            # pylint: disable=consider-using-with
+            body_file = tempfile.SpooledTemporaryFile(
+                max_size=settings.FILE_UPLOAD_MAX_MEMORY_SIZE, mode="w+b")
+        else:
+            # Receive the HTTP request body as a stream object.
+            try:
+                body_file = await self.read_body(receive)
+            except dj_asgi.RequestAborted:
+                return
         # Request is complete and can be served.
         try:
             dj_asgi.set_script_prefix(self.get_script_prefix(scope))

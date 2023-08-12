@@ -20,20 +20,6 @@ async def test_accept_ws_twice():
 
 
 @pytest.mark.asyncio
-async def test_accept_ws_wrong_message():
-    async def _receive():
-        return {'type': 'websocket.receive'}
-
-    async def _send(_):
-        pass
-
-    ws = websocket.WebSocket(_receive, _send)
-    with pytest.raises(websocket.WSProtoException) as exc:
-        await ws.accept(websocket.HttpResponseUpgrade(handler=None))
-    assert exc.value.args[0].startswith('Wrong websocket handshake message')
-
-
-@pytest.mark.asyncio
 async def test_accept_headers():
     data = []
 
@@ -121,7 +107,6 @@ async def test_read_unknown_message():
 @pytest.mark.asyncio
 async def test_read_on_close():
     in_data = [
-        {'type': 'websocket.connect'},
         {'type': 'websocket.receive', 'text': 'foo'},
         {'type': 'websocket.disconnect'},
     ]
@@ -143,7 +128,6 @@ async def test_read_on_close():
 @pytest.mark.asyncio
 async def test_read_json_binary_and_text():
     in_data = [
-        {'type': 'websocket.connect'},
         {'type': 'websocket.receive', 'text': '{"foo": "bar"}'},
         {'type': 'websocket.receive', 'bytes': b'{"bar": "foo"}'},
     ]
@@ -165,7 +149,6 @@ async def test_read_json_binary_and_text():
 @pytest.mark.asyncio
 async def test_read_text_binary_and_text():
     in_data = [
-        {'type': 'websocket.connect'},
         {'type': 'websocket.receive', 'text': 'foo'},
         {'type': 'websocket.receive', 'bytes': b'bar'},
     ]
@@ -187,7 +170,6 @@ async def test_read_text_binary_and_text():
 @pytest.mark.asyncio
 async def test_read_bytes_binary_and_text():
     in_data = [
-        {'type': 'websocket.connect'},
         {'type': 'websocket.receive', 'text': 'foo'},
         {'type': 'websocket.receive', 'bytes': b'bar'},
     ]
