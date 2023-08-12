@@ -104,12 +104,33 @@ def _ws_cancel_view(_, __):
     raise asyncio.CancelledError()
 
 
+@websocket.websocket_view
+async def _ws_ping(_, ws: websocket.WebSocket):
+    while True:
+        data = await ws.receive_text()
+        await ws.send_text(data + '_pong')
+
+
 class UrlConf:
     urlpatterns = [
         urls.re_path(r'^file_response/$', _test_file_view),
         urls.re_path(r'^ws_exc/$', _ws_exc_view),
         urls.re_path(r'^ws_cancel/$', _ws_cancel_view),
+        urls.re_path(r'^ws_ping/$', _ws_ping),
     ]
+
+
+@override_settings(ROOT_URLCONF=UrlConf)
+@pytest.mark.asyncio
+async def test_ping_pong():
+    client = utils.AsyncClient()
+    ws: utils.ASGIWebsocket = await client.ws('/ws_ping/')
+    assert ws.connected.result() is True
+    await ws.send_text('ping')
+    result = await ws.receive_text()
+    assert result == 'ping_pong'
+    ws.close()
+    assert ws.closed.done()
 
 
 @override_settings(ROOT_URLCONF=UrlConf)
