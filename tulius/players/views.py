@@ -9,18 +9,11 @@ from django.utils.translation import gettext_lazy as _
 from tulius import models as tulius
 from tulius.forum import models as forum
 from tulius.games import models as games
-from tulius.players import models
 from tulius.players import forms
 from tulius.pm import models as pm
 from tulius.stories import models as stories
 from tulius.forum.comments import models as forum_comments
 from tulius.gameforum.comments import models as game_forum_comments
-
-
-try:
-    models.stars.flush_stars_cache()
-except:
-    pass
 
 
 def filter_by_games(players):
