@@ -1,10 +1,9 @@
-from django.conf import urls
+from django import urls
 
 from tulius.stories import views
 from tulius.stories import story_edit_views
 from tulius.stories import edit_variation
 from tulius.stories import avatar_uploads
-from tulius.stories import materials_views
 from tulius.stories import edit_story_cataloging as story_catalog
 from tulius.stories import edit_variation_catalog as variation_catalog
 
@@ -142,14 +141,7 @@ urlpatterns = [
     urls.re_path(
         r'^edit_story/(?P<pk>\d+)/add_material/$',
         story_edit_views.AddMaterialView.as_view(), name='add_story_material'),
-    # Uploads handling
-    urls.re_path(
-        r'^illustration/(?P<illustration_id>\d+)/$',
-        materials_views.uploaded_illustration, name='illustration'),
-    urls.re_path(
-        r'^illustration_thumb/(?P<illustration_id>\d+)/$',
-        materials_views.uploaded_illustration_thumb,
-        name='illustration_thumb'),
+
     urls.re_path(
         r'^edit_story/(?P<story_id>\d+)/add_illustration/$',
         story_edit_views.add_story_illustration,

@@ -43,13 +43,13 @@ class RoleTextForm(forms.ModelForm):
 class RoleDeleteForm(forms.Form):
     role = forms.ModelChoiceField(
         queryset=models.Role.objects.all(),
-        label=_(u'Role'),
+        label=_('Role'),
         empty_label=None,
     )
 
     message = forms.CharField(
         required=False,
-        label=_(u'Delete message'),
+        label=_('Delete message'),
         widget=forms.Textarea,
     )
 

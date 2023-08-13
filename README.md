@@ -28,6 +28,7 @@ Repo for http://tulius.com project.
     mkdir /home/travis/master/data/mysql
     mkdir /home/travis/master/data/static
     mkdir /home/travis/master/data/media
+    mkdir /home/travis/master/data/indexing
     mkdir /home/travis/master/data/elastic
     chown 1000:1000 /home/travis/master/data/elastic
     mkdir /home/travis/dev/data
@@ -72,11 +73,11 @@ Repo for http://tulius.com project.
     docker exec -it tulius_mysql /bin/bash
     mysql -uroot -p tulius_prod < /var/lib/mysql/backup.sql
     ```
- 8. Create Sentry database and super user (not needed if DB restored from lib files):
-     ```bash
-    docker exec -it tulius_sentry sentry upgrade
-    ```
- 9. Use sentry web interface on `http://sentry.co-de.org` (check DNS records), to finalize installation. 
+8. Create Sentry database and super user (not needed if DB restored from lib files):
+   ```bash
+   docker exec -it tulius_sentry sentry upgrade
+   ```
+9. Use sentry web interface on `http://sentry.co-de.org` (check DNS records), to finalize installation. 
  Create two sentry projects and get DSN URLs for them.
  
 10. Configure prod and dev environments.
@@ -89,14 +90,18 @@ Repo for http://tulius.com project.
     Edit settings files. Change DB passwords and sentry DSN.
    
 11. Configure Nginx using templates:
+    For production:
     ```bash
     cp /home/travis/master/scripts/tulius/nginx_production.conf /etc/nginx/conf.d/tulius_prod.conf
-    cp /home/travis/master/scripts/tulius/nginx_dev.conf /etc/nginx/conf.d/tulius_dev.conf
+    ```
+    For dev:
+    ```bash
+    cp /home/travis/master/scripts/tulius/nginx_dev.conf /etc/nginx/conf.d/tulius_dev.conf    
     ```
     
 12. Install letsEncrypt and configure SSL.
 
-13.  Configure kibana access (dev environment only)
+13. Configure kibana access (dev environment only)
     ```bash
     sudo apt install apache2-utils
     sudo touch /etc/nginx/htpasswd
@@ -116,7 +121,6 @@ Update repo if needed (use separate branch and PR)
 16. Check that everything works. Profit.
 
 # Running on local environment
-
 To run frontend part you need to install node.js & npm:
 - for Windows use installer https://nodejs.org/en/download/ 
 - for Linux (Debian based) ```apt-get install nodejs```
@@ -142,7 +146,7 @@ Instances, that needed to run:
 1. `manage.py runserver` - Django instance for backend HTTP requests
 2. `celery -A tulius worker -l info` - for deferred tasks (optional)
 3. `npm run serve` in tulius/static directory for frontend webpack dev server
- 
+
 On Windows, as Celery not supports it yet, install gevent:
 
 ```pip install gevent```
@@ -152,9 +156,7 @@ and start celery with:
 ```celery -A tulius worker -l info -P gevent```
 
 or, instead of starting Celery, you can switch it off, by adding:
-
 ```CELERY_TASK_ALWAYS_EAGER = True```
-
 to settings_production.py. However, some heavy requests, like reindexing may
 became too slow to render pages, as deferred tasks will be resolved in request 
 context. But for most things it will be enough.

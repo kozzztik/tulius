@@ -1,10 +1,16 @@
+import datetime
+import uuid
+
 import asyncio
 import threading
 import time
 import logging
 
 from django import http
+from django.core import exceptions
 from ua_parser import user_agent_parser
+
+from tulius.core.elastic import indexing
 
 
 def get_user_data(request):
@@ -50,7 +56,20 @@ def log_record(request, exec_time, response):
         content_length = None
     else:
         content_length = len(response.content)
-    logging.getLogger('profiler').info(request.path, extra={
+    host = None
+    try:
+        host = request.get_host()
+    except exceptions.DisallowedHost:
+        pass
+    now = datetime.datetime.utcnow()
+    indexing.get_indexer().index({
+        '_action': 'index',
+        '_index': f'requests_{now.year}_{now.month}',
+        '_id': str(uuid.uuid4()),
+        '@timestamp': now.isoformat(),
+        'message': request.path,
+        'scheme': request.scheme,
+        'host': host,
         'method': request.method,
         'status_code': response.status_code,
         'content_length': content_length,
@@ -58,10 +77,10 @@ def log_record(request, exec_time, response):
             'app_name': request.resolver_match.app_name,
             'url_name': request.resolver_match.url_name,
             'view_name': request.resolver_match.view_name,
-            'url_args': request.resolver_match.args,
+            'url_args': [str(arg) for arg in request.resolver_match.args],
             'url_kwargs': [{
                 'name': name,
-                'value': value
+                'value': str(value)
             } for name, value in request.resolver_match.kwargs.items()]
         } if request.resolver_match else {}),
         'user': {

@@ -23,8 +23,8 @@ class ForumSitemap(sitemaps.Sitemap):
     def lastmod(self, obj):
         return obj.create_time
 
-    def location(self, obj):
-        return f'/forums/thread/{obj.pk}/'
+    def location(self, item):
+        return f'/forums/thread/{item.pk}/'
 
     @classmethod
     def sitemaps(cls):

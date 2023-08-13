@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils import translation
 from django.db import models
 from django.core.cache import cache
@@ -39,8 +39,8 @@ class DataBlockManager(models.Manager):
 
 class DataBlock(models.Model):
     class Meta:
-        verbose_name = _(u'data block')
-        verbose_name_plural = _(u'data blocks')
+        verbose_name = _('data block')
+        verbose_name_plural = _('data blocks')
         ordering = ['name']
 
     objects = DataBlockManager()
@@ -49,27 +49,27 @@ class DataBlock(models.Model):
         max_length=100,
         blank=False,
         null=False,
-        verbose_name=_(u'name')
+        verbose_name=_('name')
     )
     full_text = models.TextField(
         default='',
         blank=True,
         null=True,
-        verbose_name=_(u'text')
+        verbose_name=_('text')
     )
 
     urls = models.TextField(
         default='',
         blank=True,
         null=True,
-        verbose_name=_(u'URLs')
+        verbose_name=_('URLs')
     )
 
     exclude_urls = models.TextField(
         default='',
         blank=True,
         null=True,
-        verbose_name=_(u'exclude URLs')
+        verbose_name=_('exclude URLs')
     )
     language = models.CharField(
         verbose_name=_('language'),

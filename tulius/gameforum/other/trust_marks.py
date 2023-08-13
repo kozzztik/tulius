@@ -21,7 +21,7 @@ def recalc_role_trust(role):
     for mark in trustmarks:
         marksum += mark.value
     if markcount:
-        marksum = (marksum / markcount)
+        marksum = marksum / markcount
     value = mark_to_percents(marksum)
     value = min(value, 100)
     value = max(value, 0)

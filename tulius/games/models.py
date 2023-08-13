@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db.models.query_utils import Q
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from tulius.stories.models import Role
 from .signals import game_status_changed
@@ -23,7 +23,7 @@ class Skin(models.Model):
         verbose_name=_('name')
     )
     description = models.TextField(
-        verbose_name=_(u'description'),
+        verbose_name=_('description'),
         blank=True,
         null=True,
     )
@@ -38,13 +38,13 @@ GAME_STATUS_COMPLETED = 6
 GAME_STATUS_COMPLETED_OPEN = 7
 
 GAME_STATUS_CHOICES = (
-    (GAME_STATUS_NEW, _(u'new')),
-    (GAME_STATUS_OPEN_FOR_REGISTRATION, _(u'open for registration')),
-    (GAME_STATUS_REGISTRATION_COMPLETED, _(u'registration completed')),
-    (GAME_STATUS_IN_PROGRESS, _(u'in progress')),
-    (GAME_STATUS_FINISHING, _(u'finishing')),
-    (GAME_STATUS_COMPLETED, _(u'completed')),
-    (GAME_STATUS_COMPLETED_OPEN, _(u'completed and open')),
+    (GAME_STATUS_NEW, _('new')),
+    (GAME_STATUS_OPEN_FOR_REGISTRATION, _('open for registration')),
+    (GAME_STATUS_REGISTRATION_COMPLETED, _('registration completed')),
+    (GAME_STATUS_IN_PROGRESS, _('in progress')),
+    (GAME_STATUS_FINISHING, _('finishing')),
+    (GAME_STATUS_COMPLETED, _('completed')),
+    (GAME_STATUS_COMPLETED_OPEN, _('completed and open')),
 )
 
 
@@ -162,77 +162,77 @@ class Game(models.Model):
         'stories.Variation', models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'variation'),
+        verbose_name=_('variation'),
         related_name='games',
     )
     serial_number = models.PositiveIntegerField(
-        verbose_name=_(u'serial number'),
+        verbose_name=_('serial number'),
     )
     name = models.CharField(
         max_length=200,
         default='',
         blank=False,
         null=False,
-        verbose_name=_(u'name')
+        verbose_name=_('name')
     )
     status = models.SmallIntegerField(
         default=GAME_STATUS_NEW,
-        verbose_name=_(u'status'),
+        verbose_name=_('status'),
         choices=GAME_STATUS_CHOICES,
     )
     announcement = models.TextField(
         default='',
         blank=True,
-        verbose_name=_(u'announcement')
+        verbose_name=_('announcement')
     )
     announcement_preview = models.TextField(
         default='',
         blank=True,
-        verbose_name=_(u'announcement preview')
+        verbose_name=_('announcement preview')
     )
     short_comment = models.CharField(
         max_length=500,
         default='',
         blank=True,
-        verbose_name=_(u'short comment')
+        verbose_name=_('short comment')
     )
     introduction = models.TextField(
         default='',
         blank=True,
-        verbose_name=_(u'introduction'),
+        verbose_name=_('introduction'),
 
     )
     requests_text = models.TextField(
         default='',
         blank=True,
-        verbose_name=_(u'requests text'),
+        verbose_name=_('requests text'),
 
     )
     card_image = models.FileField(
         null=True,
         blank=True,
-        verbose_name=_(u'playing card image'),
+        verbose_name=_('playing card image'),
         upload_to='games/card_image',
     )
     top_banner = models.FileField(
         blank=True,
         null=True,
-        verbose_name=_(u'top banner'),
+        verbose_name=_('top banner'),
         upload_to='games/top_banner',
     )
     bottom_banner = models.FileField(
         blank=True,
         null=True,
-        verbose_name=_(u'bottom banner'),
+        verbose_name=_('bottom banner'),
         upload_to='games/bottom_banner',
     )
     show_announcement = models.BooleanField(
         default=True,
-        verbose_name=_(u'show announcement'),
+        verbose_name=_('show announcement'),
     )
     skin = models.ForeignKey(
         Skin, models.PROTECT,
-        verbose_name=_(u'skin'),
+        verbose_name=_('skin'),
         related_name='games',
         blank=True,
         null=True,
@@ -240,7 +240,7 @@ class Game(models.Model):
 
     deleted = models.BooleanField(
         default=False,
-        verbose_name=_(u'deleted')
+        verbose_name=_('deleted')
     )
 
     def status_as_text(self):
@@ -375,14 +375,14 @@ class GameAdmin(models.Model):
         Game, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'game'),
+        verbose_name=_('game'),
         related_name='admins',
     )
     user = models.ForeignKey(
         User, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'user'),
+        verbose_name=_('user'),
         related_name='admined_games',
     )
 
@@ -400,14 +400,14 @@ class GameGuest(models.Model):
         Game, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'game'),
+        verbose_name=_('game'),
         related_name='guests',
     )
     user = models.ForeignKey(
         User, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'user'),
+        verbose_name=_('user'),
         related_name='guested_games',
     )
 
@@ -425,14 +425,14 @@ class GameWinner(models.Model):
         Game, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'game'),
+        verbose_name=_('game'),
         related_name='winners',
     )
     user = models.ForeignKey(
         User, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'user'),
+        verbose_name=_('user'),
         related_name='winned_games',
     )
 
@@ -451,20 +451,20 @@ class RoleRequest(models.Model):
         Game, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'game'),
+        verbose_name=_('game'),
         related_name='role_requests',
     )
     user = models.ForeignKey(
         User, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'user'),
+        verbose_name=_('user'),
         related_name='requested_games',
     )
 
     body = models.TextField(
         default='',
-        verbose_name=_(u'text')
+        verbose_name=_('text')
     )
 
     def __str__(self):
@@ -484,19 +484,19 @@ class RoleRequestSelection(models.Model):
         RoleRequest, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'role request'),
+        verbose_name=_('role request'),
         related_name='selections',
     )
 
     prefer_order = models.PositiveIntegerField(
-        verbose_name=_(u'prefer order'),
+        verbose_name=_('prefer order'),
     )
 
     role = models.ForeignKey(
         'stories.Role', models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'role'),
+        verbose_name=_('role'),
         related_name='requests',
     )
 
@@ -513,7 +513,7 @@ class RequestQuestion(models.Model):
         Game, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'game'),
+        verbose_name=_('game'),
         related_name='request_questions',
     )
     question = models.CharField(
@@ -521,7 +521,7 @@ class RequestQuestion(models.Model):
         default='',
         blank=False,
         null=False,
-        verbose_name=_(u'question')
+        verbose_name=_('question')
     )
 
     def __str__(self):
@@ -540,21 +540,21 @@ class RequestQuestionAnswer(models.Model):
         RoleRequest, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'role request'),
+        verbose_name=_('role request'),
         related_name='answers',
     )
     question = models.ForeignKey(
         RequestQuestion, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'answer'),
+        verbose_name=_('answer'),
         related_name='answers',
     )
     answer = models.CharField(
         max_length=500,
         blank=False,
         null=False,
-        verbose_name=_(u'answer')
+        verbose_name=_('answer')
     )
 
 
@@ -564,10 +564,10 @@ GAME_INVITE_STATUS_DECLINED = 3
 GAME_INVITE_STATUS_OCCUPIED = 4
 
 GAME_INVITE_STATUS_CHOICES = (
-    (GAME_INVITE_STATUS_NEW, _(u'new invite')),
-    (GAME_INVITE_STATUS_ACCEPTED, _(u'accepted invite')),
-    (GAME_INVITE_STATUS_DECLINED, _(u'declined invite')),
-    (GAME_INVITE_STATUS_OCCUPIED, _(u'occupied invite')),
+    (GAME_INVITE_STATUS_NEW, _('new invite')),
+    (GAME_INVITE_STATUS_ACCEPTED, _('accepted invite')),
+    (GAME_INVITE_STATUS_DECLINED, _('declined invite')),
+    (GAME_INVITE_STATUS_OCCUPIED, _('occupied invite')),
 )
 
 
@@ -584,7 +584,7 @@ class GameInvite(models.Model):
         'stories.Role', models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'role'),
+        verbose_name=_('role'),
         related_name='invites',
     )
 
@@ -592,13 +592,13 @@ class GameInvite(models.Model):
         User, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'user'),
+        verbose_name=_('user'),
         related_name='invites',
     )
 
     status = models.SmallIntegerField(
         default=GAME_INVITE_STATUS_NEW,
-        verbose_name=_(u'status'),
+        verbose_name=_('status'),
         choices=GAME_INVITE_STATUS_CHOICES,
     )
 
@@ -606,7 +606,7 @@ class GameInvite(models.Model):
         User, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'sender'),
+        verbose_name=_('sender'),
         related_name='sended_invites',
     )
 

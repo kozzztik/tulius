@@ -2,13 +2,12 @@ import os
 import io
 from mimetypes import guess_type
 
-from django.http import Http404, HttpResponseBadRequest
+from django.http import HttpResponseBadRequest
 from django.conf import settings
 from django.core.files.base import ContentFile
-from django.shortcuts import get_object_or_404
 from PIL import Image
 
-from djfw.uploader import handle_upload, handle_download_file_path
+from djfw.uploader import handle_upload
 from djfw.common import generate_random_id
 from tulius.stories.models import Illustration
 
@@ -69,32 +68,3 @@ def save_illustration(
 def upload_illustration(request, story, variation, illustration):
     return handle_upload(
         request, save_illustration, story, variation, illustration)
-
-
-def get_illustration_file(request, illustration_id, is_thumb):
-    """
-    View to return uploaded files
-    """
-    try:
-        illustration_id = int(illustration_id)
-    except ValueError as exc:
-        raise Http404() from exc
-    illustration = get_object_or_404(Illustration, id=illustration_id)
-    if illustration.admins_only and (
-            not illustration.edit_right(request.user)):
-        raise Http404()
-    if is_thumb:
-        filepath = illustration.file_thumb()
-        file_name = "%s_thumb.jpg" % illustration_id
-    else:
-        filepath = illustration.file_path()
-        file_name = "%s.jpg" % illustration_id
-    return handle_download_file_path(filepath, file_name, 'image')
-
-
-def uploaded_illustration(request, illustration_id):
-    return get_illustration_file(request, illustration_id, False)
-
-
-def uploaded_illustration_thumb(request, illustration_id):
-    return get_illustration_file(request, illustration_id, True)

@@ -1,7 +1,7 @@
 from django import urls
 from django.conf import settings
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from tulius.forum.threads import models as forum_models
 from tulius.forum.rights import models as rights
@@ -24,20 +24,20 @@ class GameThreadRight(models.Model):
         thread_models.Thread, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'thread'),
+        verbose_name=_('thread'),
         related_name='access_roles',
     )
     role: stories.Role = models.ForeignKey(
         stories.Role, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'role'),
+        verbose_name=_('role'),
         related_name='accessed_threads',
     )
 
     access_level = models.SmallIntegerField(
         default=forum_models.ACCESS_READ + forum_models.ACCESS_WRITE,
-        verbose_name=_(u'access rights'),
+        verbose_name=_('access rights'),
         choices=rights.THREAD_ACCESS_CHOICES,
     )
 
@@ -74,7 +74,7 @@ class Trustmark(models.Model):
         settings.AUTH_USER_MODEL, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'user'),
+        verbose_name=_('user'),
         related_name='trust_marks',
     )
 
@@ -82,7 +82,7 @@ class Trustmark(models.Model):
         stories.Variation, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'variation'),
+        verbose_name=_('variation'),
         related_name='trust_marks',
     )
 
@@ -90,12 +90,12 @@ class Trustmark(models.Model):
         stories.Role, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'role'),
+        verbose_name=_('role'),
         related_name='trust_marks',
     )
 
     value = models.SmallIntegerField(
         null=False,
         blank=False,
-        verbose_name=_(u'value'),
+        verbose_name=_('value'),
     )

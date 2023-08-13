@@ -3,13 +3,16 @@ import os
 
 from sentry_sdk.integrations.django import DjangoIntegration
 
-branch = os.environ.get("TULIUS_BRANCH", '')
-env = {
-    'master': 'prod',  # production env
-    'dev': 'qa',  # test staging env
-    'local': 'dev',  # local development env
-    'test': 'test'  # ci tests env
-}[branch]
+env = os.environ.get('TULIUS_ENV', None)
+if not env:
+    branch = os.environ.get("TULIUS_BRANCH", '')
+    env = {
+        'master': 'prod',  # production env
+        'dev': 'qa',  # test staging env
+        'local': 'dev',  # local development env
+        'test': 'test',  # ci tests env
+        'local_docker': 'local_docker'  # local docker env
+    }[branch]
 TEST_RUN = bool(os.environ.get("TULIUS_TEST", ''))
 
 ENV = env
@@ -21,14 +24,13 @@ ROOT_URLCONF = 'tulius.urls'
 TIME_ZONE = 'Europe/Moscow'
 LANGUAGE_CODE = 'ru'
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 SITE_ID = 1
 
 DEBUG = (env != 'prod')
 TEMPLATE_DEBUG = DEBUG
 
-SECRET_KEY = '0q^^#b-w#ae@i%h$da%chx@3ldu52c5%6v)_fiaorkl+4#r%=1'
+SECRET_KEY = 'ADD SECRET KEY'
 
 VK_APP_KEY = '4782118'
 VK_APP_SECRET = 'm6GcbXexyppJ4cv1p94y'
@@ -37,6 +39,9 @@ MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'tulius.User'
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10Mb
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -92,6 +97,7 @@ INSTALLED_APPS = (
 
 MIDDLEWARE = (
     # 'raven.contrib.django.raven_compat.middleware.Sentry404CatchMiddleware',
+    'tulius.core.profiler.profiler_middleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -100,7 +106,6 @@ MIDDLEWARE = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'djfw.pagination.middleware.pagination_middleware',
     'djfw.flatpages.middleware.flatpage_middleware',
-    'tulius.core.profiler.profiler_middleware',
 )
 
 STATICFILES_FINDERS = (
@@ -176,7 +181,7 @@ INSTALLER_BACKUPS_DIR = BASE_DIR + 'backups/'
 
 WYSIBB_THUMB_SIZE = (350, 350)
 
-ELASTIC_HOSTS = ['localhost:9200'] if env == 'dev' else ['10.5.0.30:9200']
+ELASTIC_HOSTS = ['http://localhost:9200'] if env == 'dev' else ['http://10.5.0.30:9200']
 ELASTIC_PREFIX = 'test' if TEST_RUN else env
 
 ELASTIC_MODELS = (
@@ -189,6 +194,17 @@ ELASTIC_MODELS = (
     ('game_forum_threads', 'Thread'),
     ('game_forum_comments', 'Comment'),
 )
+
+ELASTIC_INDEXING = {
+    'BASE_DIR': os.path.join(BASE_DIR, 'data', 'indexing'),
+    'SEND_PERIOD': 15,
+    'PACK_SIZE': 1000,
+    'TIMEOUT': 60,
+    'INDEX_TEMPLATES': {
+        'requests': 'tulius.core.elastic.templates.REQUESTS_TEMPLATE',
+        'logging': 'tulius.core.elastic.templates.LOGGING_TEMPLATE',
+    },
+}
 
 LOGGING = {
     'version': 1,
@@ -215,27 +231,18 @@ LOGGING = {
         'logfile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.WatchedFileHandler',
-            'filename': BASE_DIR + 'logfile.txt',
+            'filename': os.path.join(BASE_DIR, 'data', 'logfile.txt'),
         },
         'sqllogfile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.WatchedFileHandler',
-            'filename': BASE_DIR + 'sql-logfile.txt',
+            'filename': os.path.join(BASE_DIR, 'data', 'sql-logfile.txt'),
         },
-        'log_stash': {
+        'elastic_search': {
             'level': 'DEBUG',
-            'class': 'logstash.TCPLogstashHandler',
-            'host': '127.0.0.1' if env == 'dev' else '10.5.0.31',
-            'port': 11011,
-            'version': 1,
+            'class': 'tulius.core.elastic.handler.Handler',
+            'index_name': 'logging_{year}_{month:02}'
         },
-        'elastic_search_indexing': {
-            'level': 'DEBUG',
-            'class': 'logstash.TCPLogstashHandler',
-            'host': '127.0.0.1' if env == 'dev' else '10.5.0.31',
-            'port': 11012,
-            'version': 1,
-        }
     },
     'loggers': {
         'django.db.backends': {
@@ -243,42 +250,32 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
-        'django.request': {
-            'handlers': ['logfile', 'mail_admins'],
-            'level': 'WARNING',
-            'propagate': True,
-        },
-        'installer': {
-            'handlers': ['null'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'async_app': {
-            'handlers': ['console'],
-            'level': 'DEBUG' if env == 'dev' else 'ERROR',
-            'propagate': True,
-        },
-        'profiler': {
-            'handlers': ['null' if TEST_RUN else 'log_stash'],
-            'level': 'DEBUG',
+        'deferred_indexing': {
+            'handlers': ['console'] if env in ['dev', 'local_docker'] else [],
+            'level': 'DEBUG' if env in ['dev', 'local_docker'] else 'ERROR',
             'propagate': False,
         },
-        'elastic_search_indexing': {
-            'handlers': ['elastic_search_indexing'],
-            'level': 'DEBUG',
+        'elastic_transport': {
+            'handlers': ['console'] if env in ['dev', 'local_docker'] else [],
+            'level': 'INFO' if env in ['dev', 'local_docker'] else 'ERROR',
             'propagate': False,
         },
-        'elasticsearch': {
-            'handlers': ['console'],
-            'level': 'DEBUG' if env == 'dev' else 'ERROR',
-            'propagate': True,
+        'urllib3': {
+            'handlers': ['console'] if env in ['dev', 'local_docker'] else [],
+            'level': 'INFO' if env in ['dev', 'local_docker'] else 'ERROR',
+            'propagate': False,
         },
         'celery.task': {
-            'handlers': ['console'],
-            'level': 'DEBUG' if env == 'dev' else 'ERROR',
+            'level': 'DEBUG' if env in ['dev', 'local_docker'] else 'WARNING',
             'propagate': True,
         },
-    }
+    },
+    'root': {
+        'handlers':
+            (['console'] if env in ['dev', 'local_docker'] else []) +
+            ['elastic_search'],
+        'level': 'DEBUG' if env in ['dev', 'local_docker'] else 'WARNING',
+    },
 }
 
 if DEBUG:
@@ -302,11 +299,12 @@ MAIL_RECEIVERS = ['pm.mail.get_mail']
 
 
 REDIS_CONNECTION = {
-    'host': '127.0.0.1' if env in ['dev', 'test'] else 'tulius_redis',
+    'host': '127.0.0.1' if env in ['dev', ] else 'tulius_redis',
     'port': 6379,
-    'db': {'prod': 3, 'qa': 2, 'dev': 1, 'test': 4}[env],
+    'db': {'prod': 3, 'qa': 2, 'dev': 1, 'test': 4, 'local_docker': 1, 'local': 1}[env],
     'password': '',
 }
+REDIS_LOCATION = 'redis://{host}:{port}?db={db}'.format(**REDIS_CONNECTION)
 
 # Actual credentials are hold in settings_production.py file.
 DATABASES = {
@@ -317,7 +315,8 @@ DATABASES = {
         'USER': 'travis' if env == 'test' else 'tulius_{}'.format(env),
         'PASSWORD': '' if env == 'test' else 'tulius',
         'PORT': '',
-        'CONN_MAX_AGE': 20,
+        'CONN_MAX_AGE': None,
+        'CONN_HEALTH_CHECKS': True,
         'ATOMIC_REQUESTS': True,
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
@@ -330,14 +329,8 @@ DATABASES = {
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 CACHES = {
     'default': {
-        'BACKEND': 'redis_cache.RedisCache',
-        'LOCATION': '{host}:{port}'.format(**REDIS_CONNECTION),
-        'OPTIONS': {
-            'DB': REDIS_CONNECTION['db'],
-            'PARSER_CLASS': 'redis.connection.HiredisParser',
-            'CONNECTION_POOL_CLASS': 'redis.BlockingConnectionPool',
-            'PICKLE_VERSION': -1,
-        },
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': REDIS_LOCATION,
     },
 }
 
@@ -364,3 +357,4 @@ CELERY_BROKER_URL = 'redis://{host}:{port}/{db}'.format(**REDIS_CONNECTION)
 CELERY_WORKER_CONCURRENCY = 3
 CELERY_EVENT_QUEUE_PREFIX = f'{env}_'
 CELERY_TASK_ALWAYS_EAGER = TEST_RUN
+REQUESTS_TIMEOUT = 60

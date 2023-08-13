@@ -3,7 +3,7 @@ from django import shortcuts
 from django.contrib import messages
 from django.views import generic
 from django.contrib.auth import decorators
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from djfw import views as djfw_views
 from djfw.cataloging import core as cataloging

@@ -1,7 +1,7 @@
 from django import urls
 from django.db import models
 from django.utils import html
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from djfw.wysibb.templatetags import bbcodes
 from tulius.forum.comments import models as comment_models

@@ -1,6 +1,6 @@
 import asyncio
-import functools
 
+from asgiref.sync import sync_to_async
 from django import http
 from django.conf import settings
 
@@ -29,6 +29,10 @@ class FlatpageFallbackMiddleware:
         # is a middleware, we can't assume the errors will be caught elsewhere.
         except http.Http404:
             return response
+        except:
+            if settings.DEBUG:
+                raise
+            return response
 
 
 class AsyncFlatpageFallbackMiddleware:
@@ -44,9 +48,9 @@ class AsyncFlatpageFallbackMiddleware:
             # No need to check for a flatpage for non-404 responses.
             return response
         try:
-            return await asyncio.get_event_loop().run_in_executor(
-                None, functools.partial(
-                    views.flatpage, request, request.path_info))
+            return await sync_to_async(
+                views.flatpage, thread_sensitive=False)(
+                request, request.path_info)
         # Return the original response if any errors happened. Because this
         # is a middleware, we can't assume the errors will be caught elsewhere.
         except http.Http404:

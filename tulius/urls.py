@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.conf import urls
+from django import urls
 from django.contrib.sitemaps import views as sitemaps_views
 from django.contrib import admin
 from django.conf.urls.static import static
@@ -108,7 +108,6 @@ urlpatterns = [
     urls.re_path(
         r'^api/ws/', urls.include(
             'tulius.websockets.urls', namespace='websockets')),
-
 ]
 
 handler404 = 'tulius.views.error404'

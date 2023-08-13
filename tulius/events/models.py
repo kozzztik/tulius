@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class Notification(models.Model):
@@ -20,40 +20,40 @@ class Notification(models.Model):
         blank=False,
         null=False,
         unique=True,
-        verbose_name=_(u'code name')
+        verbose_name=_('code name')
     )
     order = models.PositiveIntegerField(
         blank=True,
         null=True,
-        verbose_name=_(u'order'),
+        verbose_name=_('order'),
     )
     name = models.CharField(
         max_length=100,
         default='',
         blank=True,
         null=True,
-        verbose_name=_(u'name')
+        verbose_name=_('name')
     )
     description = models.CharField(
         max_length=250,
         default='',
         blank=True,
         null=True,
-        verbose_name=_(u'description')
+        verbose_name=_('description')
     )
     header_template = models.TextField(
         default='',
         blank=True,
-        verbose_name=_(u'header template')
+        verbose_name=_('header template')
     )
     body_template = models.TextField(
         default='',
         blank=True,
-        verbose_name=_(u'body template')
+        verbose_name=_('body template')
     )
 
     def __str__(self):
-        return self.name or self.code_name
+        return str(self.name or self.code_name)
 
 
 class UserNotification(models.Model):
@@ -70,7 +70,7 @@ class UserNotification(models.Model):
         settings.AUTH_USER_MODEL, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'user'),
+        verbose_name=_('user'),
         related_name='notifications',
     )
 
@@ -78,13 +78,13 @@ class UserNotification(models.Model):
         Notification, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'notification'),
+        verbose_name=_('notification'),
         related_name='users',
     )
 
     enabled = models.BooleanField(
         default=True,
-        verbose_name=_(u'enabled')
+        verbose_name=_('enabled')
     )
 
     def __str__(self):

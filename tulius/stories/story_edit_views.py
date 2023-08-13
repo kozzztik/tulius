@@ -289,7 +289,7 @@ class StoryDeleteAvatarView(
     model = models.Avatar
 
     def get(self, request, *args, **kwargs):
-        return self.post(request, *args, **kwargs)
+        return self.delete(request, *args, **kwargs)
 
     def check_rights(self, obj, user):
         self.story = obj.story
@@ -411,7 +411,7 @@ class DeleteIllustrationView(
     story_url = story_catalog.EDIT_STORY_PAGES_ILLUSTRATIONS
 
     def get(self, request, *args, **kwargs):
-        return self.post(request, *args, **kwargs)
+        return self.delete(request, *args, **kwargs)
 
     def check_rights(self, obj, user):
         self.story = obj.story

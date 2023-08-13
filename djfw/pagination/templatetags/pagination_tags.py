@@ -108,14 +108,14 @@ class AutoPaginateNode(template.Node):
                 ) from exc
             context[key] = []
             context['invalid_page'] = True
-            return u''
+            return ''
         if self.context_var is not None:
             context[self.context_var] = page_obj.object_list
         else:
             context[key] = page_obj.object_list
         context['paginator'] = paginator
         context['page_obj'] = page_obj
-        return u''
+        return ''
 
 
 # pylint: disable=too-many-branches,too-many-statements
@@ -160,11 +160,9 @@ def paginate(context, window=DEFAULT_WINDOW, hashtag=''):
         # Now we look around our current page, making sure that we don't wrap
         # around.
         current_start = page_obj.number - 1 - window
-        if current_start < 0:
-            current_start = 0
+        current_start = max(current_start, 0)
         current_end = page_obj.number - 1 + window
-        if current_end < 0:
-            current_end = 0
+        current_end = max(current_end, 0)
         current = set(page_range[current_start:current_end])
         pages = []
         # If there's no overlap between the first set of pages and the current

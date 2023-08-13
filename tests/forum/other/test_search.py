@@ -6,7 +6,7 @@ from django.db.models import signals
 from django.conf import settings
 from django.utils import timezone
 import pytest
-from elasticsearch7 import exceptions
+from elasticsearch8 import exceptions
 
 from tulius.forum.threads import models as thread_models
 from tulius.forum.comments import models
@@ -103,7 +103,7 @@ def test_search_conditions(admin, user, thread):
     data = response.json()
     assert len(data['results']) == 1
     assert data['results'][0]['comment']['id'] == comment1.pk
-    # do combined time search
+    # do combine time search
     response = user.post(
         '/api/forum/search/', {
             'date_from': '2019-10-10',
@@ -193,7 +193,7 @@ def test_reindex_all(superuser, admin):
         es_models.do_direct_index(admin.user)
         # check it is now broken
         doc = es_models.client.get(
-            es_models.index_name(admin.user.__class__), admin.user.pk)
+            index=es_models.index_name(admin.user.__class__), id=admin.user.pk)
         assert doc['_source']['animation_speed'] == old_value + 100
         # try reindex by not superuser
         response = admin.post('/api/forum/elastic/reindex/all/')
@@ -205,25 +205,26 @@ def test_reindex_all(superuser, admin):
         assert response.status_code == 200
         # check user is fixed
         doc = es_models.client.get(
-            es_models.index_name(admin.user.__class__), admin.user.pk)
+            index=es_models.index_name(admin.user.__class__), id=admin.user.pk)
         assert doc['_source']['animation_speed'] == old_value
     finally:
         admin.user.animation_speed = old_value
 
 
 def test_index_restore(superuser, admin):
-    es_models.client.indices.delete(es_models.index_name(admin.user.__class__))
+    es_models.client.indices.delete(
+        index=es_models.index_name(admin.user.__class__))
     # check it is now broken
     with pytest.raises(exceptions.NotFoundError):
         es_models.client.get(
-            es_models.index_name(admin.user.__class__), admin.user.pk)
+            index=es_models.index_name(admin.user.__class__), id=admin.user.pk)
     # do reindex all (but only users)
     with mock.patch.object(settings, 'ELASTIC_MODELS', (('tulius', 'User'),)):
         response = superuser.post('/api/forum/elastic/reindex/all/')
     assert response.status_code == 200
     # check user is fixed
     doc = es_models.client.get(
-        es_models.index_name(admin.user.__class__), admin.user.pk)
+        index=es_models.index_name(admin.user.__class__), id=admin.user.pk)
     assert doc['_source']['animation_speed'] == admin.user.animation_speed
 
 
@@ -234,15 +235,15 @@ def test_reindex_room(superuser, admin, room_group, thread):
     comment.title = old_value + 'foobar'
     es_models.do_direct_index(comment)
     # flush index to be sure get will return fresh data
-    es_models.client.indices.flush(es_models.index_name(models.Comment))
+    es_models.client.indices.flush(index=es_models.index_name(models.Comment))
     # check it is now broken
-    # some workaround about index refresh. Sometime it needs some time for
+    # some workaround about index refresh. Sometimes it needs some time for
     # document to appear in index and flush not helps
     for i in range(3):
         if i:
             time.sleep(2)
         doc = es_models.client.get(
-            es_models.index_name(comment.__class__), comment.pk)
+            index=es_models.index_name(comment.__class__), id=comment.pk)
         if doc['_source']['title'] == old_value + 'foobar':
             break
     assert doc['_source']['title'] == old_value + 'foobar'
@@ -256,7 +257,7 @@ def test_reindex_room(superuser, admin, room_group, thread):
     assert response.status_code == 200
     # check user is fixed
     doc = es_models.client.get(
-        es_models.index_name(comment.__class__), comment.pk)
+        index=es_models.index_name(comment.__class__), id=comment.pk)
     assert doc['_source']['title'] == old_value
 
 
@@ -353,3 +354,31 @@ def test_search_after_move(superuser, room_group):
     assert response.status_code == 200
     data = response.json()
     assert data['results'][0]['thread']['id'] == thread['id']
+
+
+def test_search_result_no_highlight(admin, thread):
+    response = admin.post(
+        thread['url'] + 'comments_page/', {
+            'reply_id': thread['first_comment_id'],
+            'title': 'title', 'body': 'Some foo text',
+            'media': {},
+        })
+    assert response.status_code == 200
+    data = response.json()
+    response = {
+        'took': 3,
+        'timed_out': False,
+        'hits': {
+            'total': {'value': 1, 'relation': 'eq'},
+            'max_score': 2.5207777,
+            'hits': [{'_id': data['comments'][1]['id']}],
+        }
+    }
+    search = mock.MagicMock(return_value=response)
+    with mock.patch.object(es_models.client, 'search', search):
+        response = admin.post(
+            '/api/forum/search/',
+            {'text': 'foo', 'thread_id': thread["id"]})
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data['results']) == 1

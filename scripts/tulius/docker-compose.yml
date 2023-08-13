@@ -33,7 +33,7 @@ services:
     container_name: tulius_mail
 
   elastic_search:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.6.1
     restart: always
     networks:
       tuliusnet:
@@ -44,60 +44,27 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=false
       - xpack.ml.enabled=false
+      - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
     volumes:
       - ../../data/elastic:/usr/share/elasticsearch/data
     ports:
       - 127.0.0.1:9200:9200
     container_name: tulius_elastic
 
-  log_stash:
-    image: docker.elastic.co/logstash/logstash:7.9.2
-    restart: always
-    environment:
-      - MONITORING_ENABLED=false
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.6.1
     networks:
       tuliusnet:
         ipv4_address: 10.5.0.31
-    volumes:
-      - ./logstash/configs:/usr/share/logstash/pipeline/
-      - ./logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml
-    container_name: tulius_log_stash
-
-#  sentry_web:
-#    build:
-#      context: ./sentry
-#    restart: always
-#    networks:
-#      tuliusnet:
-#        ipv4_address: 10.5.0.6
-#    volumes:
-#      - ../../data/:/var/lib/sentry/files
-#    container_name: tulius_sentry
-#
-#  sentry_worker:
-#    build:
-#      context: ./sentry
-#    command: run worker
-#    restart: always
-#    networks:
-#      tuliusnet:
-#        ipv4_address: 10.5.0.7
-#    volumes:
-#      - ../../data/:/var/lib/sentry/files
-#    container_name: tulius_sentry_worker
-#
-#  sentry_cron:
-#    build:
-#      context: ./sentry
-#    command: run cron
-#    restart: always
-#    networks:
-#      tuliusnet:
-#        ipv4_address: 10.5.0.8
-#    volumes:
-#      - ../../data/:/var/lib/sentry/files
-#    container_name: tulius_sentry_cron
+    restart: unless-stopped
+    environment:
+      SERVER_NAME: tulius-kibana
+      ELASTICSEARCH_HOSTS: http://10.5.0.30:9200
 
 networks:
   tuliusnet:

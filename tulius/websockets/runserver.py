@@ -5,6 +5,7 @@ from aiohttp import web
 from aiohttp.http import WSMsgType
 from django.contrib.staticfiles import handlers as static_handlers
 from django.core.management.commands import runserver as dj_runserver
+import uvicorn
 
 from tulius.websockets.asgi import asgi_handler
 
@@ -111,7 +112,10 @@ class ASGIServer:
         self.asgi_application = asgi_handler.get_asgi_application()
         self.server_address = server_address
         self.app.add_routes([
-            web.route('*', '/{tail:.*}', self.aiohttp_handler)
+            web.get('/{tail:.*}', self.aiohttp_handler),
+            web.post('/{tail:.*}', self.aiohttp_handler),
+            web.put('/{tail:.*}', self.aiohttp_handler),
+            web.options('/{tail:.*}', self.aiohttp_handler),
         ])
 
     def set_app(self, wsgi_handler):
@@ -123,12 +127,19 @@ class ASGIServer:
     def serve_forever(self):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        web.run_app(
-            self.app,
+        uvicorn.run(
+            self.asgi_application,
             host=self.server_address[0],
             port=self.server_address[1],
-            print=None,
-        )
+            workers=1,
+            log_level="info")
+
+        # web.run_app(
+        #     self.app,
+        #     host=self.server_address[0],
+        #     port=self.server_address[1],
+        #     print=None,
+        # )
 
     async def aiohttp_handler(self, request):
         handler = ASGIRequestHandler(request)

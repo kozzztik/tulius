@@ -43,9 +43,9 @@ MAX_AVATAR_SIZE = 10 * 1024 * 1024
 def check_mime(request, filename):
     mime = guess_type(filename, True)[0]
     if mime[:5] != 'image':
-        raise Exception("Only image upload, not " + mime)
+        raise ValueError("Only image upload, not " + mime)
     if int(request.META['CONTENT_LENGTH']) > MAX_AVATAR_SIZE:
-        raise Exception("File too big")
+        raise ValueError("File too big")
 
 
 @login_required

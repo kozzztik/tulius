@@ -32,7 +32,6 @@ const router = new VueRouter({
     routes: routes,
 })
 
-
 function production_url() {
     var schema = window.location.protocol == 'https:' ? 'wss://' : 'ws://';
     return schema + window.location.host + '/api/ws/';
@@ -100,6 +99,7 @@ var app = new Vue({
 });
 
 Vue.app_error_handler = (message, tag) => app.add_message(message, tag);
+
 
 // Add a request interceptor
 axios.interceptors.request.use(

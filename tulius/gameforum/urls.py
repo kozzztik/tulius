@@ -1,4 +1,4 @@
-from django.conf import urls
+from django import urls
 
 from tulius.gameforum import views
 from tulius.gameforum.threads import views as threads

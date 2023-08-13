@@ -6,9 +6,8 @@ from django import urls
 from django.contrib import auth
 from django.contrib import messages
 from django.contrib.sites.models import Site
-from django.contrib.sites.requests import RequestSite
 from django.http import Http404, HttpResponseRedirect
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView, View, FormView
 
 from .forms import LoginForm, ReLoginForm, RegistrationForm
@@ -88,10 +87,6 @@ class RegisterView(FormView):
         data = form.cleaned_data
         username, email, password = \
             data['username'], data['email'], data['password1']
-        if Site._meta.installed:
-            site = Site.objects.get_current()
-        else:
-            site = RequestSite(self.request)
         new_user = auth.get_user_model().objects.create_user(
             username, email, password)
         new_user.is_active = False
@@ -103,7 +98,7 @@ class RegisterView(FormView):
             (salt + username).encode('utf-8')).hexdigest()
         registration_profile = RegistrationProfile.objects.create(
             user=new_user, activation_key=activation_key)
-        registration_profile.send_activation_email(site)
+        registration_profile.send_activation_email(Site.objects.get_current())
         return super().form_valid(form)
 
 

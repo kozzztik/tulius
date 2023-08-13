@@ -8,7 +8,7 @@ from django.core.mail import send_mail
 from django.core import validators
 from django.utils import timezone
 from django.utils import html
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from tulius import signals
 from tulius.core.autocomplete.models import add_autocomplete_widget
@@ -33,6 +33,8 @@ USER_GAME_INLINE_CHOICES = (
     (USER_GAME_INLINE_TIME, _('Current time')),
     (USER_GAME_INLINE_POSTS, _('Messages count')),
 )
+
+STARS_LIST = [5, 15, 30, 50, 75]
 
 
 class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
@@ -108,20 +110,20 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
     )
     sex = models.SmallIntegerField(
         default=USER_SEX_UNDEFINED,
-        verbose_name=_(u'sex'),
+        verbose_name=_('sex'),
         choices=USER_SEX_CHOICES,
     )
 
     game_inline = models.SmallIntegerField(
         default=USER_GAME_INLINE_TIME,
         blank=False,
-        verbose_name=_(u'Show in game'),
+        verbose_name=_('Show in game'),
         choices=USER_GAME_INLINE_CHOICES,
     )
     animation_speed = models.PositiveIntegerField(
         default=1000,
         blank=False,
-        verbose_name=_(u'Animation speed'),
+        verbose_name=_('Animation speed'),
     )
 
     vk_profile = models.ForeignKey(
@@ -135,7 +137,7 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
         default=0,
         blank=False,
         editable=False,
-        verbose_name=_(u'Show in game'),
+        verbose_name=_('Show in game'),
     )
 
     last_read_pm_id = models.PositiveIntegerField(
@@ -159,7 +161,7 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
 
     def __str__(self):
         v = self.username
-        return u'%s' % (v, )
+        return '%s' % (v, )
 
     def get_absolute_url(self):
         return urls.reverse(
@@ -179,7 +181,6 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
     def full_stars(self):
         from tulius.stories.models import Variation, Role
         from tulius.games import models as game_models
-        from tulius.players.models import stars
 
         self.full_stars_cache = getattr(self, 'full_stars_cache', None)
         if self.full_stars_cache is not None:
@@ -195,13 +196,13 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
         big_stars = int(games_played / 100)
         games_played -= big_stars * 100
         small_stars = 0
-        for star in stars.stars_list:
+        for star in STARS_LIST:
             if star <= games_played:
                 small_stars += 1
             else:
                 break
         self.full_stars_cache = 'b' * big_stars + 's' * small_stars + 'e' * (
-            stars.stars_count - small_stars)
+            len(STARS_LIST) - small_stars)
         return self.full_stars_cache
 
     new_invites_cache = None

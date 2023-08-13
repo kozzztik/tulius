@@ -90,6 +90,7 @@ class Likes(likes.Likes, comments_api.CommentsBase):
     def create_like(self):
         like = super().create_like()
         game = self.variation.game
+        # pylint: disable=unsupported-assignment-operation
         like.data['variation'] = {
             'id': self.variation.pk,
             'name': str(game) if game else self.variation.name}

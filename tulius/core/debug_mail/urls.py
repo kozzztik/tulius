@@ -1,4 +1,4 @@
-from django.conf import urls
+from django import urls
 
 from tulius.core.debug_mail import views
 

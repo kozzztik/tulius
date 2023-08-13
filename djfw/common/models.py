@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.db import models
 
 
@@ -61,7 +61,7 @@ class AbstractDescribedStatusModel(AbstractStatusModel):
         null=True,
         blank=True,
         default='',
-        verbose_name=_(u'Описание')
+        verbose_name=_('Описание')
     )
 
 
@@ -95,8 +95,8 @@ class AbstractQuestion(AbstractBaseModel):
 
     body = models.TextField(
         default='',
-        verbose_name=_(u'body')
+        verbose_name=_('body')
     )
 
     def __unicode__(self):
-        return u'%s' % self.body
+        return '%s' % self.body

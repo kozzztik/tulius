@@ -1,4 +1,4 @@
-version: '3.5'
+version: '2.4'
 services:
   web:
     image: kozzztik/tulius:master
@@ -10,7 +10,9 @@ services:
       TULIUS_BRANCH: master
     volumes:
       - ../../../data/media:/opt/tulius/data/media
+      - ../../../data/indexing:/opt/tulius/data/indexing
       - ../../../settings_production.py:/opt/tulius/settings_production.py
+    mem_limit: 512M
     logging:
       driver: json-file
       options:
@@ -28,6 +30,7 @@ services:
       TULIUS_BRANCH: master
     volumes:
       - ../../../settings_production.py:/opt/tulius/settings_production.py
+    mem_limit: 512M
     logging:
       driver: json-file
       options:
@@ -41,3 +44,4 @@ networks:
       config:
         - subnet: 10.5.0.0/16
     name: tuliusnet
+    external: true

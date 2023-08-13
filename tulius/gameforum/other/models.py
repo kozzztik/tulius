@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from tulius.forum.other import models as other_models
 from tulius.forum.read_marks import models as read_marks_models
@@ -45,7 +45,7 @@ class VotingVote(other_models.AbstractVotingVote):
         User, models.PROTECT,
         null=False,
         blank=False,
-        verbose_name=_(u'user'),
+        verbose_name=_('user'),
         related_name='game_voting_votes',
     )
     comment = models.ForeignKey(
@@ -53,5 +53,5 @@ class VotingVote(other_models.AbstractVotingVote):
         null=False,
         blank=False,
         related_name='votes',
-        verbose_name=_(u'comment'),
+        verbose_name=_('comment'),
     )

@@ -4,7 +4,7 @@ from django.conf import settings
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils.timezone import now as datetime_now
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class RegistrationProfile(models.Model):
@@ -12,7 +12,7 @@ class RegistrationProfile(models.Model):
         settings.AUTH_USER_MODEL, models.PROTECT,
         verbose_name=_('user'))
     activation_key = models.CharField(_('activation key'), max_length=40)
-    ACTIVATED = u"ALREADY_ACTIVATED"
+    ACTIVATED = "ALREADY_ACTIVATED"
 
     class Meta:
         verbose_name = _('registration profile')
