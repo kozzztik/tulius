@@ -37,7 +37,7 @@ docker run \
     -e TULIUS_BRANCH="$ENV" \
     --net tuliusnet \
     -v "/home/travis/$ENV/settings_production.py":/opt/tulius/settings_production.py \
-    kozzztik/tulius:$1 python manage.py migrate
+    kozzztik/tulius:$1 python manage.py migrate --fake-initial
 
 
 echo "Run compose"
