@@ -73,7 +73,7 @@ INSTALLED_APPS = (
     'tulius.TuliusConfig',
     'tulius.core.ckeditor',
     'tulius.login',
-    'tulius.players',
+    'tulius.players.PlayersConfig',
     'tulius.profile',
     'tulius.games',
     'tulius.forum',
