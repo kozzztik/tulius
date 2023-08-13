@@ -24,19 +24,7 @@
         <link rel="stylesheet" href="{{ STATIC_URL }}common/css/vue-loading.css" type="text/css">
         <link rel="stylesheet" href="{{ STATIC_URL }}common/components/vue-multiselect.min.css" type="text/css">
 
-        <script type="text/javascript" src="{{ STATIC_URL }}common/js/vue.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}common/bootstrap-vue/bootstrap-vue.min.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}common/bootstrap-vue/bootstrap-vue-icons.min.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}common/bootstrap-vue/popper.min.js"></script>
-
         <script type="text/javascript" src="{{ STATIC_URL }}ckeditor4/ckeditor.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}common/js/axios.min.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}common/js/vue-loading-overlay.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}common/js/vue-router.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}common/js/vue-tinybox.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}common/components/vue-multiselect.min.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}common/js/vue-common.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}common/js/vue-native-websocket.js"></script>
     </head>
     <body class="bootstrap4">
         <div id="vue_app">
@@ -53,7 +41,9 @@
                 <breadcrumbs :upper="false" :items="breadcrumb_items" v-if="!loading"></breadcrumbs>
                 <footer v-if="show_footer" v-html="footer_content"></footer>
             </div>
-            <script type="module" src="{{ STATIC_URL }}app/app.js"></script>
+            {% for module in index_bundle %}
+                <script type="module" src="{{ module }}"></script>
+            {% endfor %}
         </div>
     </body>
 </html>

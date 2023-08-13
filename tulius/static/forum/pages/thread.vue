@@ -1,0 +1,10 @@
+<template>
+    <div>
+        <forum_thread_actions v-if="!loading" :thread="thread"></forum_thread_actions>
+        <forum_thread_comments :thread="thread" v-model="comments_page" v-if="!loading" ref="comments"></forum_thread_comments>
+        <forum_reply_form :thread="thread" ref="reply_form" v-if="!loading && thread.rights.write"></forum_reply_form>
+        <forum_online_status :thread="thread"></forum_online_status>
+    </div>
+</template>
+
+<script src="./thread.js"></script>

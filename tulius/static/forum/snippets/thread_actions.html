@@ -1,0 +1,76 @@
+<div v-if="!user.is_anonymous" class="btn-toolbar justify-content-between forum-menu" role="toolbar" aria-label="Toolbar">
+    <b-dropdown id="dropdown-1" text="Действия" class="btn-group-sm" variant="light">
+        <b-dropdown-item data-toggle="modal" href="javascript:void(0);" v-if="!thread.room" v-on:click="$bvModal.show('quoteAnswer')">
+            Ответить с цитатой
+        </b-dropdown-item>
+        <b-dropdown-item data-toggle="modal" href="javascript:void(0);" v-if="!thread.room" v-on:click="mark_not_read()">
+            Пометить все как не прочитанное
+        </b-dropdown-item>
+        <b-dropdown-item href="javascript:void(0)" v-if="thread.room" @click="mark_all_as_readed()">
+            Пометить все как прочитанное
+        </b-dropdown-item>
+        <b-dropdown-item href="javascript:void(0)" v-if="thread.rights.edit" @click="$refs.thread_access.show_dialog()">
+            Права доступа
+        </b-dropdown-item>
+        <b-dropdown-item :to="urls.add_room(thread.id)" v-if="thread.room && thread.rights.moderate">
+            Добавить комнату
+        </b-dropdown-item>
+        <b-dropdown-item :to="urls.add_thread(thread.id)" v-if="thread.room && thread.rights.write">
+            Добавить тему
+        </b-dropdown-item>
+        <b-dropdown-item href="javascript:void(0);" @click="$refs.edit_room.show()" v-if="thread.room && thread.rights.edit">
+            Редактировать
+        </b-dropdown-item>
+        <b-dropdown-item href="javascript:void(0)" @click="$refs.move_thread.show()" v-if="thread.rights.move">
+            <span v-if="thread.room">Переместить комнату</span>
+            <span v-if="!thread.room">Переместить тему</span>
+        </b-dropdown-item>
+        <b-dropdown-item href="javascript:void(0);" v-if="thread.rights.edit" v-on:click="$bvModal.show('roomDelete')">
+            <span v-if="thread.room">Удалить комнату</span>
+            <span v-if="!thread.room">Удалить тему</span>
+        </b-dropdown-item>
+        <b-dropdown-item href="javascript:void(0);" :to="urls.thread_fix(thread.id)" v-if="user.superuser">
+            Обновить счетчики
+        </b-dropdown-item>
+        <b-dropdown-item href="javascript:void(0);" :to="{name: 'forum_reindex_thread', id: thread.id}" v-if="thread.room && user.superuser">
+            Переиндексировать комнату
+        </b-dropdown-item>
+        <b-dropdown-item href="javascript:void(0);" :to="urls.deleted_threads(thread.id)" v-if="thread.room && user.superuser">
+            Удаленные комнаты и темы
+        </b-dropdown-item>
+        <b-dropdown-item :to="urls.extended_search({thread_id: thread.id})">
+            Расширенный поиск
+        </b-dropdown-item>
+    </b-dropdown>
+    <forum_thread_access :thread="thread" ref="thread_access"></forum_thread_access>
+    <move_thread :thread="thread" :show_root="true" ref="move_thread"></move_thread>
+    <b-modal id="quoteAnswer" title="Цитирование" ok-only v-if="!thread.room" >
+        <p>
+            Цитировать теперь легко! Просто выделите текст мышкой:
+        </p>
+        <img src="/static/forum/img/quote_help1.png" style="width: 450px;">
+        <p>И нажмите кнопку "Ответить". Под постом появится форма быстрого ответа, а выделенный текст будет вставлен в нее как цитата.</p>
+        <img src="/static/forum/img/quote_help2.png" style="width: 450px;">
+    </b-modal>
+    <b-modal id="roomDelete"
+             :title="delete_title" ok-title="Удалить" ok-variant="danger"
+             cancel-title="Отменить" @ok="delete_thread">
+        <div class="form-horizontal">
+        <fieldset class="control-group">
+            <div class="control-label">
+                <label for="delete_comment">Комментарий:</label>
+            </div>
+            <div class="controls">
+                <input id="delete_comment" type="text" v-model="delete_comment">
+            </div>
+        </fieldset>
+        </div>
+    </b-modal>
+    <forum_edit_room ref="edit_room" :thread="thread" :page="$parent" v-if="thread.room"></forum_edit_room>
+    <form class="input-group btn-group-sm" @submit.prevent="search_submit">
+        <input type="text" name="text" required class="form-control" v-model="search_text">
+        <button class="btn btn-light" id="search" type="submit">
+            Поиск
+        </button>
+    </form>
+</div>

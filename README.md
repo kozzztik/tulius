@@ -121,9 +121,18 @@ Update repo if needed (use separate branch and PR)
 16. Check that everything works. Profit.
 
 # Running on local environment
+To run frontend part you need to install node.js & npm:
+- for Windows use installer https://nodejs.org/en/download/ 
+- for Linux (Debian based) ```apt-get install nodejs```
 
-To use Tulius on local dev environment you need to at least 1 instance]
-(2 for correct work of heavy requests). 
+Then switch to tulius/static folder and run 
+```
+npm install @vue/cli -g
+npm install -D
+```
+
+To use Tulius on local dev environment you need to at least 2 instances
+3 for correct work of heavy requests). 
 For all of them it is needed to set environment variable:
 
 ```bash
@@ -136,6 +145,7 @@ file from template and set needed options there.
 Instances, that needed to run:
 1. `manage.py runserver` - Django instance for backend HTTP requests
 2. `celery -A tulius worker -l info` - for deferred tasks (optional)
+3. `npm run serve` in tulius/static directory for frontend webpack dev server
 
 On Windows, as Celery not supports it yet, install gevent:
 

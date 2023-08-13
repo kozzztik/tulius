@@ -3,7 +3,9 @@ FROM kozzztik/tulius:base_3.1.0
 RUN mkdir /opt/tulius/data
 RUN pip install --upgrade pip
 # for coveralls
-RUN apt-get install git -y
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
+RUN apt-get update && apt-get install nodejs git -y
+RUN npm install @vue/cli -g
 ENV TULIUS_BRANCH local
 
 ADD tulius /opt/tulius/tulius
@@ -24,6 +26,7 @@ RUN pip install -r requirements.txt
 ADD .git /opt/tulius/.git
 
 RUN python manage.py compilemessages
+RUN cd tulius/static && npm install && npm run build
 
 ADD gunicorn.conf.py /opt/tulius/gunicorn.conf.py
 CMD [ "gunicorn" ]

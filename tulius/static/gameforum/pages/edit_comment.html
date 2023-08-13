@@ -1,0 +1,4 @@
+<div>
+    <game_forum_thread_actions :variation="variation" :thread="thread" :upper="true" ref="thread_actions" v-if="!loading"></game_forum_thread_actions>
+    <game_forum_reply_form :thread="thread" :comment="comment" ref="reply_form" v-if="!loading" editor></game_forum_reply_form>
+</div>

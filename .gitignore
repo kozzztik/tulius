@@ -95,3 +95,6 @@ settings_production.py
 /sql-logfile.txt
 /logfile.txt
 /data/
+/tulius/static/node_modules/
+/tulius/static/app/index_bundle.js
+/tulius/static/package-lock.json

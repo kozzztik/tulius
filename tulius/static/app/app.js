@@ -1,9 +1,29 @@
+import Vue from 'vue'
 import routes from './routes.js'
-import breadcrumbs from '/static/common/components/breadcrumbs.js'
-import main_menu from '/static/common/components/main_menu.js'
-import CKEditor from '/static/ckeditor4/ckeditor4-vue/index.js';
+import breadcrumbs from '../common/components/breadcrumbs.js'
+import main_menu from '../common/components/main_menu.js'
+import CKEditor from '../ckeditor4/ckeditor4-vue/index.js';
+import axios from '../common/js/axios.min.js';
+import VueLoading from '../common/js/vue-loading-overlay.js';
+import Tinybox from '../common/js/vue-tinybox.js';
+import VueMultiselect from '../common/components/vue-multiselect.min.js';
+import VueRouter from '../common/js/vue-router.js';
+import VueNativeSock from '../common/js/vue-native-websocket.js';
+import BootstrapVue from '../common/bootstrap-vue/bootstrap-vue.min.js'
+import IconsPlugin from '../common/bootstrap-vue/bootstrap-vue-icons.min.js'
+import popper from '../common/bootstrap-vue/popper.min.js'
 
+axios.defaults.xsrfCookieName = 'csrftoken';
+axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
+
+Vue.use(VueRouter)
+Vue.use(BootstrapVue)
+Vue.use(IconsPlugin)
 Vue.use( CKEditor );
+Vue.use(VueLoading);
+Vue.component('loading', VueLoading)
+Vue.component('Tinybox', Tinybox);
+Vue.component('multiselect', VueMultiselect.default)
 
 const NotFound = { template: '<p>Страница не найдена</p>' }
 
@@ -19,7 +39,7 @@ function production_url() {
 
 var websockets_url = production_url();
 
-Vue.use(VueNativeSock.default, websockets_url, {
+Vue.use(VueNativeSock, websockets_url, {
     reconnection: true,
     reconnectionDelay: 3000,
     format: 'json'
@@ -85,7 +105,7 @@ Vue.app_error_handler = (message, tag) => app.add_message(message, tag);
 axios.interceptors.request.use(
     config => config,
     error => {
-        Vue.app_error_handler(error, "error")
+        app.add_message(error, "error")
         return Promise.reject(error);
     }
 );
@@ -94,7 +114,9 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
     response => response,
     error => {
-        Vue.app_error_handler(error, "error")
+        app.add_message(error, "error")
         return Promise.reject(error);
     }
 );
+
+export default app;

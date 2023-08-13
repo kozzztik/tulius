@@ -1,6 +1,8 @@
 FROM python:3.11
 EXPOSE 7000
-RUN apt-get update && apt-get install gettext -y
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
+RUN apt-get update && apt-get install gettext git nodejs -y
+RUN npm install @vue/cli -g
 ENV PYTHONUNBUFFERED 1
 ENV TULIUS_BRANCH local
 RUN mkdir /opt/tulius
