@@ -34,6 +34,8 @@ USER_GAME_INLINE_CHOICES = (
     (USER_GAME_INLINE_POSTS, _('Messages count')),
 )
 
+STARS_LIST = [5, 15, 30, 50, 75]
+
 
 class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
     username = models.CharField(
@@ -179,7 +181,6 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
     def full_stars(self):
         from tulius.stories.models import Variation, Role
         from tulius.games import models as game_models
-        from tulius.players.models import stars
 
         self.full_stars_cache = getattr(self, 'full_stars_cache', None)
         if self.full_stars_cache is not None:
@@ -195,13 +196,13 @@ class User(auth_models.PermissionsMixin, auth_models.AbstractBaseUser):
         big_stars = int(games_played / 100)
         games_played -= big_stars * 100
         small_stars = 0
-        for star in stars.stars_list:
+        for star in STARS_LIST:
             if star <= games_played:
                 small_stars += 1
             else:
                 break
         self.full_stars_cache = 'b' * big_stars + 's' * small_stars + 'e' * (
-            stars.stars_count - small_stars)
+            len(STARS_LIST) - small_stars)
         return self.full_stars_cache
 
     new_invites_cache = None
