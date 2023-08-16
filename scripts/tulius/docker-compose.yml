@@ -9,7 +9,7 @@ services:
     container_name: tulius_redis
 
   mysql:
-    image: mysql/mysql-server:5.7.22
+    image: mysql:8.1.0
     restart: always
     networks:
       tuliusnet:

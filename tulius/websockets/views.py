@@ -1,9 +1,9 @@
 from django.core.cache.backends.redis import RedisCache
 from django.conf import settings
 from django.db import transaction
+from django.core.handlers import websocket
 
 from tulius.websockets import user_session
-from tulius.websockets.asgi import websocket
 
 params = settings.CACHES['default'].copy()
 if params['BACKEND'] != 'django.core.cache.backends.redis.RedisCache':

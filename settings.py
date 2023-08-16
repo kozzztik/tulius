@@ -336,7 +336,7 @@ elif env == 'qa':
     ]
 
 RAVEN_CONFIG = {
-    'integrations': [DjangoIntegration()],
+    'integrations': [DjangoIntegration(signals_spans=False)],
     'send_default_pii': True,
 }
 

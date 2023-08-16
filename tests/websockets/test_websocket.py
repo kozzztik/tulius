@@ -1,7 +1,6 @@
 import pytest
 from django.core import exceptions
-
-from tulius.websockets.asgi import websocket
+from django.core.handlers import websocket
 
 
 @pytest.mark.asyncio
@@ -12,7 +11,7 @@ async def test_accept_ws_twice():
     async def _send(_):
         pass
 
-    ws = websocket.WebSocket(_receive, _send)
+    ws = websocket.WebSocket(None, _receive, _send)
     await ws.accept(websocket.HttpResponseUpgrade(handler=None))
     with pytest.raises(websocket.WSProtoException) as exc:
         await ws.accept(websocket.HttpResponseUpgrade(handler=None))
@@ -31,7 +30,7 @@ async def test_accept_headers():
 
     response = websocket.HttpResponseUpgrade(handler=None)
     response.headers['Foo'] = 'Bar'
-    ws = websocket.WebSocket(_receive, _send)
+    ws = websocket.WebSocket(None, _receive, _send)
     await ws.accept(response)
     assert len(data) == 1
     headers = data[0]['headers']
@@ -46,7 +45,7 @@ async def test_operation_without_accept():
     async def _send(message):
         data.append(message)
 
-    ws = websocket.WebSocket(None, _send)
+    ws = websocket.WebSocket(None, None, _send)
     with pytest.raises(websocket.WSProtoException) as exc:
         await ws.send({})
     assert exc.value.args[0] == 'Websocket needs to be accepted before send'
@@ -71,7 +70,7 @@ async def test_operation_on_closed_ws():
     async def _send(message):
         data.append(message)
 
-    ws = websocket.WebSocket(_receive, _send)
+    ws = websocket.WebSocket(None, _receive, _send)
     await ws.accept(websocket.HttpResponseUpgrade(handler=None))
     await ws.close()
 
@@ -97,7 +96,7 @@ async def test_read_unknown_message():
     async def _send(_):
         pass
 
-    ws = websocket.WebSocket(_receive, _send)
+    ws = websocket.WebSocket(None, _receive, _send)
     await ws.accept(websocket.HttpResponseUpgrade(handler=None))
     with pytest.raises(websocket.WSProtoException) as exc:
         await ws.receive()
@@ -117,7 +116,7 @@ async def test_read_on_close():
     async def _send(_):
         pass
 
-    ws = websocket.WebSocket(_receive, _send)
+    ws = websocket.WebSocket(None, _receive, _send)
     await ws.accept(websocket.HttpResponseUpgrade(handler=None))
     message = await ws.receive_text()
     assert message == 'foo'
@@ -138,7 +137,7 @@ async def test_read_json_binary_and_text():
     async def _send(_):
         pass
 
-    ws = websocket.WebSocket(_receive, _send)
+    ws = websocket.WebSocket(None, _receive, _send)
     await ws.accept(websocket.HttpResponseUpgrade(handler=None))
     message = await ws.receive_json()
     assert message == {'foo': 'bar'}
@@ -159,7 +158,7 @@ async def test_read_text_binary_and_text():
     async def _send(_):
         pass
 
-    ws = websocket.WebSocket(_receive, _send)
+    ws = websocket.WebSocket(None, _receive, _send)
     await ws.accept(websocket.HttpResponseUpgrade(handler=None))
     message = await ws.receive_text()
     assert message == 'foo'
@@ -180,7 +179,7 @@ async def test_read_bytes_binary_and_text():
     async def _send(_):
         pass
 
-    ws = websocket.WebSocket(_receive, _send)
+    ws = websocket.WebSocket(None, _receive, _send)
     await ws.accept(websocket.HttpResponseUpgrade(handler=None))
     message = await ws.receive_bytes()
     assert message == b'foo'
@@ -197,7 +196,7 @@ async def test_send_json():
 
     async def _send(message):
         data.append(message)
-    ws = websocket.WebSocket(_receive, _send)
+    ws = websocket.WebSocket(None, _receive, _send)
     await ws.accept(websocket.HttpResponseUpgrade(handler=None))
     await ws.send_json({'foo': 'bar'})
     assert len(data) == 2
@@ -215,7 +214,7 @@ async def test_send_text():
 
     async def _send(message):
         data.append(message)
-    ws = websocket.WebSocket(_receive, _send)
+    ws = websocket.WebSocket(None, _receive, _send)
     await ws.accept(websocket.HttpResponseUpgrade(handler=None))
     with pytest.raises(websocket.WSProtoException):
         await ws.send_text(b'bar')
@@ -235,7 +234,7 @@ async def test_send_bytes():
 
     async def _send(message):
         data.append(message)
-    ws = websocket.WebSocket(_receive, _send)
+    ws = websocket.WebSocket(None, _receive, _send)
     await ws.accept(websocket.HttpResponseUpgrade(handler=None))
     with pytest.raises(websocket.WSProtoException):
         await ws.send_bytes('bar')
@@ -259,7 +258,7 @@ async def test_accept_wrong_order():
     async def _send(message):
         data.append(message)
 
-    ws = websocket.WebSocket(_receive, _send)
+    ws = websocket.WebSocket(None, _receive, _send)
     await ws.accept(websocket.HttpResponseUpgrade(handler=None))
     assert len(data) == 1
     assert data[0]['type'] == 'websocket.accept'

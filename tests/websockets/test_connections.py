@@ -8,10 +8,11 @@ from django import urls
 from django import http
 from django import db
 from django.db import transaction
+from django.core.handlers import websocket
+
 import pytest
 from asgiref.sync import sync_to_async
 
-from tulius.websockets.asgi import websocket
 from tulius.websockets.asgi.utils import AsyncClient
 from tulius.websockets.asgi import connections
 

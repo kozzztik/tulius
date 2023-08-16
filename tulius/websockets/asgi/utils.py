@@ -8,6 +8,9 @@ from tulius.websockets.asgi import asgi_handler
 from tulius.websockets.asgi import connections
 
 
+TIMEOUT = 60
+
+
 class ASGIRequest:
     def __init__(self, app, scope):
         self.app = app
@@ -21,6 +24,7 @@ class ASGIRequest:
         self.request = None
         scope['_test_asgi_context'] = self
         self.asgi_request = None
+        self.closed = asyncio.Future()
 
     async def run(self):
         await self.app(self.scope, self._receive, self._send)
@@ -28,9 +32,11 @@ class ASGIRequest:
     async def _send(self, data):
         data.asgi_request = self.request
         self.response = data
+        self.closed.set_result(True)
 
     async def _receive(self):
         if self._request_body_send:
+            await asyncio.wait([self.closed], timeout=TIMEOUT)
             return {'type': 'http.disconnect'}
         self._request_body_send = True
         return {
@@ -47,7 +53,6 @@ class BaseASGIContext(ASGIRequest):
         self.receive_queue = []
         self._send_futures = []
         self._receive_futures = []
-        self.closed = asyncio.Future()
 
     def close(self, exc=None):
         if self.closed.done():
@@ -94,12 +99,15 @@ class BaseASGIContext(ASGIRequest):
     async def _internal_send(self, message):
         if self.closed.done():
             raise asyncio.CancelledError()
-        if self._send_futures:
-            self._send_futures.pop(0).set_result(message)
-        else:
-            self.send_queue.append(message)
+        while self._send_futures:
+            future = self._send_futures.pop(0)
+            if future.cancelled():
+                continue
+            future.set_result(message)
+            return
+        self.send_queue.append(message)
 
-    async def _internal_read(self, timeout=60):
+    async def _internal_read(self, timeout=TIMEOUT):
         if self.closed.done():
             raise asyncio.CancelledError()
         if self.receive_queue:
@@ -118,13 +126,17 @@ class ASGIWebsocket(BaseASGIContext):
         super().__init__(app, scope)
         self.connected = asyncio.Future()
         self.cookies = None
+        self.sub_protocol = None
+        self.close_message = None
 
     async def _send(self, data):
         if data["type"] == "websocket.accept":
             self.connected.set_result(True)
             self.asgi_request = self.request
+            self.sub_protocol = data["subprotocol"]
         elif data["type"] == "websocket.close":
             self.close()
+            self.close_message = data
         elif data["type"] == "websocket.send":
             await super()._send(data)
 
@@ -156,8 +168,8 @@ class ASGIWebsocket(BaseASGIContext):
                 self.connected.set_exception(exc)
             else:
                 self.connected.set_result(False)
-        while self.receive_queue:
-            f = self.receive_queue.pop()
+        while self._receive_futures:
+            f = self._receive_futures.pop()
             f.set_result({'type': 'websocket.disconnect'})
         super().close(exc)
 
@@ -207,7 +219,9 @@ class AsyncClient(django_client.AsyncClient):
             raise_request_exception=raise_request_exception, **defaults)
         self.handler = AsyncClientHandler(enforce_csrf_checks)
 
-    def ws(self, path, secure=False, **extra):
+    def ws(self, path, sub_protocols=None, secure=False, **extra):
+        if sub_protocols:
+            extra['sec_websocket_protocol'] = ', '.join(sub_protocols)
         return self.generic("WS", path, secure=secure, **extra)
 
     def _base_scope(self, **request):
@@ -215,6 +229,11 @@ class AsyncClient(django_client.AsyncClient):
         if request['method'] == 'WS':
             scope['type'] = 'websocket'
             scope['scheme'] = 'ws'
+            for name, value in request['headers']:
+                if name == b'sec_websocket_protocol' and value:
+                    sub_protocols = value.decode().split(', ')
+                    scope['subprotocols'] = sub_protocols
+                    break
             scope.pop('method')
         return scope
 
