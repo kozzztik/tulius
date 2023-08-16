@@ -7,11 +7,11 @@ from django import http
 from django.test import override_settings
 from django.core import signals
 from django.core.handlers import asgi as dj_asgi
+from django.core.handlers import websocket
 
 from tulius.websockets.asgi import asgi_handler
 from tulius.websockets.asgi import utils
 from tulius.websockets.asgi import connections
-from tulius.websockets.asgi import websocket
 
 
 def setup_module(_):
@@ -111,12 +111,40 @@ async def _ws_ping(_, ws: websocket.WebSocket):
         await ws.send_text(data + '_pong')
 
 
+def _ws_view_proto(request):
+    return websocket.HttpResponseUpgrade(
+        handler=_ws_proto, sub_protocol=request.sub_protocols[-1])
+
+
+async def _ws_proto(_, ws: websocket.WebSocket):
+    while True:
+        data = await ws.receive_text()
+        await ws.send_text(data + '_pong')
+
+
+def _ws_close(_):
+    return websocket.HttpResponseWSClose(close_code=42, reason='foobar')
+
+
+@websocket.websocket_view
+async def _ws_close_after_read(_, ws: websocket.WebSocket):
+    data = None
+    try:
+        data = await ws.receive_text()
+        await ws.send_text(data + '_pong')
+    finally:
+        await ws.close(code=43, reason=data)
+
+
 class UrlConf:
     urlpatterns = [
         urls.re_path(r'^file_response/$', _test_file_view),
         urls.re_path(r'^ws_exc/$', _ws_exc_view),
         urls.re_path(r'^ws_cancel/$', _ws_cancel_view),
         urls.re_path(r'^ws_ping/$', _ws_ping),
+        urls.re_path(r'^ws_proto/$', _ws_view_proto),
+        urls.re_path(r'^ws_close/$', _ws_close),
+        urls.re_path(r'^ws_close_after_read/$', _ws_close_after_read),
     ]
 
 
@@ -203,3 +231,47 @@ async def test_websocket_timeout():
         signals.got_request_exception.disconnect(receiver)
         if ws:
             ws.close()
+
+
+@override_settings(ROOT_URLCONF=UrlConf)
+@pytest.mark.asyncio
+async def test_sub_protocols():
+    client = utils.AsyncClient()
+    ws: utils.ASGIWebsocket = await client.ws(
+        '/ws_proto/', sub_protocols=['foo', 'bar'])
+    try:
+        assert ws.connected.result() is True
+        assert ws.sub_protocol == 'bar'
+    finally:
+        ws.close()
+
+
+@override_settings(ROOT_URLCONF=UrlConf)
+@pytest.mark.asyncio
+async def test_close_on_init():
+    client = utils.AsyncClient()
+    ws: utils.ASGIWebsocket = await client.ws('/ws_close/')
+    try:
+        assert ws.connected.result() is False
+        assert ws.close_message['reason'] == 'foobar'
+        assert ws.close_message['code'] == 42
+    finally:
+        ws.close()
+
+
+@override_settings(ROOT_URLCONF=UrlConf)
+@pytest.mark.asyncio
+async def test_close_after_read():
+    client = utils.AsyncClient()
+    ws: utils.ASGIWebsocket = await client.ws('/ws_close_after_read/')
+    try:
+        assert ws.connected.result() is True
+        await ws.send_text('ping')
+        result = await ws.receive_text()
+        assert result == 'ping_pong'
+        with pytest.raises(asyncio.CancelledError):
+            await ws.receive_text()
+        assert ws.close_message['reason'] == 'ping'
+        assert ws.close_message['code'] == 43
+    finally:
+        ws.close()
