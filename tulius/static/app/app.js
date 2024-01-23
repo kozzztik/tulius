@@ -19,11 +19,11 @@ function production_url() {
 
 var websockets_url = production_url();
 
-Vue.use(VueNativeSock.default, websockets_url, {
-    reconnection: true,
-    reconnectionDelay: 3000,
-    format: 'json'
-});
+//Vue.use(VueNativeSock.default, websockets_url, {
+//    reconnection: true,
+//    reconnectionDelay: 3000,
+//    format: 'json'
+//});
 
 var app = new Vue({
     el: '#vue_app',

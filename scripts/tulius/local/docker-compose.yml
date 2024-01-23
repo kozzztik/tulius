@@ -69,19 +69,31 @@ services:
         ipv4_address: 10.5.0.20
     environment:
       TULIUS_ENV: local_docker
-    ports:
-      - 7000:7000
     volumes:
       - ../../../data/media:/opt/tulius/data/media
       - ../../../data/mail:/opt/tulius/data/mail
       - ../../../data/indexing:/opt/tulius/data/indexing
       - ../../../settings_production.py:/opt/tulius/settings_production.py
+      - ../../../../django_h2/:/opt/tulius/django_h2
+    command: bash -c "pip install -e /opt/tulius/django_h2 && python -m django_h2 --serve_static"
     mem_limit: 512M
     logging:
       driver: json-file
       options:
         max-size: "100m"
         max-file: "10"
+
+  nginx:
+    image: nginx
+    networks:
+      tuliusnet:
+        ipv4_address: 10.5.0.4
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/tulius.conf:ro
+      - ../../../data/media:/opt/tulius/data/media
+    command: ['nginx', '-g', 'daemon off;']
 
 networks:
   tuliusnet:
