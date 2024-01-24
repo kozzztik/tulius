@@ -7,6 +7,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from tulius.core.ckeditor import html_converter
+from tulius.core import sse
 from tulius.forum.comments import models
 from tulius.forum.threads import views
 from tulius.forum.threads import models as thread_models
@@ -14,7 +15,8 @@ from tulius.forum.threads import signals as thread_signals
 from tulius.forum.comments import pagination
 from tulius.forum.comments import signals as comment_signals
 from tulius.forum.comments import mutations
-from tulius.websockets import publisher
+
+THREAD_COMMENTS_CHANNEL = 'forum_thread_comments_{thread_id}'
 
 
 @dispatch.receiver(thread_signals.to_json_as_item, sender=thread_models.Thread)
@@ -51,6 +53,8 @@ class CommentsBase(views.BaseThreadView):
 
 
 class CommentsPageAPI(CommentsBase):
+    comments_channel = THREAD_COMMENTS_CHANNEL
+
     def get_context_data(self, **kwargs):
         self.get_parent_thread(**kwargs)
         page_num = kwargs.get('page') or int(self.request.GET.get('page', 1))
@@ -124,8 +128,18 @@ class CommentsPageAPI(CommentsBase):
             self.obj.save()
             transaction.commit()
             page = comment.page
-            publisher.notify_thread_about_new_comment(
-                self, self.obj, comment, page)
+            sse.publish_message(
+                self.comments_channel.format(thread_id=self.obj.id),
+                {
+                    '.direct': True,
+                    '.action': 'new_comment',
+                    '.namespaced': 'thread_comments',
+                    'id': comment.pk,
+                    'parent_id': self.obj.id,
+                    'url': comment.get_absolute_url(),
+                    'page': page,
+                }
+            )
         else:
             page = self.pages_count(self.obj)
         return self.get_context_data(page=page, **kwargs)
@@ -219,6 +233,19 @@ class CommentAPI(CommentBase):
             self.comment.save()
             transaction.commit()
         return self.comment.to_json(self.user, detailed=True)
+
+
+class CommentsSubscription(views.BaseThreadView):
+    channel_template = THREAD_COMMENTS_CHANNEL
+
+    def get(self, request, *args, **kwargs):
+        self.get_parent_thread(**kwargs)
+        channel = sse.RedisChannel(
+            request.user,
+            [self.channel_template.format(thread_id=self.obj.pk)],
+            request
+        )
+        return channel.response
 
 
 thread_signals.on_update.connect(

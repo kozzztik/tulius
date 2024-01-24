@@ -14,6 +14,9 @@ from tulius.forum.threads import mutations as base_mutations
 from tulius.gameforum.rights import mutations as rights_mutations
 
 
+THREAD_COMMENTS_CHANNEL = 'gameforum_thread_comments_{thread_id}'
+
+
 base_mutations.on_mutation(rights_mutations.UpdateRights)(
     mutations.FixCountersOnRights)
 
@@ -127,6 +130,8 @@ def update_role_comments_count(role_id, value):
 
 
 class CommentsPageAPI(comments.CommentsPageAPI, CommentsBase):
+    comments_channel = THREAD_COMMENTS_CHANNEL
+
     @classmethod
     def create_comment(cls, thread, user, data):
         comment = super().create_comment(thread, user, data)
@@ -171,3 +176,8 @@ class CommentAPI(comments.CommentAPI, CommentsBase):
 
 thread_signals.on_update.connect(
     CommentAPI.on_thread_update, sender=thread_models.Thread)
+
+
+class CommentsSubscription(
+        comments.CommentsSubscription, threads.BaseThreadAPI):
+    channel_template = THREAD_COMMENTS_CHANNEL

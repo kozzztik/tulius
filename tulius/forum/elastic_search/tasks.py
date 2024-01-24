@@ -2,10 +2,9 @@ from celery import shared_task
 from django import apps
 from django.conf import settings
 
+from tulius.core import sse
 from tulius.forum.elastic_search import models
 from tulius.forum.elastic_search import mapping
-from tulius.websockets import publisher
-from tulius.websockets import consts
 
 
 class ReindexAll(models.ReindexQuery):
@@ -21,14 +20,16 @@ class ReindexAll(models.ReindexQuery):
             'count': counter,
             'all_count': all_count
         }
-        publisher.publish_message(
-            consts.CHANNEL_USER.format(self.user_id), {
+        sse.publish_message_to_user(
+            self.user_id,
+            {
                 '.direct': True,
                 '.action': 'index_all_elastic_search',
                 '.namespaced': 'task_update',
                 'finished': False,
                 'counters': self.counters
-            })
+            }
+        )
 
 
 @shared_task(track_started=True)
@@ -39,14 +40,16 @@ def reindex_all_entities(user_id):
         mapping.rebuild_index(model)
         ReindexAll(f'{app_name}.{model_name}', user_id, counters)(
             model.objects.all())
-    publisher.publish_message(
-        consts.CHANNEL_USER.format(user_id), {
+    sse.publish_message_to_user(
+        user_id,
+        {
             '.direct': True,
             '.action': 'index_all_elastic_search',
             '.namespaced': 'task_update',
             'finished': True,
             'counters': counters
-        })
+        }
+    )
 
 
 class ReindexComments(models.ReindexQuery):
@@ -60,15 +63,17 @@ class ReindexComments(models.ReindexQuery):
         if not self.reported:
             self.reported = True
             self.counters['comments'] += all_count
-            publisher.publish_message(
-                consts.CHANNEL_USER.format(self.user_id), {
+            sse.publish_message_to_user(
+                self.user_id,
+                {
                     '.direct': True,
                     '.action': 'index_forum_elastic_search',
                     '.namespaced': 'task_update',
                     'finished': False,
                     'threads': self.counters['threads'],
                     'comments': self.counters['comments'],
-                })
+                }
+            )
 
 
 @shared_task(track_started=True)
@@ -89,15 +94,17 @@ def reindex_forum(app_label, model_name, parent_id, user_id):
         counters['threads'] += 1
         if not thread.room:
             ReindexComments(user_id, counters)(thread.comments)
-    publisher.publish_message(
-        consts.CHANNEL_USER.format(user_id), {
+    sse.publish_message_to_user(
+        user_id,
+        {
             '.direct': True,
             '.action': 'index_forum_elastic_search',
             '.namespaced': 'task_update',
             'finished': True,
             'threads': counters['threads'],
             'comments': counters['comments'],
-        })
+        }
+    )
 
 
 @shared_task(track_started=True)

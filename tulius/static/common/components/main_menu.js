@@ -5,6 +5,7 @@ export default LazyComponent('main_menu', {
         return {
             articles: [],
             show: '',
+            sse: null,
         }
     },
     methods: {
@@ -29,11 +30,11 @@ export default LazyComponent('main_menu', {
             this.articles = response.data.pages;
         }).catch(error => this.$parent.add_message(error, "error"))
         .then(() => {});
-        this.$options.sockets.onmessage = (msg) => {
-            var data = JSON.parse(msg.data)
-            if (data['.namespaced'] == 'pm') {
+        this.sse = new EventSource('/api/sse/');
+        this.sse.addEventListener("pm", (event) => {
+            const content = JSON.parse(event.data);
+            if (content['.action'] == 'new_pm')
                 this.$root.user.not_readed_messages = true;
-            }
-        }
+        });
     }
 })

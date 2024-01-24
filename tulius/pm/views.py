@@ -5,7 +5,7 @@ from django.views import generic
 from django.utils import decorators
 from django.contrib.auth import decorators as auth_decorators
 
-from tulius.websockets import publisher
+from tulius.core import sse
 
 from .forms import PrivateMessageForm
 from .models import PrivateTalking, PrivateMessage
@@ -63,7 +63,14 @@ class PlayerSendMessageView(generic.DetailView):
             request.user, self.object, data=request.POST or None)
         if form.is_valid():
             m = form.save()
-            publisher.publish_message_to_user(
-                self.object, publisher.consts.USER_NEW_PM, m.pk)
+            sse.publish_message_to_user(
+                self.object.pk,
+                {
+                    '.direct': True,
+                    '.action': 'new_pm',
+                    '.namespaced': 'pm',
+                    'id': m.pk,
+                }
+            )
         return http.HttpResponseRedirect(
             urls.reverse('pm:to_user', args=(self.object.pk,)))

@@ -1,8 +1,8 @@
 from django.utils import timezone
 
+from tulius.core import sse
 from tulius.forum.threads import signals
 from tulius.forum.threads import models
-from tulius.websockets import publisher
 
 
 class Mutation:
@@ -247,7 +247,15 @@ class ThreadFixCounters(ThreadCounters):
     def update_result(self, instance):
         self.result['threads'] = self.result.get('threads', 0) + 1
         if self.user:
-            publisher.notify_user_about_fixes(self.user, self.result)
+            sse.publish_message_to_user(
+                self.user.id,
+                {
+                    '.direct': True,
+                    '.action': 'fixes_update',
+                    '.namespaced': 'fixes_update',
+                    'data': self.result,
+                }
+            )
 
     def process_thread(self, instance):
         instance.threads_count.cleanup()

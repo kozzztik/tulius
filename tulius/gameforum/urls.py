@@ -41,6 +41,9 @@ urlpatterns = [
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/comments_page/$',
         comments.CommentsPageAPI.as_view(), name='comments_page'),
     urls.re_path(
+        r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/comments_sse/$',
+        comments.CommentsSubscription.as_view(), name='comments_sse'),
+    urls.re_path(
         r'^variation/(?P<variation_id>\d+)/thread/(?P<pk>\d+)/read_mark/$',
         read_marks.ReadmarkAPI.as_view(), name='thread_readmark'),
     urls.re_path(

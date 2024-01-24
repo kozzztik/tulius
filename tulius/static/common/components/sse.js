@@ -1,5 +1,5 @@
 jQuery(document).ready(function($) {
-    const evtSource = new EventSource("/api/ws/sse/");
+    const evtSource = new EventSource("/api/sse/");
     evtSource.addEventListener("pm", (event) => {
         const content = JSON.parse(event.data)
         if (content['.action'] == 'new_pm') {
