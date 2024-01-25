@@ -20,16 +20,19 @@ class RedisChannel:
         self.user = user
 
     async def handler(self):
-        redis = aioredis.from_url(settings.REDIS_LOCATION)
-        pubsub = redis.pubsub()
-        await pubsub.subscribe(
-            **{
-                f'{settings.ENV}_{name}': self._get_message
-                for name in self.channel_names
-            }
-        )
-        await pubsub.run(
-            exception_handler=self._pubsub_exc_handler, poll_timeout=30)
+        redis_client = aioredis.from_url(settings.REDIS_LOCATION)
+        pubsub = redis_client.pubsub()
+        try:
+            await pubsub.subscribe(
+                **{
+                    f'{settings.ENV}_{name}': self._get_message
+                    for name in self.channel_names
+                }
+            )
+            await pubsub.run(
+                exception_handler=self._pubsub_exc_handler, poll_timeout=30)
+        finally:
+            pubsub.close()
 
     @staticmethod
     def _pubsub_exc_handler(e, *args):

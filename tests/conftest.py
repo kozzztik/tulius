@@ -1,7 +1,9 @@
 import os
+from weakref import ref
 
 import pytest
 import django
+from django.db.backends.signals import connection_created
 from django.test import client as django_client
 from django.test import utils
 
@@ -106,10 +108,25 @@ def pytest_sessionstart(session):
     )
 
 
+connections_history = []
+
+
+@connection_created.connect
+def new_db_connection(sender, connection, **kwargs):
+    connections_history.append(ref(connection))
+
+
 @pytest.hookimpl(trylast=True)
 def pytest_sessionfinish(session, exitstatus):
     db_cfg = getattr(session, 'django_db_cfg')
     if db_cfg and not session.config.option.keep_db:
+        # mysql can stuck if there are open connections to DB while dropping it
+        # So close all of them, including opened in async thread pool.
+        alive = [x() for x in connections_history]
+        for conn in alive:
+            if conn:
+                conn.inc_thread_sharing()  # for async connections
+                conn.close()
         utils.teardown_databases(
             db_cfg, verbosity=session.config.option.verbose)
     # pylint: disable=import-outside-toplevel

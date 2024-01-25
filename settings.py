@@ -258,6 +258,7 @@ LOGGING = {
             'propagate': True,
         },
         'hpack': {'level': 'WARNING'},
+        'flake8': {'level': 'ERROR'},
     },
     'root': {
         'handlers':
