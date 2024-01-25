@@ -63,10 +63,11 @@ Repo for http://tulius.com project.
     ```sql
     CREATE DATABASE tulius_prod;
     CREATE DATABASE tulius_qa;
-    CREATE DATABASE sentry;
-    GRANT ALL ON tulius_prod.* TO tulius_prod@'%' IDENTIFIED BY 'tulius prod password';
-    GRANT ALL ON tulius_qa.* TO tulius_qa@'%' IDENTIFIED BY 'tulius qa password';
-    GRANT ALL ON sentry.* TO sentry@'%' IDENTIFIED BY 'sentry';
+    CREATE USER 'tulius_prod'@'%' IDENTIFIED BY 'tulius prod password';
+    GRANT ALL ON tulius_prod.* TO tulius_prod@'%';
+    CREATE USER 'tulius_qa'@'%' IDENTIFIED BY 'tulius qa password';
+    GRANT ALL ON tulius_qa.* TO tulius_qa@'%';
+    flush privileges;
     ``` 
     If you have SQL backup file, placed to mysql data folder:
     ```bash
