@@ -17,10 +17,6 @@ from tulius.core.elastic import transport
 logger = logging.getLogger('deferred_indexing')
 
 
-class ClosedException(Exception):
-    pass
-
-
 class ElasticIndexer:
     def __init__(self, config, autostart=True):
         self.config = config.copy()
@@ -78,7 +74,7 @@ class ElasticIndexer:
 
     def index(self, data):
         if self._closing:
-            raise ClosedException()
+            return
         with self._lock:
             if not self._work_files:
                 self._work_files.append(files.WorkFile(
@@ -274,10 +270,8 @@ def get_indexer() -> ElasticIndexer:
 
 
 def close(*_):
-    global _indexer  # pylint: disable=global-statement
     if _indexer:
         _indexer.close()
-    _indexer = None
 
 
 signal.signal(signal.SIGINT, close)

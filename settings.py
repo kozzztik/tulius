@@ -92,7 +92,7 @@ INSTALLED_APPS = (
     'tulius.events.EventsConfig',
     'tulius.vk',
     'tulius.counters',
-    'tulius.websockets.WebsocketsConfig',
+    'django_h2.DjangoH2Config',
 )
 
 MIDDLEWARE = (
@@ -196,7 +196,7 @@ ELASTIC_INDEXING = {
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': False,
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse'
@@ -257,6 +257,8 @@ LOGGING = {
             'level': 'DEBUG' if env in ['dev', 'local_docker'] else 'WARNING',
             'propagate': True,
         },
+        'hpack': {'level': 'WARNING'},
+        'flake8': {'level': 'ERROR'},
     },
     'root': {
         'handlers':

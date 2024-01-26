@@ -26,4 +26,4 @@ ADD .git /opt/tulius/.git
 RUN python manage.py compilemessages
 
 ADD gunicorn.conf.py /opt/tulius/gunicorn.conf.py
-CMD [ "gunicorn" ]
+CMD python -m django_h2
