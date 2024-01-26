@@ -32,7 +32,7 @@ class RedisChannel:
             await pubsub.run(
                 exception_handler=self._pubsub_exc_handler, poll_timeout=30)
         finally:
-            pubsub.close()
+            await pubsub.aclose()
 
     @staticmethod
     def _pubsub_exc_handler(e, *args):

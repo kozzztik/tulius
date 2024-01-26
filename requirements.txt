@@ -10,7 +10,7 @@ ua-parser == 0.10.0
 
 # sentry
 sentry-sdk == 1.29.2
-redis == 4.5.4
+redis == 5.0.1
 requests == 2.28.2
 elasticsearch8 == 8.6.2
 
