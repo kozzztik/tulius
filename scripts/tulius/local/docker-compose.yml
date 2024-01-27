@@ -72,7 +72,6 @@ services:
     volumes:
       - ../../../data/media:/opt/tulius/data/media
       - ../../../data/mail:/opt/tulius/data/mail
-      - ../../../data/indexing:/opt/tulius/data/indexing
       - ../../../settings_production.py:/opt/tulius/settings_production.py
       - ../../../../django_h2/:/opt/tulius/django_h2
     command: bash -c "pip install -e /opt/tulius/django_h2 && python -m django_h2 --serve_static"
