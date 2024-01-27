@@ -35,6 +35,6 @@ gunicorn == 21.2.0
 uvicorn == 0.20.0
 websockets == 10.4
 h2
-django_h2 @ git+https://github.com/kozzztik/django_h2.git@main
+django_h2 @ git+https://github.com/kozzztik/django_h2.git@324edc8
 
 portalocker == 2.7.0
