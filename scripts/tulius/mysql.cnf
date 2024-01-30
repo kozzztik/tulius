@@ -23,11 +23,6 @@ thread_cache_size       = 16
 max_connections         = 250
 table_open_cache        = 1000
 #thread_concurrency     = 10
-#
-# * Query Cache Configuration
-#
-query_cache_limit       = 1M
-query_cache_size        = 100M
 # InnoDB
 innodb_flush_log_at_trx_commit = 0
 innodb_buffer_pool_size = 300M

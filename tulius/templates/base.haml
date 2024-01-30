@@ -16,17 +16,7 @@
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/js/jquery.history.js'}
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/jquery-lightbox/js/lightbox.js'}
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/js/autocomplete-select.js'}
-    %script{type: 'text/javascript', src: '{{ STATIC_URL }}websockets/ws4redis.js'}
-    <script type='text/javascript'>
-        var w_schema = window.location.protocol == 'https:' ? 'wss://' : 'ws://';
-        var websocket_uri = w_schema + window.location.host + "{% url "websockets:old" %}";
-        {% if not request.user.is_anonymous %}
-        var last_read_pm_id = {{ request.user.last_read_pm_id }};
-        {% else %}
-        var last_read_pm_id = 0;
-        {% endif %}
-    </script>
-        %script{type: 'text/javascript', src: '{{ STATIC_URL }}websockets/websockets.js'}
+    %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/components/sse.js'}
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}tulius/js/menu.js'}
     %script{type: 'text/javascript', src: '{{ STATIC_URL }}common/js/jquery.formset.js'}
 

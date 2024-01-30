@@ -15,6 +15,7 @@ export default LazyComponent('forum_thread_comments', {
             delete_comment_message: '',
             old_page: null,
             old_thread: null,
+            sse: null,
         }
     },
     computed: {
@@ -31,18 +32,18 @@ export default LazyComponent('forum_thread_comments', {
     },
     methods: {
         subscribe_comments() {
-            if (this.thread.id)
-                this.$root.$socket.sendObj({action: 'subscribe_comments', id: this.thread.id});
-        },
-        unsubscribe_comments() {
             if (this.thread.id) {
-                this.$root.$socket.sendObj({action: 'unsubscribe_comments', id: this.thread.id})
+                this.sse = new EventSource(this.thread.url + 'comments_sse/');
+                this.sse.addEventListener("thread_comments", (event) => {
+                    const content = JSON.parse(event.data);
+                    if (content['.action'] == 'new_comment')
+                        this.new_comment_event(content);
+                });
             }
-            delete this.$options.sockets.onmessage
         },
-        websock_message(msg) {
-            var data = JSON.parse(msg.data);
-            if ((data['.namespaced'] != 'thread_comments') || (data.parent_id != this.thread.id)) return;
+        new_comment_event(data) {
+            if (data.parent_id != this.thread.id)
+                return;
             if (data.page > this.pagination.pages_count) {
                 this.pagination.pages_count = this.pagination.pages_count + 1;
                 this.pagination.pages.push(this.pagination.pages_count);
@@ -100,7 +101,6 @@ export default LazyComponent('forum_thread_comments', {
             this.update_likes();
         },
         load_api(pk, page) {
-            this.unsubscribe_comments();
             this.cleanup_reply_form();
             if (this.$parent.$refs.reply_form)
                 this.$parent.$refs.reply_form.hide();
@@ -204,11 +204,6 @@ export default LazyComponent('forum_thread_comments', {
         },
     },
     mounted() {
-        this.$parent.$options.sockets.onopen = this.subscribe_comments;
-        this.$parent.$options.sockets.onmessage = this.websock_message;
         this.load_api(this.thread.id, this.$route.query['page'] || 1)
-    },
-    beforeDestroy() {
-        this.unsubscribe_comments();
     },
 })

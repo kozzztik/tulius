@@ -10,6 +10,7 @@ from django.utils import timezone
 from djfw.news import models as news
 from djfw.flatpages import models as flatpage_models
 
+from tulius.core import sse
 from tulius.profile import views as profile_views
 from tulius.games import models as games
 from tulius import celery
@@ -85,3 +86,11 @@ class CeleryStatusAPI(generic.View):
             'stats': celery.app.control.inspect().stats() or {},
             'active': active,
         })
+
+
+def sse_channel_view(request):
+    names = [sse.CHANNEL_PUBLIC]
+    if request.user.is_authenticated:
+        names.append(sse.CHANNEL_USER.format(request.user.id))
+    channel = sse.RedisChannel(request.user, names, request)
+    return channel.response

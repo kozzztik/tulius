@@ -1,103 +1,78 @@
 import json
 
 import pytest
-
+from django_h2.test_client import AsyncClient
 from tulius.forum.threads import models
-from tulius.websockets.asgi.utils import AsyncClient
 
 
 @pytest.mark.asyncio
-async def test_comments_ws(thread, superuser, admin, user):
-    wss = {}
-    clients = {}
+async def test_comments_sse(thread, user, admin):
+    user_client = AsyncClient()
+    admin_client = AsyncClient()
+    user_client.cookies = user.cookies
+    admin_client.cookies = admin.cookies
+    sse = await user_client.sse(thread['url'] + 'comments_sse/')
+    assert sse.status_code == 200
     try:
-        for u in [superuser, admin, user]:
-            clients[u] = client = AsyncClient()
-            client.cookies = u.cookies
-            wss[u] = await client.ws('/api/ws/')
-            response = await client.get(thread['url'])
-            assert response.status_code == 200
-        await wss[user].send_text(json.dumps({
-            'action': 'subscribe_comments', 'id': thread['id']}))
+        response = await user_client.get(thread['url'])
+        assert response.status_code == 200
         # post comment to thread
-        response = await clients[admin].post(
+        response = await admin_client.post(
             thread['url'] + 'comments_page/', {
                 'reply_id': thread['first_comment_id'],
                 'title': 'ho ho ho', 'body': 'happy new year',
                 'media': {},
-            })
+            },
+            content_type='application/json'
+        )
         assert response.status_code == 200
-        data = await wss[user].receive_text()
-        data = json.loads(data)
-        assert data['.namespaced'] == 'thread_comments'
+        event = await sse.events.__anext__()
+        assert event['event'] == 'thread_comments'
+        data = json.loads(event['data'])
         assert data['.action'] == 'new_comment'
         assert data['parent_id'] == thread['id']
-        assert wss[admin].send_queue == []
-        assert wss[superuser].send_queue == []
-        # again, but unsubscribe
-        await wss[user].send_text(json.dumps({
-            'action': 'unsubscribe_comments', 'id': thread['id']}))
-        await wss[superuser].send_text(json.dumps({
-            'action': 'subscribe_comments', 'id': thread['id']}))
-        response = await clients[admin].post(
-            thread['url'] + 'comments_page/', {
-                'reply_id': thread['first_comment_id'],
-                'title': 'ho ho ho', 'body': 'happy new year2',
-                'media': {},
-            })
-        assert response.status_code == 200
-        data = await wss[superuser].receive_text()
-        data = json.loads(data)
-        assert data['.namespaced'] == 'thread_comments'
-        assert data['.action'] == 'new_comment'
-        assert data['parent_id'] == thread['id']
-        assert wss[user].send_queue == []
-        assert wss[admin].send_queue == []
     finally:
-        for u in wss.values():
-            u.close()
+        sse.close()
 
 
 @pytest.mark.asyncio
-async def test_comments_ws_no_rights(room_group, superuser, admin, user):
-    client = AsyncClient()
-    client.cookies = admin.cookies
-    response = await client.put(
-        room_group['url'], {
+async def test_comments_sse_no_rights(room_group, superuser, admin, user):
+    admin_client = AsyncClient()
+    admin_client.cookies = admin.cookies
+    response = await admin_client.put(
+        room_group['url'],
+        {
             'title': 'thread', 'body': 'thread description',
             'room': False, 'default_rights': models.NO_ACCESS,
-            'granted_rights': [], 'important': False, 'media': {}})
+            'granted_rights': [], 'important': False, 'media': {}
+        },
+        content_type='application/json'
+    )
     assert response.status_code == 200
     thread = response.json()
-    wss = {}
-    clients = {}
+    user_client = AsyncClient()
+    user_client.cookies = user.cookies
+    response = await user_client.sse(thread['url'] + 'comments_sse/')
+    assert response.status_code == 403
+    superuser_client = AsyncClient()
+    superuser_client.cookies = superuser.cookies
+    sse = await superuser_client.sse(thread['url'] + 'comments_sse/')
+    assert sse.status_code == 200
     try:
-        for u in [superuser, admin, user]:
-            clients[u] = client = AsyncClient()
-            client.cookies = u.cookies
-            wss[u] = await client.ws('/api/ws/')
-            response = await client.get(thread['url'])
-            if u is user:
-                assert response.status_code == 403
-            else:
-                assert response.status_code == 200
-            await wss[u].send_text(json.dumps({
-                'action': 'subscribe_comments', 'id': thread['id']}))
-        # post comment to thread
-        response = await clients[admin].post(
-            thread['url'] + 'comments_page/', {
+        response = await admin_client.post(
+            thread['url'] + 'comments_page/',
+            {
                 'reply_id': thread['first_comment_id'],
                 'title': 'ho ho ho', 'body': 'happy new year',
                 'media': {},
-            })
+            },
+            content_type='application/json'
+        )
         assert response.status_code == 200
-        for u in [superuser, admin]:
-            data = await wss[u].receive_text()
-            data = json.loads(data)
-            assert data['.namespaced'] == 'thread_comments'
-            assert data['.action'] == 'new_comment'
-            assert data['parent_id'] == thread['id']
-        assert wss[user].send_queue == []
+        event = await sse.events.__anext__()
+        assert event['event'] == 'thread_comments'
+        data = json.loads(event['data'])
+        assert data['.action'] == 'new_comment'
+        assert data['parent_id'] == thread['id']
     finally:
-        for u in wss.values():
-            u.close()
+        sse.close()

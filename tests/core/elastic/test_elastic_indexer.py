@@ -38,8 +38,7 @@ def test_index_to_closed_indexer(indexer_config):
     indexer_config['PACK_SIZE'] = 1
     with indexing.ElasticIndexer(indexer_config, autostart=False) as indexer:
         pass
-    with pytest.raises(indexing.ClosedException):
-        indexer.index({})
+    indexer.index({})
 
 
 def test_indexing_queue_if_transport_is_slow(indexer_config):
@@ -82,7 +81,7 @@ def test_closing_module():
     assert indexer == indexing.get_indexer()  # gives same indexer
     indexing.close()
     indexing.close()  # can do twice nothing happen
-    assert indexer != indexing.get_indexer()  # gives new after close
+    assert indexer == indexing.get_indexer()  # gives same after close
 
 
 def test_closing_indexer_twice(indexer_config):

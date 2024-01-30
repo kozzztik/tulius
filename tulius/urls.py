@@ -105,9 +105,7 @@ urlpatterns = [
     urls.re_path(
         r'^counters/', urls.include(
             'tulius.counters.urls', namespace='counters')),
-    urls.re_path(
-        r'^api/ws/', urls.include(
-            'tulius.websockets.urls', namespace='websockets')),
+    urls.re_path(r'^api/sse/$', views.sse_channel_view, name='sse_channel'),
 ]
 
 handler404 = 'tulius.views.error404'
