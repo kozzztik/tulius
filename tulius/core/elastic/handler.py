@@ -10,9 +10,18 @@ from tulius.core.elastic import indexing
 
 
 class Handler(logging.Handler):
-    def __init__(self, index_name=None, level=logging.NOTSET, autostart=True, **indexer_config):
+    def __init__(
+            self,
+            index_name=None,
+            level=logging.NOTSET,
+            autostart=True,
+            **indexer_config
+    ):
         self._index_name = index_name or '{logger}'
-        self._indexer = indexing.ElasticIndexer(indexer_config, autostart=autostart)
+        self._indexer = indexing.ElasticIndexer(
+            indexer_config,
+            autostart=autostart
+        )
         super().__init__(level=level)
 
     def get_index_name(self, tstamp, record):
