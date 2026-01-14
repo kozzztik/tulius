@@ -1,4 +1,5 @@
 import logging
+import os
 
 from unittest import mock
 
@@ -6,12 +7,16 @@ from tulius.core.elastic import indexing
 from tulius.core.elastic import handler
 
 
-def test_log_objects():
+def test_log_objects(tmp_path):
+    config = {
+        'BASE_DIR': os.path.join(tmp_path, 'queue'),
+        'HOSTS': 'http://127.0.0.1:9200'
+    }
     logger = logging.Logger(__name__)
     logger.propagate = False
-    logger.handlers = [handler.Handler()]
+    logger.handlers = [handler.Handler(autostart=False, **config)]
     index = mock.MagicMock()
-    with mock.patch.object(indexing.get_indexer(), 'index', index):
+    with mock.patch.object(indexing.ElasticIndexer, 'index', index):
         logger.error('Test', extra={'obj': object()})
     assert index.called
     record = index.call_args[0][0]
@@ -19,12 +24,16 @@ def test_log_objects():
     assert '<object object at ' in record['obj']
 
 
-def test_log_exception():
+def test_log_exception(tmp_path):
+    config = {
+        'BASE_DIR': os.path.join(tmp_path, 'queue'),
+        'HOSTS': 'http://127.0.0.1:9200'
+    }
     logger = logging.Logger(__name__)
     logger.propagate = False
-    logger.handlers = [handler.Handler()]
+    logger.handlers = [handler.Handler(autostart=False, **config)]
     index = mock.MagicMock()
-    with mock.patch.object(indexing.get_indexer(), 'index', index):
+    with mock.patch.object(indexing.ElasticIndexer, 'index', index):
         try:
             raise ValueError('Test')
         except ValueError as exc:

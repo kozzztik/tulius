@@ -10,8 +10,9 @@ from tulius.core.elastic import indexing
 
 
 class Handler(logging.Handler):
-    def __init__(self, index_name=None, level=logging.NOTSET):
+    def __init__(self, index_name=None, level=logging.NOTSET, autostart=True, **indexer_config):
         self._index_name = index_name or '{logger}'
+        self._indexer = indexing.ElasticIndexer(indexer_config, autostart=autostart)
         super().__init__(level=level)
 
     def get_index_name(self, tstamp, record):
@@ -34,7 +35,7 @@ class Handler(logging.Handler):
         message.update(self.get_extra_fields(record))
         if record.exc_info:
             message.update(self.get_debug_fields(record))
-        indexing.get_indexer().index(message)
+        self._indexer.index(message)
 
     @staticmethod
     def get_extra_fields(record):

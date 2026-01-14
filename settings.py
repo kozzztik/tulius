@@ -184,6 +184,7 @@ ELASTIC_MODELS = (
 )
 
 ELASTIC_INDEXING = {
+    'HOSTS': ELASTIC_HOSTS,
     'BASE_DIR': os.path.join(BASE_DIR, 'data', 'indexing'),
     'SEND_PERIOD': 15,
     'PACK_SIZE': 1000,
@@ -229,7 +230,8 @@ LOGGING = {
         'elastic_search': {
             'level': 'DEBUG',
             'class': 'tulius.core.elastic.handler.Handler',
-            'index_name': 'logging_{year}_{month:02}'
+            'index_name': 'logging_{year}_{month:02}',
+            **ELASTIC_INDEXING
         },
     },
     'loggers': {

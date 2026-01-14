@@ -1,7 +1,6 @@
 import logging
 
 import elasticsearch8
-from django.conf import settings
 from django.utils import module_loading
 from django.core import exceptions
 
@@ -38,7 +37,7 @@ class ElasticTransport(BaseTransport):
         super().__init__(config)
         self.timeout = self.config.get('TIMEOUT', 60)
         self.client = elasticsearch8.Elasticsearch(
-            hosts=settings.ELASTIC_HOSTS, request_timeout=self.timeout)
+            hosts=config['HOSTS'], request_timeout=self.timeout)
 
     def init_indexing(self):
         try:
