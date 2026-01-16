@@ -51,7 +51,7 @@ class ElasticIndexer:
     def start_indexing(self):
         if not self._thread:
             self._stop_indexing = False
-            self._thread = threading.Thread(target=self._run)
+            self._thread = threading.Thread(target=self._run, daemon=True)
             self._thread.start()
 
     def stop_indexing(self):

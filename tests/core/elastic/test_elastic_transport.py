@@ -58,6 +58,7 @@ def es_index_template_fixture():
 
 def test_full_cycle(tmp_path, es_index, es_index_template):
     config = {
+        'HOSTS': settings.ELASTIC_HOSTS,
         'BASE_DIR': os.path.join(tmp_path, 'queue'),
         'INDEX_TEMPLATES': {
             # this checks that invalid templates doesn't brake indexing
@@ -129,6 +130,7 @@ def test_full_cycle(tmp_path, es_index, es_index_template):
 
 def test_completely_invalid_templates(tmp_path, es_index):
     config = {
+        'HOSTS': settings.ELASTIC_HOSTS,
         'BASE_DIR': tmp_path,
         'INDEX_TEMPLATES': object(),
         'PACK_SIZE': 1,
@@ -151,6 +153,7 @@ def test_completely_invalid_templates(tmp_path, es_index):
 
 def test_doc_no_index(tmp_path):
     config = {
+        'HOSTS': settings.ELASTIC_HOSTS,
         'BASE_DIR': tmp_path,
         'PACK_SIZE': 1,
     }
@@ -171,6 +174,7 @@ def test_doc_no_index(tmp_path):
 
 def test_connection_refused(tmp_path, es_index):
     config = {
+        'HOSTS': settings.ELASTIC_HOSTS,
         'BASE_DIR': tmp_path,
         'PACK_SIZE': 1,
     }

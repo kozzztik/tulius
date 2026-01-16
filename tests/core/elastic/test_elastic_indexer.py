@@ -22,7 +22,8 @@ def _test_indexer_config(tmp_path):
 
 def test_creating_dirs(tmp_path):
     config = {
-        'BASE_DIR': os.path.join(tmp_path, 'queue')
+        'BASE_DIR': os.path.join(tmp_path, 'queue'),
+        'HOSTS': 'http://127.0.0.1:9200'
     }
     assert not os.path.exists(config['BASE_DIR'])
     with indexing.ElasticIndexer(config, autostart=False):
