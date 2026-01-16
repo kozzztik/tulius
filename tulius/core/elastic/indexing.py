@@ -53,6 +53,8 @@ class ElasticIndexer:
             self._stop_indexing = False
             self._thread = threading.Thread(target=self._run, daemon=True)
             self._thread.start()
+        else:
+            logger.warning('Indexing already started')
 
     def stop_indexing(self):
         if self._thread:
@@ -224,6 +226,7 @@ class ElasticIndexer:
 
     def _run(self):
         transport_inited = False
+        logger.warning('Indexing started pid %s', os.getpid())
         while True:
             try:
                 if self._stop_indexing:
