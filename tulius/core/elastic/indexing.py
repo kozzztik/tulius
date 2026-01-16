@@ -22,6 +22,9 @@ class ClosedException(Exception):
 
 
 class ElasticIndexer:
+    _thread = None
+    _stop_indexing = False
+
     def __init__(self, config, autostart=True):
         self.config = config.copy()
         self.send_period = self.config.get('SEND_PERIOD', 15)
@@ -29,23 +32,28 @@ class ElasticIndexer:
         self.file_size_limit = self.config.get(
             'FILE_SIZE_LIMIT', 1024 * 1024 * 50)
         self._closing = False
-        cls = self.config.get('transport', transport.ElasticTransport)
-        if isinstance(cls, str):
-            cls = module_loading.import_string(cls)
-        self.transport: transport.BaseTransport | None = cls(self.config)
+        self._transport_cls = self.config.get('transport', transport.ElasticTransport)
+        if isinstance(self._transport_cls, str):
+            self._transport_cls = module_loading.import_string(self._transport_cls)
         self._base_dir = self.config['BASE_DIR']
         os.makedirs(self._base_dir, exist_ok=True)
         self.dead_queue_dir = self.config.setdefault(
             'DEAD_QUEUE_DIR', os.path.join(self._base_dir, 'dead'))
         os.makedirs(self.dead_queue_dir, exist_ok=True)
+        self.file_send_signal = signals.Signal()
+        self.autostart = autostart
+        self._init()
+
+    def _init(self):
+        self.pid = os.getpid()
+        self.transport: transport.BaseTransport | None =  self._transport_cls(self.config)
         self._lock = threading.Lock()
         self._work_files = []
         self._waiter = threading.Event()
         self._dead_queue_file = None
         self._thread = None
         self._stop_indexing = False
-        self.file_send_signal = signals.Signal()
-        if autostart:
+        if self.autostart:
             self.start_indexing()
 
     def start_indexing(self):
@@ -81,6 +89,10 @@ class ElasticIndexer:
     def index(self, data):
         if self._closing:
             raise ClosedException()
+        if self.pid != os.getpid():
+            # we are in new process (after fork)
+            logger.info('Reinit indexing (process changed)')
+            self._init()
         with self._lock:
             if not self._work_files:
                 self._work_files.append(files.WorkFile(
