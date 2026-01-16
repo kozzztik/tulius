@@ -8,6 +8,7 @@ from django.core import exceptions
 from ua_parser import user_agent_parser
 
 logger = logging.getLogger('profiler')
+django_logger = logging.getLogger('django.request')
 
 
 def get_user_data(request):
@@ -38,8 +39,7 @@ def get_user_data(request):
         if os['minor']:
             result['os_version'] += '.' + os['minor']
     except Exception:
-        logger = logging.getLogger('django.request')
-        logger.error(
+        django_logger.error(
             'Cant parse user agent %s',
             request.META.get('HTTP_USER_AGENT'))
     return result
