@@ -1,6 +1,3 @@
-import datetime
-import uuid
-
 import asyncio
 import threading
 import time
@@ -10,7 +7,7 @@ from django import http
 from django.core import exceptions
 from ua_parser import user_agent_parser
 
-from tulius.core.elastic import indexing
+logger = logging.getLogger('profiler')
 
 
 def get_user_data(request):
@@ -61,38 +58,35 @@ def log_record(request, exec_time, response):
         host = request.get_host()
     except exceptions.DisallowedHost:
         pass
-    now = datetime.datetime.utcnow()
-    indexing.get_indexer().index({
-        '_action': 'index',
-        '_index': f'requests_{now.year}_{now.month:02}',
-        '_id': str(uuid.uuid4()),
-        '@timestamp': now.isoformat(),
-        'message': request.path,
-        'scheme': request.scheme,
-        'host': host,
-        'method': request.method,
-        'status_code': response.status_code,
-        'content_length': content_length,
-        **({
-            'app_name': request.resolver_match.app_name,
-            'url_name': request.resolver_match.url_name,
-            'view_name': request.resolver_match.view_name,
-            'url_args': [str(arg) for arg in request.resolver_match.args],
-            'url_kwargs': [{
-                'name': name,
-                'value': str(value)
-            } for name, value in request.resolver_match.kwargs.items()]
-        } if request.resolver_match else {}),
-        'user': {
-            'id': user.id,
-            'title': user.username
-        } if user and user.is_authenticated else None,
-        'exec_time': exec_time / 1000000,
-        'thread_id': threading.current_thread().ident,
-        'ip': request.META['REMOTE_ADDR'],
-        **get_user_data(request),
-        **request.profiling_data,
-    })
+    logger.info(
+        request.path,
+        extra={
+            'scheme': request.scheme,
+            'host': host,
+            'method': request.method,
+            'status_code': response.status_code,
+            'content_length': content_length,
+            **({
+                'app_name': request.resolver_match.app_name,
+                'url_name': request.resolver_match.url_name,
+                'view_name': request.resolver_match.view_name,
+                'url_args': [str(arg) for arg in request.resolver_match.args],
+                'url_kwargs': [{
+                    'name': name,
+                    'value': str(value)
+                } for name, value in request.resolver_match.kwargs.items()]
+            } if request.resolver_match else {}),
+            'user': {
+                'id': user.id,
+                'title': user.username
+            } if user and user.is_authenticated else None,
+            'exec_time': exec_time / 1000000,
+            'thread_id': threading.current_thread().ident,
+            'ip': request.META['REMOTE_ADDR'],
+            **get_user_data(request),
+            **request.profiling_data,
+        }
+    )
 
 
 def profiler_middleware(get_response):

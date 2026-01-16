@@ -23,7 +23,7 @@ def test_profiler_minor_versions(client):
     })
     index = mock.MagicMock()
     with mock.patch.object(user_agent_parser, 'Parse', parser):
-        with mock.patch.object(indexing._indexer, 'index', index):
+        with mock.patch.object(indexing.ElasticIndexer, 'index', index):
             response = client.get('/')
     assert response.status_code == 200
     assert index.called
