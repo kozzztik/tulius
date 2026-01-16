@@ -64,7 +64,7 @@ def log_record(request, exec_time, response):
     now = datetime.datetime.utcnow()
     indexing.get_indexer().index({
         '_action': 'index',
-        '_index': f'requests_{now.year}_{now.month}',
+        '_index': f'requests_{now.year}_{now.month:02}',
         '_id': str(uuid.uuid4()),
         '@timestamp': now.isoformat(),
         'message': request.path,
