@@ -233,6 +233,12 @@ LOGGING = {
             'index_name': 'logging_{year}_{month:02}',
             **ELASTIC_INDEXING
         },
+        'elastic_profiler': {
+            'level': 'DEBUG',
+            'class': 'tulius.core.elastic.handler.Handler',
+            'index_name': 'requests_{year}_{month:02}',
+            **ELASTIC_INDEXING
+        },
     },
     'loggers': {
         'django.db.backends': {
@@ -259,6 +265,11 @@ LOGGING = {
             'level': 'DEBUG' if env in ['dev', 'local_docker'] else 'WARNING',
             'propagate': True,
         },
+        'profiler': {
+            'handlers': ['elastic_profiler'],
+            'level': 'DEBUG',
+            'propagate': False,
+        }
     },
     'root': {
         'handlers':
