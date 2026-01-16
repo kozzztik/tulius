@@ -46,7 +46,7 @@ class ElasticIndexer:
 
     def _init(self):
         self.pid = os.getpid()
-        self.transport: transport.BaseTransport | None =  self._transport_cls(self.config)
+        self.transport: transport.BaseTransport | None = self._transport_cls(self.config)
         self._lock = threading.Lock()
         self._work_files = []
         self._waiter = threading.Event()
