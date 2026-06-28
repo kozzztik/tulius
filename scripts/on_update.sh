@@ -14,9 +14,9 @@ fi
 echo "Stop existing compose"
 cd scripts/tulius/$ENV
 # First stop web then wait till celery will finish all tasks
-docker-compose stop web
-docker-compose exec celery python manage.py wait_celery || true
-docker-compose down --remove-orphans
+docker compose stop web
+docker compose exec celery python manage.py wait_celery || true
+docker compose down --remove-orphans
 docker system prune -a --force
 docker rm -v $(docker ps --filter status=exited -q 2>/dev/null) 2>/dev/null || true
 docker rmi $(docker images --filter dangling=true -q 2>/dev/null) 2>/dev/null || true
@@ -43,7 +43,7 @@ docker run \
 echo "Run compose"
 
 cd scripts/tulius/$ENV
-docker-compose up -d --build --force-recreate
+docker compose up -d --build --force-recreate
 cd $ROOTDIR
 
 echo "Done."
