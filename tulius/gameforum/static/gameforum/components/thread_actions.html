@@ -103,6 +103,7 @@
     <forum_edit_room ref="edit_room" :thread="thread" :page="$parent" :extra_fields="['id','user']" v-if="thread.room">
         <template v-slot:before_form="slotProps">
             <game_forum_role_selector :variation="variation" :thread="thread" :form="slotProps.form" :editor="false"></game_forum_role_selector>
+            <game_forum_role_selector :variation="variation" :thread="thread" :form="slotProps.form" :editor="true"></game_forum_role_selector>
         </template>
     </forum_edit_room>
 
